@@ -154,13 +154,12 @@ jobs:
           if [ -n "$CLASSES_JS" ]; then
             cp "$CLASSES_JS" public/classes.js
             echo "classes.js copied from $CLASSES_JS ($(stat -c%s public/classes.js) bytes)"
-          elif [ ! -f public/classes.js ]; then
-            echo "classes.js not found - generating build placeholder"
+          elif [ -f public/classes.js ] && [ $(stat -c%s public/classes.js) -gt 500 ]; then
+            echo "Using existing public/classes.js stub ($(stat -c%s public/classes.js) bytes)"
+          else
+            echo "classes.js not found and no stub in repo - generating minimal placeholder"
             echo '// EaglerCraftX 26.1.2 - Build Stub' > public/classes.js
-            echo '// This file will be replaced by the actual TeaVM compilation output.' >> public/classes.js
-            echo '// Run the full build pipeline with a Minecraft 26.1.2 JAR to generate it.' >> public/classes.js
             echo 'console.warn("[EaglerCraftX] Build stub loaded. Full compilation required.");' >> public/classes.js
-            echo 'if (window.__eaglercraftLoadingProgress) { window.__eaglercraftLoadingProgress(100, "Build stub"); }' >> public/classes.js
           fi
 
           # Copy source map if available (check both paths)

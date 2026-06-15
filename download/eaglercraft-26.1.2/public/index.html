@@ -157,12 +157,14 @@
 
         window.__eaglercraftLoadingProgress = function(pct, text) {
             setProgress(pct, text);
-            if (pct >= 100) {
-                setTimeout(function() {
-                    loadingScreen.classList.add("hidden");
-                    setTimeout(function() { loadingScreen.style.display = "none"; }, 500);
-                }, 300);
-            }
+        };
+
+        // Called by the real game when it's ready to show the canvas
+        window.__eaglercraftReady = function() {
+            setTimeout(function() {
+                loadingScreen.classList.add("hidden");
+                setTimeout(function() { loadingScreen.style.display = "none"; }, 500);
+            }, 300);
         };
 
         window.onerror = function(msg, url, line, col, err) {
