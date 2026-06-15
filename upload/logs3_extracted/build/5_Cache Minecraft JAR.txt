@@ -1,0 +1,19 @@
+﻿2026-06-15T18:48:47.2660779Z ##[group]Run actions/cache@v4
+2026-06-15T18:48:47.2661093Z with:
+2026-06-15T18:48:47.2661472Z   path: minecraft-26.1.2.jar
+2026-06-15T18:48:47.2661743Z   key: minecraft-26.1.2-jar-v1
+2026-06-15T18:48:47.2662046Z   enableCrossOsArchive: false
+2026-06-15T18:48:47.2662308Z   fail-on-cache-miss: false
+2026-06-15T18:48:47.2662555Z   lookup-only: false
+2026-06-15T18:48:47.2662783Z   save-always: false
+2026-06-15T18:48:47.2663002Z env:
+2026-06-15T18:48:47.2663204Z   JAVA_VERSION: 25
+2026-06-15T18:48:47.2663426Z   NODE_VERSION: 22
+2026-06-15T18:48:47.2663662Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T18:48:47.2663967Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T18:48:47.2664367Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:48:47.2664864Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:48:47.2665251Z ##[endgroup]
+2026-06-15T18:48:47.3760072Z (node:2342) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T18:48:47.3761311Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T18:48:47.4865133Z Cache not found for input keys: minecraft-26.1.2-jar-v1

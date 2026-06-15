@@ -1,0 +1,34 @@
+﻿2026-06-15T18:48:52.6560581Z ##[group]Run chmod +x gradlew 2>/dev/null || true
+2026-06-15T18:48:52.6561012Z [36;1mchmod +x gradlew 2>/dev/null || true[0m
+2026-06-15T18:48:52.6561466Z [36;1mchmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true[0m
+2026-06-15T18:48:52.6562400Z [36;1mchmod +x build_init.sh build_compile.sh build_dist.sh build_clean.sh build_workspace.sh CompileLatestClient.sh 2>/dev/null || true[0m
+2026-06-15T18:48:52.6596753Z shell: /usr/bin/bash -e {0}
+2026-06-15T18:48:52.6597082Z env:
+2026-06-15T18:48:52.6597321Z   JAVA_VERSION: 25
+2026-06-15T18:48:52.6597577Z   NODE_VERSION: 22
+2026-06-15T18:48:52.6597852Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T18:48:52.6598192Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T18:48:52.6598636Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:48:52.6599182Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:48:52.6599654Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T18:48:52.6600064Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T18:48:52.6600394Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T18:48:52.6600738Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T18:48:52.6601233Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T18:48:52.6601765Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T18:48:52.6602131Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T18:48:52.6602444Z ##[endgroup]
+2026-06-15T18:48:52.6713804Z 
+2026-06-15T18:48:52.6714769Z Setting execute permissions on shell scripts...
+2026-06-15T18:48:52.6715213Z 
+2026-06-15T18:48:52.6727337Z [0;32m[CHMOD][0m chmod +x build_init.sh
+2026-06-15T18:48:52.6737863Z [0;32m[CHMOD][0m chmod +x build_workspace.sh
+2026-06-15T18:48:52.6749791Z [0;32m[CHMOD][0m chmod +x build_compile.sh
+2026-06-15T18:48:52.6761985Z [0;32m[CHMOD][0m chmod +x build_dist.sh
+2026-06-15T18:48:52.6773514Z [0;32m[CHMOD][0m chmod +x build_clean.sh
+2026-06-15T18:48:52.6784347Z [0;32m[CHMOD][0m chmod +x CompileLatestClient.sh
+2026-06-15T18:48:52.6794897Z [0;32m[CHMOD][0m chmod +x run_chmod.sh
+2026-06-15T18:48:52.6795269Z 
+2026-06-15T18:48:52.6796726Z [0;36m[CHMOD][0m Scanning for additional shell scripts...
+2026-06-15T18:48:52.6833184Z 
+2026-06-15T18:48:52.6833987Z [0;32m[CHMOD][0m All shell scripts now have execute permissions.

@@ -1,0 +1,7 @@
+﻿2026-06-15T18:49:40.8928400Z Post job cleanup.
+2026-06-15T18:49:41.0231835Z (node:3130) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T18:49:41.0232838Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T18:49:41.0437645Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T18:49:41.1842541Z (node:3130) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-15T18:49:41.4069682Z Sent 186770 of 186770 (100.0%), 0.8 MBs/sec
+2026-06-15T18:49:41.7108216Z Cache saved with the key: setup-java-Linux-x64-gradle-1670d76cddc232df15007a2166de0f396104d52d071bc0a147ddada22dbb3a49
