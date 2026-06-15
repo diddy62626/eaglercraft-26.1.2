@@ -1,0 +1,22 @@
+﻿2026-06-15T19:01:25.1404720Z ##[group]Run actions/setup-node@v4
+2026-06-15T19:01:25.1405042Z with:
+2026-06-15T19:01:25.1405243Z   node-version: 22
+2026-06-15T19:01:25.1405469Z   always-auth: false
+2026-06-15T19:01:25.1406038Z   check-latest: false
+2026-06-15T19:01:25.1409264Z   token: ***
+2026-06-15T19:01:25.1409480Z env:
+2026-06-15T19:01:25.1409672Z   JAVA_VERSION: 25
+2026-06-15T19:01:25.1409883Z   NODE_VERSION: 22
+2026-06-15T19:01:25.1410108Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:25.1410417Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:25.1410806Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:25.1411297Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:25.1411686Z ##[endgroup]
+2026-06-15T19:01:25.2778006Z Found in cache @ /opt/hostedtoolcache/node/22.22.3/x64
+2026-06-15T19:01:25.2781801Z (node:2338) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:01:25.2783293Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:01:25.2785105Z ##[group]Environment details
+2026-06-15T19:01:28.4975479Z node: v22.22.3
+2026-06-15T19:01:28.4976442Z npm: 10.9.8
+2026-06-15T19:01:28.4976769Z yarn: 1.22.22
+2026-06-15T19:01:28.4977559Z ##[endgroup]

@@ -1,0 +1,92 @@
+﻿2026-06-15T19:02:13.7932143Z ##[group]Run ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true
+2026-06-15T19:02:13.7932964Z [36;1m./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true[0m
+2026-06-15T19:02:13.7933473Z [36;1m[0m
+2026-06-15T19:02:13.7933890Z [36;1m# Check if classes.js was produced (TeaVM 0.15.0 outputs to build/generated/teavm/js/)[0m
+2026-06-15T19:02:13.7934385Z [36;1mCLASSES_JS=""[0m
+2026-06-15T19:02:13.7934867Z [36;1mfor path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do[0m
+2026-06-15T19:02:13.7935396Z [36;1m  if [ -f "$path" ]; then[0m
+2026-06-15T19:02:13.7935993Z [36;1m    CLASSES_JS="$path"[0m
+2026-06-15T19:02:13.7936465Z [36;1m    echo "classes.js found at: $path ($(stat -c%s "$path") bytes)"[0m
+2026-06-15T19:02:13.7936897Z [36;1m    break[0m
+2026-06-15T19:02:13.7937158Z [36;1m  fi[0m
+2026-06-15T19:02:13.7937393Z [36;1mdone[0m
+2026-06-15T19:02:13.7937643Z [36;1mif [ -z "$CLASSES_JS" ]; then[0m
+2026-06-15T19:02:13.7938093Z [36;1m  echo "TeaVM compilation not yet complete - will generate stub"[0m
+2026-06-15T19:02:13.7938502Z [36;1mfi[0m
+2026-06-15T19:02:13.7969410Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:02:13.7969719Z env:
+2026-06-15T19:02:13.7969965Z   JAVA_VERSION: 25
+2026-06-15T19:02:13.7970225Z   NODE_VERSION: 22
+2026-06-15T19:02:13.7970489Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:13.7970847Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:13.7971314Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:13.7971851Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:13.7972320Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:13.7972682Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:13.7973036Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:13.7973387Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:13.7973880Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:13.7974426Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:13.7974804Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:13.7975119Z ##[endgroup]
+2026-06-15T19:02:14.1817945Z WARNING: A restricted method in java.lang.System has been called
+2026-06-15T19:02:14.1821551Z WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/native-platform-0.22-milestone-29.jar)
+2026-06-15T19:02:14.1824820Z WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+2026-06-15T19:02:14.1827113Z WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+2026-06-15T19:02:14.1828550Z 
+2026-06-15T19:02:14.1858993Z Initialized native services in: /home/runner/.gradle/native
+2026-06-15T19:02:14.1889231Z Initialized jansi services in: /home/runner/.gradle/native
+2026-06-15T19:02:14.3132407Z The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+2026-06-15T19:02:14.3162331Z Wanted: DaemonRequestContext{jvmCriteria=/usr/lib/jvm/temurin-25-jdk-amd64 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:+UseG1GC, -XX:+HeapDumpOnOutOfMemoryError, --enable-preview, -Xmx2G, -Dfile.encoding=UTF-8, -Duser.country, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+2026-06-15T19:02:14.3165581Z Actual: DefaultDaemonContext[uid=f1917082-46a3-46a6-959e-76a2542c4be6,javaHome=/usr/lib/jvm/temurin-25-jdk-amd64,javaVersion=25,javaVendor=Eclipse Adoptium,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=false,nativeServicesMode=ENABLED,daemonOpts=-XX:+UseG1GC,-Xmx4g,-Dfile.encoding=UTF-8,-Duser.country,-Duser.language=en,-Duser.variant]
+2026-06-15T19:02:14.3167636Z 
+2026-06-15T19:02:14.4123575Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T19:02:14.5135450Z Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/9.5.1 Command: /usr/lib/jvm/temurin-25-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError --enable-preview -Xmx2G -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/gradle-daemon-main-9.5.1.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/agents/gradle-instrumentation-agent-9.5.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.5.1
+2026-06-15T19:02:14.5146009Z Successfully started process 'Gradle build daemon'
+2026-06-15T19:02:15.3140166Z An attempt to start the daemon took 0.893 secs.
+2026-06-15T19:02:15.4124440Z The client will now receive all logging from the daemon (pid: 2740). The daemon log file: /home/runner/.gradle/daemon/9.5.1/daemon-2740.out.log
+2026-06-15T19:02:15.4125334Z Daemon will be stopped at the end of the build 
+2026-06-15T19:02:15.8121922Z Using 4 worker leases.
+2026-06-15T19:02:15.8129737Z Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+2026-06-15T19:02:16.1145971Z Received JVM installation metadata from '/usr/lib/jvm/temurin-25-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64, JAVA_VERSION=25.0.3, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.3+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.3+9-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+2026-06-15T19:02:16.4127390Z Watching the file system is configured to be enabled if available
+2026-06-15T19:02:16.4147453Z Now considering [/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2] as hierarchies to watch
+2026-06-15T19:02:16.4186528Z File system watching is active
+2026-06-15T19:02:17.4120357Z Starting Build
+2026-06-15T19:02:17.6121557Z Settings evaluated using settings file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/settings.gradle'.
+2026-06-15T19:02:17.8128066Z Using local directory build cache for the root build (location = /home/runner/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+2026-06-15T19:02:17.9120559Z Projects loaded. Root project using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:17.9138936Z Included projects: [root project 'eaglercraft-26.1.2', project ':buildtools', project ':sources']
+2026-06-15T19:02:18.9119611Z 
+2026-06-15T19:02:18.9148072Z > Configure project :
+2026-06-15T19:02:18.9167777Z Evaluating root project 'eaglercraft-26.1.2' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:18.9169560Z Resolved plugin [id: 'java']
+2026-06-15T19:02:18.9198931Z Resolved plugin [id: 'org.teavm', version: '0.15.0', apply: false]
+2026-06-15T19:02:19.3126827Z 
+2026-06-15T19:02:19.3166842Z > Configure project :buildtools
+2026-06-15T19:02:19.3182327Z Evaluating project ':buildtools' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/buildtools/build.gradle'.
+2026-06-15T19:02:19.3196938Z Resolved plugin [id: 'java']
+2026-06-15T19:02:19.4119642Z 
+2026-06-15T19:02:19.4127326Z > Configure project :sources
+2026-06-15T19:02:19.4129053Z Evaluating project ':sources' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle'.
+2026-06-15T19:02:19.4130439Z Resolved plugin [id: 'java']
+2026-06-15T19:02:19.4132665Z Resolved plugin [id: 'org.teavm', version: '0.15.0']
+2026-06-15T19:02:19.5121182Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1781550137199.json
+2026-06-15T19:02:19.5132548Z 
+2026-06-15T19:02:19.5133369Z FAILURE: Build failed with an exception.
+2026-06-15T19:02:19.5133992Z 
+2026-06-15T19:02:19.5134350Z * Where:
+2026-06-15T19:02:19.5135563Z Build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle' line: 97
+2026-06-15T19:02:19.5137014Z 
+2026-06-15T19:02:19.5137416Z * What went wrong:
+2026-06-15T19:02:19.5138423Z A problem occurred evaluating project ':sources'.
+2026-06-15T19:02:19.5139849Z > Could not set unknown property 'mainClass' for object of type org.teavm.gradle.TeaVMExtensionImpl.
+2026-06-15T19:02:19.5140799Z 
+2026-06-15T19:02:19.5141157Z * Try:
+2026-06-15T19:02:19.5141988Z > Run with --stacktrace option to get the stack trace.
+2026-06-15T19:02:19.5142998Z > Run with --debug option to get more log output.
+2026-06-15T19:02:19.5144320Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-06-15T19:02:19.5180259Z > Get more help at https://help.gradle.org.
+2026-06-15T19:02:19.5219172Z 
+2026-06-15T19:02:19.5266109Z BUILD FAILED in 5s
+2026-06-15T19:02:19.6836398Z TeaVM compilation not yet complete - will generate stub

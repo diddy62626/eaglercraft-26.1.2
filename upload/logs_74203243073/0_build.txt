@@ -1,0 +1,932 @@
+﻿2026-06-15T19:01:20.3982130Z Current runner version: '2.335.1'
+2026-06-15T19:01:20.4008365Z ##[group]Runner Image Provisioner
+2026-06-15T19:01:20.4009313Z Hosted Compute Agent
+2026-06-15T19:01:20.4009969Z Version: 20260527.539
+2026-06-15T19:01:20.4010664Z Commit: a891dd388383b896fa6ac04a82c0b75cec981078
+2026-06-15T19:01:20.4011549Z Build Date: 2026-05-27T21:39:57Z
+2026-06-15T19:01:20.4012256Z Worker ID: {85127050-6f25-4e39-9ea4-4a85e6c8c45c}
+2026-06-15T19:01:20.4013026Z Azure Region: westus
+2026-06-15T19:01:20.4013633Z ##[endgroup]
+2026-06-15T19:01:20.4015216Z ##[group]Operating System
+2026-06-15T19:01:20.4016341Z Ubuntu
+2026-06-15T19:01:20.4016904Z 24.04.4
+2026-06-15T19:01:20.4017476Z LTS
+2026-06-15T19:01:20.4018068Z ##[endgroup]
+2026-06-15T19:01:20.4018628Z ##[group]Runner Image
+2026-06-15T19:01:20.4019336Z Image: ubuntu-24.04
+2026-06-15T19:01:20.4019975Z Version: 20260607.184.1
+2026-06-15T19:01:20.4021325Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260607.184/images/ubuntu/Ubuntu2404-Readme.md
+2026-06-15T19:01:20.4022995Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260607.184
+2026-06-15T19:01:20.4024006Z ##[endgroup]
+2026-06-15T19:01:20.4025260Z ##[group]GITHUB_TOKEN Permissions
+2026-06-15T19:01:20.4027471Z Contents: write
+2026-06-15T19:01:20.4028168Z Metadata: read
+2026-06-15T19:01:20.4028851Z Pages: write
+2026-06-15T19:01:20.4029462Z ##[endgroup]
+2026-06-15T19:01:20.4031555Z Secret source: Actions
+2026-06-15T19:01:20.4032403Z Prepare workflow directory
+2026-06-15T19:01:20.4480868Z Prepare all required actions
+2026-06-15T19:01:20.4519208Z Getting action download info
+2026-06-15T19:01:20.9614395Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-06-15T19:01:21.0469294Z Download action repository 'actions/setup-java@v4' (SHA:c1e323688fd81a25caa38c78aa6df2d33d3e20d9)
+2026-06-15T19:01:21.6242179Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-06-15T19:01:21.7036504Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-06-15T19:01:21.8639949Z Download action repository 'gradle/actions@v4' (SHA:ed408507eac070d1f99cc633dbcf757c94c7933a)
+2026-06-15T19:01:22.9422733Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-06-15T19:01:23.0454128Z Download action repository 'peaceiris/actions-gh-pages@v4' (SHA:84c30a85c19949d7eee79c4ff27748b70285e453)
+2026-06-15T19:01:23.6710808Z Complete job name: build
+2026-06-15T19:01:23.7510135Z ##[group]Run actions/checkout@v4
+2026-06-15T19:01:23.7510796Z with:
+2026-06-15T19:01:23.7511097Z   repository: diddy62626/eaglercraft-26.1.2
+2026-06-15T19:01:23.7514322Z   token: ***
+2026-06-15T19:01:23.7514595Z   ssh-strict: true
+2026-06-15T19:01:23.7514866Z   ssh-user: git
+2026-06-15T19:01:23.7515142Z   persist-credentials: true
+2026-06-15T19:01:23.7515437Z   clean: true
+2026-06-15T19:01:23.7515923Z   sparse-checkout-cone-mode: true
+2026-06-15T19:01:23.7516284Z   fetch-depth: 1
+2026-06-15T19:01:23.7516559Z   fetch-tags: false
+2026-06-15T19:01:23.7516835Z   show-progress: true
+2026-06-15T19:01:23.7517100Z   lfs: false
+2026-06-15T19:01:23.7517350Z   submodules: false
+2026-06-15T19:01:23.7517625Z   set-safe-directory: true
+2026-06-15T19:01:23.7518164Z env:
+2026-06-15T19:01:23.7518415Z   JAVA_VERSION: 25
+2026-06-15T19:01:23.7518675Z   NODE_VERSION: 22
+2026-06-15T19:01:23.7518974Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:23.7519349Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:23.7519691Z ##[endgroup]
+2026-06-15T19:01:23.8484888Z Syncing repository: diddy62626/eaglercraft-26.1.2
+2026-06-15T19:01:23.8486868Z ##[group]Getting Git version info
+2026-06-15T19:01:23.8487427Z Working directory is '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2'
+2026-06-15T19:01:23.8488166Z [command]/usr/bin/git version
+2026-06-15T19:01:23.8541500Z git version 2.54.0
+2026-06-15T19:01:23.8594203Z ##[endgroup]
+2026-06-15T19:01:23.8610136Z Temporarily overriding HOME='/home/runner/work/_temp/42974994-3572-4cdd-af62-6deb72470bc9' before making global git config changes
+2026-06-15T19:01:23.8612113Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-15T19:01:23.8617033Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+2026-06-15T19:01:23.8665276Z Deleting the contents of '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2'
+2026-06-15T19:01:23.8669707Z ##[group]Initializing the repository
+2026-06-15T19:01:23.8673716Z [command]/usr/bin/git init /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+2026-06-15T19:01:23.8777529Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-06-15T19:01:23.8778723Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-06-15T19:01:23.8779748Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-06-15T19:01:23.8780398Z hint: call:
+2026-06-15T19:01:23.8781259Z hint:
+2026-06-15T19:01:23.8781670Z hint: 	git config --global init.defaultBranch <name>
+2026-06-15T19:01:23.8782098Z hint:
+2026-06-15T19:01:23.8782491Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-06-15T19:01:23.8783252Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-06-15T19:01:23.8783761Z hint:
+2026-06-15T19:01:23.8784047Z hint: 	git branch -m <name>
+2026-06-15T19:01:23.8784373Z hint:
+2026-06-15T19:01:23.8784811Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-06-15T19:01:23.8786381Z Initialized empty Git repository in /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/.git/
+2026-06-15T19:01:23.8797857Z [command]/usr/bin/git remote add origin https://github.com/diddy62626/eaglercraft-26.1.2
+2026-06-15T19:01:23.8837345Z ##[endgroup]
+2026-06-15T19:01:23.8837856Z ##[group]Disabling automatic garbage collection
+2026-06-15T19:01:23.8842772Z [command]/usr/bin/git config --local gc.auto 0
+2026-06-15T19:01:23.8870011Z ##[endgroup]
+2026-06-15T19:01:23.8870510Z ##[group]Setting up auth
+2026-06-15T19:01:23.8876896Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-15T19:01:23.8907711Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-15T19:01:23.9236682Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-15T19:01:23.9268769Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-15T19:01:23.9485052Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-15T19:01:23.9514535Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-15T19:01:23.9731519Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-06-15T19:01:23.9764650Z ##[endgroup]
+2026-06-15T19:01:23.9765616Z ##[group]Fetching the repository
+2026-06-15T19:01:23.9774531Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +03561582d8c6178d3f79b90514b8575e9caab07b:refs/remotes/origin/main
+2026-06-15T19:01:24.4834475Z From https://github.com/diddy62626/eaglercraft-26.1.2
+2026-06-15T19:01:24.4835334Z  * [new ref]         03561582d8c6178d3f79b90514b8575e9caab07b -> origin/main
+2026-06-15T19:01:24.4871026Z ##[endgroup]
+2026-06-15T19:01:24.4872028Z ##[group]Determining the checkout info
+2026-06-15T19:01:24.4873751Z ##[endgroup]
+2026-06-15T19:01:24.4881702Z [command]/usr/bin/git sparse-checkout disable
+2026-06-15T19:01:24.4939802Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-06-15T19:01:24.4984922Z ##[group]Checking out the ref
+2026-06-15T19:01:24.4990397Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-06-15T19:01:24.5227694Z Switched to a new branch 'main'
+2026-06-15T19:01:24.5250521Z branch 'main' set up to track 'origin/main'.
+2026-06-15T19:01:24.5253448Z ##[endgroup]
+2026-06-15T19:01:24.5293905Z [command]/usr/bin/git log -1 --format=%H
+2026-06-15T19:01:24.5321110Z 03561582d8c6178d3f79b90514b8575e9caab07b
+2026-06-15T19:01:24.5661328Z ##[group]Run actions/setup-java@v4
+2026-06-15T19:01:24.5661695Z with:
+2026-06-15T19:01:24.5661951Z   distribution: temurin
+2026-06-15T19:01:24.5662234Z   java-version: 25
+2026-06-15T19:01:24.5662501Z   cache: gradle
+2026-06-15T19:01:24.5662761Z   java-package: jdk
+2026-06-15T19:01:24.5663025Z   check-latest: false
+2026-06-15T19:01:24.5663294Z   server-id: github
+2026-06-15T19:01:24.5663562Z   server-username: GITHUB_ACTOR
+2026-06-15T19:01:24.5663879Z   server-password: GITHUB_TOKEN
+2026-06-15T19:01:24.5664202Z   overwrite-settings: true
+2026-06-15T19:01:24.5664487Z   job-status: success
+2026-06-15T19:01:24.5667947Z   token: ***
+2026-06-15T19:01:24.5668212Z env:
+2026-06-15T19:01:24.5668446Z   JAVA_VERSION: 25
+2026-06-15T19:01:24.5668703Z   NODE_VERSION: 22
+2026-06-15T19:01:24.5668984Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:24.5669320Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:24.5669650Z ##[endgroup]
+2026-06-15T19:01:24.7258013Z ##[group]Installed distributions
+2026-06-15T19:01:24.7724521Z Resolved Java 25.0.3+9 from tool-cache
+2026-06-15T19:01:24.7725326Z Setting Java 25.0.3+9 as the default
+2026-06-15T19:01:24.7735934Z (node:2325) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:01:24.7737009Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:01:24.7740750Z Creating toolchains.xml for JDK version 25 from temurin
+2026-06-15T19:01:24.7816230Z Writing to /home/runner/.m2/toolchains.xml
+2026-06-15T19:01:24.7817035Z 
+2026-06-15T19:01:24.7817294Z Java configuration:
+2026-06-15T19:01:24.7817859Z   Distribution: temurin
+2026-06-15T19:01:24.7818421Z   Version: 25.0.3+9
+2026-06-15T19:01:24.7819123Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:24.7819729Z 
+2026-06-15T19:01:24.7820386Z ##[endgroup]
+2026-06-15T19:01:24.7836457Z Creating settings.xml with server-id: github
+2026-06-15T19:01:24.7839926Z Writing to /home/runner/.m2/settings.xml
+2026-06-15T19:01:25.1231370Z gradle cache is not found
+2026-06-15T19:01:25.1404740Z ##[group]Run actions/setup-node@v4
+2026-06-15T19:01:25.1405046Z with:
+2026-06-15T19:01:25.1405246Z   node-version: 22
+2026-06-15T19:01:25.1405472Z   always-auth: false
+2026-06-15T19:01:25.1406044Z   check-latest: false
+2026-06-15T19:01:25.1409277Z   token: ***
+2026-06-15T19:01:25.1409483Z env:
+2026-06-15T19:01:25.1409675Z   JAVA_VERSION: 25
+2026-06-15T19:01:25.1409886Z   NODE_VERSION: 22
+2026-06-15T19:01:25.1410110Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:25.1410421Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:25.1410810Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:25.1411300Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:25.1411689Z ##[endgroup]
+2026-06-15T19:01:25.2778053Z Found in cache @ /opt/hostedtoolcache/node/22.22.3/x64
+2026-06-15T19:01:25.2781895Z (node:2338) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:01:25.2783312Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:01:25.2785126Z ##[group]Environment details
+2026-06-15T19:01:28.4975541Z node: v22.22.3
+2026-06-15T19:01:28.4976452Z npm: 10.9.8
+2026-06-15T19:01:28.4976773Z yarn: 1.22.22
+2026-06-15T19:01:28.4977563Z ##[endgroup]
+2026-06-15T19:01:28.5119710Z ##[group]Run actions/cache@v4
+2026-06-15T19:01:28.5119988Z with:
+2026-06-15T19:01:28.5120378Z   path: minecraft-26.1.2.jar
+2026-06-15T19:01:28.5120644Z   key: minecraft-26.1.2-jar-v1
+2026-06-15T19:01:28.5120915Z   enableCrossOsArchive: false
+2026-06-15T19:01:28.5121177Z   fail-on-cache-miss: false
+2026-06-15T19:01:28.5121427Z   lookup-only: false
+2026-06-15T19:01:28.5121647Z   save-always: false
+2026-06-15T19:01:28.5121861Z env:
+2026-06-15T19:01:28.5122055Z   JAVA_VERSION: 25
+2026-06-15T19:01:28.5122288Z   NODE_VERSION: 22
+2026-06-15T19:01:28.5122538Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:28.5122833Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:28.5123228Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.5123731Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.5124123Z ##[endgroup]
+2026-06-15T19:01:28.6187016Z (node:2370) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:01:28.6188713Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:01:28.9140522Z Cache not found for input keys: minecraft-26.1.2-jar-v1
+2026-06-15T19:01:28.9285093Z ##[group]Run if [ -f minecraft-26.1.2.jar ] && [ -s minecraft-26.1.2.jar ]; then
+2026-06-15T19:01:28.9286094Z [36;1mif [ -f minecraft-26.1.2.jar ] && [ -s minecraft-26.1.2.jar ]; then[0m
+2026-06-15T19:01:28.9286581Z [36;1m  echo "found=true" >> $GITHUB_OUTPUT[0m
+2026-06-15T19:01:28.9287021Z [36;1m  echo "Minecraft JAR found ($(stat -c%s minecraft-26.1.2.jar) bytes)"[0m
+2026-06-15T19:01:28.9287424Z [36;1melse[0m
+2026-06-15T19:01:28.9287664Z [36;1m  echo "found=false" >> $GITHUB_OUTPUT[0m
+2026-06-15T19:01:28.9288083Z [36;1m  echo "No Minecraft JAR found - will build platform layer only"[0m
+2026-06-15T19:01:28.9288488Z [36;1mfi[0m
+2026-06-15T19:01:28.9454777Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:01:28.9455069Z env:
+2026-06-15T19:01:28.9455288Z   JAVA_VERSION: 25
+2026-06-15T19:01:28.9455507Z   NODE_VERSION: 22
+2026-06-15T19:01:28.9455971Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:28.9456286Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:28.9456843Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9457681Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9458353Z ##[endgroup]
+2026-06-15T19:01:28.9532730Z No Minecraft JAR found - will build platform layer only
+2026-06-15T19:01:28.9666248Z ##[group]Run gradle/actions/setup-gradle@v4
+2026-06-15T19:01:28.9666590Z with:
+2026-06-15T19:01:28.9666821Z   gradle-home-cache-cleanup: true
+2026-06-15T19:01:28.9667101Z   cache-disabled: false
+2026-06-15T19:01:28.9667344Z   cache-read-only: false
+2026-06-15T19:01:28.9667596Z   cache-write-only: false
+2026-06-15T19:01:28.9667851Z   cache-overwrite-existing: false
+2026-06-15T19:01:28.9668124Z   cache-cleanup: on-success
+2026-06-15T19:01:28.9668432Z   gradle-home-cache-includes: caches
+notifications
+
+2026-06-15T19:01:28.9668781Z   add-job-summary: always
+2026-06-15T19:01:28.9669045Z   add-job-summary-as-pr-comment: never
+2026-06-15T19:01:28.9669345Z   dependency-graph: disabled
+2026-06-15T19:01:28.9669670Z   dependency-graph-report-dir: dependency-graph-reports
+2026-06-15T19:01:28.9670058Z   dependency-graph-continue-on-failure: true
+2026-06-15T19:01:28.9670372Z   build-scan-publish: false
+2026-06-15T19:01:28.9670624Z   validate-wrappers: true
+2026-06-15T19:01:28.9670908Z   allow-snapshot-wrappers: false
+2026-06-15T19:01:28.9671197Z   gradle-home-cache-strict-match: false
+2026-06-15T19:01:28.9671491Z   workflow-job-context: null
+2026-06-15T19:01:28.9674629Z   github-token: ***
+2026-06-15T19:01:28.9674852Z env:
+2026-06-15T19:01:28.9675044Z   JAVA_VERSION: 25
+2026-06-15T19:01:28.9675265Z   NODE_VERSION: 22
+2026-06-15T19:01:28.9675491Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:28.9675944Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:28.9676339Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9677014Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9677403Z ##[endgroup]
+2026-06-15T19:01:34.8038549Z Merged default JDK locations into /home/runner/.m2/toolchains.xml
+2026-06-15T19:01:34.8040262Z Preparing cache for cleanup.
+2026-06-15T19:01:34.8043637Z ##[group]Restore Gradle state from cache
+2026-06-15T19:01:35.0768211Z Cache hit for restore-key: gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-c57f0d1a4e2eeb646f1083d21adbb58072908253
+2026-06-15T19:01:35.8759868Z Received 187912 of 187912 (100.0%), 0.3 MBs/sec
+2026-06-15T19:01:35.8761400Z Cache Size: ~0 MB (187912 B)
+2026-06-15T19:01:35.8797302Z [command]/usr/bin/tar -xf /home/runner/work/_temp/a067b3e5-b34e-4b7f-b823-db60481ca224/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:35.8938192Z Cache restored successfully
+2026-06-15T19:01:35.8943417Z Restored cache entry with key gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-03561582d8c6178d3f79b90514b8575e9caab07b to /home/runner/.gradle/caches,/home/runner/.gradle/notifications,/home/runner/.gradle/.setup-gradle in 1089ms
+2026-06-15T19:01:36.1561877Z Cache hit for: gradle-transforms-v1-fe5b3ee4d4f1d3644e0bca3028fca032
+2026-06-15T19:01:36.1638912Z Cache hit for: gradle-wrapper-zips-v1-32a3a100d181ec75e824fde1164fcedd
+2026-06-15T19:01:36.1667294Z Cache hit for: gradle-wrapper-zips-v1-9666c30e2bcfc5e86859eb978b1f5b22
+2026-06-15T19:01:36.1729853Z Cache hit for: gradle-instrumented-jars-v1-227e5a8f1a3e15c797b61f397387b64b
+2026-06-15T19:01:36.1925453Z Cache hit for: gradle-groovy-dsl-v1-8999b74659d43177f33037ea32c06e39
+2026-06-15T19:01:36.2016868Z Cache hit for: gradle-dependencies-v1-ba46d341b967260f62d1345b706fe030
+2026-06-15T19:01:36.6418010Z Received 94987 of 94987 (100.0%), 0.5 MBs/sec
+2026-06-15T19:01:36.6419031Z Cache Size: ~0 MB (94987 B)
+2026-06-15T19:01:36.6462686Z [command]/usr/bin/tar -xf /home/runner/work/_temp/de161b34-eb54-48d8-872c-96211259d1b1/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:36.6752970Z Cache restored successfully
+2026-06-15T19:01:36.6814963Z Restored cache entry with key gradle-instrumented-jars-v1-227e5a8f1a3e15c797b61f397387b64b to /home/runner/.gradle/caches/jars-*/*/ in 786ms
+2026-06-15T19:01:36.9655954Z Received 146651 of 146651 (100.0%), 0.3 MBs/sec
+2026-06-15T19:01:36.9657155Z Cache Size: ~0 MB (146651 B)
+2026-06-15T19:01:36.9686686Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e3d55fe3-ff1f-46f5-971b-3e04b0325096/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:36.9907689Z Cache restored successfully
+2026-06-15T19:01:36.9910261Z Restored cache entry with key gradle-groovy-dsl-v1-8999b74659d43177f33037ea32c06e39 to /home/runner/.gradle/caches/*/groovy-dsl/*/ in 1094ms
+2026-06-15T19:01:37.4113414Z Received 0 of 4106927 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4333283Z Received 0 of 139612154 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4508189Z Received 0 of 135882926 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4894010Z Received 0 of 7095752 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.7733906Z Received 4106927 of 4106927 (100.0%), 2.9 MBs/sec
+2026-06-15T19:01:37.7735952Z Cache Size: ~4 MB (4106927 B)
+2026-06-15T19:01:37.7852202Z [command]/usr/bin/tar -xf /home/runner/work/_temp/cb2ba369-3b3a-41c6-a78f-c8ca7afb029a/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:37.8403103Z Cache restored successfully
+2026-06-15T19:01:37.8464871Z Restored cache entry with key gradle-transforms-v1-fe5b3ee4d4f1d3644e0bca3028fca032 to /home/runner/.gradle/caches/transforms-4/*/,/home/runner/.gradle/caches/*/transforms/*/ in 1950ms
+2026-06-15T19:01:38.4337413Z Received 83886080 of 139612154 (60.1%), 40.0 MBs/sec
+2026-06-15T19:01:38.4516326Z Received 88080384 of 135882926 (64.8%), 42.0 MBs/sec
+2026-06-15T19:01:38.4895042Z Received 2901448 of 7095752 (40.9%), 1.4 MBs/sec
+2026-06-15T19:01:39.1197283Z Received 139612154 of 139612154 (100.0%), 49.6 MBs/sec
+2026-06-15T19:01:39.1200638Z Cache Size: ~133 MB (139612154 B)
+2026-06-15T19:01:39.1324338Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e9a769a4-b484-48bc-806f-baeeff184f73/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:39.1773997Z Received 7095752 of 7095752 (100.0%), 2.5 MBs/sec
+2026-06-15T19:01:39.1776938Z Cache Size: ~7 MB (7095752 B)
+2026-06-15T19:01:39.1806336Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7fb0ec41-1356-4b85-966a-aee5b5732da3/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:39.2106892Z Cache restored successfully
+2026-06-15T19:01:39.2117993Z Restored cache entry with key gradle-dependencies-v1-ba46d341b967260f62d1345b706fe030 to /home/runner/.gradle/caches/modules-*/files-*/*/*/*/* in 3316ms
+2026-06-15T19:01:39.3800114Z Cache restored successfully
+2026-06-15T19:01:39.3860448Z Restored cache entry with key gradle-wrapper-zips-v1-32a3a100d181ec75e824fde1164fcedd to /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx in 3490ms
+2026-06-15T19:01:39.4511914Z Received 130023424 of 135882926 (95.7%), 41.3 MBs/sec
+2026-06-15T19:01:40.4515973Z Received 134217728 of 135882926 (98.8%), 32.0 MBs/sec
+2026-06-15T19:01:41.4511557Z Received 134217728 of 135882926 (98.8%), 25.6 MBs/sec
+2026-06-15T19:01:41.5105278Z Received 135882926 of 135882926 (100.0%), 25.6 MBs/sec
+2026-06-15T19:01:41.5106737Z Cache Size: ~130 MB (135882926 B)
+2026-06-15T19:01:41.5242896Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e4677000-925b-4a46-92e7-d3a0a1ec0812/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:41.7212403Z Cache restored successfully
+2026-06-15T19:01:41.7270840Z Restored cache entry with key gradle-wrapper-zips-v1-9666c30e2bcfc5e86859eb978b1f5b22 to /home/runner/.gradle/wrapper/dists/gradle-8.12-bin/cetblhg4pflnnks72fxwobvgv in 5832ms
+2026-06-15T19:01:41.7344364Z ##[endgroup]
+2026-06-15T19:01:41.7433127Z ##[group]All Gradle Wrapper jars are valid
+2026-06-15T19:01:41.7434672Z ✓ Found known Gradle Wrapper JAR files:
+2026-06-15T19:01:41.7436212Z   2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046 gradle/wrapper/gradle-wrapper.jar
+2026-06-15T19:01:41.7438015Z ##[endgroup]
+2026-06-15T19:01:41.7589766Z ##[group]Run chmod +x gradlew 2>/dev/null || true
+2026-06-15T19:01:41.7590244Z [36;1mchmod +x gradlew 2>/dev/null || true[0m
+2026-06-15T19:01:41.7590712Z [36;1mchmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true[0m
+2026-06-15T19:01:41.7591498Z [36;1mchmod +x build_init.sh build_compile.sh build_dist.sh build_clean.sh build_workspace.sh CompileLatestClient.sh 2>/dev/null || true[0m
+2026-06-15T19:01:41.7624064Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:01:41.7624371Z env:
+2026-06-15T19:01:41.7624605Z   JAVA_VERSION: 25
+2026-06-15T19:01:41.7624881Z   NODE_VERSION: 22
+2026-06-15T19:01:41.7625150Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:41.7625490Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:41.7626236Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:41.7626794Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:41.7627314Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:01:41.7627689Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:01:41.7628029Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:01:41.7628377Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:01:41.7628874Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:01:41.7629413Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:01:41.7629781Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:01:41.7630114Z ##[endgroup]
+2026-06-15T19:01:41.7733110Z 
+2026-06-15T19:01:41.7733832Z Setting execute permissions on shell scripts...
+2026-06-15T19:01:41.7734329Z 
+2026-06-15T19:01:41.7745403Z [0;32m[CHMOD][0m chmod +x build_init.sh
+2026-06-15T19:01:41.7755451Z [0;32m[CHMOD][0m chmod +x build_workspace.sh
+2026-06-15T19:01:41.7765273Z [0;32m[CHMOD][0m chmod +x build_compile.sh
+2026-06-15T19:01:41.7775159Z [0;32m[CHMOD][0m chmod +x build_dist.sh
+2026-06-15T19:01:41.7785145Z [0;32m[CHMOD][0m chmod +x build_clean.sh
+2026-06-15T19:01:41.7795535Z [0;32m[CHMOD][0m chmod +x CompileLatestClient.sh
+2026-06-15T19:01:41.7805362Z [0;32m[CHMOD][0m chmod +x run_chmod.sh
+2026-06-15T19:01:41.7805953Z 
+2026-06-15T19:01:41.7806540Z [0;36m[CHMOD][0m Scanning for additional shell scripts...
+2026-06-15T19:01:41.7839628Z 
+2026-06-15T19:01:41.7840391Z [0;32m[CHMOD][0m All shell scripts now have execute permissions.
+2026-06-15T19:01:41.7885166Z ##[group]Run echo "=== Gradle build info ==="
+2026-06-15T19:01:41.7885606Z [36;1mecho "=== Gradle build info ==="[0m
+2026-06-15T19:01:41.7886365Z [36;1m./gradlew --no-daemon buildInfo 2>&1 || true[0m
+2026-06-15T19:01:41.7886728Z [36;1m[0m
+2026-06-15T19:01:41.7887002Z [36;1mecho "=== Compiling Java sources ==="[0m
+2026-06-15T19:01:41.7887496Z [36;1m./gradlew --no-daemon --info compileJava 2>&1 | tee gradle-compile.log || true[0m
+2026-06-15T19:01:41.7887971Z [36;1m[0m
+2026-06-15T19:01:41.7888250Z [36;1mecho "=== Checking compile result ==="[0m
+2026-06-15T19:01:41.7888723Z [36;1mif grep -qi "BUILD SUCCESSFUL" gradle-compile.log 2>/dev/null; then[0m
+2026-06-15T19:01:41.7889212Z [36;1m  echo "Gradle compileJava succeeded"[0m
+2026-06-15T19:01:41.7889546Z [36;1melse[0m
+2026-06-15T19:01:41.7889957Z [36;1m  echo "Gradle compileJava had issues (expected for stub project) - continuing"[0m
+2026-06-15T19:01:41.7890417Z [36;1mfi[0m
+2026-06-15T19:01:41.7918665Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:01:41.7918979Z env:
+2026-06-15T19:01:41.7919213Z   JAVA_VERSION: 25
+2026-06-15T19:01:41.7919480Z   NODE_VERSION: 22
+2026-06-15T19:01:41.7919762Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:41.7920110Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:41.7920588Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:41.7921135Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:41.7921608Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:01:41.7921990Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:01:41.7922328Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:01:41.7922678Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:01:41.7923174Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:01:41.7923720Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:01:41.7924098Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:01:41.7924536Z ##[endgroup]
+2026-06-15T19:01:41.7973678Z === Gradle build info ===
+2026-06-15T19:01:44.8597453Z WARNING: A restricted method in java.lang.System has been called
+2026-06-15T19:01:44.8600042Z WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/native-platform-0.22-milestone-29.jar)
+2026-06-15T19:01:44.8602411Z WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+2026-06-15T19:01:44.8603868Z WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+2026-06-15T19:01:44.8604541Z 
+2026-06-15T19:01:46.0709893Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T19:01:48.6703347Z Daemon will be stopped at the end of the build 
+2026-06-15T19:02:07.6768198Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1781550112298.json
+2026-06-15T19:02:07.6794214Z 
+2026-06-15T19:02:07.6812374Z FAILURE: Build failed with an exception.
+2026-06-15T19:02:07.6836488Z 
+2026-06-15T19:02:07.6837976Z * Where:
+2026-06-15T19:02:07.6852303Z Build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle' line: 97
+2026-06-15T19:02:07.6856919Z 
+2026-06-15T19:02:07.6886617Z * What went wrong:
+2026-06-15T19:02:07.6889066Z A problem occurred evaluating project ':sources'.
+2026-06-15T19:02:07.6890541Z > Could not set unknown property 'mainClass' for object of type org.teavm.gradle.TeaVMExtensionImpl.
+2026-06-15T19:02:07.6891539Z 
+2026-06-15T19:02:07.6906650Z * Try:
+2026-06-15T19:02:07.6908201Z > Run with --stacktrace option to get the stack trace.
+2026-06-15T19:02:07.6909754Z > Run with --info or --debug option to get more log output.
+2026-06-15T19:02:07.6911123Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-06-15T19:02:07.6912307Z > Get more help at https://help.gradle.org.
+2026-06-15T19:02:07.6912907Z 
+2026-06-15T19:02:07.6913270Z BUILD FAILED in 25s
+2026-06-15T19:02:07.8286780Z === Compiling Java sources ===
+2026-06-15T19:02:08.1928578Z WARNING: A restricted method in java.lang.System has been called
+2026-06-15T19:02:08.1931063Z WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/native-platform-0.22-milestone-29.jar)
+2026-06-15T19:02:08.1934434Z WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+2026-06-15T19:02:08.1936474Z WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+2026-06-15T19:02:08.1937273Z 
+2026-06-15T19:02:08.1983106Z Initialized native services in: /home/runner/.gradle/native
+2026-06-15T19:02:08.2013738Z Initialized jansi services in: /home/runner/.gradle/native
+2026-06-15T19:02:08.3253676Z The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+2026-06-15T19:02:08.3267752Z Wanted: DaemonRequestContext{jvmCriteria=/usr/lib/jvm/temurin-25-jdk-amd64 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:+UseG1GC, -XX:+HeapDumpOnOutOfMemoryError, --enable-preview, -Xmx2G, -Dfile.encoding=UTF-8, -Duser.country, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+2026-06-15T19:02:08.3274580Z Actual: DefaultDaemonContext[uid=9c00b018-8d1d-4dbe-8928-e6407ef53652,javaHome=/usr/lib/jvm/temurin-25-jdk-amd64,javaVersion=25,javaVendor=Eclipse Adoptium,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=false,nativeServicesMode=ENABLED,daemonOpts=-XX:+UseG1GC,-Xmx4g,-Dfile.encoding=UTF-8,-Duser.country,-Duser.language=en,-Duser.variant]
+2026-06-15T19:02:08.3278022Z 
+2026-06-15T19:02:08.4269222Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T19:02:08.4282184Z Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/9.5.1 Command: /usr/lib/jvm/temurin-25-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError --enable-preview -Xmx2G -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/gradle-daemon-main-9.5.1.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/agents/gradle-instrumentation-agent-9.5.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.5.1
+2026-06-15T19:02:08.5245034Z Successfully started process 'Gradle build daemon'
+2026-06-15T19:02:09.3248363Z An attempt to start the daemon took 0.861 secs.
+2026-06-15T19:02:09.4245165Z The client will now receive all logging from the daemon (pid: 2642). The daemon log file: /home/runner/.gradle/daemon/9.5.1/daemon-2642.out.log
+2026-06-15T19:02:09.4262350Z Daemon will be stopped at the end of the build 
+2026-06-15T19:02:09.7243639Z Using 4 worker leases.
+2026-06-15T19:02:09.8249456Z Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+2026-06-15T19:02:10.0260566Z Received JVM installation metadata from '/usr/lib/jvm/temurin-25-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64, JAVA_VERSION=25.0.3, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.3+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.3+9-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+2026-06-15T19:02:10.4243526Z Watching the file system is configured to be enabled if available
+2026-06-15T19:02:10.4245248Z Now considering [/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2] as hierarchies to watch
+2026-06-15T19:02:10.4246834Z File system watching is active
+2026-06-15T19:02:11.5253927Z Starting Build
+2026-06-15T19:02:11.7248874Z Settings evaluated using settings file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/settings.gradle'.
+2026-06-15T19:02:12.0273555Z Using local directory build cache for the root build (location = /home/runner/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+2026-06-15T19:02:12.1278155Z Projects loaded. Root project using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:12.1284172Z Included projects: [root project 'eaglercraft-26.1.2', project ':buildtools', project ':sources']
+2026-06-15T19:02:13.1243364Z 
+2026-06-15T19:02:13.1268449Z > Configure project :
+2026-06-15T19:02:13.1270120Z Evaluating root project 'eaglercraft-26.1.2' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:13.1271535Z Resolved plugin [id: 'java']
+2026-06-15T19:02:13.1272548Z Resolved plugin [id: 'org.teavm', version: '0.15.0', apply: false]
+2026-06-15T19:02:13.4243089Z 
+2026-06-15T19:02:13.4256197Z > Configure project :buildtools
+2026-06-15T19:02:13.4258232Z Evaluating project ':buildtools' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/buildtools/build.gradle'.
+2026-06-15T19:02:13.4259917Z Resolved plugin [id: 'java']
+2026-06-15T19:02:13.5242474Z 
+2026-06-15T19:02:13.5258514Z > Configure project :sources
+2026-06-15T19:02:13.5267509Z Evaluating project ':sources' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle'.
+2026-06-15T19:02:13.5271832Z Resolved plugin [id: 'java']
+2026-06-15T19:02:13.5273167Z Resolved plugin [id: 'org.teavm', version: '0.15.0']
+2026-06-15T19:02:13.5274960Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1781550131281.json
+2026-06-15T19:02:13.6242603Z 
+2026-06-15T19:02:13.6307289Z FAILURE: Build failed with an exception.
+2026-06-15T19:02:13.6316151Z 
+2026-06-15T19:02:13.6346498Z * Where:
+2026-06-15T19:02:13.6347608Z Build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle' line: 97
+2026-06-15T19:02:13.6348418Z 
+2026-06-15T19:02:13.6348674Z * What went wrong:
+2026-06-15T19:02:13.6349356Z A problem occurred evaluating project ':sources'.
+2026-06-15T19:02:13.6350658Z > Could not set unknown property 'mainClass' for object of type org.teavm.gradle.TeaVMExtensionImpl.
+2026-06-15T19:02:13.6351454Z 
+2026-06-15T19:02:13.6351686Z * Try:
+2026-06-15T19:02:13.6352341Z > Run with --stacktrace option to get the stack trace.
+2026-06-15T19:02:13.6353119Z > Run with --debug option to get more log output.
+2026-06-15T19:02:13.6354093Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-06-15T19:02:13.6355456Z > Get more help at https://help.gradle.org.
+2026-06-15T19:02:13.6356269Z 
+2026-06-15T19:02:13.6356495Z BUILD FAILED in 5s
+2026-06-15T19:02:13.7885098Z === Checking compile result ===
+2026-06-15T19:02:13.7901637Z Gradle compileJava had issues (expected for stub project) - continuing
+2026-06-15T19:02:13.7932153Z ##[group]Run ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true
+2026-06-15T19:02:13.7932967Z [36;1m./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true[0m
+2026-06-15T19:02:13.7933476Z [36;1m[0m
+2026-06-15T19:02:13.7933893Z [36;1m# Check if classes.js was produced (TeaVM 0.15.0 outputs to build/generated/teavm/js/)[0m
+2026-06-15T19:02:13.7934387Z [36;1mCLASSES_JS=""[0m
+2026-06-15T19:02:13.7934869Z [36;1mfor path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do[0m
+2026-06-15T19:02:13.7935398Z [36;1m  if [ -f "$path" ]; then[0m
+2026-06-15T19:02:13.7936000Z [36;1m    CLASSES_JS="$path"[0m
+2026-06-15T19:02:13.7936469Z [36;1m    echo "classes.js found at: $path ($(stat -c%s "$path") bytes)"[0m
+2026-06-15T19:02:13.7936900Z [36;1m    break[0m
+2026-06-15T19:02:13.7937160Z [36;1m  fi[0m
+2026-06-15T19:02:13.7937394Z [36;1mdone[0m
+2026-06-15T19:02:13.7937675Z [36;1mif [ -z "$CLASSES_JS" ]; then[0m
+2026-06-15T19:02:13.7938096Z [36;1m  echo "TeaVM compilation not yet complete - will generate stub"[0m
+2026-06-15T19:02:13.7938504Z [36;1mfi[0m
+2026-06-15T19:02:13.7969417Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:02:13.7969721Z env:
+2026-06-15T19:02:13.7969967Z   JAVA_VERSION: 25
+2026-06-15T19:02:13.7970227Z   NODE_VERSION: 22
+2026-06-15T19:02:13.7970492Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:13.7970858Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:13.7971317Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:13.7971853Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:13.7972322Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:13.7972685Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:13.7973039Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:13.7973389Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:13.7973887Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:13.7974429Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:13.7974806Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:13.7975121Z ##[endgroup]
+2026-06-15T19:02:14.1817982Z WARNING: A restricted method in java.lang.System has been called
+2026-06-15T19:02:14.1821572Z WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/native-platform-0.22-milestone-29.jar)
+2026-06-15T19:02:14.1824836Z WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+2026-06-15T19:02:14.1827129Z WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+2026-06-15T19:02:14.1828572Z 
+2026-06-15T19:02:14.1859026Z Initialized native services in: /home/runner/.gradle/native
+2026-06-15T19:02:14.1889253Z Initialized jansi services in: /home/runner/.gradle/native
+2026-06-15T19:02:14.3132447Z The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+2026-06-15T19:02:14.3162347Z Wanted: DaemonRequestContext{jvmCriteria=/usr/lib/jvm/temurin-25-jdk-amd64 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:+UseG1GC, -XX:+HeapDumpOnOutOfMemoryError, --enable-preview, -Xmx2G, -Dfile.encoding=UTF-8, -Duser.country, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+2026-06-15T19:02:14.3166147Z Actual: DefaultDaemonContext[uid=f1917082-46a3-46a6-959e-76a2542c4be6,javaHome=/usr/lib/jvm/temurin-25-jdk-amd64,javaVersion=25,javaVendor=Eclipse Adoptium,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=false,nativeServicesMode=ENABLED,daemonOpts=-XX:+UseG1GC,-Xmx4g,-Dfile.encoding=UTF-8,-Duser.country,-Duser.language=en,-Duser.variant]
+2026-06-15T19:02:14.3167640Z 
+2026-06-15T19:02:14.4123615Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T19:02:14.5135551Z Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/9.5.1 Command: /usr/lib/jvm/temurin-25-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError --enable-preview -Xmx2G -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/gradle-daemon-main-9.5.1.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/agents/gradle-instrumentation-agent-9.5.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.5.1
+2026-06-15T19:02:14.5146029Z Successfully started process 'Gradle build daemon'
+2026-06-15T19:02:15.3140212Z An attempt to start the daemon took 0.893 secs.
+2026-06-15T19:02:15.4124477Z The client will now receive all logging from the daemon (pid: 2740). The daemon log file: /home/runner/.gradle/daemon/9.5.1/daemon-2740.out.log
+2026-06-15T19:02:15.4125337Z Daemon will be stopped at the end of the build 
+2026-06-15T19:02:15.8122004Z Using 4 worker leases.
+2026-06-15T19:02:15.8129769Z Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+2026-06-15T19:02:16.1146022Z Received JVM installation metadata from '/usr/lib/jvm/temurin-25-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64, JAVA_VERSION=25.0.3, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.3+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.3+9-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+2026-06-15T19:02:16.4127434Z Watching the file system is configured to be enabled if available
+2026-06-15T19:02:16.4147503Z Now considering [/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2] as hierarchies to watch
+2026-06-15T19:02:16.4186543Z File system watching is active
+2026-06-15T19:02:17.4120409Z Starting Build
+2026-06-15T19:02:17.6121602Z Settings evaluated using settings file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/settings.gradle'.
+2026-06-15T19:02:17.8128114Z Using local directory build cache for the root build (location = /home/runner/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+2026-06-15T19:02:17.9120606Z Projects loaded. Root project using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:17.9138966Z Included projects: [root project 'eaglercraft-26.1.2', project ':buildtools', project ':sources']
+2026-06-15T19:02:18.9119668Z 
+2026-06-15T19:02:18.9148089Z > Configure project :
+2026-06-15T19:02:18.9168164Z Evaluating root project 'eaglercraft-26.1.2' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/build.gradle'.
+2026-06-15T19:02:18.9169566Z Resolved plugin [id: 'java']
+2026-06-15T19:02:18.9198946Z Resolved plugin [id: 'org.teavm', version: '0.15.0', apply: false]
+2026-06-15T19:02:19.3126878Z 
+2026-06-15T19:02:19.3166876Z > Configure project :buildtools
+2026-06-15T19:02:19.3182350Z Evaluating project ':buildtools' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/buildtools/build.gradle'.
+2026-06-15T19:02:19.3196954Z Resolved plugin [id: 'java']
+2026-06-15T19:02:19.4119694Z 
+2026-06-15T19:02:19.4127340Z > Configure project :sources
+2026-06-15T19:02:19.4129059Z Evaluating project ':sources' using build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle'.
+2026-06-15T19:02:19.4130444Z Resolved plugin [id: 'java']
+2026-06-15T19:02:19.4132676Z Resolved plugin [id: 'org.teavm', version: '0.15.0']
+2026-06-15T19:02:19.5121234Z gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1781550137199.json
+2026-06-15T19:02:19.5132613Z 
+2026-06-15T19:02:19.5133374Z FAILURE: Build failed with an exception.
+2026-06-15T19:02:19.5133996Z 
+2026-06-15T19:02:19.5134354Z * Where:
+2026-06-15T19:02:19.5135568Z Build file '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/sources/build.gradle' line: 97
+2026-06-15T19:02:19.5137020Z 
+2026-06-15T19:02:19.5137420Z * What went wrong:
+2026-06-15T19:02:19.5138429Z A problem occurred evaluating project ':sources'.
+2026-06-15T19:02:19.5139854Z > Could not set unknown property 'mainClass' for object of type org.teavm.gradle.TeaVMExtensionImpl.
+2026-06-15T19:02:19.5140804Z 
+2026-06-15T19:02:19.5141162Z * Try:
+2026-06-15T19:02:19.5141993Z > Run with --stacktrace option to get the stack trace.
+2026-06-15T19:02:19.5143003Z > Run with --debug option to get more log output.
+2026-06-15T19:02:19.5144325Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+2026-06-15T19:02:19.5180280Z > Get more help at https://help.gradle.org.
+2026-06-15T19:02:19.5219196Z 
+2026-06-15T19:02:19.5266190Z BUILD FAILED in 5s
+2026-06-15T19:02:19.6836441Z TeaVM compilation not yet complete - will generate stub
+2026-06-15T19:02:19.6876399Z ##[group]Run if [ -f sources/setup/workspace_template/CompileEPK.sh ]; then
+2026-06-15T19:02:19.6877442Z [36;1mif [ -f sources/setup/workspace_template/CompileEPK.sh ]; then[0m
+2026-06-15T19:02:19.6878364Z [36;1m  chmod +x sources/setup/workspace_template/CompileEPK.sh[0m
+2026-06-15T19:02:19.6879269Z [36;1m  sources/setup/workspace_template/CompileEPK.sh 2>&1 || true[0m
+2026-06-15T19:02:19.6879996Z [36;1mfi[0m
+2026-06-15T19:02:19.6918537Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:02:19.6918851Z env:
+2026-06-15T19:02:19.6919094Z   JAVA_VERSION: 25
+2026-06-15T19:02:19.6919353Z   NODE_VERSION: 22
+2026-06-15T19:02:19.6919620Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:19.6919960Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:19.6920628Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.6921187Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.6921705Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:19.6922094Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:19.6922435Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:19.6922795Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:19.6923300Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:19.6923848Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:19.6924223Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:19.6924550Z ##[endgroup]
+2026-06-15T19:02:19.7031094Z [0;36m========================================[0m
+2026-06-15T19:02:19.7032484Z [0;36m EaglerCraft 26.1.2 - Compile EPK[0m
+2026-06-15T19:02:19.7033746Z [0;36m========================================[0m
+2026-06-15T19:02:19.7034580Z 
+2026-06-15T19:02:19.7035356Z [1;33m[CHECK][0m Verifying prerequisites...
+2026-06-15T19:02:19.7036949Z [0;32m[OK][0m Java found
+2026-06-15T19:02:19.7038817Z [0;31m[ERROR][0m Gradle wrapper not found. Run build_workspace.sh first.
+2026-06-15T19:02:19.7064761Z ##[group]Run echo "Assembling public/ directory..."
+2026-06-15T19:02:19.7065279Z [36;1mecho "Assembling public/ directory..."[0m
+2026-06-15T19:02:19.7065618Z [36;1m[0m
+2026-06-15T19:02:19.7066295Z [36;1m# Copy classes.js (check both old and new TeaVM output paths)[0m
+2026-06-15T19:02:19.7066729Z [36;1mCLASSES_JS=""[0m
+2026-06-15T19:02:19.7067211Z [36;1mfor path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do[0m
+2026-06-15T19:02:19.7067745Z [36;1m  if [ -f "$path" ]; then[0m
+2026-06-15T19:02:19.7068070Z [36;1m    CLASSES_JS="$path"[0m
+2026-06-15T19:02:19.7068364Z [36;1m    break[0m
+2026-06-15T19:02:19.7068614Z [36;1m  fi[0m
+2026-06-15T19:02:19.7068861Z [36;1mdone[0m
+2026-06-15T19:02:19.7069116Z [36;1mif [ -n "$CLASSES_JS" ]; then[0m
+2026-06-15T19:02:19.7069471Z [36;1m  cp "$CLASSES_JS" public/classes.js[0m
+2026-06-15T19:02:19.7070007Z [36;1m  echo "classes.js copied from $CLASSES_JS ($(stat -c%s public/classes.js) bytes)"[0m
+2026-06-15T19:02:19.7070516Z [36;1melif [ ! -f public/classes.js ]; then[0m
+2026-06-15T19:02:19.7070951Z [36;1m  echo "classes.js not found - generating build placeholder"[0m
+2026-06-15T19:02:19.7071475Z [36;1m  echo '// EaglerCraftX 26.1.2 - Build Stub' > public/classes.js[0m
+2026-06-15T19:02:19.7072110Z [36;1m  echo '// This file will be replaced by the actual TeaVM compilation output.' >> public/classes.js[0m
+2026-06-15T19:02:19.7072865Z [36;1m  echo '// Run the full build pipeline with a Minecraft 26.1.2 JAR to generate it.' >> public/classes.js[0m
+2026-06-15T19:02:19.7073649Z [36;1m  echo 'console.warn("[EaglerCraftX] Build stub loaded. Full compilation required.");' >> public/classes.js[0m
+2026-06-15T19:02:19.7074575Z [36;1m  echo 'if (window.__eaglercraftLoadingProgress) { window.__eaglercraftLoadingProgress(100, "Build stub"); }' >> public/classes.js[0m
+2026-06-15T19:02:19.7075218Z [36;1mfi[0m
+2026-06-15T19:02:19.7075456Z [36;1m[0m
+2026-06-15T19:02:19.7076131Z [36;1m# Copy source map if available (check both paths)[0m
+2026-06-15T19:02:19.7076818Z [36;1mfor smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do[0m
+2026-06-15T19:02:19.7077380Z [36;1m  if [ -f "$smap" ]; then[0m
+2026-06-15T19:02:19.7077725Z [36;1m    cp "$smap" public/classes.js.map[0m
+2026-06-15T19:02:19.7078116Z [36;1m    echo "Source map copied from $smap"[0m
+2026-06-15T19:02:19.7078461Z [36;1m    break[0m
+2026-06-15T19:02:19.7078715Z [36;1m  fi[0m
+2026-06-15T19:02:19.7078949Z [36;1mdone[0m
+2026-06-15T19:02:19.7079183Z [36;1m[0m
+2026-06-15T19:02:19.7079421Z [36;1m# Copy EPK assets[0m
+2026-06-15T19:02:19.7079737Z [36;1mif [ -f output/assets.epk ]; then[0m
+2026-06-15T19:02:19.7080305Z [36;1m  cp output/assets.epk public/assets.epk[0m
+2026-06-15T19:02:19.7080701Z [36;1melif [ ! -f public/assets.epk ]; then[0m
+2026-06-15T19:02:19.7081146Z [36;1m  echo "assets.epk not found - creating minimal placeholder"[0m
+2026-06-15T19:02:19.7081627Z [36;1m  # Create minimal valid EPK file (EAGPK!! header)[0m
+2026-06-15T19:02:19.7082112Z [36;1m  printf 'EAGPK!!\x00\x00\x00\x00\x00\x00\x00\x00' > public/assets.epk[0m
+2026-06-15T19:02:19.7082532Z [36;1mfi[0m
+2026-06-15T19:02:19.7082767Z [36;1m[0m
+2026-06-15T19:02:19.7083008Z [36;1m# Copy language files[0m
+2026-06-15T19:02:19.7083322Z [36;1mif [ -d output/lang ]; then[0m
+2026-06-15T19:02:19.7083653Z [36;1m  mkdir -p public/lang[0m
+2026-06-15T19:02:19.7083986Z [36;1m  cp -r output/lang/* public/lang/[0m
+2026-06-15T19:02:19.7084367Z [36;1melif [ -d sources/resources/lang ]; then[0m
+2026-06-15T19:02:19.7084728Z [36;1m  mkdir -p public/lang[0m
+2026-06-15T19:02:19.7085143Z [36;1m  cp -r sources/resources/lang/* public/lang/ 2>/dev/null || true[0m
+2026-06-15T19:02:19.7085567Z [36;1mfi[0m
+2026-06-15T19:02:19.7085975Z [36;1m[0m
+2026-06-15T19:02:19.7086211Z [36;1m# Copy favicon[0m
+2026-06-15T19:02:19.7086634Z [36;1mif [ -f sources/setup/workspace_template/javascript/favicon.png ]; then[0m
+2026-06-15T19:02:19.7087483Z [36;1m  cp sources/setup/workspace_template/javascript/favicon.png public/favicon.png 2>/dev/null || true[0m
+2026-06-15T19:02:19.7088204Z [36;1mfi[0m
+2026-06-15T19:02:19.7088502Z [36;1m[0m
+2026-06-15T19:02:19.7088760Z [36;1mecho "public/ contents:"[0m
+2026-06-15T19:02:19.7089088Z [36;1mls -la public/[0m
+2026-06-15T19:02:19.7089429Z [36;1mecho "Total size: $(du -sh public/ | cut -f1)"[0m
+2026-06-15T19:02:19.7121176Z shell: /usr/bin/bash -e {0}
+2026-06-15T19:02:19.7121485Z env:
+2026-06-15T19:02:19.7121718Z   JAVA_VERSION: 25
+2026-06-15T19:02:19.7121968Z   NODE_VERSION: 22
+2026-06-15T19:02:19.7122238Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:19.7122585Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:19.7123046Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.7123599Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.7124079Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:19.7124454Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:19.7124796Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:19.7125147Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:19.7125877Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:19.7126526Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:19.7126900Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:19.7127215Z ##[endgroup]
+2026-06-15T19:02:19.7181185Z Assembling public/ directory...
+2026-06-15T19:02:19.7182205Z classes.js not found - generating build placeholder
+2026-06-15T19:02:19.7184159Z assets.epk not found - creating minimal placeholder
+2026-06-15T19:02:19.7199986Z public/ contents:
+2026-06-15T19:02:19.7212693Z total 32
+2026-06-15T19:02:19.7213260Z drwxr-xr-x  2 runner runner 4096 Jun 15 19:02 .
+2026-06-15T19:02:19.7213749Z drwxr-xr-x 11 runner runner 4096 Jun 15 19:02 ..
+2026-06-15T19:02:19.7214252Z -rw-r--r--  1 runner runner   15 Jun 15 19:02 assets.epk
+2026-06-15T19:02:19.7214748Z -rw-r--r--  1 runner runner  360 Jun 15 19:02 classes.js
+2026-06-15T19:02:19.7215233Z -rw-r--r--  1 runner runner 1209 Jun 15 19:02 favicon.png
+2026-06-15T19:02:19.7215995Z -rw-r--r--  1 runner runner 8383 Jun 15 19:01 index.html
+2026-06-15T19:02:19.7401192Z Total size: 28K
+2026-06-15T19:02:19.7511478Z ##[group]Run actions/upload-artifact@v4
+2026-06-15T19:02:19.7511829Z with:
+2026-06-15T19:02:19.7512087Z   name: eaglercraft-26.1.2-build
+2026-06-15T19:02:19.7512392Z   path: public/
+2026-06-15T19:02:19.7512651Z   retention-days: 30
+2026-06-15T19:02:19.7512939Z   if-no-files-found: warn
+2026-06-15T19:02:19.7513225Z   compression-level: 6
+2026-06-15T19:02:19.7513695Z   overwrite: false
+2026-06-15T19:02:19.7513966Z   include-hidden-files: false
+2026-06-15T19:02:19.7514263Z env:
+2026-06-15T19:02:19.7514491Z   JAVA_VERSION: 25
+2026-06-15T19:02:19.7514745Z   NODE_VERSION: 22
+2026-06-15T19:02:19.7515010Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:19.7515344Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:19.7516056Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.7516635Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:19.7517145Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:19.7517505Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:19.7517846Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:19.7518186Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:19.7518680Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:19.7519219Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:19.7519584Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:19.7519895Z ##[endgroup]
+2026-06-15T19:02:19.9159803Z (node:2815) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:02:19.9161481Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:02:19.9226232Z With the provided path, there will be 4 files uploaded
+2026-06-15T19:02:19.9232179Z Artifact name is valid!
+2026-06-15T19:02:19.9232952Z Root directory input is valid!
+2026-06-15T19:02:20.3451015Z Beginning upload of artifact content to blob storage
+2026-06-15T19:02:20.3687575Z (node:2815) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-15T19:02:20.6418647Z Uploaded bytes 4017
+2026-06-15T19:02:20.7188069Z Finished uploading artifact content to blob storage!
+2026-06-15T19:02:20.7189777Z SHA256 digest of uploaded artifact zip is cf99dcf3ecd098a9d68cf8090c9ea57df84894f52681c1f4d2dbc4a1c218ffe7
+2026-06-15T19:02:20.7190979Z Finalizing artifact upload
+2026-06-15T19:02:20.9923670Z Artifact eaglercraft-26.1.2-build.zip successfully finalized. Artifact ID 7647930237
+2026-06-15T19:02:20.9925470Z Artifact eaglercraft-26.1.2-build has been successfully uploaded! Final size is 4017 bytes. Artifact ID is 7647930237
+2026-06-15T19:02:20.9931862Z Artifact download URL: https://github.com/diddy62626/eaglercraft-26.1.2/actions/runs/27569413582/artifacts/7647930237
+2026-06-15T19:02:21.0083615Z ##[group]Run peaceiris/actions-gh-pages@v4
+2026-06-15T19:02:21.0084001Z with:
+2026-06-15T19:02:21.0087672Z   github_token: ***
+2026-06-15T19:02:21.0087967Z   publish_dir: ./public
+2026-06-15T19:02:21.0088260Z   publish_branch: gh-pages
+2026-06-15T19:02:21.0088551Z   force_orphan: true
+2026-06-15T19:02:21.0088871Z   commit_message: deploy: EaglerCraftX 26.1.2 build
+2026-06-15T19:02:21.0089256Z   allow_empty_commit: false
+2026-06-15T19:02:21.0089537Z   keep_files: false
+2026-06-15T19:02:21.0089794Z   enable_jekyll: false
+2026-06-15T19:02:21.0090064Z   disable_nojekyll: false
+2026-06-15T19:02:21.0090342Z   exclude_assets: .github
+2026-06-15T19:02:21.0090613Z env:
+2026-06-15T19:02:21.0090849Z   JAVA_VERSION: 25
+2026-06-15T19:02:21.0091107Z   NODE_VERSION: 22
+2026-06-15T19:02:21.0091377Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:02:21.0091708Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:02:21.0092198Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:21.0092754Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:02:21.0093235Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-06-15T19:02:21.0093599Z   GRADLE_USER_HOME: /home/runner/.gradle
+2026-06-15T19:02:21.0093945Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-06-15T19:02:21.0094504Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-06-15T19:02:21.0095017Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-06-15T19:02:21.0095563Z   DEVELOCITY_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-06-15T19:02:21.0096242Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-06-15T19:02:21.0096573Z ##[endgroup]
+2026-06-15T19:02:21.1133998Z [INFO] Usage https://github.com/peaceiris/actions-gh-pages#readme
+2026-06-15T19:02:21.1139007Z ##[group]Dump inputs
+2026-06-15T19:02:21.1139600Z [INFO] GithubToken: true
+2026-06-15T19:02:21.1140031Z [INFO] PublishBranch: gh-pages
+2026-06-15T19:02:21.1140672Z [INFO] PublishDir: ./public
+2026-06-15T19:02:21.1141054Z [INFO] DestinationDir: 
+2026-06-15T19:02:21.1141432Z [INFO] ExternalRepository: 
+2026-06-15T19:02:21.1141845Z [INFO] AllowEmptyCommit: false
+2026-06-15T19:02:21.1142326Z [INFO] KeepFiles: false
+2026-06-15T19:02:21.1142912Z [INFO] ForceOrphan: true
+2026-06-15T19:02:21.1143392Z [INFO] UserName: 
+2026-06-15T19:02:21.1143742Z [INFO] UserEmail: 
+2026-06-15T19:02:21.1144532Z [INFO] CommitMessage: deploy: EaglerCraftX 26.1.2 build
+2026-06-15T19:02:21.1145438Z [INFO] FullCommitMessage: 
+2026-06-15T19:02:21.1146367Z [INFO] TagName: 
+2026-06-15T19:02:21.1146920Z [INFO] TagMessage: 
+2026-06-15T19:02:21.1147638Z [INFO] EnableJekyll (DisableNoJekyll): false
+2026-06-15T19:02:21.1148158Z [INFO] CNAME: 
+2026-06-15T19:02:21.1148495Z [INFO] ExcludeAssets .github
+2026-06-15T19:02:21.1148716Z 
+2026-06-15T19:02:21.1149272Z ##[endgroup]
+2026-06-15T19:02:21.1150114Z ##[group]Setup auth token
+2026-06-15T19:02:21.1150752Z [INFO] setup GITHUB_TOKEN
+2026-06-15T19:02:21.1152640Z ##[endgroup]
+2026-06-15T19:02:21.1153570Z ##[group]Prepare publishing assets
+2026-06-15T19:02:21.1154624Z [INFO] ForceOrphan: true
+2026-06-15T19:02:21.1159416Z [INFO] chdir /home/runner/actions_github_pages_1781550141114
+2026-06-15T19:02:21.1191383Z [command]/usr/bin/git init
+2026-06-15T19:02:21.1248235Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-06-15T19:02:21.1249481Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-06-15T19:02:21.1250693Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-06-15T19:02:21.1251471Z hint: call:
+2026-06-15T19:02:21.1251881Z hint:
+2026-06-15T19:02:21.1252503Z hint: 	git config --global init.defaultBranch <name>
+2026-06-15T19:02:21.1253122Z hint:
+2026-06-15T19:02:21.1253877Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-06-15T19:02:21.1254542Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-06-15T19:02:21.1254996Z hint:
+2026-06-15T19:02:21.1255531Z hint: 	git branch -m <name>
+2026-06-15T19:02:21.1256311Z hint:
+2026-06-15T19:02:21.1256794Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-06-15T19:02:21.1262848Z Initialized empty Git repository in /home/runner/actions_github_pages_1781550141114/.git/
+2026-06-15T19:02:21.1286710Z [command]/usr/bin/git checkout --orphan gh-pages
+2026-06-15T19:02:21.1315305Z Switched to a new branch 'gh-pages'
+2026-06-15T19:02:21.1319202Z [INFO] prepare publishing assets
+2026-06-15T19:02:21.1320590Z [INFO] copy /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/public to /home/runner/actions_github_pages_1781550141114
+2026-06-15T19:02:21.1358086Z [INFO] delete excluded assets
+2026-06-15T19:02:21.1410751Z [INFO] Created /home/runner/actions_github_pages_1781550141114/.nojekyll
+2026-06-15T19:02:21.1411753Z ##[endgroup]
+2026-06-15T19:02:21.1412400Z ##[group]Setup Git config
+2026-06-15T19:02:21.1422803Z [command]/usr/bin/git remote rm origin
+2026-06-15T19:02:21.1449337Z error: No such remote: 'origin'
+2026-06-15T19:02:21.1455301Z [INFO] The process '/usr/bin/git' failed with exit code 2
+2026-06-15T19:02:21.1473941Z [command]/usr/bin/git remote add origin ***github.com/diddy62626/eaglercraft-26.1.2.git
+2026-06-15T19:02:21.1517739Z [command]/usr/bin/git add --all
+2026-06-15T19:02:21.1571991Z [command]/usr/bin/git config user.name diddy62626
+2026-06-15T19:02:21.1622084Z [command]/usr/bin/git config user.email diddy62626@users.noreply.github.com
+2026-06-15T19:02:21.1650804Z ##[endgroup]
+2026-06-15T19:02:21.1651682Z ##[group]Create a commit
+2026-06-15T19:02:21.1666303Z [command]/usr/bin/git commit -m deploy: EaglerCraftX 26.1.2 build 03561582d8c6178d3f79b90514b8575e9caab07b
+2026-06-15T19:02:21.1727306Z [gh-pages (root-commit) 1749946] deploy: EaglerCraftX 26.1.2 build 03561582d8c6178d3f79b90514b8575e9caab07b
+2026-06-15T19:02:21.1728016Z  5 files changed, 231 insertions(+)
+2026-06-15T19:02:21.1728382Z  create mode 100644 .nojekyll
+2026-06-15T19:02:21.1728767Z  create mode 100644 assets.epk
+2026-06-15T19:02:21.1729107Z  create mode 100644 classes.js
+2026-06-15T19:02:21.1729438Z  create mode 100644 favicon.png
+2026-06-15T19:02:21.1729767Z  create mode 100644 index.html
+2026-06-15T19:02:21.1731205Z ##[endgroup]
+2026-06-15T19:02:21.1731933Z ##[group]Push the commit or tag
+2026-06-15T19:02:21.1743733Z [command]/usr/bin/git push origin --force gh-pages
+2026-06-15T19:02:22.3418299Z To https://github.com/diddy62626/eaglercraft-26.1.2.git
+2026-06-15T19:02:22.3419011Z  + 617dcb6...1749946 gh-pages -> gh-pages (forced update)
+2026-06-15T19:02:22.3464709Z ##[endgroup]
+2026-06-15T19:02:22.3465313Z [INFO] Action successfully completed
+2026-06-15T19:02:22.3692155Z Post job cleanup.
+2026-06-15T19:02:22.6247732Z ##[warning]This job uses deprecated functionality from the 'gradle/actions/setup-gradle' action. Consult the Job Summary for more details.
+2026-06-15T19:02:22.6263065Z DEPRECATION: The `gradle-home-cache-cleanup` input parameter has been replaced by `cache-cleanup`. See https://github.com/gradle/actions/blob/main/docs/deprecation-upgrade-guide.md#the-gradle-home-cache-cleanup-input-parameter-has-been-replaced-by-cache-cleanup
+2026-06-15T19:02:22.6265588Z In post-action step
+2026-06-15T19:02:22.6266763Z ##[group]Stopping Gradle daemons
+2026-06-15T19:02:22.6268149Z Stopping Gradle daemons for /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1
+2026-06-15T19:02:22.6270146Z [command]/home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/bin/gradle --stop
+2026-06-15T19:02:23.2020919Z No Gradle daemons are running.
+2026-06-15T19:02:23.2109178Z ##[endgroup]
+2026-06-15T19:02:23.2139463Z ##[group]Provision Gradle >= 9.5.1
+2026-06-15T19:02:32.1473898Z Gradle version 9.5.1 is available at /usr/bin/gradle and >= 9.5.1. Not installing.
+2026-06-15T19:02:32.1474692Z ##[endgroup]
+2026-06-15T19:02:32.1479342Z ##[group]Executing Gradle to clean up caches
+2026-06-15T19:02:32.1480181Z Cleaning up caches last used before 1781550094804
+2026-06-15T19:02:32.1483714Z [command]/usr/bin/gradle -g /home/runner/.gradle -I init.gradle --info --no-daemon --no-scan --build-cache -DGITHUB_DEPENDENCY_GRAPH_ENABLED=false -DGRADLE_ACTIONS_SKIP_BUILD_RESULT_CAPTURE=true noop
+2026-06-15T19:02:32.5270834Z Initialized native services in: /home/runner/.gradle/native
+2026-06-15T19:02:32.5293968Z Initialized jansi services in: /home/runner/.gradle/native
+2026-06-15T19:02:32.7515188Z The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+2026-06-15T19:02:32.7528151Z Wanted: DaemonRequestContext{jvmCriteria=/usr/lib/jvm/temurin-25-jdk-amd64 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+2026-06-15T19:02:32.7533563Z Actual: DefaultDaemonContext[uid=7d692f7c-a4bb-44a0-a664-7f3be102576b,javaHome=/usr/lib/jvm/temurin-25-jdk-amd64,javaVersion=25,javaVendor=Eclipse Adoptium,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:+UseG1GC,-Xms64m,-Xmx4g,-Dfile.encoding=UTF-8,-Duser.country,-Duser.language=en,-Duser.variant]
+2026-06-15T19:02:32.7535895Z 
+2026-06-15T19:02:33.4514211Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T19:02:33.6550613Z Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/9.5.1 Command: /usr/lib/jvm/temurin-25-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /usr/share/gradle-9.5.1/lib/gradle-daemon-main-9.5.1.jar -javaagent:/usr/share/gradle-9.5.1/lib/agents/gradle-instrumentation-agent-9.5.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.5.1
+2026-06-15T19:02:33.6559711Z Successfully started process 'Gradle build daemon'
+2026-06-15T19:02:41.3514088Z An attempt to start the daemon took 7.884 secs.
+2026-06-15T19:02:41.4515596Z The client will now receive all logging from the daemon (pid: 2992). The daemon log file: /home/runner/.gradle/daemon/9.5.1/daemon-2992.out.log
+2026-06-15T19:02:41.4517512Z Daemon will be stopped at the end of the build 
+2026-06-15T19:02:43.2516989Z Using 4 worker leases.
+2026-06-15T19:02:43.4515291Z Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=false, resilientModelBuilding=false}
+2026-06-15T19:02:44.9514563Z Received JVM installation metadata from '/usr/lib/jvm/temurin-25-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64, JAVA_VERSION=25.0.3, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.3+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.3+9-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+2026-06-15T19:02:45.7514107Z Watching the file system is configured to be enabled if available
+2026-06-15T19:02:45.7515207Z Now considering [/home/runner/work/_temp/dummy-cleanup-project] as hierarchies to watch
+2026-06-15T19:02:45.7516295Z File system watching is active
+2026-06-15T19:02:46.8513339Z Caching disabled for Groovy DSL script compilation (cp_init) because:
+2026-06-15T19:02:46.8514333Z   Build cache is disabled
+2026-06-15T19:02:46.8515121Z   Not worth caching.
+2026-06-15T19:02:46.9511696Z Compiling initialization script '/home/runner/work/_temp/dummy-cleanup-project/init.gradle' using SubsetScriptTransformer.
+2026-06-15T19:02:48.5512908Z Caching disabled for Groovy DSL script compilation (init) because:
+2026-06-15T19:02:48.5513732Z   Build cache is disabled
+2026-06-15T19:02:48.5514203Z   Not worth caching.
+2026-06-15T19:02:48.5515474Z Compiling initialization script '/home/runner/work/_temp/dummy-cleanup-project/init.gradle' using BuildScriptTransformer.
+2026-06-15T19:02:49.4512517Z gradle/actions: Not capturing build results
+2026-06-15T19:02:49.6512605Z Starting Build
+2026-06-15T19:02:49.7513902Z Settings evaluated using settings file '/home/runner/work/_temp/dummy-cleanup-project/settings.gradle'.
+2026-06-15T19:02:49.8513951Z Using local directory build cache for the root build (location = /home/runner/.gradle/caches/build-cache-1, remove unused entries = older than 2026-06-15 19:01:34 UTC).
+2026-06-15T19:02:50.0517057Z Projects loaded. Root project using build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle'.
+2026-06-15T19:02:50.0518468Z Included projects: [root project 'dummy-cleanup-project']
+2026-06-15T19:02:50.3527311Z 
+2026-06-15T19:02:50.3528360Z > Configure project :
+2026-06-15T19:02:50.3530133Z Evaluating root project 'dummy-cleanup-project' using build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle'.
+2026-06-15T19:02:50.3531685Z All projects evaluated.
+2026-06-15T19:02:50.3532495Z Task name matched 'noop'
+2026-06-15T19:02:50.3533410Z Selected primary task 'noop' from project :
+2026-06-15T19:02:50.3534420Z Tasks to be executed: [task ':noop']
+2026-06-15T19:02:50.3535335Z Tasks that were excluded: []
+2026-06-15T19:02:50.4513232Z Resolve mutations for :noop (Thread[#55,Execution worker,5,main]) started.
+2026-06-15T19:02:50.4516838Z :noop (Thread[#55,Execution worker,5,main]) started.
+2026-06-15T19:02:50.4517233Z 
+2026-06-15T19:02:50.4517409Z > Task :noop UP-TO-DATE
+2026-06-15T19:02:50.4517850Z Skipping task ':noop' as it has no actions.
+2026-06-15T19:02:50.5514643Z 
+2026-06-15T19:02:50.5535420Z BUILD SUCCESSFUL in 18s
+2026-06-15T19:02:50.5537967Z Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html
+2026-06-15T19:02:50.5540384Z Build cache (/home/runner/.gradle/caches/build-cache-1) removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.5542506Z Build cache (/home/runner/.gradle/caches/build-cache-1) cleanup deleted 1 files/directories.
+2026-06-15T19:02:50.5544247Z Build cache (/home/runner/.gradle/caches/build-cache-1) cleaned up in 0.004 secs.
+2026-06-15T19:02:50.5545928Z groovy-dsl removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.5547312Z groovy-dsl cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.5548309Z groovy-dsl cleaned up in 0.02 secs.
+2026-06-15T19:02:50.5549495Z jars (/home/runner/.gradle/caches/jars-9) cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.5551201Z jars (/home/runner/.gradle/caches/jars-9) removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.6523745Z jars (/home/runner/.gradle/caches/jars-9) cleanup deleted 6 files/directories.
+2026-06-15T19:02:50.6524970Z jars (/home/runner/.gradle/caches/jars-9) cleaned up in 0.053 secs.
+2026-06-15T19:02:50.6526485Z Artifact transforms cache removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.7337530Z Artifact transforms cache cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7342159Z Artifact transforms cache cleaned up in 0.089 secs.
+2026-06-15T19:02:50.7349130Z artifact cache (/home/runner/.gradle/caches/modules-2) cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7351495Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7358016Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.7360699Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7363061Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7366733Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] removing files not accessed on or after Mon Jun 15 19:01:34 UTC 2026.
+2026-06-15T19:02:50.7369259Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] cleanup deleted 95 files/directories.
+2026-06-15T19:02:50.7371524Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/metadata-2.107] cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7372554Z artifact cache (/home/runner/.gradle/caches/modules-2) cleanup deleted 0 files/directories.
+2026-06-15T19:02:50.7373619Z artifact cache (/home/runner/.gradle/caches/modules-2) cleaned up in 0.045 secs.
+2026-06-15T19:02:50.7755348Z ##[endgroup]
+2026-06-15T19:02:50.7756495Z ##[group]Caching Gradle state
+2026-06-15T19:02:50.9251793Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:50.9685157Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:50.9811092Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:51.1004106Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:51.6741841Z Sent 95540 of 95540 (100.0%), 0.2 MBs/sec
+2026-06-15T19:02:51.7555104Z Sent 164172 of 164172 (100.0%), 0.3 MBs/sec
+2026-06-15T19:02:52.0021732Z Saved cache entry with key gradle-instrumented-jars-v1-a4f6016001fbc8216cceaecd1cc1d6c1 from /home/runner/.gradle/caches/jars-*/*/ in 1104ms
+2026-06-15T19:02:52.0745095Z Saved cache entry with key gradle-groovy-dsl-v1-f822524c597bc1489e4d60422917be38 from /home/runner/.gradle/caches/*/groovy-dsl/*/ in 1141ms
+2026-06-15T19:02:52.2101917Z Sent 5922032 of 5922032 (100.0%), 6.0 MBs/sec
+2026-06-15T19:02:52.3399202Z Sent 7872753 of 7872753 (100.0%), 8.5 MBs/sec
+2026-06-15T19:02:52.5999923Z Saved cache entry with key gradle-dependencies-v1-25106ad303c991e3c25e1070a6657237 from /home/runner/.gradle/caches/modules-*/files-*/*/*/*/* in 1719ms
+2026-06-15T19:02:52.6281623Z Saved cache entry with key gradle-transforms-v1-eb22dbd6a11b91497446f44312ba22cb from /home/runner/.gradle/caches/transforms-4/*/,/home/runner/.gradle/caches/*/transforms/*/ in 1592ms
+2026-06-15T19:02:52.6848700Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:53.4112121Z Sent 156341 of 156341 (100.0%), 0.3 MBs/sec
+2026-06-15T19:02:53.6746530Z Saved cache entry with key gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-03561582d8c6178d3f79b90514b8575e9caab07b from /home/runner/.gradle/caches,/home/runner/.gradle/notifications,/home/runner/.gradle/.setup-gradle in 999ms
+2026-06-15T19:02:53.6748204Z ##[endgroup]
+2026-06-15T19:02:53.6754922Z Generating Job Summary
+2026-06-15T19:02:53.6769031Z Completed post-action step
+2026-06-15T19:02:53.6950449Z Post job cleanup.
+2026-06-15T19:02:53.7998657Z (node:3110) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:02:53.8000254Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:02:53.8126784Z [warning]Path Validation Error: Path(s) specified in the action for caching do(es) not exist, hence no cache is being saved.
+2026-06-15T19:02:53.8234550Z Post job cleanup.
+2026-06-15T19:02:53.9434285Z (node:3123) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:02:53.9435273Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:02:53.9593757Z Post job cleanup.
+2026-06-15T19:02:54.0891101Z (node:3131) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-15T19:02:54.0893204Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-15T19:02:54.1103097Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T19:02:54.4030991Z (node:3131) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-15T19:02:55.0034617Z Sent 155353 of 155353 (100.0%), 0.2 MBs/sec
+2026-06-15T19:02:55.3653617Z Cache saved with the key: setup-java-Linux-x64-gradle-e1f8222f1d9d7be2063d764bb7784a83fe0b642d1f7f91f26f174f49689b202e
+2026-06-15T19:02:55.3801384Z Post job cleanup.
+2026-06-15T19:02:55.4628446Z [command]/usr/bin/git version
+2026-06-15T19:02:55.4665324Z git version 2.54.0
+2026-06-15T19:02:55.4736477Z Temporarily overriding HOME='/home/runner/work/_temp/8669e529-237c-426d-8491-240915aabd05' before making global git config changes
+2026-06-15T19:02:55.4738351Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-15T19:02:55.4742940Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+2026-06-15T19:02:55.4780284Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-15T19:02:55.4814414Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-15T19:02:55.5035332Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-15T19:02:55.5060839Z http.https://github.com/.extraheader
+2026-06-15T19:02:55.5072753Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-06-15T19:02:55.5104368Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-15T19:02:55.5325124Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-15T19:02:55.5359682Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-15T19:02:55.5713543Z Cleaning up orphan processes
+2026-06-15T19:02:55.6006479Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, gradle/actions/setup-gradle@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

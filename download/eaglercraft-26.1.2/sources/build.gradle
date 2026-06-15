@@ -87,24 +87,31 @@ java {
 // See: https://teavm.org/docs/tooling/gradle.html
 //
 // DSL structure:
-//   teavm { }         - common configuration (mainClass, optimization, properties)
-//   teavm.js { }      - JS-specific (obfuscated, sourceMap, targetFileName, maxTopLevelNames)
-//   teavm.wasmGC { }  - Wasm GC-specific
-//   teavm.c { }       - C target-specific
+//   teavm { }             - top-level container
+//     all { }             - common config (mainClass, optimization, properties)
+//     js { }              - JS-specific (obfuscated, sourceMap, targetFileName, maxTopLevelNames)
+//     wasmGC { }          - Wasm GC-specific
+//     c { }               - C target-specific
+//
+// IMPORTANT: mainClass, optimization, properties go in teavm.all { },
+// NOT directly in teavm { } — the top-level TeaVMExtension does not
+// have these properties (causes "unknown property" error).
 
 teavm {
-    // Common configuration (applies to all targets)
-    mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
+    all {
+        // Common configuration (applies to all targets)
+        mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-    // BALANCED optimization is recommended for JS target (AGGRESSIVE doesn't
-    // give significant performance growth but produces more code)
-    optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+        // BALANCED optimization is recommended for JS target (AGGRESSIVE doesn't
+        // give significant performance growth but produces more code)
+        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
 
-    // Additional TeaVM properties
-    properties = [
-        'teavm.minHeapSize' : '256MB',
-        'teavm.maxHeapSize' : '1024MB'
-    ]
+        // Additional TeaVM properties
+        properties = [
+            'teavm.minHeapSize' : '256MB',
+            'teavm.maxHeapSize' : '1024MB'
+        ]
+    }
 
     js {
         // Obfuscation (recommended for production - produces less code)

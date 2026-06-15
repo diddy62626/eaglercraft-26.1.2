@@ -75,9 +75,12 @@ java {
 // TeaVM Configuration (0.15.0 DSL)
 // ============================================================
 // See: https://teavm.org/docs/tooling/gradle.html
+// mainClass, optimization go in teavm.all { }, NOT in teavm { }
 teavm {
-    mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
-    optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+    all {
+        mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
+        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+    }
 
     js {
         obfuscated = true

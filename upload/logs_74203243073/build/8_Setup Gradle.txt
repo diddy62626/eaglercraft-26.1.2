@@ -1,0 +1,90 @@
+﻿2026-06-15T19:01:28.9666234Z ##[group]Run gradle/actions/setup-gradle@v4
+2026-06-15T19:01:28.9666586Z with:
+2026-06-15T19:01:28.9666817Z   gradle-home-cache-cleanup: true
+2026-06-15T19:01:28.9667098Z   cache-disabled: false
+2026-06-15T19:01:28.9667341Z   cache-read-only: false
+2026-06-15T19:01:28.9667592Z   cache-write-only: false
+2026-06-15T19:01:28.9667848Z   cache-overwrite-existing: false
+2026-06-15T19:01:28.9668121Z   cache-cleanup: on-success
+2026-06-15T19:01:28.9668423Z   gradle-home-cache-includes: caches
+notifications
+
+2026-06-15T19:01:28.9668778Z   add-job-summary: always
+2026-06-15T19:01:28.9669042Z   add-job-summary-as-pr-comment: never
+2026-06-15T19:01:28.9669342Z   dependency-graph: disabled
+2026-06-15T19:01:28.9669667Z   dependency-graph-report-dir: dependency-graph-reports
+2026-06-15T19:01:28.9670055Z   dependency-graph-continue-on-failure: true
+2026-06-15T19:01:28.9670369Z   build-scan-publish: false
+2026-06-15T19:01:28.9670621Z   validate-wrappers: true
+2026-06-15T19:01:28.9670877Z   allow-snapshot-wrappers: false
+2026-06-15T19:01:28.9671194Z   gradle-home-cache-strict-match: false
+2026-06-15T19:01:28.9671488Z   workflow-job-context: null
+2026-06-15T19:01:28.9674625Z   github-token: ***
+2026-06-15T19:01:28.9674849Z env:
+2026-06-15T19:01:28.9675041Z   JAVA_VERSION: 25
+2026-06-15T19:01:28.9675262Z   NODE_VERSION: 22
+2026-06-15T19:01:28.9675486Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T19:01:28.9675940Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T19:01:28.9676335Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9677009Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T19:01:28.9677400Z ##[endgroup]
+2026-06-15T19:01:34.8038509Z Merged default JDK locations into /home/runner/.m2/toolchains.xml
+2026-06-15T19:01:34.8040251Z Preparing cache for cleanup.
+2026-06-15T19:01:34.8043627Z ##[group]Restore Gradle state from cache
+2026-06-15T19:01:35.0768159Z Cache hit for restore-key: gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-c57f0d1a4e2eeb646f1083d21adbb58072908253
+2026-06-15T19:01:35.8759820Z Received 187912 of 187912 (100.0%), 0.3 MBs/sec
+2026-06-15T19:01:35.8761392Z Cache Size: ~0 MB (187912 B)
+2026-06-15T19:01:35.8797290Z [command]/usr/bin/tar -xf /home/runner/work/_temp/a067b3e5-b34e-4b7f-b823-db60481ca224/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:35.8938178Z Cache restored successfully
+2026-06-15T19:01:35.8943400Z Restored cache entry with key gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-03561582d8c6178d3f79b90514b8575e9caab07b to /home/runner/.gradle/caches,/home/runner/.gradle/notifications,/home/runner/.gradle/.setup-gradle in 1089ms
+2026-06-15T19:01:36.1561837Z Cache hit for: gradle-transforms-v1-fe5b3ee4d4f1d3644e0bca3028fca032
+2026-06-15T19:01:36.1638893Z Cache hit for: gradle-wrapper-zips-v1-32a3a100d181ec75e824fde1164fcedd
+2026-06-15T19:01:36.1667262Z Cache hit for: gradle-wrapper-zips-v1-9666c30e2bcfc5e86859eb978b1f5b22
+2026-06-15T19:01:36.1729838Z Cache hit for: gradle-instrumented-jars-v1-227e5a8f1a3e15c797b61f397387b64b
+2026-06-15T19:01:36.1925444Z Cache hit for: gradle-groovy-dsl-v1-8999b74659d43177f33037ea32c06e39
+2026-06-15T19:01:36.2016854Z Cache hit for: gradle-dependencies-v1-ba46d341b967260f62d1345b706fe030
+2026-06-15T19:01:36.6417964Z Received 94987 of 94987 (100.0%), 0.5 MBs/sec
+2026-06-15T19:01:36.6419023Z Cache Size: ~0 MB (94987 B)
+2026-06-15T19:01:36.6462667Z [command]/usr/bin/tar -xf /home/runner/work/_temp/de161b34-eb54-48d8-872c-96211259d1b1/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:36.6752955Z Cache restored successfully
+2026-06-15T19:01:36.6814952Z Restored cache entry with key gradle-instrumented-jars-v1-227e5a8f1a3e15c797b61f397387b64b to /home/runner/.gradle/caches/jars-*/*/ in 786ms
+2026-06-15T19:01:36.9655909Z Received 146651 of 146651 (100.0%), 0.3 MBs/sec
+2026-06-15T19:01:36.9656731Z Cache Size: ~0 MB (146651 B)
+2026-06-15T19:01:36.9686671Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e3d55fe3-ff1f-46f5-971b-3e04b0325096/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:36.9907676Z Cache restored successfully
+2026-06-15T19:01:36.9910251Z Restored cache entry with key gradle-groovy-dsl-v1-8999b74659d43177f33037ea32c06e39 to /home/runner/.gradle/caches/*/groovy-dsl/*/ in 1094ms
+2026-06-15T19:01:37.4113374Z Received 0 of 4106927 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4333256Z Received 0 of 139612154 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4508160Z Received 0 of 135882926 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.4893963Z Received 0 of 7095752 (0.0%), 0.0 MBs/sec
+2026-06-15T19:01:37.7733870Z Received 4106927 of 4106927 (100.0%), 2.9 MBs/sec
+2026-06-15T19:01:37.7735944Z Cache Size: ~4 MB (4106927 B)
+2026-06-15T19:01:37.7852155Z [command]/usr/bin/tar -xf /home/runner/work/_temp/cb2ba369-3b3a-41c6-a78f-c8ca7afb029a/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:37.8403060Z Cache restored successfully
+2026-06-15T19:01:37.8464840Z Restored cache entry with key gradle-transforms-v1-fe5b3ee4d4f1d3644e0bca3028fca032 to /home/runner/.gradle/caches/transforms-4/*/,/home/runner/.gradle/caches/*/transforms/*/ in 1950ms
+2026-06-15T19:01:38.4337373Z Received 83886080 of 139612154 (60.1%), 40.0 MBs/sec
+2026-06-15T19:01:38.4516300Z Received 88080384 of 135882926 (64.8%), 42.0 MBs/sec
+2026-06-15T19:01:38.4895007Z Received 2901448 of 7095752 (40.9%), 1.4 MBs/sec
+2026-06-15T19:01:39.1197236Z Received 139612154 of 139612154 (100.0%), 49.6 MBs/sec
+2026-06-15T19:01:39.1200626Z Cache Size: ~133 MB (139612154 B)
+2026-06-15T19:01:39.1324306Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e9a769a4-b484-48bc-806f-baeeff184f73/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:39.1773899Z Received 7095752 of 7095752 (100.0%), 2.5 MBs/sec
+2026-06-15T19:01:39.1776926Z Cache Size: ~7 MB (7095752 B)
+2026-06-15T19:01:39.1806320Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7fb0ec41-1356-4b85-966a-aee5b5732da3/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:39.2106852Z Cache restored successfully
+2026-06-15T19:01:39.2117976Z Restored cache entry with key gradle-dependencies-v1-ba46d341b967260f62d1345b706fe030 to /home/runner/.gradle/caches/modules-*/files-*/*/*/*/* in 3316ms
+2026-06-15T19:01:39.3800078Z Cache restored successfully
+2026-06-15T19:01:39.3860429Z Restored cache entry with key gradle-wrapper-zips-v1-32a3a100d181ec75e824fde1164fcedd to /home/runner/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx in 3490ms
+2026-06-15T19:01:39.4511896Z Received 130023424 of 135882926 (95.7%), 41.3 MBs/sec
+2026-06-15T19:01:40.4515939Z Received 134217728 of 135882926 (98.8%), 32.0 MBs/sec
+2026-06-15T19:01:41.4511481Z Received 134217728 of 135882926 (98.8%), 25.6 MBs/sec
+2026-06-15T19:01:41.5105221Z Received 135882926 of 135882926 (100.0%), 25.6 MBs/sec
+2026-06-15T19:01:41.5106727Z Cache Size: ~130 MB (135882926 B)
+2026-06-15T19:01:41.5242855Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e4677000-925b-4a46-92e7-d3a0a1ec0812/cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --use-compress-program unzstd
+2026-06-15T19:01:41.7212361Z Cache restored successfully
+2026-06-15T19:01:41.7270826Z Restored cache entry with key gradle-wrapper-zips-v1-9666c30e2bcfc5e86859eb978b1f5b22 to /home/runner/.gradle/wrapper/dists/gradle-8.12-bin/cetblhg4pflnnks72fxwobvgv in 5832ms
+2026-06-15T19:01:41.7344351Z ##[endgroup]
+2026-06-15T19:01:41.7433112Z ##[group]All Gradle Wrapper jars are valid
+2026-06-15T19:01:41.7434658Z ✓ Found known Gradle Wrapper JAR files:
+2026-06-15T19:01:41.7436200Z   2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046 gradle/wrapper/gradle-wrapper.jar
+2026-06-15T19:01:41.7438005Z ##[endgroup]
