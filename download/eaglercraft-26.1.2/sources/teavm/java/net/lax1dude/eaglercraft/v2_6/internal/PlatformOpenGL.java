@@ -949,6 +949,75 @@ public class PlatformOpenGL {
                 return contextLost;
         }
 
+        // ========== GL11 Shim Support ==========
+
+        /**
+         * Alias for _wglCreateTexture() - matches LWJGL glGenTextures naming.
+         */
+        public static JSObject _wglGenTextures() {
+                return _wglCreateTexture();
+        }
+
+        /**
+         * Alias for _wglDeleteTexture() - matches LWJGL glDeleteTextures naming.
+         */
+        public static void _wglDeleteTextures(JSObject texture) {
+                _wglDeleteTexture(texture);
+        }
+
+        /**
+         * Reads integer GL state into an Int32Array.
+         * Handles both single-value and multi-value parameters.
+         */
+        @JSBody(params = { "pname", "params" }, script = "" +
+                        "var result = gl.getParameter(pname);" +
+                        "if (typeof result === 'number') {" +
+                        "  params[0] = result;" +
+                        "} else if (result && result.length) {" +
+                        "  for (var i = 0; i < result.length && i < params.length; i++) {" +
+                        "    params[i] = result[i];" +
+                        "  }" +
+                        "}")
+        public static native void _wglGetIntegerv(int pname, Int32Array params);
+
+        /**
+         * Reads float GL state into a Float32Array.
+         * Handles both single-value and multi-value parameters.
+         */
+        @JSBody(params = { "pname", "params" }, script = "" +
+                        "var result = gl.getParameter(pname);" +
+                        "if (typeof result === 'number') {" +
+                        "  params[0] = result;" +
+                        "} else if (result && result.length) {" +
+                        "  for (var i = 0; i < result.length && i < params.length; i++) {" +
+                        "    params[i] = result[i];" +
+                        "  }" +
+                        "}")
+        public static native void _wglGetFloatv(int pname, Float32Array params);
+
+        /**
+         * Reads boolean GL state into a Uint8Array.
+         */
+        @JSBody(params = { "pname", "params" }, script = "" +
+                        "var result = gl.getParameter(pname);" +
+                        "if (typeof result === 'boolean') {" +
+                        "  params[0] = result ? 1 : 0;" +
+                        "} else if (typeof result === 'number') {" +
+                        "  params[0] = result !== 0 ? 1 : 0;" +
+                        "} else if (result && result.length) {" +
+                        "  for (var i = 0; i < result.length && i < params.length; i++) {" +
+                        "    params[i] = result[i] !== 0 ? 1 : 0;" +
+                        "  }" +
+                        "}")
+        public static native void _wglGetBooleanv(int pname, Uint8Array params);
+
+        /**
+         * Read pixels into a JSObject (supports typed array views like Uint8Array, Float32Array, etc.).
+         */
+        @JSBody(params = { "x", "y", "w", "h", "format", "type", "pixels" },
+                        script = "gl.readPixels(x, y, w, h, format, type, pixels);")
+        public static native void _wglReadPixels(int x, int y, int w, int h, int format, int type, JSObject pixels);
+
         // ========== Native Helper Methods ==========
 
         /**

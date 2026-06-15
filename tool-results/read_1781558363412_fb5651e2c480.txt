@@ -1,0 +1,884 @@
+     1→     1→package org.lwjgl.opengl;
+     2→     2→
+     3→     3→import java.util.HashMap;
+     4→     4→import java.util.Map;
+     5→     5→
+     6→     6→import org.teavm.jso.JSObject;
+     7→     7→import org.teavm.jso.typedarrays.Float32Array;
+     8→     8→import org.teavm.jso.typedarrays.Int32Array;
+     9→     9→import org.teavm.jso.typedarrays.Uint8Array;
+    10→    10→
+    11→    11→import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
+    12→    12→
+    13→    13→/**
+    14→    14→ * TeaVM-compatible shim for LWJGL's GL11 class.
+    15→    15→ * Forwards all GL calls to the PlatformOpenGL layer (WebGL2 backend).
+    16→    16→ * Methods for features not present in WebGL2 are implemented as no-ops.
+    17→    17→ */
+    18→    18→public class GL11 {
+    19→    19→
+    20→    20→        // ================================================================
+    21→    21→        // Internal texture ID mapping (int <-> JSObject)
+    22→    22→        // ================================================================
+    23→    23→
+    24→    24→        private static final Map<Integer, JSObject> textureMap = new HashMap<>();
+    25→    25→        private static int nextTextureId = 1;
+    26→    26→
+    27→    27→        /**
+    28→    28→         * Returns the PlatformOpenGL JSObject for the given int texture ID,
+    29→    29→         * or null if id == 0 (no texture bound).
+    30→    30→         */
+    31→    31→        public static JSObject getTextureObject(int id) {
+    32→    32→                return id == 0 ? null : textureMap.get(id);
+    33→    33→        }
+    34→    34→
+    35→    35→        // ================================================================
+    36→    36→        // GL Constants
+    37→    37→        // ================================================================
+    38→    38→
+    39→    39→        // --- Boolean ---
+    40→    40→        public static final int GL_FALSE = 0;
+    41→    41→        public static final int GL_TRUE = 1;
+    42→    42→
+    43→    43→        // --- Errors ---
+    44→    44→        public static final int GL_NO_ERROR = 0;
+    45→    45→        public static final int GL_INVALID_ENUM = 0x0500;
+    46→    46→        public static final int GL_INVALID_VALUE = 0x0501;
+    47→    47→        public static final int GL_INVALID_OPERATION = 0x0502;
+    48→    48→        public static final int GL_STACK_OVERFLOW = 0x0503;
+    49→    49→        public static final int GL_STACK_UNDERFLOW = 0x0504;
+    50→    50→        public static final int GL_OUT_OF_MEMORY = 0x0505;
+    51→    51→
+    52→    52→        // --- Enable / Disable caps ---
+    53→    53→        public static final int GL_DEPTH_TEST = 0x0B71;
+    54→    54→        public static final int GL_BLEND = 0x0BE2;
+    55→    55→        public static final int GL_CULL_FACE = 0x0B44;
+    56→    56→        public static final int GL_SCISSOR_TEST = 0x0C11;
+    57→    57→        public static final int GL_STENCIL_TEST = 0x0B90;
+    58→    58→        public static final int GL_TEXTURE_2D = 0x0DE1;
+    59→    59→        public static final int GL_DITHER = 0x0BD0;
+    60→    60→        public static final int GL_POLYGON_OFFSET_FILL = 0x8037;
+    61→    61→        public static final int GL_ALPHA_TEST = 0x0BC0;
+    62→    62→        public static final int GL_FOG = 0x0B60;
+    63→    63→        public static final int GL_LIGHTING = 0x0B50;
+    64→    64→        public static final int GL_COLOR_MATERIAL = 0x0B57;
+    65→    65→        public static final int GL_NORMALIZE = 0x0BA1;
+    66→    66→        public static final int GL_RESCALE_NORMAL = 0x803A;
+    67→    67→        public static final int GL_POINT_SMOOTH = 0x0B10;
+    68→    68→        public static final int GL_LINE_SMOOTH = 0x0B20;
+    69→    69→        public static final int GL_POLYGON_SMOOTH = 0x0B41;
+    70→    70→        public static final int GL_COLOR_LOGIC_OP = 0x0BF2;
+    71→    71→        public static final int GL_INDEX_LOGIC_OP = 0x0BF1;
+    72→    72→        public static final int GL_MULTISAMPLE = 0x809D;
+    73→    73→        public static final int GL_SAMPLE_ALPHA_TO_COVERAGE = 0x809E;
+    74→    74→        public static final int GL_SAMPLE_ALPHA_TO_ONE = 0x809F;
+    75→    75→        public static final int GL_SAMPLE_COVERAGE = 0x80A0;
+    76→    76→
+    77→    77→        // --- Clear bits ---
+    78→    78→        public static final int GL_COLOR_BUFFER_BIT = 0x00004000;
+    79→    79→        public static final int GL_DEPTH_BUFFER_BIT = 0x00000100;
+    80→    80→        public static final int GL_STENCIL_BUFFER_BIT = 0x00000400;
+    81→    81→
+    82→    82→        // --- Blend factors ---
+    83→    83→        public static final int GL_ZERO = 0;
+    84→    84→        public static final int GL_ONE = 1;
+    85→    85→        public static final int GL_SRC_COLOR = 0x0300;
+    86→    86→        public static final int GL_ONE_MINUS_SRC_COLOR = 0x0301;
+    87→    87→        public static final int GL_SRC_ALPHA = 0x0302;
+    88→    88→        public static final int GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+    89→    89→        public static final int GL_DST_ALPHA = 0x0304;
+    90→    90→        public static final int GL_ONE_MINUS_DST_ALPHA = 0x0305;
+    91→    91→        public static final int GL_DST_COLOR = 0x0306;
+    92→    92→        public static final int GL_ONE_MINUS_DST_COLOR = 0x0307;
+    93→    93→        public static final int GL_SRC_ALPHA_SATURATE = 0x0308;
+    94→    94→        public static final int GL_CONSTANT_COLOR = 0x8001;
+    95→    95→        public static final int GL_ONE_MINUS_CONSTANT_COLOR = 0x8002;
+    96→    96→        public static final int GL_CONSTANT_ALPHA = 0x8003;
+    97→    97→        public static final int GL_ONE_MINUS_CONSTANT_ALPHA = 0x8004;
+    98→    98→
+    99→    99→        // --- Blend equations ---
+   100→   100→        public static final int GL_FUNC_ADD = 0x8006;
+   101→   101→        public static final int GL_FUNC_SUBTRACT = 0x800A;
+   102→   102→        public static final int GL_FUNC_REVERSE_SUBTRACT = 0x800B;
+   103→   103→        public static final int GL_MIN = 0x8007;
+   104→   104→        public static final int GL_MAX = 0x8008;
+   105→   105→
+   106→   106→        // --- Depth functions ---
+   107→   107→        public static final int GL_NEVER = 0x0200;
+   108→   108→        public static final int GL_LESS = 0x0201;
+   109→   109→        public static final int GL_EQUAL = 0x0202;
+   110→   110→        public static final int GL_LEQUAL = 0x0203;
+   111→   111→        public static final int GL_GREATER = 0x0204;
+   112→   112→        public static final int GL_NOTEQUAL = 0x0205;
+   113→   113→        public static final int GL_GEQUAL = 0x0206;
+   114→   114→        public static final int GL_ALWAYS = 0x0207;
+   115→   115→
+   116→   116→        // --- Face culling ---
+   117→   117→        public static final int GL_FRONT = 0x0404;
+   118→   118→        public static final int GL_BACK = 0x0405;
+   119→   119→        public static final int GL_FRONT_AND_BACK = 0x0408;
+   120→   120→
+   121→   121→        // --- Front face direction ---
+   122→   122→        public static final int GL_CW = 0x0900;
+   123→   123→        public static final int GL_CCW = 0x0901;
+   124→   124→
+   125→   125→        // --- Primitive types ---
+   126→   126→        public static final int GL_POINTS = 0x0000;
+   127→   127→        public static final int GL_LINES = 0x0001;
+   128→   128→        public static final int GL_LINE_LOOP = 0x0002;
+   129→   129→        public static final int GL_LINE_STRIP = 0x0003;
+   130→   130→        public static final int GL_TRIANGLES = 0x0004;
+   131→   131→        public static final int GL_TRIANGLE_STRIP = 0x0005;
+   132→   132→        public static final int GL_TRIANGLE_FAN = 0x0006;
+   133→   133→        public static final int GL_QUADS = 0x0007;
+   134→   134→        public static final int GL_QUAD_STRIP = 0x0008;
+   135→   135→        public static final int GL_POLYGON = 0x0009;
+   136→   136→
+   137→   137→        // --- Pixel formats ---
+   138→   138→        public static final int GL_DEPTH_COMPONENT = 0x1902;
+   139→   139→        public static final int GL_RED = 0x1903;
+   140→   140→        public static final int GL_GREEN = 0x1904;
+   141→   141→        public static final int GL_BLUE = 0x1905;
+   142→   142→        public static final int GL_ALPHA = 0x1906;
+   143→   143→        public static final int GL_RGB = 0x1907;
+   144→   144→        public static final int GL_RGBA = 0x1908;
+   145→   145→        public static final int GL_LUMINANCE = 0x1909;
+   146→   146→        public static final int GL_LUMINANCE_ALPHA = 0x190A;
+   147→   147→        public static final int GL_BGRA = 0x80E1;
+   148→   148→        public static final int GL_RG = 0x8227;
+   149→   149→        public static final int GL_RED_INTEGER = 0x8D94;
+   150→   150→        public static final int GL_GREEN_INTEGER = 0x8D95;
+   151→   151→        public static final int GL_BLUE_INTEGER = 0x8D96;
+   152→   152→        public static final int GL_ALPHA_INTEGER = 0x8D97;
+   153→   153→        public static final int GL_RGB_INTEGER = 0x8D98;
+   154→   154→        public static final int GL_RGBA_INTEGER = 0x8D99;
+   155→   155→        public static final int GL_RG_INTEGER = 0x8228;
+   156→   156→        public static final int GL_DEPTH_STENCIL = 0x84F9;
+   157→   157→
+   158→   158→        // --- Internal formats ---
+   159→   159→        public static final int GL_R8 = 0x8229;
+   160→   160→        public static final int GL_R16F = 0x822D;
+   161→   161→        public static final int GL_R32F = 0x822E;
+   162→   162→        public static final int GL_RG8 = 0x822B;
+   163→   163→        public static final int GL_RG16F = 0x822F;
+   164→   164→        public static final int GL_RG32F = 0x8230;
+   165→   165→        public static final int GL_RGB8 = 0x8051;
+   166→   166→        public static final int GL_RGB565 = 0x8D62;
+   167→   167→        public static final int GL_RGB16F = 0x881B;
+   168→   168→        public static final int GL_RGB32F = 0x8815;
+   169→   169→        public static final int GL_RGBA4 = 0x8056;
+   170→   170→        public static final int GL_RGB5_A1 = 0x8057;
+   171→   171→        public static final int GL_RGBA8 = 0x8058;
+   172→   172→        public static final int GL_RGBA16F = 0x881A;
+   173→   173→        public static final int GL_RGBA32F = 0x8814;
+   174→   174→        public static final int GL_SRGB8_ALPHA8 = 0x8C43;
+   175→   175→        public static final int GL_DEPTH_COMPONENT16 = 0x81A5;
+   176→   176→        public static final int GL_DEPTH_COMPONENT24 = 0x81A6;
+   177→   177→        public static final int GL_DEPTH_COMPONENT32F = 0x8CAC;
+   178→   178→        public static final int GL_DEPTH24_STENCIL8 = 0x88F0;
+   179→   179→        public static final int GL_DEPTH32F_STENCIL8 = 0x8CAD;
+   180→   180→        public static final int GL_R11F_G11F_B10F = 0x8C3A;
+   181→   181→        public static final int GL_COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
+   182→   182→        public static final int GL_COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
+   183→   183→        public static final int GL_COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
+   184→   184→        public static final int GL_COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3;
+   185→   185→
+   186→   186→        // --- Pixel types ---
+   187→   187→        public static final int GL_BYTE = 0x1400;
+   188→   188→        public static final int GL_UNSIGNED_BYTE = 0x1401;
+   189→   189→        public static final int GL_SHORT = 0x1402;
+   190→   190→        public static final int GL_UNSIGNED_SHORT = 0x1403;
+   191→   191→        public static final int GL_INT = 0x1404;
+   192→   192→        public static final int GL_UNSIGNED_INT = 0x1405;
+   193→   193→        public static final int GL_FLOAT = 0x1406;
+   194→   194→        public static final int GL_DOUBLE = 0x140A;
+   195→   195→        public static final int GL_HALF_FLOAT = 0x140B;
+   196→   196→        public static final int GL_UNSIGNED_SHORT_4_4_4_4 = 0x8033;
+   197→   197→        public static final int GL_UNSIGNED_SHORT_5_5_5_1 = 0x8034;
+   198→   198→        public static final int GL_UNSIGNED_SHORT_5_6_5 = 0x8363;
+   199→   199→        public static final int GL_UNSIGNED_INT_8_8_8_8 = 0x8035;
+   200→   200→        public static final int GL_UNSIGNED_INT_8_8_8_8_REV = 0x8367;
+   201→   201→        public static final int GL_UNSIGNED_INT_2_10_10_10_REV = 0x8368;
+   202→   202→        public static final int GL_UNSIGNED_INT_10F_11F_11F_REV = 0x8C3B;
+   203→   203→        public static final int GL_UNSIGNED_INT_24_8 = 0x84FA;
+   204→   204→        public static final int GL_FLOAT_32_UNSIGNED_INT_24_8_REV = 0x8DAD;
+   205→   205→
+   206→   206→        // --- Texture units ---
+   207→   207→        public static final int GL_TEXTURE0 = 0x84C0;
+   208→   208→        public static final int GL_TEXTURE1 = 0x84C1;
+   209→   209→        public static final int GL_TEXTURE2 = 0x84C2;
+   210→   210→        public static final int GL_TEXTURE3 = 0x84C3;
+   211→   211→        public static final int GL_TEXTURE4 = 0x84C4;
+   212→   212→        public static final int GL_TEXTURE5 = 0x84C5;
+   213→   213→        public static final int GL_TEXTURE6 = 0x84C6;
+   214→   214→        public static final int GL_TEXTURE7 = 0x84C7;
+   215→   215→        public static final int GL_TEXTURE8 = 0x84C8;
+   216→   216→        public static final int GL_TEXTURE9 = 0x84C9;
+   217→   217→        public static final int GL_TEXTURE10 = 0x84CA;
+   218→   218→        public static final int GL_TEXTURE11 = 0x84CB;
+   219→   219→        public static final int GL_TEXTURE12 = 0x84CC;
+   220→   220→        public static final int GL_TEXTURE13 = 0x84CD;
+   221→   221→        public static final int GL_TEXTURE14 = 0x84CE;
+   222→   222→        public static final int GL_TEXTURE15 = 0x84CF;
+   223→   223→        public static final int GL_TEXTURE16 = 0x84D0;
+   224→   224→        public static final int GL_TEXTURE17 = 0x84D1;
+   225→   225→        public static final int GL_TEXTURE18 = 0x84D2;
+   226→   226→        public static final int GL_TEXTURE19 = 0x84D3;
+   227→   227→        public static final int GL_TEXTURE20 = 0x84D4;
+   228→   228→        public static final int GL_TEXTURE21 = 0x84D5;
+   229→   229→        public static final int GL_TEXTURE22 = 0x84D6;
+   230→   230→        public static final int GL_TEXTURE23 = 0x84D7;
+   231→   231→        public static final int GL_TEXTURE24 = 0x84D8;
+   232→   232→        public static final int GL_TEXTURE25 = 0x84D9;
+   233→   233→        public static final int GL_TEXTURE26 = 0x84DA;
+   234→   234→        public static final int GL_TEXTURE27 = 0x84DB;
+   235→   235→        public static final int GL_TEXTURE28 = 0x84DC;
+   236→   236→        public static final int GL_TEXTURE29 = 0x84DD;
+   237→   237→        public static final int GL_TEXTURE30 = 0x84DE;
+   238→   238→        public static final int GL_TEXTURE31 = 0x84DF;
+   239→   239→        public static final int GL_ACTIVE_TEXTURE = 0x84E0;
+   240→   240→
+   241→   241→        // --- Texture parameters ---
+   242→   242→        public static final int GL_TEXTURE_MIN_FILTER = 0x2801;
+   243→   243→        public static final int GL_TEXTURE_MAG_FILTER = 0x2800;
+   244→   244→        public static final int GL_TEXTURE_WRAP_S = 0x2802;
+   245→   245→        public static final int GL_TEXTURE_WRAP_T = 0x2803;
+   246→   246→        public static final int GL_TEXTURE_WRAP_R = 0x8072;
+   247→   247→        public static final int GL_TEXTURE_MAX_LEVEL = 0x813D;
+   248→   248→        public static final int GL_TEXTURE_MAX_ANISOTROPY = 0x84FE;
+   249→   249→        public static final int GL_MAX_TEXTURE_MAX_ANISOTROPY = 0x84FF;
+   250→   250→        public static final int GL_TEXTURE_LOD_BIAS = 0x8501;
+   251→   251→        public static final int GL_TEXTURE_COMPARE_MODE = 0x884C;
+   252→   252→        public static final int GL_TEXTURE_COMPARE_FUNC = 0x884D;
+   253→   253→        public static final int GL_TEXTURE_WIDTH = 0x1000;
+   254→   254→        public static final int GL_TEXTURE_HEIGHT = 0x1001;
+   255→   255→        public static final int GL_TEXTURE_INTERNAL_FORMAT = 0x1003;
+   256→   256→        public static final int GL_TEXTURE_BORDER = 0x1005;
+   257→   257→        public static final int GL_TEXTURE_RED_SIZE = 0x1006;
+   258→   258→        public static final int GL_TEXTURE_GREEN_SIZE = 0x1007;
+   259→   259→        public static final int GL_TEXTURE_BLUE_SIZE = 0x1008;
+   260→   260→        public static final int GL_TEXTURE_ALPHA_SIZE = 0x1009;
+   261→   261→
+   262→   262→        // --- Texture filter modes ---
+   263→   263→        public static final int GL_NEAREST = 0x2600;
+   264→   264→        public static final int GL_LINEAR = 0x2601;
+   265→   265→        public static final int GL_NEAREST_MIPMAP_NEAREST = 0x2700;
+   266→   266→        public static final int GL_LINEAR_MIPMAP_NEAREST = 0x2701;
+   267→   267→        public static final int GL_NEAREST_MIPMAP_LINEAR = 0x2702;
+   268→   268→        public static final int GL_LINEAR_MIPMAP_LINEAR = 0x2703;
+   269→   269→
+   270→   270→        // --- Texture wrap modes ---
+   271→   271→        public static final int GL_CLAMP_TO_EDGE = 0x812F;
+   272→   272→        public static final int GL_REPEAT = 0x2901;
+   273→   273→        public static final int GL_MIRRORED_REPEAT = 0x8370;
+   274→   274→        public static final int GL_CLAMP_TO_BORDER = 0x812D;
+   275→   275→
+   276→   276→        // --- Pixel store ---
+   277→   277→        public static final int GL_UNPACK_ALIGNMENT = 0x0CF5;
+   278→   278→        public static final int GL_PACK_ALIGNMENT = 0x0D05;
+   279→   279→        public static final int GL_UNPACK_ROW_LENGTH = 0x0CF2;
+   280→   280→        public static final int GL_UNPACK_SKIP_ROWS = 0x0CF3;
+   281→   281→        public static final int GL_UNPACK_SKIP_PIXELS = 0x0CF4;
+   282→   282→        public static final int GL_UNPACK_IMAGE_HEIGHT = 0x806E;
+   283→   283→        public static final int GL_UNPACK_SKIP_IMAGES = 0x806D;
+   284→   284→        public static final int GL_PACK_ROW_LENGTH = 0x0D02;
+   285→   285→        public static final int GL_PACK_SKIP_ROWS = 0x0D03;
+   286→   286→        public static final int GL_PACK_SKIP_PIXELS = 0x0D04;
+   287→   287→        public static final int GL_PACK_IMAGE_HEIGHT = 0x806C;
+   288→   288→        public static final int GL_PACK_SKIP_IMAGES = 0x806B;
+   289→   289→
+   290→   290→        // --- Get parameters ---
+   291→   291→        public static final int GL_MAX_TEXTURE_SIZE = 0x0D33;
+   292→   292→        public static final int GL_MAX_TEXTURE_UNITS = 0x84E2;
+   293→   293→        public static final int GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8B4D;
+   294→   294→        public static final int GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8B4C;
+   295→   295→        public static final int GL_MAX_TEXTURE_IMAGE_UNITS = 0x8872;
+   296→   296→        public static final int GL_MAX_CUBE_MAP_TEXTURE_SIZE = 0x851C;
+   297→   297→        public static final int GL_MAX_RENDERBUFFER_SIZE = 0x84E8;
+   298→   298→        public static final int GL_MAX_VIEWPORT_DIMS = 0x0D3A;
+   299→   299→        public static final int GL_MAX_VERTEX_ATTRIBS = 0x8869;
+   300→   300→        public static final int GL_MAX_VERTEX_UNIFORM_VECTORS = 0x8DFB;
+   301→   301→        public static final int GL_MAX_VARYING_VECTORS = 0x8DFC;
+   302→   302→        public static final int GL_MAX_FRAGMENT_UNIFORM_VECTORS = 0x8DFD;
+   303→   303→        public static final int GL_VIEWPORT = 0x0BA2;
+   304→   304→        public static final int GL_DEPTH_BITS = 0x0D56;
+   305→   305→        public static final int GL_STENCIL_BITS = 0x0D57;
+   306→   306→        public static final int GL_ALPHA_BITS = 0x0D55;
+   307→   307→        public static final int GL_RED_BITS = 0x0D52;
+   308→   308→        public static final int GL_GREEN_BITS = 0x0D53;
+   309→   309→        public static final int GL_BLUE_BITS = 0x0D54;
+   310→   310→        public static final int GL_SUBPIXEL_BITS = 0x0D50;
+   311→   311→        public static final int GL_ALIASED_LINE_WIDTH_RANGE = 0x846E;
+   312→   312→        public static final int GL_ALIASED_POINT_SIZE_RANGE = 0x846D;
+   313→   313→        public static final int GL_DEPTH_RANGE = 0x0B70;
+   314→   314→        public static final int GL_DEPTH_WRITEMASK = 0x0B72;
+   315→   315→        public static final int GL_DEPTH_CLEAR_VALUE = 0x0B73;
+   316→   316→        public static final int GL_COLOR_WRITEMASK = 0x0C23;
+   317→   317→        public static final int GL_DOUBLEBUFFER = 0x0C32;
+   318→   318→        public static final int GL_STEREO = 0x0C33;
+   319→   319→        public static final int GL_SAMPLE_BUFFERS = 0x80A8;
+   320→   320→        public static final int GL_SAMPLES = 0x80A9;
+   321→   321→        public static final int GL_SAMPLE_COVERAGE_VALUE = 0x80AA;
+   322→   322→        public static final int GL_SAMPLE_COVERAGE_INVERT = 0x80AB;
+   323→   323→
+   324→   324→        // --- String queries ---
+   325→   325→        public static final int GL_VENDOR = 0x1F00;
+   326→   326→        public static final int GL_RENDERER = 0x1F01;
+   327→   327→        public static final int GL_VERSION = 0x1F02;
+   328→   328→        public static final int GL_EXTENSIONS = 0x1F03;
+   329→   329→        public static final int GL_SHADING_LANGUAGE_VERSION = 0x8B8C;
+   330→   330→
+   331→   331→        // --- Stencil operations ---
+   332→   332→        public static final int GL_KEEP = 0x1E00;
+   333→   333→        public static final int GL_REPLACE = 0x1E01;
+   334→   334→        public static final int GL_INCR = 0x1E02;
+   335→   335→        public static final int GL_DECR = 0x1E03;
+   336→   336→        public static final int GL_INVERT = 0x150A;
+   337→   337→        public static final int GL_INCR_WRAP = 0x8507;
+   338→   338→        public static final int GL_DECR_WRAP = 0x8508;
+   339→   339→        public static final int GL_STENCIL_INDEX = 0x1901;
+   340→   340→        public static final int GL_STENCIL_FUNC = 0x0B92;
+   341→   341→        public static final int GL_STENCIL_VALUE_MASK = 0x0B93;
+   342→   342→        public static final int GL_STENCIL_REF = 0x0B97;
+   343→   343→        public static final int GL_STENCIL_FAIL = 0x0B94;
+   344→   344→        public static final int GL_STENCIL_PASS_DEPTH_FAIL = 0x0B95;
+   345→   345→        public static final int GL_STENCIL_PASS_DEPTH_PASS = 0x0B96;
+   346→   346→        public static final int GL_STENCIL_BACK_FUNC = 0x8800;
+   347→   347→        public static final int GL_STENCIL_BACK_VALUE_MASK = 0x8CA4;
+   348→   348→        public static final int GL_STENCIL_BACK_REF = 0x8CA3;
+   349→   349→        public static final int GL_STENCIL_BACK_FAIL = 0x8801;
+   350→   350→        public static final int GL_STENCIL_BACK_PASS_DEPTH_FAIL = 0x8802;
+   351→   351→        public static final int GL_STENCIL_BACK_PASS_DEPTH_PASS = 0x8803;
+   352→   352→        public static final int GL_STENCIL_CLEAR_VALUE = 0x0B91;
+   353→   353→
+   354→   354→        // --- Fog (no-ops in WebGL2, constants still needed) ---
+   355→   355→        public static final int GL_FOG_COLOR = 0x0B66;
+   356→   356→        public static final int GL_FOG_DENSITY = 0x0B62;
+   357→   357→        public static final int GL_FOG_END = 0x0B64;
+   358→   358→        public static final int GL_FOG_START = 0x0B63;
+   359→   359→        public static final int GL_FOG_MODE = 0x0B65;
+   360→   360→        public static final int GL_FOG_INDEX = 0x0B61;
+   361→   361→        public static final int GL_FOG_COORD_SRC = 0x8450;
+   362→   362→        public static final int GL_EXP = 0x0800;
+   363→   363→        public static final int GL_EXP2 = 0x0801;
+   364→   364→
+   365→   365→        // --- Logic op ---
+   366→   366→        public static final int GL_LOGIC_OP_MODE = 0x0BF0;
+   367→   367→        public static final int GL_CLEAR = 0x1500;
+   368→   368→        public static final int GL_AND = 0x1501;
+   369→   369→        public static final int GL_AND_REVERSE = 0x1502;
+   370→   370→        public static final int GL_COPY = 0x1503;
+   371→   371→        public static final int GL_AND_INVERTED = 0x1504;
+   372→   372→        public static final int GL_NOOP = 0x1505;
+   373→   373→        public static final int GL_XOR = 0x1506;
+   374→   374→        public static final int GL_OR = 0x1507;
+   375→   375→        public static final int GL_NOR = 0x1508;
+   376→   376→        public static final int GL_EQUIV = 0x1509;
+   377→   377→        public static final int GL_INVERT = 0x150A;
+   378→   378→        public static final int GL_OR_REVERSE = 0x150B;
+   379→   379→        public static final int GL_COPY_INVERTED = 0x150C;
+   380→   380→        public static final int GL_OR_INVERTED = 0x150D;
+   381→   381→        public static final int GL_NAND = 0x150E;
+   382→   382→        public static final int GL_SET = 0x150F;
+   383→   383→
+   384→   384→        // --- Texture env (no-ops in WebGL2) ---
+   385→   385→        public static final int GL_TEXTURE_ENV = 0x2300;
+   386→   386→        public static final int GL_TEXTURE_ENV_MODE = 0x2200;
+   387→   387→        public static final int GL_MODULATE = 0x2100;
+   388→   388→        public static final int GL_DECAL = 0x2101;
+   389→   389→        public static final int GL_ADD = 0x0104;
+   390→   390→        public static final int GL_COMBINE = 0x8570;
+   391→   391→        public static final int GL_COMBINE_RGB = 0x8571;
+   392→   392→        public static final int GL_COMBINE_ALPHA = 0x8572;
+   393→   393→        public static final int GL_INTERPOLATE = 0x8575;
+   394→   394→        public static final int GL_SUBTRACT = 0x84E7;
+   395→   395→        public static final int GL_SRC0_RGB = 0x8580;
+   396→   396→        public static final int GL_SRC1_RGB = 0x8581;
+   397→   397→        public static final int GL_SRC2_RGB = 0x8582;
+   398→   398→        public static final int GL_SRC0_ALPHA = 0x8588;
+   399→   399→        public static final int GL_SRC1_ALPHA = 0x8589;
+   400→   400→        public static final int GL_SRC2_ALPHA = 0x858A;
+   401→   401→        public static final int GL_OPERAND0_RGB = 0x8590;
+   402→   402→        public static final int GL_OPERAND1_RGB = 0x8591;
+   403→   403→        public static final int GL_OPERAND2_RGB = 0x8592;
+   404→   404→        public static final int GL_OPERAND0_ALPHA = 0x8598;
+   405→   405→        public static final int GL_OPERAND1_ALPHA = 0x8599;
+   406→   406→        public static final int GL_OPERAND2_ALPHA = 0x859A;
+   407→   407→        public static final int GL_RGB_SCALE = 0x8573;
+   408→   408→        public static final int GL_ALPHA_SCALE = 0x8574;
+   409→   409→
+   410→   410→        // --- Framebuffer ---
+   411→   411→        public static final int GL_FRAMEBUFFER = 0x8D40;
+   412→   412→        public static final int GL_RENDERBUFFER = 0x8D41;
+   413→   413→        public static final int GL_COLOR_ATTACHMENT0 = 0x8CE0;
+   414→   414→        public static final int GL_DEPTH_ATTACHMENT = 0x8D00;
+   415→   415→        public static final int GL_STENCIL_ATTACHMENT = 0x8D20;
+   416→   416→        public static final int GL_DEPTH_STENCIL_ATTACHMENT = 0x821A;
+   417→   417→        public static final int GL_FRAMEBUFFER_COMPLETE = 0x8CD5;
+   418→   418→        public static final int GL_DRAW_FRAMEBUFFER = 0x8CA9;
+   419→   419→        public static final int GL_READ_FRAMEBUFFER = 0x8CA8;
+   420→   420→        public static final int GL_FRAMEBUFFER_UNDEFINED = 0x8219;
+   421→   421→
+   422→   422→        // --- Polygon mode ---
+   423→   423→        public static final int GL_POINT = 0x1B00;
+   424→   424→        public static final int GL_LINE = 0x1B01;
+   425→   425→        public static final int GL_FILL = 0x1B02;
+   426→   426→
+   427→   427→        // --- Matrix mode ---
+   428→   428→        public static final int GL_MODELVIEW = 0x1700;
+   429→   429→        public static final int GL_PROJECTION = 0x1701;
+   430→   430→        public static final int GL_TEXTURE = 0x1702;
+   431→   431→
+   432→   432→        // --- Hints ---
+   433→   433→        public static final int GL_DONT_CARE = 0x1100;
+   434→   434→        public static final int GL_FASTEST = 0x1101;
+   435→   435→        public static final int GL_NICEST = 0x1102;
+   436→   436→        public static final int GL_PERSPECTIVE_CORRECTION_HINT = 0x0C50;
+   437→   437→        public static final int GL_POINT_SMOOTH_HINT = 0x0C51;
+   438→   438→        public static final int GL_LINE_SMOOTH_HINT = 0x0C52;
+   439→   439→        public static final int GL_FOG_HINT = 0x0C54;
+   440→   440→        public static final int GL_GENERATE_MIPMAP_HINT = 0x8192;
+   441→   441→        public static final int GL_TEXTURE_COMPRESSION_HINT = 0x84EF;
+   442→   442→
+   443→   443→        // --- Blend color ---
+   444→   444→        public static final int GL_BLEND_COLOR = 0x8005;
+   445→   445→        public static final int GL_BLEND_DST = 0x0BE0;
+   446→   446→        public static final int GL_BLEND_SRC = 0x0BE1;
+   447→   447→        public static final int GL_BLEND_EQUATION = 0x8009;
+   448→   448→
+   449→   449→        // --- Read/Draw buffer ---
+   450→   450→        public static final int GL_NONE = 0;
+   451→   451→        public static final int GL_LEFT = 0x0406;
+   452→   452→        public static final int GL_RIGHT = 0x0407;
+   453→   453→
+   454→   454→        // --- Lighting ---
+   455→   455→        public static final int GL_LIGHT0 = 0x4000;
+   456→   456→        public static final int GL_LIGHT1 = 0x4001;
+   457→   457→        public static final int GL_LIGHT2 = 0x4002;
+   458→   458→        public static final int GL_LIGHT3 = 0x4003;
+   459→   459→        public static final int GL_LIGHT4 = 0x4004;
+   460→   460→        public static final int GL_LIGHT5 = 0x4005;
+   461→   461→        public static final int GL_LIGHT6 = 0x4006;
+   462→   462→        public static final int GL_LIGHT7 = 0x4007;
+   463→   463→        public static final int GL_AMBIENT = 0x1200;
+   464→   464→        public static final int GL_DIFFUSE = 0x1201;
+   465→   465→        public static final int GL_SPECULAR = 0x1202;
+   466→   466→        public static final int GL_POSITION = 0x1203;
+   467→   467→        public static final int GL_SPOT_DIRECTION = 0x1204;
+   468→   468→        public static final int GL_SPOT_EXPONENT = 0x1205;
+   469→   469→        public static final int GL_SPOT_CUTOFF = 0x1206;
+   470→   470→        public static final int GL_CONSTANT_ATTENUATION = 0x1207;
+   471→   471→        public static final int GL_LINEAR_ATTENUATION = 0x1208;
+   472→   472→        public static final int GL_QUADRATIC_ATTENUATION = 0x1209;
+   473→   473→        public static final int GL_EMISSION = 0x1600;
+   474→   474→        public static final int GL_SHININESS = 0x1601;
+   475→   475→        public static final int GL_AMBIENT_AND_DIFFUSE = 0x1602;
+   476→   476→        public static final int GL_COLOR_INDEXES = 0x1603;
+   477→   477→
+   478→   478→        // --- Material face ---
+   479→   479→        public static final int GL_FRONT_FACE = 0x0B46;
+   480→   480→
+   481→   481→        // --- Current state ---
+   482→   482→        public static final int GL_CURRENT_COLOR = 0x0B00;
+   483→   483→        public static final int GL_CURRENT_NORMAL = 0x0B02;
+   484→   484→        public static final int GL_CURRENT_TEXTURE_COORDS = 0x0B03;
+   485→   485→
+   486→   486→        // --- Pixel transfer ---
+   487→   487→        public static final int GL_MAP_COLOR = 0x0D10;
+   488→   488→        public static final int GL_MAP_STENCIL = 0x0D11;
+   489→   489→        public static final int GL_INDEX_SHIFT = 0x0D12;
+   490→   490→        public static final int GL_INDEX_OFFSET = 0x0D13;
+   491→   491→        public static final int GL_RED_SCALE = 0x0D14;
+   492→   492→        public static final int GL_RED_BIAS = 0x0D15;
+   493→   493→        public static final int GL_GREEN_SCALE = 0x0D18;
+   494→   494→        public static final int GL_GREEN_BIAS = 0x0D19;
+   495→   495→        public static final int GL_BLUE_SCALE = 0x0D1A;
+   496→   496→        public static final int GL_BLUE_BIAS = 0x0D1B;
+   497→   497→        public static final int GL_ALPHA_SCALE = 0x0D1C;
+   498→   498→        public static final int GL_ALPHA_BIAS = 0x0D1D;
+   499→   499→        public static final int GL_DEPTH_SCALE = 0x0D1E;
+   500→   500→        public static final int GL_DEPTH_BIAS = 0x0D1F;
+   501→   501→
+   502→   502→        // --- Scissor / viewport boxes ---
+   503→   503→        public static final int GL_SCISSOR_BOX = 0x0C10;
+   504→   504→        public static final int GL_MAX_ATTRIB_STACK_DEPTH = 0x0D35;
+   505→   505→
+   506→   506→        // --- Pixel map ---
+   507→   507→        public static final int GL_PIXEL_MAP_I_TO_I = 0x0C70;
+   508→   508→        public static final int GL_PIXEL_MAP_S_TO_S = 0x0C71;
+   509→   509→        public static final int GL_PIXEL_MAP_I_TO_R = 0x0C72;
+   510→   510→        public static final int GL_PIXEL_MAP_I_TO_G = 0x0C73;
+   511→   511→        public static final int GL_PIXEL_MAP_I_TO_B = 0x0C74;
+   512→   512→        public static final int GL_PIXEL_MAP_I_TO_A = 0x0C75;
+   513→   513→        public static final int GL_PIXEL_MAP_R_TO_R = 0x0C76;
+   514→   514→        public static final int GL_PIXEL_MAP_G_TO_G = 0x0C77;
+   515→   515→        public static final int GL_PIXEL_MAP_B_TO_B = 0x0C78;
+   516→   516→        public static final int GL_PIXEL_MAP_A_TO_A = 0x0C79;
+   517→   517→
+   518→   518→        // --- Buffer objects ---
+   519→   519→        public static final int GL_ARRAY_BUFFER = 0x8892;
+   520→   520→        public static final int GL_ELEMENT_ARRAY_BUFFER = 0x8893;
+   521→   521→        public static final int GL_STATIC_DRAW = 0x88E4;
+   522→   522→        public static final int GL_DYNAMIC_DRAW = 0x88E8;
+   523→   523→        public static final int GL_STREAM_DRAW = 0x88E0;
+   524→   524→
+   525→   525→        // --- Shader ---
+   526→   526→        public static final int GL_FRAGMENT_SHADER = 0x8B30;
+   527→   527→        public static final int GL_VERTEX_SHADER = 0x8B31;
+   528→   528→        public static final int GL_COMPILE_STATUS = 0x8B81;
+   529→   529→        public static final int GL_LINK_STATUS = 0x8B82;
+   530→   530→        public static final int GL_VALIDATE_STATUS = 0x8B83;
+   531→   531→        public static final int GL_INFO_LOG_LENGTH = 0x8B84;
+   532→   532→        public static final int GL_ACTIVE_UNIFORMS = 0x8B86;
+   533→   533→        public static final int GL_ACTIVE_ATTRIBUTES = 0x8B89;
+   534→   534→
+   535→   535→        // ================================================================
+   536→   536→        // GL Methods
+   537→   537→        // ================================================================
+   538→   538→
+   539→   539→        // --- State management ---
+   540→   540→        public static void glEnable(int cap) {
+   541→   541→                PlatformOpenGL._wglEnable(cap);
+   542→   542→        }
+   543→   543→
+   544→   544→        public static void glDisable(int cap) {
+   545→   545→                PlatformOpenGL._wglDisable(cap);
+   546→   546→        }
+   547→   547→
+   548→   548→        // --- Clear ---
+   549→   549→        public static void glClearColor(float r, float g, float b, float a) {
+   550→   550→                PlatformOpenGL._wglClearColor(r, g, b, a);
+   551→   551→        }
+   552→   552→
+   553→   553→        public static void glClearDepth(double depth) {
+   554→   554→                PlatformOpenGL._wglClearDepth(depth);
+   555→   555→        }
+   556→   556→
+   557→   557→        public static void glClearStencil(int s) {
+   558→   558→                PlatformOpenGL._wglClearStencil(s);
+   559→   559→        }
+   560→   560→
+   561→   561→        public static void glClear(int mask) {
+   562→   562→                PlatformOpenGL._wglClear(mask);
+   563→   563→        }
+   564→   564→
+   565→   565→        // --- Viewport / Scissor ---
+   566→   566→        public static void glViewport(int x, int y, int w, int h) {
+   567→   567→                PlatformOpenGL._wglViewport(x, y, w, h);
+   568→   568→        }
+   569→   569→
+   570→   570→        public static void glScissor(int x, int y, int w, int h) {
+   571→   571→                PlatformOpenGL._wglScissor(x, y, w, h);
+   572→   572→        }
+   573→   573→
+   574→   574→        // --- Blend ---
+   575→   575→        public static void glBlendFunc(int sfactor, int dfactor) {
+   576→   576→                PlatformOpenGL._wglBlendFunc(sfactor, dfactor);
+   577→   577→        }
+   578→   578→
+   579→   579→        // --- Depth ---
+   580→   580→        public static void glDepthFunc(int func) {
+   581→   581→                PlatformOpenGL._wglDepthFunc(func);
+   582→   582→        }
+   583→   583→
+   584→   584→        public static void glDepthMask(boolean flag) {
+   585→   585→                PlatformOpenGL._wglDepthMask(flag);
+   586→   586→        }
+   587→   587→
+   588→   588→        public static void glDepthRange(double near, double far) {
+   589→   589→                PlatformOpenGL._wglDepthRange(near, far);
+   590→   590→        }
+   591→   591→
+   592→   592→        // --- Color mask ---
+   593→   593→        public static void glColorMask(boolean r, boolean g, boolean b, boolean a) {
+   594→   594→                PlatformOpenGL._wglColorMask(r, g, b, a);
+   595→   595→        }
+   596→   596→
+   597→   597→        // --- Face culling ---
+   598→   598→        public static void glCullFace(int mode) {
+   599→   599→                PlatformOpenGL._wglCullFace(mode);
+   600→   600→        }
+   601→   601→
+   602→   602→        public static void glFrontFace(int dir) {
+   603→   603→                PlatformOpenGL._wglFrontFace(dir);
+   604→   604→        }
+   605→   605→
+   606→   606→        // --- Line width ---
+   607→   607→        public static void glLineWidth(float width) {
+   608→   608→                PlatformOpenGL._wglLineWidth(width);
+   609→   609→        }
+   610→   610→
+   611→   611→        // --- Polygon offset ---
+   612→   612→        public static void glPolygonOffset(float factor, float units) {
+   613→   613→                PlatformOpenGL._wglPolygonOffset(factor, units);
+   614→   614→        }
+   615→   615→
+   616→   616→        // --- Pixel store ---
+   617→   617→        public static void glPixelStorei(int pname, int param) {
+   618→   618→                PlatformOpenGL._wglPixelStorei(pname, param);
+   619→   619→        }
+   620→   620→
+   621→   621→        // --- Read pixels ---
+   622→   622→        public static void glReadPixels(int x, int y, int w, int h, int format, int type, Object pixels) {
+   623→   623→                PlatformOpenGL._wglReadPixels(x, y, w, h, format, type, pixels != null ? (JSObject) pixels : null);
+   624→   624→        }
+   625→   625→
+   626→   626→        // --- Drawing ---
+   627→   627→        public static void glDrawArrays(int mode, int first, int count) {
+   628→   628→                PlatformOpenGL._wglDrawArrays(mode, first, count);
+   629→   629→        }
+   630→   630→
+   631→   631→        public static void glDrawElements(int mode, int count, int type, int offset) {
+   632→   632→                PlatformOpenGL._wglDrawElements(mode, count, type, offset);
+   633→   633→        }
+   634→   634→
+   635→   635→        public static void glDrawElements(int mode, int count, int type, long offset) {
+   636→   636→                PlatformOpenGL._wglDrawElements(mode, count, type, (int) offset);
+   637→   637→        }
+   638→   638→
+   639→   639→        // --- Flush / Finish ---
+   640→   640→        public static void glFlush() {
+   641→   641→                PlatformOpenGL._wglFlush();
+   642→   642→        }
+   643→   643→
+   644→   644→        public static void glFinish() {
+   645→   645→                PlatformOpenGL._wglFinish();
+   646→   646→        }
+   647→   647→
+   648→   648→        // --- Error / String queries ---
+   649→   649→        public static int glGetError() {
+   650→   650→                return PlatformOpenGL._wglGetError();
+   651→   651→        }
+   652→   652→
+   653→   653→        public static String glGetString(int name) {
+   654→   654→                return PlatformOpenGL._wglGetString(name);
+   655→   655→        }
+   656→   656→
+   657→   657→        // --- State queries (single value) ---
+   658→   658→
+   659→   659→        public static boolean glIsEnabled(int cap) {
+   660→   660→                return PlatformOpenGL._wglIsEnabled(cap);
+   661→   661→        }
+   662→   662→
+   663→   663→        public static int glGetInteger(int pname) {
+   664→   664→                return PlatformOpenGL._wglGetInteger(pname);
+   665→   665→        }
+   666→   666→
+   667→   667→        // --- State queries ---
+   668→   668→
+   669→   669→        public static void glGetIntegerv(int pname, int[] params, int offset) {
+   670→   670→                int len = params.length - offset;
+   671→   671→                Int32Array arr = Int32Array.create(len);
+   672→   672→                PlatformOpenGL._wglGetIntegerv(pname, arr);
+   673→   673→                for (int i = 0; i < len; i++) {
+   674→   674→                        params[offset + i] = arr.get(i);
+   675→   675→                }
+   676→   676→        }
+   677→   677→
+   678→   678→        /**
+   679→   679→         * NIO IntBuffer version - handled by the java.nio shim layer.
+   680→   680→         */
+   681→   681→        public static void glGetIntegerv(int pname, Object params) {
+   682→   682→                // TODO: NIO IntBuffer shim
+   683→   683→        }
+   684→   684→
+   685→   685→        public static void glGetFloatv(int pname, float[] params, int offset) {
+   686→   686→                int len = params.length - offset;
+   687→   687→                Float32Array arr = Float32Array.create(len);
+   688→   688→                PlatformOpenGL._wglGetFloatv(pname, arr);
+   689→   689→                for (int i = 0; i < len; i++) {
+   690→   690→                        params[offset + i] = arr.get(i);
+   691→   691→                }
+   692→   692→        }
+   693→   693→
+   694→   694→        /**
+   695→   695→         * NIO FloatBuffer version - handled by the java.nio shim layer.
+   696→   696→         */
+   697→   697→        public static void glGetFloatv(int pname, Object params) {
+   698→   698→                // TODO: NIO FloatBuffer shim
+   699→   699→        }
+   700→   700→
+   701→   701→        public static void glGetBooleanv(int pname, boolean[] params, int offset) {
+   702→   702→                int len = params.length - offset;
+   703→   703→                Uint8Array arr = Uint8Array.create(len);
+   704→   704→                PlatformOpenGL._wglGetBooleanv(pname, arr);
+   705→   705→                for (int i = 0; i < len; i++) {
+   706→   706→                        params[offset + i] = arr.get(i) != 0;
+   707→   707→                }
+   708→   708→        }
+   709→   709→
+   710→   710→        /**
+   711→   711→         * NIO ByteBuffer version - handled by the java.nio shim layer.
+   712→   712→         */
+   713→   713→        public static void glGetBooleanv(int pname, Object params) {
+   714→   714→                // TODO: NIO ByteBuffer shim
+   715→   715→        }
+   716→   716→
+   717→   717→        // --- Texture management ---
+   718→   718→
+   719→   719→        public static void glActiveTexture(int texture) {
+   720→   720→                PlatformOpenGL._wglActiveTexture(texture);
+   721→   721→        }
+   722→   722→
+   723→   723→        public static void glBindTexture(int target, int texture) {
+   724→   724→                PlatformOpenGL._wglBindTexture(target, getTextureObject(texture));
+   725→   725→        }
+   726→   726→
+   727→   727→        public static int glGenTextures() {
+   728→   728→                JSObject tex = PlatformOpenGL._wglGenTextures();
+   729→   729→                int id = nextTextureId++;
+   730→   730→                textureMap.put(id, tex);
+   731→   731→                return id;
+   732→   732→        }
+   733→   733→
+   734→   734→        public static void glGenTextures(int n, int[] textures, int offset) {
+   735→   735→                for (int i = 0; i < n; i++) {
+   736→   736→                        textures[offset + i] = glGenTextures();
+   737→   737→                }
+   738→   738→        }
+   739→   739→
+   740→   740→        /**
+   741→   741→         * NIO IntBuffer version - handled by the java.nio shim layer.
+   742→   742→         */
+   743→   743→        public static void glGenTextures(int n, Object textures) {
+   744→   744→                // TODO: NIO IntBuffer shim
+   745→   745→        }
+   746→   746→
+   747→   747→        public static void glDeleteTextures(int texture) {
+   748→   748→                JSObject tex = textureMap.remove(texture);
+   749→   749→                if (tex != null) {
+   750→   750→                        PlatformOpenGL._wglDeleteTextures(tex);
+   751→   751→                }
+   752→   752→        }
+   753→   753→
+   754→   754→        public static void glDeleteTextures(int n, int[] textures, int offset) {
+   755→   755→                for (int i = 0; i < n; i++) {
+   756→   756→                        glDeleteTextures(textures[offset + i]);
+   757→   757→                }
+   758→   758→        }
+   759→   759→
+   760→   760→        /**
+   761→   761→         * NIO IntBuffer version - handled by the java.nio shim layer.
+   762→   762→         */
+   763→   763→        public static void glDeleteTextures(int n, Object textures) {
+   764→   764→                // TODO: NIO IntBuffer shim
+   765→   765→        }
+   766→   766→
+   767→   767→        public static boolean glIsTexture(int texture) {
+   768→   768→                return texture != 0 && textureMap.containsKey(texture);
+   769→   769→        }
+   770→   770→
+   771→   771→        // --- Texture image ---
+   772→   772→
+   773→   773→        public static void glTexImage2D(int target, int level, int internalformat, int width, int height,
+   774→   774→                        int border, int format, int type, Object pixels) {
+   775→   775→                PlatformOpenGL._wglTexImage2D(target, level, internalformat, width, height, border, format, type,
+   776→   776→                                pixels != null ? (JSObject) pixels : null);
+   777→   777→        }
+   778→   778→
+   779→   779→        public static void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height,
+   780→   780→                        int format, int type, Object pixels) {
+   781→   781→                PlatformOpenGL._wglTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
+   782→   782→                                pixels != null ? (JSObject) pixels : null);
+   783→   783→        }
+   784→   784→
+   785→   785→        public static void glTexParameteri(int target, int pname, int param) {
+   786→   786→                PlatformOpenGL._wglTexParameteri(target, pname, param);
+   787→   787→        }
+   788→   788→
+   789→   789→        public static void glTexParameterf(int target, int pname, float param) {
+   790→   790→                PlatformOpenGL._wglTexParameterf(target, pname, param);
+   791→   791→        }
+   792→   792→
+   793→   793→        public static void glGenerateMipmap(int target) {
+   794→   794→                PlatformOpenGL._wglGenerateMipmap(target);
+   795→   795→        }
+   796→   796→
+   797→   797→        // --- Read/Draw buffer ---
+   798→   798→
+   799→   799→        public static void glReadBuffer(int mode) {
+   800→   800→                PlatformOpenGL._wglReadBuffer(mode);
+   801→   801→        }
+   802→   802→
+   803→   803→        /**
+   804→   804→         * No-op: glDrawBuffer is not supported in WebGL2.
+   805→   805→         */
+   806→   806→        public static void glDrawBuffer(int mode) {
+   807→   807→                // Not supported in WebGL2
+   808→   808→        }
+   809→   809→
+   810→   810→        // ================================================================
+   811→   811→        // No-op methods (features not supported in WebGL2)
+   812→   812→        // ================================================================
+   813→   813→
+   814→   814→        /**
+   815→   815→         * No-op: glLogicOp is not supported in WebGL2.
+   816→   816→         */
+   817→   817→        public static void glLogicOp(int opcode) {
+   818→   818→                // Not supported in WebGL2
+   819→   819→        }
+   820→   820→
+   821→   821→        /**
+   822→   822→         * No-op: glFogi is not supported in WebGL2.
+   823→   823→         */
+   824→   824→        public static void glFogi(int pname, int param) {
+   825→   825→                // Not supported in WebGL2
+   826→   826→        }
+   827→   827→
+   828→   828→        /**
+   829→   829→         * No-op: glFogf is not supported in WebGL2.
+   830→   830→         */
+   831→   831→        public static void glFogf(int pname, float param) {
+   832→   832→                // Not supported in WebGL2
+   833→   833→        }
+   834→   834→
+   835→   835→        /**
+   836→   836→         * No-op: glFogfv is not supported in WebGL2 (array version).
+   837→   837→         */
+   838→   838→        public static void glFogfv(int pname, float[] params, int offset) {
+   839→   839→                // Not supported in WebGL2
+   840→   840→        }
+   841→   841→
+   842→   842→        /**
+   843→   843→         * No-op: glFogfv is not supported in WebGL2 (NIO buffer version).
+   844→   844→         */
+   845→   845→        public static void glFogfv(int pname, Object params) {
+   846→   846→                // Not supported in WebGL2
+   847→   847→        }
+   848→   848→
+   849→   849→        /**
+   850→   850→         * No-op: glTexEnvf is not supported in WebGL2.
+   851→   851→         */
+   852→   852→        public static void glTexEnvf(int target, int pname, float param) {
+   853→   853→                // Not supported in WebGL2
+   854→   854→        }
+   855→   855→
+   856→   856→        /**
+   857→   857→         * No-op: glTexEnvi is not supported in WebGL2.
+   858→   858→         */
+   859→   859→        public static void glTexEnvi(int target, int pname, int param) {
+   860→   860→                // Not supported in WebGL2
+   861→   861→        }
+   862→   862→
+   863→   863→        /**
+   864→   864→         * No-op: glHint has no meaningful effect in WebGL2.
+   865→   865→         */
+   866→   866→        public static void glHint(int target, int mode) {
+   867→   867→                // No-op in WebGL2
+   868→   868→        }
+   869→   869→
+   870→   870→        /**
+   871→   871→         * No-op: glShadeModel is fixed-function pipeline (not in WebGL2).
+   872→   872→         */
+   873→   873→        public static void glShadeModel(int mode) {
+   874→   874→                // Not supported in WebGL2
+   875→   875→        }
+   876→   876→
+   877→   877→        /**
+   878→   878→         * No-op: glAlphaFunc is fixed-function pipeline (not in WebGL2).
+   879→   879→         */
+   880→   880→        public static void glAlphaFunc(int func, float ref) {
+   881→   881→                // Not supported in WebGL2
+   882→   882→        }
+   883→   883→}
+   884→   884→

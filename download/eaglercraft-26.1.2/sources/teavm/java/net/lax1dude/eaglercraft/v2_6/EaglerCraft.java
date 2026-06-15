@@ -304,24 +304,48 @@ public class EaglerCraft {
                         ClientMain.log("[EaglerCraft] Creating Minecraft instance...");
                 }
 
-                // TODO: Replace with actual MC 26.1.2 Minecraft class instantiation
-                // after decompilation. Expected:
-                //   minecraftInstance = Minecraft.getInstance();
-                //   or:
-                //   minecraftInstance = new Minecraft(...);
-                //
-                // For now, we store null and rely on the fact that MC's main class
-                // will be patched to use EaglerCraft's platform services directly.
-                //
-                // The actual MC 26.1.2 class name is likely:
-                //   net.minecraft.client.Minecraft
-                // and it likely has a static accessor like:
-                //   Minecraft.getInstance()
+                try {
+                        // Directly reference MC's Minecraft class so TeaVM includes it.
+                        // TeaVM only compiles classes that are statically reachable
+                        // from the mainClass - reflection won't work.
+                        //
+                        // MC 26.1.2's Minecraft class is net.minecraft.client.Minecraft
+                        // It's a singleton accessible via Minecraft.getInstance()
+                        //
+                        // However, Minecraft's constructor requires many services
+                        // (game directory, assets, GLFW window, etc.) that don't
+                        // exist in the browser. We'll try a minimal bootstrap.
 
-                minecraftInstance = null; // Placeholder
+                        try {
+                                // Force TeaVM to include the Minecraft class by referencing it
+                                // The class itself will fail to initialize fully because it
+                                // depends on GLFW/LWJGL, but our shims provide no-op stubs
+                                net.minecraft.client.Minecraft mc = null;
+                                try {
+                                        mc = net.minecraft.client.Minecraft.getInstance();
+                                } catch (Throwable t) {
+                                        ClientMain.log("[EaglerCraft] Minecraft.getInstance() failed: " + t.getMessage());
+                                        ClientMain.log("[EaglerCraft] (This is expected - MC needs full LWJGL setup)");
+                                }
+
+                                if (mc != null) {
+                                        minecraftInstance = mc;
+                                        ClientMain.log("[EaglerCraft] Minecraft instance created successfully!");
+                                } else {
+                                        ClientMain.log("[EaglerCraft] Could not create MC instance (missing native services)");
+                                        ClientMain.log("[EaglerCraft] Running in adapter-only mode with title screen");
+                                }
+                        } catch (NoClassDefFoundError e) {
+                                ClientMain.log("[EaglerCraft] Minecraft class not available: " + e.getMessage());
+                                ClientMain.log("[EaglerCraft] Running in adapter-only mode");
+                        } catch (Throwable t) {
+                                ClientMain.warn("[EaglerCraft] Error creating Minecraft: " + t.getMessage());
+                        }
+                } catch (Throwable t) {
+                        ClientMain.warn("[EaglerCraft] Error during MC instance creation: " + t.getMessage());
+                }
 
                 if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
-                        ClientMain.log("[EaglerCraft] Minecraft instance created (placeholder)");
                         ClientMain.log("[EaglerCraft] Display: " + PlatformRuntime.getCanvasWidth()
                                         + "x" + PlatformRuntime.getCanvasHeight()
                                         + " @" + PlatformRuntime.getDevicePixelRatio() + "x DPR");
