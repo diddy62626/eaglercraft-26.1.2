@@ -1,0 +1,33 @@
+﻿2026-06-15T18:24:39.0654618Z ##[group]Run actions/setup-java@v4
+2026-06-15T18:24:39.0655007Z with:
+2026-06-15T18:24:39.0655217Z   distribution: temurin
+2026-06-15T18:24:39.0655452Z   java-version: 25
+2026-06-15T18:24:39.0655663Z   cache: gradle
+2026-06-15T18:24:39.0655888Z   java-package: jdk
+2026-06-15T18:24:39.0656103Z   check-latest: false
+2026-06-15T18:24:39.0656322Z   server-id: github
+2026-06-15T18:24:39.0656543Z   server-username: GITHUB_ACTOR
+2026-06-15T18:24:39.0656814Z   server-password: GITHUB_TOKEN
+2026-06-15T18:24:39.0657072Z   overwrite-settings: true
+2026-06-15T18:24:39.0657316Z   job-status: success
+2026-06-15T18:24:39.0660469Z   token: ***
+2026-06-15T18:24:39.0660683Z env:
+2026-06-15T18:24:39.0660872Z   JAVA_VERSION: 25
+2026-06-15T18:24:39.0661115Z   NODE_VERSION: 22
+2026-06-15T18:24:39.0661397Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T18:24:39.0661663Z ##[endgroup]
+2026-06-15T18:24:39.2739488Z ##[group]Installed distributions
+2026-06-15T18:24:39.2914068Z Resolved Java 25.0.3+9 from tool-cache
+2026-06-15T18:24:39.2914954Z Setting Java 25.0.3+9 as the default
+2026-06-15T18:24:39.2929296Z Creating toolchains.xml for JDK version 25 from temurin
+2026-06-15T18:24:39.3012907Z Writing to /home/runner/.m2/toolchains.xml
+2026-06-15T18:24:39.3013384Z 
+2026-06-15T18:24:39.3022479Z Java configuration:
+2026-06-15T18:24:39.3050359Z   Distribution: temurin
+2026-06-15T18:24:39.3080270Z   Version: 25.0.3+9
+2026-06-15T18:24:39.3103428Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:24:39.3108636Z 
+2026-06-15T18:24:39.3120633Z ##[endgroup]
+2026-06-15T18:24:39.3137121Z Creating settings.xml with server-id: github
+2026-06-15T18:24:39.3137985Z Writing to /home/runner/.m2/settings.xml
+2026-06-15T18:24:39.6627356Z gradle cache is not found
