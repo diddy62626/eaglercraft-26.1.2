@@ -120,7 +120,8 @@ jobs:
           TEAVM_EXIT=$?
 
           # Check if TeaVM reported errors in the log (even if exit code was 0)
-          ERROR_COUNT=$(grep -ciE 'error:|ERROR|compilation error|failed' teavm.log 2>/dev/null || echo 0)
+          # Use specific patterns to avoid false positives from JVM args like HeapDumpOnOutOfMemoryError
+          ERROR_COUNT=$(grep -cE '\.java:[0-9]+: error:|TeaVM.*error|Compilation error|BUILD FAILED' teavm.log 2>/dev/null || echo 0)
           if [ "$TEAVM_EXIT" -ne 0 ] || [ "$ERROR_COUNT" -gt 0 ]; then
             echo "=== TeaVM compilation FAILED (exit=$TEAVM_EXIT, errors in log=$ERROR_COUNT) ==="
             echo "Last 80 lines of TeaVM log:"

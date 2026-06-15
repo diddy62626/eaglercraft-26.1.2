@@ -44,6 +44,13 @@ dependencies {
     implementation files("desktopRuntime/codecjorbis.jar")
     implementation files("desktopRuntime/soundsystem.jar")
 
+    // TeaVM source set also needs all the same dependencies
+    // since it includes both teavm/java and main/java code
+    teavmImplementation teavm.libs.jso
+    teavmImplementation teavm.libs.jsoApis
+    teavmImplementation "org.teavm:teavm-classlib:${teaVMVersion}"
+    teavmImplementation files("libs/minecraft-${minecraftVersion}.jar")
+
     // Test dependencies
     testImplementation 'junit:junit:4.13.2'
 }
@@ -61,11 +68,14 @@ sourceSets {
         }
     }
     // The teavm source set is auto-created by the TeaVM plugin.
-    // We just need to point it to our directory.
+    // It contains BOTH the platform layer and the game adapter code.
+    // All EaglerCraft code that TeaVM compiles to JavaScript lives here.
     teavm {
         java {
             srcDirs = ['teavm/java']
         }
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
     }
     lwjgl {
         java {
