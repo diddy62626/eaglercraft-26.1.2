@@ -1,0 +1,119 @@
+# EaglercraftXBungee Default Settings
+# Version: 26.1.2
+# This file contains the default configuration for the EaglerCraft BungeeCord gateway plugin.
+
+# Message of the Day - displayed in the EaglerCraft server browser
+motd:
+  line1: "&6EaglerCraft Server"
+  line2: "&7Powered by EaglercraftXBungee"
+
+# Authentication settings
+authentication:
+  # Enable Microsoft account authentication via login codes
+  # When enabled, players must authenticate with a Microsoft account
+  enable_microsoft_auth: false
+  # URL for the Microsoft authentication endpoint
+  auth_endpoint: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"
+  # Client ID for the Microsoft application registration
+  client_id: ""
+  # Time-to-live for authentication codes in milliseconds (5 minutes)
+  code_ttl_ms: 300000
+
+# Voice chat settings
+voice_chat:
+  # Enable voice chat relay between EaglerCraft clients
+  enabled: true
+  # Maximum number of simultaneous voice connections per channel
+  max_connections_per_channel: 20
+  # Voice signal relay timeout in milliseconds
+  relay_timeout_ms: 5000
+
+# Skin service settings
+skins:
+  # Enable custom skin upload and display for EaglerCraft clients
+  enabled: true
+  # Maximum skin file size in bytes (64KB default for 64x64 PNG)
+  max_skin_size: 65536
+  # Cache expiration time for skins in seconds
+  cache_ttl_seconds: 3600
+  # Allowed skin dimensions (width x height)
+  allowed_dimensions:
+    - "64x64"
+    - "128x128"
+
+# Cape service settings
+capes:
+  # Enable custom cape upload and display for EaglerCraft clients
+  enabled: true
+  # Maximum cape file size in bytes
+  max_cape_size: 32768
+  # Cache expiration time for capes in seconds
+  cache_ttl_seconds: 3600
+  # Allowed cape dimensions
+  allowed_dimensions:
+    - "64x32"
+    - "22x17"
+
+# Rate limiting configuration
+rate_limit:
+  # Maximum number of connections per IP address within the time window
+  connections_per_minute: 10
+  # Time window for rate limiting in milliseconds
+  window_ms: 60000
+  # Maximum number of simultaneous players per IP address
+  max_players_per_ip: 3
+  # Enable IP-based connection throttling
+  enable_throttle: true
+  # Throttle delay in milliseconds between consecutive connections
+  throttle_delay_ms: 1000
+
+# HTTP file server settings
+http_server:
+  # Enable the built-in HTTP server for serving web resources
+  enabled: true
+  # Local directory path for web files
+  path: "web"
+  # HTTP server port (separate from WebSocket port)
+  port: 8080
+  # Enable directory listing
+  enable_directory_listing: false
+  # Default index file
+  index_file: "index.html"
+  # Maximum file size for HTTP uploads in bytes (1MB)
+  max_upload_size: 1048576
+
+# Connection settings
+connection:
+  # WebSocket connection timeout in milliseconds
+  handshake_timeout_ms: 10000
+  # Maximum time without a keep-alive before disconnecting (60 seconds)
+  keep_alive_timeout_ms: 60000
+  # Enable WebSocket compression (permessage-deflate)
+  enable_compression: true
+  # Maximum WebSocket frame size in bytes (1MB)
+  max_frame_size: 1048576
+  # Maximum number of packets per second per connection
+  max_packets_per_second: 500
+
+# Protocol settings
+protocol:
+  # Minecraft protocol version (1.21.4 = 770)
+  mc_protocol_version: 770
+  # EaglerCraft protocol version
+  eagler_protocol_version: 775
+  # Enable protocol version negotiation
+  enable_version_negotiation: true
+  # Supported EaglerCraft protocol versions
+  supported_versions:
+    - 775
+    - 769
+    - 764
+
+# Debug settings
+debug:
+  # Enable debug logging
+  enabled: false
+  # Log all incoming/outgoing packets
+  log_packets: false
+  # Log WebSocket connection events
+  log_connections: true

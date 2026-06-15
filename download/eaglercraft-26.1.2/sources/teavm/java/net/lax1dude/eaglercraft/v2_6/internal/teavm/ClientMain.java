@@ -1,0 +1,464 @@
+package net.lax1dude.eaglercraft.v2_6.internal.teavm;
+
+import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
+import org.teavm.jso.JSObject;
+import org.teavm.jso.browser.Window;
+import org.teavm.jso.dom.html.HTMLCanvasElement;
+import org.teavm.jso.dom.html.HTMLDocument;
+import org.teavm.jso.dom.html.HTMLElement;
+
+import net.lax1dude.eaglercraft.v2_6.internal.teavm.opts.IClientConfig;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformInput;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformAudio;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformApplication;
+
+/**
+ * Client initialization and startup logic for EaglerCraft 26.1.2 TeaVM platform.
+ * Handles browser feature detection, WebGL2 context creation, and client bootstrap.
+ *
+ * <p>Key 26.1.2 improvements:</p>
+ * <ul>
+ *   <li>WebGL2 native (no WebGL1 fallback)</li>
+ *   <li>Modern browser feature detection</li>
+ *   <li>OffscreenCanvas support for integrated server</li>
+ *   <li>Performance API for frame timing</li>
+ *   <li>Page Visibility API for auto-pause</li>
+ * </ul>
+ */
+public class ClientMain {
+
+        private static final Window window = Window.current();
+        private static final HTMLDocument document = HTMLDocument.current();
+
+        /** The main game canvas element. */
+        static HTMLCanvasElement canvas;
+
+        /** The WebGL2 rendering context. */
+        static WebGL2RenderingContext webgl;
+
+        /** The client configuration loaded from the bootstrap page. */
+        public static IClientConfig config;
+
+        /** Whether the client has been initialized. */
+        private static boolean initialized = false;
+
+        /** Whether the client is running in a dedicated worker. */
+        static boolean isDedicatedWorker = false;
+
+        /** Whether OffscreenCanvas is available for the integrated server. */
+        public static boolean offscreenCanvasSupported = false;
+
+        /** Whether the Pointer Lock API 2.0 is available. */
+        public static boolean pointerLockSupported = false;
+
+        /** Whether the Gamepad API is available. */
+        public static boolean gamepadSupported = false;
+
+        /** Whether the Web Audio API is available. */
+        public static boolean audioSupported = false;
+
+        /** Whether the Performance API is available. */
+        static boolean performanceSupported = false;
+
+        /** Whether the Clipboard API (async) is available. */
+        public static boolean clipboardSupported = false;
+
+        /** Whether the Fullscreen API is available. */
+        public static boolean fullscreenSupported = false;
+
+        /** Whether WebCodecs API is available. */
+        static boolean webCodecsSupported = false;
+
+        /** Whether WebGPU is available (for future use). */
+        static boolean webGPUSupported = false;
+
+        /** Whether the Screen Orientation API is available. */
+        public static boolean screenOrientationSupported = false;
+
+        /** Whether the Page Visibility API is available. */
+        public static boolean pageVisibilitySupported = false;
+
+        /** Frame timing via Performance API. */
+        static long lastFrameTime = 0;
+
+        /** The animation frame callback ID for cancellation. */
+        private static int animationFrameId = 0;
+
+        /** Callback interface for the game loop tick. */
+        @JSFunctor
+        public interface TickFunctor extends JSObject {
+                void tick();
+        }
+
+        private static TickFunctor tickFunctor = null;
+
+        /**
+         * Main entry point called from MainClass.main().
+         * Performs browser feature detection, creates the canvas and WebGL2 context,
+         * then starts the game loop.
+         */
+        public static void _main() {
+                if (initialized) {
+                        return;
+                }
+
+                try {
+                        // Load client configuration from the bootstrap page
+                        config = loadConfig();
+
+                        // Detect browser capabilities
+                        detectBrowserFeatures();
+
+                        // Validate minimum requirements (WebGL2 is mandatory)
+                        if (webgl == null) {
+                                createCanvasAndContext();
+                        }
+
+                        if (webgl == null) {
+                                showCrashScreen("WebGL2 is not supported by your browser!\n\n"
+                                                + "EaglerCraft 26.1.2 requires WebGL2.\n"
+                                                + "Please use a modern browser (Chrome 56+, Firefox 51+, Edge 79+, Safari 15+).");
+                                return;
+                        }
+
+                        // Initialize platform subsystems
+                        PlatformInput._init();
+                        PlatformRuntime._init();
+                        PlatformAudio._init();
+                        PlatformApplication._init();
+
+                        initialized = true;
+
+                        // Start the game loop
+                        startGameLoop();
+
+                } catch (Throwable t) {
+                        showCrashScreen("Failed to initialize EaglerCraft 26.1.2!\n\n" + t.getMessage());
+                }
+        }
+
+        /**
+         * Detects available browser features and APIs.
+         * Results are stored in static boolean fields for use by Platform* classes.
+         */
+        private static void detectBrowserFeatures() {
+                offscreenCanvasSupported = checkOffscreenCanvas();
+                pointerLockSupported = checkPointerLock();
+                gamepadSupported = checkGamepad();
+                audioSupported = checkWebAudio();
+                performanceSupported = checkPerformance();
+                clipboardSupported = checkClipboard();
+                fullscreenSupported = checkFullscreen();
+                webCodecsSupported = checkWebCodecs();
+                webGPUSupported = checkWebGPU();
+                screenOrientationSupported = checkScreenOrientation();
+                pageVisibilitySupported = checkPageVisibility();
+        }
+
+        /**
+         * Creates the game canvas element and initializes the WebGL2 context.
+         * Uses context attributes from the client configuration if available.
+         */
+        private static void createCanvasAndContext() {
+                String containerId = "game_frame";
+                if (config != null && config.getContainer() != null) {
+                        containerId = config.getContainer();
+                }
+
+                HTMLElement container = document.getElementById(containerId);
+                if (container == null) {
+                        // Fallback: create container if not found
+                        container = document.getBody();
+                }
+
+                // Create the canvas element
+                canvas = (HTMLCanvasElement) document.createElement("canvas");
+                canvas.setId("EaglerCraftX_26_1_2_Canvas");
+                canvas.getStyle().setProperty("width", "100%");
+                canvas.getStyle().setProperty("height", "100%");
+                canvas.getStyle().setProperty("display", "block");
+                canvas.getStyle().setProperty("outline", "none");
+                canvas.getStyle().setProperty("image-rendering", "pixelated");
+                canvas.setAttribute("tabindex", "0");
+                canvas.setAttribute("autocomplete", "off");
+
+                container.appendChild(canvas);
+
+                // Create WebGL2 context with attributes
+                webgl = createWebGL2Context(canvas);
+        }
+
+        /**
+         * Creates a WebGL2 rendering context on the given canvas.
+         * Uses configuration attributes if provided, otherwise uses defaults
+         * optimized for EaglerCraft 26.1.2.
+         */
+        private static WebGL2RenderingContext createWebGL2Context(HTMLCanvasElement canvasElement) {
+                JSObject attrs = null;
+                if (config != null && config.getGLContextAttributes() != null) {
+                        attrs = createContextAttributes(config.getGLContextAttributes());
+                } else {
+                        attrs = createDefaultContextAttributes();
+                }
+                return tryCreateWebGL2(canvasElement, attrs);
+        }
+
+        /**
+         * Starts the game loop using requestAnimationFrame for vsync.
+         */
+        private static void startGameLoop() {
+                lastFrameTime = getCurrentTimeMillis();
+
+                tickFunctor = () -> {
+                        if (!initialized) return;
+
+                        long currentTime = getCurrentTimeMillis();
+                        long deltaTime = currentTime - lastFrameTime;
+                        lastFrameTime = currentTime;
+
+                        // Update frame timing in PlatformRuntime
+                        PlatformRuntime.update(deltaTime);
+
+                        // Schedule the next frame
+                        animationFrameId = requestAnimationFrame(tickFunctor);
+                };
+
+                animationFrameId = requestAnimationFrame(tickFunctor);
+        }
+
+        /**
+         * Stops the game loop.
+         */
+        public static void stopGameLoop() {
+                if (animationFrameId != 0) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = 0;
+                }
+                initialized = false;
+        }
+
+        /**
+         * Shows a crash screen with the given error message.
+         * Replaces the entire page content with a styled error display.
+         */
+        public static void showCrashScreen(String message) {
+                showCrashScreen0(message);
+        }
+
+        // ========== Native JS Methods ==========
+
+        /**
+         * Loads the client configuration from window.__eaglercraftXClientConfig.
+         */
+        @JSBody(params = {}, script = "return window.__eaglercraftXClientConfig || null;")
+        private static native IClientConfig loadConfig();
+
+        /**
+         * Checks if OffscreenCanvas is available.
+         */
+        @JSBody(params = {}, script = "return typeof OffscreenCanvas !== 'undefined';")
+        private static native boolean checkOffscreenCanvas();
+
+        /**
+         * Checks if the Pointer Lock API is available.
+         */
+        @JSBody(params = {}, script = "return !!(document.exitPointerLock || document.mozExitPointerLock);")
+        private static native boolean checkPointerLock();
+
+        /**
+         * Checks if the Gamepad API is available.
+         */
+        @JSBody(params = {}, script = "return !!navigator.getGamepads;")
+        private static native boolean checkGamepad();
+
+        /**
+         * Checks if the Web Audio API is available.
+         */
+        @JSBody(params = {}, script = "return !!(window.AudioContext || window.webkitAudioContext);")
+        private static native boolean checkWebAudio();
+
+        /**
+         * Checks if the Performance API is available.
+         */
+        @JSBody(params = {}, script = "return !!(window.performance && window.performance.now);")
+        private static native boolean checkPerformance();
+
+        /**
+         * Checks if the async Clipboard API is available.
+         */
+        @JSBody(params = {}, script = "return !!(navigator.clipboard && navigator.clipboard.readText);")
+        private static native boolean checkClipboard();
+
+        /**
+         * Checks if the Fullscreen API is available.
+         */
+        @JSBody(params = {}, script = "return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);")
+        private static native boolean checkFullscreen();
+
+        /**
+         * Checks if the WebCodecs API is available.
+         */
+        @JSBody(params = {}, script = "return typeof VideoDecoder !== 'undefined';")
+        private static native boolean checkWebCodecs();
+
+        /**
+         * Checks if WebGPU is available.
+         */
+        @JSBody(params = {}, script = "return !!navigator.gpu;")
+        private static native boolean checkWebGPU();
+
+        /**
+         * Checks if the Screen Orientation API is available.
+         */
+        @JSBody(params = {}, script = "return !!screen.orientation;")
+        private static native boolean checkScreenOrientation();
+
+        /**
+         * Checks if the Page Visibility API is available.
+         */
+        @JSBody(params = {}, script = "return typeof document.hidden !== 'undefined';")
+        private static native boolean checkPageVisibility();
+
+        /**
+         * Tries to create a WebGL2 context with the given attributes.
+         * Returns null if WebGL2 is not available.
+         */
+        @JSBody(params = { "canvas", "attrs" }, script = ""
+                        + "try {"
+                        + "  var ctx = canvas.getContext('webgl2', attrs);"
+                        + "  if (!ctx) ctx = canvas.getContext('experimental-webgl2', attrs);"
+                        + "  return ctx;"
+                        + "} catch(e) {"
+                        + "  return null;"
+                        + "}")
+        private static native WebGL2RenderingContext tryCreateWebGL2(HTMLCanvasElement canvas, JSObject attrs);
+
+        /**
+         * Creates default WebGL2 context attributes optimized for EaglerCraft 26.1.2.
+         */
+        @JSBody(params = {}, script = ""
+                        + "return {"
+                        + "  alpha: false,"
+                        + "  depth: true,"
+                        + "  stencil: true,"
+                        + "  antialias: false,"
+                        + "  premultipliedAlpha: false,"
+                        + "  preserveDrawingBuffer: false,"
+                        + "  powerPreference: 'high-performance',"
+                        + "  failIfMajorPerformanceCaveat: false,"
+                        + "  desynchronized: true"
+                        + "};")
+        private static native JSObject createDefaultContextAttributes();
+
+        /**
+         * Creates WebGL2 context attributes from the client configuration.
+         */
+        @JSBody(params = { "glConfig" }, script = ""
+                        + "return {"
+                        + "  alpha: glConfig.alpha !== undefined ? glConfig.alpha : false,"
+                        + "  depth: glConfig.depth !== undefined ? glConfig.depth : true,"
+                        + "  stencil: glConfig.stencil !== undefined ? glConfig.stencil : true,"
+                        + "  antialias: glConfig.antialias !== undefined ? glConfig.antialias : false,"
+                        + "  premultipliedAlpha: glConfig.premultipliedAlpha !== undefined ? glConfig.premultipliedAlpha : false,"
+                        + "  preserveDrawingBuffer: glConfig.preserveDrawingBuffer !== undefined ? glConfig.preserveDrawingBuffer : false,"
+                        + "  powerPreference: glConfig.powerPreference || 'high-performance',"
+                        + "  failIfMajorPerformanceCaveat: glConfig.failIfMajorPerformanceCaveat || false,"
+                        + "  desynchronized: glConfig.desynchronized !== undefined ? glConfig.desynchronized : true"
+                        + "};")
+        private static native JSObject createContextAttributes(Object glConfig);
+
+        /**
+         * Requests the next animation frame.
+         */
+        @JSBody(params = { "callback" }, script = "return window.requestAnimationFrame(callback);")
+        private static native int requestAnimationFrame(TickFunctor callback);
+
+        /**
+         * Cancels an animation frame request.
+         */
+        @JSBody(params = { "id" }, script = "window.cancelAnimationFrame(id);")
+        private static native void cancelAnimationFrame(int id);
+
+        /**
+         * Gets the current time in milliseconds using the Performance API if available.
+         */
+        @JSBody(params = {}, script = ""
+                        + "if (window.performance && window.performance.now) {"
+                        + "  return Math.floor(window.performance.now());"
+                        + "} else {"
+                        + "  return Date.now();"
+                        + "}")
+        private static native long getCurrentTimeMillis();
+
+        /**
+         * Shows a crash screen with the given message.
+         * Creates a full-page overlay with the error details.
+         */
+        @JSBody(params = { "message" }, script = ""
+                        + "var root = document.createElement('div');"
+                        + "root.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#FFF;"
+                        + "font-family:monospace;display:flex;align-items:center;justify-content:center;z-index:999999;';"
+                        + "var box = document.createElement('div');"
+                        + "box.style.cssText = 'max-width:80vw;max-height:80vh;overflow:auto;padding:32px;"
+                        + "background:#111;border:2px solid #333;border-radius:8px;white-space:pre-wrap;word-break:break-word;';"
+                        + "var title = document.createElement('h2');"
+                        + "title.style.cssText = 'color:#F55;margin:0 0 16px 0;';"
+                        + "title.textContent = 'EaglerCraft 26.1.2 Crashed!';"
+                        + "var msg = document.createElement('p');"
+                        + "msg.style.cssText = 'font-size:14px;line-height:1.6;';"
+                        + "msg.textContent = message;"
+                        + "box.appendChild(title);"
+                        + "box.appendChild(msg);"
+                        + "root.appendChild(box);"
+                        + "document.body.innerHTML = '';"
+                        + "document.body.appendChild(root);")
+        private static native void showCrashScreen0(String message);
+
+        /**
+         * Gets the WebGL2 context for use by PlatformOpenGL.
+         */
+        public static WebGL2RenderingContext getWebGL2() {
+                return webgl;
+        }
+
+        /**
+         * Gets the game canvas element.
+         */
+        public static HTMLCanvasElement getCanvas() {
+                return canvas;
+        }
+
+        /**
+         * Gets the client configuration.
+         */
+        public static IClientConfig getConfig() {
+                return config;
+        }
+
+        /**
+         * Checks if the client has been initialized.
+         */
+        public static boolean isInitialized() {
+                return initialized;
+        }
+
+        /**
+         * Logs a message to the browser console.
+         */
+        @JSBody(params = { "msg" }, script = "console.log(msg);")
+        public static native void log(String msg);
+
+        /**
+         * Logs a warning to the browser console.
+         */
+        @JSBody(params = { "msg" }, script = "console.warn(msg);")
+        public static native void warn(String msg);
+
+        /**
+         * Logs an error to the browser console.
+         */
+        @JSBody(params = { "msg" }, script = "console.error(msg);")
+        public static native void error(String msg);
+}

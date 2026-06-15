@@ -1,0 +1,44 @@
+name: EaglercraftXBungee
+version: 1.3.2
+main: net.lax1dude.eaglercraft.v2_6.plugin.gateway_bungee.EaglercraftXBungee
+author: lax1dude
+description: EaglerCraft gateway plugin for BungeeCord - translates WebSocket connections to TCP Minecraft protocol
+
+softdepends:
+  - RedisBungee
+
+permissions:
+  eaglercraft.admin:
+    description: Allows access to all EaglercraftXBungee admin commands
+    default: op
+    children:
+      eaglercraft.admin.reload:
+        description: Allows reloading the plugin configuration
+        default: op
+      eaglercraft.admin.list:
+        description: Allows listing EaglerCraft players
+        default: op
+      eaglercraft.admin.skin:
+        description: Allows managing skins and capes
+        default: op
+      eaglercraft.admin.voice:
+        description: Allows managing voice channels
+        default: op
+  eaglercraft.voice:
+    description: Allows using voice chat features
+    default: true
+
+commands:
+  eagler:
+    description: Main EaglercraftXBungee administration command
+    usage: /eagler [reload|list|rate|skins|voice|auth]
+    aliases: [eag]
+    permission: eaglercraft.admin
+  eaglerskin:
+    description: Manage EaglerCraft skins and capes
+    usage: /eaglerskin <list|clear|reload> [username]
+    permission: eaglercraft.admin.skin
+  eaglervoice:
+    description: Manage EaglerCraft voice chat channels
+    usage: /eaglervoice [list]
+    permission: eaglercraft.admin.voice

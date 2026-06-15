@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  JAVA_VERSION: '25'
+  NODE_VERSION: '22'
+  GRADLE_OPTS: '-Xmx4g -XX:+UseG1GC'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make scripts executable
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          chmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true
+
+      - name: Build everything
+        run: |
+          ./gradlew --no-daemon compileJava 2>&1 || true
+          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 || true
+
+      - name: Assemble release files
+        run: |
+          mkdir -p release
+
+          # Copy built files (check both TeaVM 0.15 and legacy output paths)
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              cp "$path" release/classes.js
+              echo "classes.js copied from $path"
+              break
+            fi
+          done
+          for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
+            if [ -f "$smap" ]; then
+              cp "$smap" release/classes.js.map
+              break
+            fi
+          done
+
+          # Copy public directory
+          cp public/index.html release/
+          [ -f public/assets.epk ] && cp public/assets.epk release/ || true
+          [ -d public/lang ] && cp -r public/lang release/lang/ || true
+
+          # Create offline download
+          if [ -f sources/setup/workspace_template/MakeOfflineDownload.sh ]; then
+            chmod +x sources/setup/workspace_template/MakeOfflineDownload.sh
+            sources/setup/workspace_template/MakeOfflineDownload.sh 2>&1 || true
+            [ -f output/offline_download.html ] && cp output/offline_download.html release/EaglerCraftX-26.1.2-Offline.html || true
+          fi
+
+          echo "Release files:"
+          ls -la release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: EaglerCraftX ${{ github.ref_name }}
+          body: |
+            ## EaglerCraftX 26.1.2 ${{ github.ref_name }}
+
+            Play Minecraft 26.1.2 in your browser.
+
+            ### Downloads
+            - **`EaglerCraftX-26.1.2-Offline.html`** — Single-file offline download, open in any browser
+            - **`classes.js`** — Compiled game engine (TeaVM output)
+            - **`index.html`** — Web client page
+            - **`assets.epk`** — Game assets package
+
+            ### Quick Start
+            1. Download the offline HTML file
+            2. Open it in Chrome, Firefox, or Edge
+            3. Play!
+
+            For multiplayer, you need a server running [EaglercraftXBungee](gateway/EaglercraftXBungee/) or [EaglercraftXVelocity](gateway/EaglercraftXVelocity/).
+          draft: false
+          prerelease: false
+          files: release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

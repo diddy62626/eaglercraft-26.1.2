@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'org.teavm' version '0.15.0' apply false
+}
+
+group = 'net.lax1dude.eaglercraft'
+version = '2.6.0'
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Define project-wide properties
+ext {
+    teaVMVersion = '0.15.0'
+    minecraftVersion = '26.1.2'
+    protocolVersion = 775
+    javaVersion = JavaVersion.VERSION_25
+}
+
+// Root project tasks
+tasks.register('cleanAll') {
+    group = 'build'
+    description = 'Clean all subprojects'
+    dependsOn subprojects.collect { it.tasks.named('clean') }
+}
+
+tasks.register('buildAll') {
+    group = 'build'
+    description = 'Build all subprojects in correct order'
+    dependsOn ':buildtools:build'
+    dependsOn ':sources:build'
+}
+
+// Print build info
+tasks.register('buildInfo') {
+    group = 'help'
+    description = 'Display EaglerCraft build information'
+    doLast {
+        println '=' * 60
+        println 'EaglerCraft v2.6.0 - Build Information'
+        println '=' * 60
+        println "Minecraft Version : ${project.ext.minecraftVersion}"
+        println "Protocol Version  : ${project.ext.protocolVersion}"
+        println "TeaVM Version     : ${project.ext.teaVMVersion}"
+        println "Java Version      : ${project.ext.javaVersion}"
+        println "Group             : ${project.group}"
+        println "Version           : ${project.version}"
+        println "Obfuscation       : None (MC 26.1.2 ships unobfuscated)"
+        println "MCP Required      : No"
+        println '=' * 60
+    }
+}

@@ -1,0 +1,159 @@
+<!-- 
+  EaglerCraft 26.1.2 - Offline Download Template
+  ==================================================
+  
+  This template is used by the build_dist.sh script to create
+  a single-file offline download of the EaglerCraft client.
+  
+  The template contains placeholders that are replaced during
+  the build process:
+  
+  {{EAGLERCRAFT_VERSION}}     - Version string (e.g., "26.1.2")
+  {{EAGLERCRAFT_BUNDLE_JS}}   - Bundled JavaScript code
+  {{EAGLERCRAFT_ASSETS}}      - Base64-encoded assets (EPK)
+  {{EAGLERCRAFT_BUILD_DATE}}  - Build timestamp
+  {{EAGLERCRAFT_BUILD_HASH}}  - Git commit hash (short)
+  {{EAGLERCRAFT_INTEGRITY}}   - SHA-256 integrity hash
+  
+  The offline download bundles everything into a single HTML file
+  that can be opened in any modern browser without internet access.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EaglerCraft {{EAGLERCRAFT_VERSION}} - Minecraft in your browser (Offline)">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>EaglerCraft {{EAGLERCRAFT_VERSION}} - Offline</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e0e0e0; touch-action: none; -webkit-user-select: none; user-select: none; }
+        #eaglercraft { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
+        
+        /* Loading Screen */
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.5s ease-out; }
+        #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+        .loading-title { font-size: 2.5rem; font-weight: 700; color: #e94560; margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(233, 69, 96, 0.5); letter-spacing: 2px; }
+        .loading-subtitle { font-size: 1rem; color: #a0a0b0; margin-bottom: 2rem; letter-spacing: 4px; text-transform: uppercase; }
+        .loading-badge { font-size: 0.7rem; color: #e94560; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 3px; padding: 2px 8px; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .progress-container { width: 320px; max-width: 80vw; }
+        .progress-bar-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #e94560, #ff6b6b); border-radius: 3px; transition: width 0.3s ease-out; }
+        .progress-text { text-align: center; font-size: 0.8rem; color: #888; margin-top: 0.75rem; }
+        .progress-detail { text-align: center; font-size: 0.7rem; color: #555; margin-top: 0.3rem; }
+        
+        /* Error Overlay */
+        #error-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 26, 46, 0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }
+        #error-overlay.visible { display: flex; }
+        .error-title { font-size: 1.5rem; font-weight: 700; color: #e94560; margin-bottom: 1rem; }
+        .error-message { font-size: 0.9rem; color: #ccc; text-align: center; max-width: 500px; line-height: 1.5; margin-bottom: 1.5rem; }
+        .error-details { font-size: 0.75rem; color: #666; background: rgba(0, 0, 0, 0.3); border-radius: 6px; padding: 1rem; max-width: 600px; max-height: 200px; overflow-y: auto; font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-all; }
+        .error-button { margin-top: 1.5rem; padding: 0.6rem 2rem; background: #e94560; color: white; border: none; border-radius: 4px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+        .error-button:hover { background: #ff6b6b; }
+        
+        /* Offline Indicator */
+        .offline-indicator { position: fixed; top: 10px; right: 10px; font-size: 0.65rem; color: #555; z-index: 100; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-title">EaglerCraft</div>
+        <div class="loading-subtitle">Minecraft in your browser</div>
+        <div class="loading-badge">OFFLINE EDITION v{{EAGLERCRAFT_VERSION}}</div>
+        <div class="progress-container">
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Initializing offline client...</div>
+            <div class="progress-detail" id="progress-detail"></div>
+        </div>
+    </div>
+    
+    <canvas id="eaglercraft"></canvas>
+    
+    <div class="offline-indicator">OFFLINE | {{EAGLERCRAFT_BUILD_DATE}}</div>
+    
+    <div id="error-overlay">
+        <div class="error-title">An Error Occurred</div>
+        <div class="error-message" id="error-message">EaglerCraft encountered an error and cannot continue.</div>
+        <div class="error-details" id="error-details"></div>
+        <button class="error-button" onclick="location.reload()">Reload Page</button>
+    </div>
+    
+    <script type="text/javascript">
+        // EaglerCraft X Options (Offline)
+        window.eaglercraftXOpts = {
+            container: "eaglercraft",
+            assetsURI: "data:application/epk;base64,{{EAGLERCRAFT_ASSETS}}",
+            localesURI: null,
+            worldsDB: "worlds_offline",
+            resourcePacksDB: "resourcePacks_offline",
+            servers: [],
+            relays: [],
+            enableMinceraft: true,
+            crashOnUncaughtExceptions: true,
+            allowBootMenu: false,
+            allowUpdateSvc: false,
+            enableServerListing: false,
+            offlineMode: true
+        };
+        
+        // Loading Progress
+        var _progress = 0;
+        function setLoadingProgress(p, t, d) {
+            _progress = Math.max(0, Math.min(100, p));
+            var f = document.getElementById("progress-fill");
+            var te = document.getElementById("progress-text");
+            var de = document.getElementById("progress-detail");
+            if (f) f.style.width = _progress + "%";
+            if (te) te.textContent = t || "";
+            if (de) de.textContent = d || "";
+        }
+        function hideLoadingScreen() {
+            var s = document.getElementById("loading-screen");
+            if (s) { s.classList.add("fade-out"); setTimeout(function(){ s.style.display = "none"; }, 500); }
+        }
+        function showError(m, d) {
+            var o = document.getElementById("error-overlay");
+            var me = document.getElementById("error-message");
+            var de = document.getElementById("error-details");
+            if (me) me.textContent = m;
+            if (de) de.textContent = d || "";
+            if (o) o.classList.add("visible");
+        }
+        
+        // WebGL2 Check
+        try {
+            var _c = document.createElement("canvas");
+            var _gl = _c.getContext("webgl2") || _c.getContext("experimental-webgl2");
+            if (!_gl) {
+                showError("WebGL2 is not supported!", "Please use a modern browser with WebGL2 support.");
+            }
+        } catch(e) {
+            showError("WebGL2 initialization failed", e.message);
+        }
+        
+        // Prevent defaults
+        document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+        document.addEventListener("dragover", function(e) { e.preventDefault(); });
+        document.addEventListener("drop", function(e) { e.preventDefault(); });
+        
+        // Set canvas size
+        var canvas = document.getElementById("eaglercraft");
+        if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener("resize", function() {
+            if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        });
+        
+        setLoadingProgress(10, "Loading offline client...", "Bundled JS");
+    </script>
+    
+    <!-- Bundled EaglerCraft JavaScript -->
+    <script type="text/javascript">
+    {{EAGLERCRAFT_BUNDLE_JS}}
+    </script>
+</body>
+</html>

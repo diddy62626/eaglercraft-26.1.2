@@ -1,0 +1,31 @@
+/*
+ * EaglerCraft 26.1.2 - Settings
+ * Port of EaglerCraft from Minecraft 1.8 to Minecraft 26.1.2
+ *
+ * Key differences from original EaglerCraft:
+ *   - No MCP deobfuscation step (MC 26.1.2 ships unobfuscated)
+ *   - Requires Java 25 with preview features
+ *   - Uses TeaVM 0.15.0 for Java-to-JavaScript compilation
+ *   - Targets WebGL2 with WebGPU readiness
+ *   - Protocol version 775
+ */
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    plugins {
+        id 'org.teavm' version '0.15.0'
+    }
+}
+
+rootProject.name = 'eaglercraft-26.1.2'
+
+// Build tools - must be built first (asset processing, world format conversion, etc.)
+include ':buildtools'
+project(':buildtools').projectDir = file('buildtools')
+
+// Main game sources - TeaVM compilation target
+include ':sources'
+project(':sources').projectDir = file('sources')
