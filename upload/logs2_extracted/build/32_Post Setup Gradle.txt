@@ -1,0 +1,130 @@
+﻿2026-06-15T18:34:26.2776088Z Post job cleanup.
+2026-06-15T18:34:26.5427167Z ##[warning]This job uses deprecated functionality from the 'gradle/actions/setup-gradle' action. Consult the Job Summary for more details.
+2026-06-15T18:34:26.5430247Z DEPRECATION: The `gradle-home-cache-cleanup` input parameter has been replaced by `cache-cleanup`. See https://github.com/gradle/actions/blob/main/docs/deprecation-upgrade-guide.md#the-gradle-home-cache-cleanup-input-parameter-has-been-replaced-by-cache-cleanup
+2026-06-15T18:34:26.5431870Z In post-action step
+2026-06-15T18:34:26.5432359Z ##[group]Stopping Gradle daemons
+2026-06-15T18:34:26.5432770Z ##[endgroup]
+2026-06-15T18:34:26.5455328Z ##[group]Provision Gradle >= 8.11
+2026-06-15T18:34:28.4566968Z Gradle version 9.5.1 is available at /usr/bin/gradle and >= 8.11. Not installing.
+2026-06-15T18:34:28.4568287Z ##[endgroup]
+2026-06-15T18:34:28.4570958Z ##[group]Executing Gradle to clean up caches
+2026-06-15T18:34:28.4571799Z Cleaning up caches last used before 1781548447636
+2026-06-15T18:34:28.4577088Z [command]/usr/bin/gradle -g /home/runner/.gradle -I init.gradle --info --no-daemon --no-scan --build-cache -DGITHUB_DEPENDENCY_GRAPH_ENABLED=false -DGRADLE_ACTIONS_SKIP_BUILD_RESULT_CAPTURE=true noop
+2026-06-15T18:34:28.8396448Z Initialized native services in: /home/runner/.gradle/native
+2026-06-15T18:34:28.8423400Z Initialized jansi services in: /home/runner/.gradle/native
+2026-06-15T18:34:29.0663034Z The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+2026-06-15T18:34:29.0672584Z Wanted: DaemonRequestContext{jvmCriteria=/usr/lib/jvm/temurin-25-jdk-amd64 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+2026-06-15T18:34:29.0679836Z Actual: DefaultDaemonContext[uid=46b9b18c-c961-41e2-8576-063426282298,javaHome=/usr/lib/jvm/temurin-25-jdk-amd64,javaVersion=25,javaVendor=Eclipse Adoptium,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:+UseG1GC,-Xms64m,-Xmx4g,-Dfile.encoding=UTF-8,-Duser.country,-Duser.language=en,-Duser.variant]
+2026-06-15T18:34:29.0682701Z 
+2026-06-15T18:34:29.2665800Z To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+2026-06-15T18:34:29.2673893Z Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/9.5.1 Command: /usr/lib/jvm/temurin-25-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /usr/share/gradle-9.5.1/lib/gradle-daemon-main-9.5.1.jar -javaagent:/usr/share/gradle-9.5.1/lib/agents/gradle-instrumentation-agent-9.5.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.5.1
+2026-06-15T18:34:29.2681813Z Successfully started process 'Gradle build daemon'
+2026-06-15T18:34:31.2661094Z An attempt to start the daemon took 1.984 secs.
+2026-06-15T18:34:31.2666207Z The client will now receive all logging from the daemon (pid: 2806). The daemon log file: /home/runner/.gradle/daemon/9.5.1/daemon-2806.out.log
+2026-06-15T18:34:31.2667738Z Daemon will be stopped at the end of the build 
+2026-06-15T18:34:31.9660130Z Using 4 worker leases.
+2026-06-15T18:34:32.0662954Z Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=false, resilientModelBuilding=false}
+2026-06-15T18:34:32.4663408Z Received JVM installation metadata from '/usr/lib/jvm/temurin-25-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64, JAVA_VERSION=25.0.3, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.3+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.3+9-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+2026-06-15T18:34:32.8666946Z Watching the file system is configured to be enabled if available
+2026-06-15T18:34:32.9660754Z Now considering [/home/runner/work/_temp/dummy-cleanup-project] as hierarchies to watch
+2026-06-15T18:34:32.9661752Z File system watching is active
+2026-06-15T18:34:33.4661676Z Caching disabled for Groovy DSL script compilation (cp_init) because:
+2026-06-15T18:34:33.4662615Z   Build cache is disabled
+2026-06-15T18:34:33.4663118Z   Not worth caching.
+2026-06-15T18:34:33.4664542Z Compiling initialization script '/home/runner/work/_temp/dummy-cleanup-project/init.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:34.2661095Z Caching disabled for Groovy DSL script compilation (init) because:
+2026-06-15T18:34:34.2662965Z   Build cache is disabled
+2026-06-15T18:34:34.2663869Z   Not worth caching.
+2026-06-15T18:34:34.2664822Z Compiling initialization script '/home/runner/work/_temp/dummy-cleanup-project/init.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:34.8672666Z Caching disabled for Groovy DSL script compilation (cp_init) because:
+2026-06-15T18:34:34.8686814Z   Build cache is disabled
+2026-06-15T18:34:34.8687734Z   Not worth caching.
+2026-06-15T18:34:34.8689490Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.build-result-capture.init.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:35.4691996Z Caching disabled for Groovy DSL script compilation (init) because:
+2026-06-15T18:34:35.4693047Z   Build cache is disabled
+2026-06-15T18:34:35.4693834Z   Not worth caching.
+2026-06-15T18:34:35.4695757Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.build-result-capture.init.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:35.8710424Z gradle/actions: Not capturing build results
+2026-06-15T18:34:35.8736614Z Caching disabled for Groovy DSL script compilation (cp_init) because:
+2026-06-15T18:34:35.8766197Z   Build cache is disabled
+2026-06-15T18:34:35.8796219Z   Not worth caching.
+2026-06-15T18:34:35.8837214Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.github-dependency-graph.init.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:35.9662377Z Caching disabled for Groovy DSL script compilation (init) because:
+2026-06-15T18:34:35.9674891Z   Build cache is disabled
+2026-06-15T18:34:35.9676001Z   Not worth caching.
+2026-06-15T18:34:35.9677707Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.github-dependency-graph.init.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:36.0662399Z Caching disabled for Groovy DSL script compilation (cp_init) because:
+2026-06-15T18:34:36.0675799Z   Build cache is disabled
+2026-06-15T18:34:36.0686480Z   Not worth caching.
+2026-06-15T18:34:36.0688463Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.inject-develocity.init.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:36.7674424Z Caching disabled for Groovy DSL script compilation (init) because:
+2026-06-15T18:34:36.7697050Z   Build cache is disabled
+2026-06-15T18:34:36.7697845Z   Not worth caching.
+2026-06-15T18:34:36.7699615Z Compiling initialization script '/home/runner/.gradle/init.d/gradle-actions.inject-develocity.init.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:37.0669252Z Starting Build
+2026-06-15T18:34:37.0710734Z Caching disabled for Groovy DSL script compilation (cp_settings) because:
+2026-06-15T18:34:37.0716226Z   Build cache is disabled
+2026-06-15T18:34:37.0754072Z   Not worth caching.
+2026-06-15T18:34:37.0776945Z Compiling settings file '/home/runner/work/_temp/dummy-cleanup-project/settings.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:37.0806611Z Caching disabled for Groovy DSL script compilation (settings) because:
+2026-06-15T18:34:37.0807488Z   Build cache is disabled
+2026-06-15T18:34:37.0807983Z   Not worth caching.
+2026-06-15T18:34:37.0809210Z Compiling settings file '/home/runner/work/_temp/dummy-cleanup-project/settings.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:37.1671460Z Settings evaluated using settings file '/home/runner/work/_temp/dummy-cleanup-project/settings.gradle'.
+2026-06-15T18:34:37.1677878Z Using local directory build cache for the root build (location = /home/runner/.gradle/caches/build-cache-1, remove unused entries = older than 2026-06-15 18:34:07 UTC).
+2026-06-15T18:34:37.2670864Z Projects loaded. Root project using build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle'.
+2026-06-15T18:34:37.2677598Z Included projects: [root project 'dummy-cleanup-project']
+2026-06-15T18:34:37.5662975Z 
+2026-06-15T18:34:37.5683840Z > Configure project :
+2026-06-15T18:34:37.5685879Z Evaluating root project 'dummy-cleanup-project' using build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle'.
+2026-06-15T18:34:37.5687953Z Caching disabled for Groovy DSL script compilation (cp_proj) because:
+2026-06-15T18:34:37.5688824Z   Not worth caching.
+2026-06-15T18:34:37.5690062Z Compiling build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle' using SubsetScriptTransformer.
+2026-06-15T18:34:37.5691541Z Caching disabled for Groovy DSL script compilation (proj) because:
+2026-06-15T18:34:37.5692367Z   Not worth caching.
+2026-06-15T18:34:37.5693590Z Compiling build file '/home/runner/work/_temp/dummy-cleanup-project/build.gradle' using BuildScriptTransformer.
+2026-06-15T18:34:37.5694752Z All projects evaluated.
+2026-06-15T18:34:37.5695356Z Task name matched 'noop'
+2026-06-15T18:34:37.5696415Z Selected primary task 'noop' from project :
+2026-06-15T18:34:37.5697194Z Tasks to be executed: [task ':noop']
+2026-06-15T18:34:37.5697854Z Tasks that were excluded: []
+2026-06-15T18:34:37.6686886Z Resolve mutations for :noop (Thread[#55,Execution worker,5,main]) started.
+2026-06-15T18:34:37.6716658Z :noop (Thread[#55,Execution worker,5,main]) started.
+2026-06-15T18:34:37.6738924Z 
+2026-06-15T18:34:37.6766502Z > Task :noop UP-TO-DATE
+2026-06-15T18:34:37.6774838Z Skipping task ':noop' as it has no actions.
+2026-06-15T18:34:37.7358683Z 
+2026-06-15T18:34:37.7359510Z BUILD SUCCESSFUL in 9s
+2026-06-15T18:34:37.7361154Z Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html
+2026-06-15T18:34:37.7362978Z jars (/home/runner/.gradle/caches/jars-9) cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7364539Z jars (/home/runner/.gradle/caches/jars-9) removing files not accessed on or after Mon Jun 15 18:34:07 UTC 2026.
+2026-06-15T18:34:37.7381244Z jars (/home/runner/.gradle/caches/jars-9) cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7382398Z jars (/home/runner/.gradle/caches/jars-9) cleaned up in 0.006 secs.
+2026-06-15T18:34:37.7383634Z artifact cache (/home/runner/.gradle/caches/modules-2) cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7394070Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7397077Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] removing files not accessed on or after Mon Jun 15 18:34:07 UTC 2026.
+2026-06-15T18:34:37.7399364Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/resources-2.1] cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7400621Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7401948Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] removing files not accessed on or after Mon Jun 15 18:34:07 UTC 2026.
+2026-06-15T18:34:37.7403217Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/files-2.1] cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7404417Z artifact cache (/home/runner/.gradle/caches/modules-2) [subdir: /home/runner/.gradle/caches/modules-2/metadata-2.107] cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7405365Z artifact cache (/home/runner/.gradle/caches/modules-2) cleanup deleted 0 files/directories.
+2026-06-15T18:34:37.7406638Z artifact cache (/home/runner/.gradle/caches/modules-2) cleaned up in 0.002 secs.
+2026-06-15T18:34:37.8193145Z ##[endgroup]
+2026-06-15T18:34:37.8211916Z ##[group]Caching Gradle state
+2026-06-15T18:34:37.8522026Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T18:34:37.8817571Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T18:34:37.9490984Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T18:34:38.2425293Z Sent 59913 of 59913 (100.0%), 0.3 MBs/sec
+2026-06-15T18:34:38.2591191Z Sent 92011 of 92011 (100.0%), 0.5 MBs/sec
+2026-06-15T18:34:38.3990982Z Saved cache entry with key gradle-instrumented-jars-v1-fd5b30ff5d6a5c33c963e8c5599a7104 from /home/runner/.gradle/caches/jars-*/*/ in 543ms
+2026-06-15T18:34:38.4106563Z Saved cache entry with key gradle-groovy-dsl-v1-2dc65472c1c7695fdad013f416340e79 from /home/runner/.gradle/caches/*/groovy-dsl/*/ in 520ms
+2026-06-15T18:34:39.4030863Z Sent 1665198 of 135882926 (1.2%), 1.6 MBs/sec
+2026-06-15T18:34:39.5848901Z Sent 135882926 of 135882926 (100.0%), 109.7 MBs/sec
+2026-06-15T18:34:39.7663577Z Saved cache entry with key gradle-wrapper-zips-v1-9666c30e2bcfc5e86859eb978b1f5b22 from /home/runner/.gradle/wrapper/dists/gradle-8.12-bin/cetblhg4pflnnks72fxwobvgv in 1931ms
+2026-06-15T18:34:39.8081612Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2 --files-from manifest.txt --use-compress-program zstdmt
+2026-06-15T18:34:40.0138661Z Sent 6886 of 6886 (100.0%), 0.1 MBs/sec
+2026-06-15T18:34:40.1554219Z Saved cache entry with key gradle-home-v1|Linux-X64|build[9666a6256c472776b30a60021e359eda]-e5ec05d1f54010996ccb9c9baaa7b0d50fb303af from /home/runner/.gradle/caches,/home/runner/.gradle/notifications,/home/runner/.gradle/.setup-gradle in 357ms
+2026-06-15T18:34:40.1556845Z ##[endgroup]
+2026-06-15T18:34:40.1561256Z Generating Job Summary
+2026-06-15T18:34:40.1573836Z Completed post-action step

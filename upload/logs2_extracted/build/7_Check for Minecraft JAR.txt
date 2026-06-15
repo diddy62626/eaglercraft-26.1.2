@@ -1,0 +1,18 @@
+﻿2026-06-15T18:34:06.3261251Z ##[group]Run if [ -f minecraft-26.1.2.jar ] && [ -s minecraft-26.1.2.jar ]; then
+2026-06-15T18:34:06.3261940Z [36;1mif [ -f minecraft-26.1.2.jar ] && [ -s minecraft-26.1.2.jar ]; then[0m
+2026-06-15T18:34:06.3262381Z [36;1m  echo "found=true" >> $GITHUB_OUTPUT[0m
+2026-06-15T18:34:06.3262797Z [36;1m  echo "Minecraft JAR found ($(stat -c%s minecraft-26.1.2.jar) bytes)"[0m
+2026-06-15T18:34:06.3263189Z [36;1melse[0m
+2026-06-15T18:34:06.3263425Z [36;1m  echo "found=false" >> $GITHUB_OUTPUT[0m
+2026-06-15T18:34:06.3263827Z [36;1m  echo "No Minecraft JAR found - will build platform layer only"[0m
+2026-06-15T18:34:06.3264203Z [36;1mfi[0m
+2026-06-15T18:34:06.3441291Z shell: /usr/bin/bash -e {0}
+2026-06-15T18:34:06.3441673Z env:
+2026-06-15T18:34:06.3441882Z   JAVA_VERSION: 25
+2026-06-15T18:34:06.3442129Z   NODE_VERSION: 22
+2026-06-15T18:34:06.3442392Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T18:34:06.3442722Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T18:34:06.3443161Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:34:06.3443780Z   JAVA_HOME_25_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/25.0.3-9/x64
+2026-06-15T18:34:06.3444203Z ##[endgroup]
+2026-06-15T18:34:06.3526844Z No Minecraft JAR found - will build platform layer only

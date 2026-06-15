@@ -1,0 +1,77 @@
+﻿2026-06-15T18:34:04.4364832Z ##[group]Run actions/checkout@v4
+2026-06-15T18:34:04.4365803Z with:
+2026-06-15T18:34:04.4366083Z   repository: diddy62626/eaglercraft-26.1.2
+2026-06-15T18:34:04.4369051Z   token: ***
+2026-06-15T18:34:04.4369280Z   ssh-strict: true
+2026-06-15T18:34:04.4369500Z   ssh-user: git
+2026-06-15T18:34:04.4369723Z   persist-credentials: true
+2026-06-15T18:34:04.4369999Z   clean: true
+2026-06-15T18:34:04.4370231Z   sparse-checkout-cone-mode: true
+2026-06-15T18:34:04.4370524Z   fetch-depth: 1
+2026-06-15T18:34:04.4370733Z   fetch-tags: false
+2026-06-15T18:34:04.4370947Z   show-progress: true
+2026-06-15T18:34:04.4371169Z   lfs: false
+2026-06-15T18:34:04.4371369Z   submodules: false
+2026-06-15T18:34:04.4371588Z   set-safe-directory: true
+2026-06-15T18:34:04.4372129Z env:
+2026-06-15T18:34:04.4372352Z   JAVA_VERSION: 25
+2026-06-15T18:34:04.4372576Z   NODE_VERSION: 22
+2026-06-15T18:34:04.4372855Z   GRADLE_OPTS: -Xmx4g -XX:+UseG1GC
+2026-06-15T18:34:04.4373149Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+2026-06-15T18:34:04.4373487Z ##[endgroup]
+2026-06-15T18:34:04.5380674Z Syncing repository: diddy62626/eaglercraft-26.1.2
+2026-06-15T18:34:04.5382338Z ##[group]Getting Git version info
+2026-06-15T18:34:04.5382836Z Working directory is '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2'
+2026-06-15T18:34:04.5383491Z [command]/usr/bin/git version
+2026-06-15T18:34:04.5448937Z git version 2.54.0
+2026-06-15T18:34:04.5504709Z ##[endgroup]
+2026-06-15T18:34:04.5522988Z Temporarily overriding HOME='/home/runner/work/_temp/939de920-79de-40fa-908b-63223f06538c' before making global git config changes
+2026-06-15T18:34:04.5524990Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-15T18:34:04.5530987Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+2026-06-15T18:34:04.5582271Z Deleting the contents of '/home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2'
+2026-06-15T18:34:04.5587661Z ##[group]Initializing the repository
+2026-06-15T18:34:04.5592085Z [command]/usr/bin/git init /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+2026-06-15T18:34:04.5695207Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-06-15T18:34:04.5696763Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-06-15T18:34:04.5698056Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-06-15T18:34:04.5699097Z hint: call:
+2026-06-15T18:34:04.5699569Z hint:
+2026-06-15T18:34:04.5700078Z hint: 	git config --global init.defaultBranch <name>
+2026-06-15T18:34:04.5700654Z hint:
+2026-06-15T18:34:04.5701176Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-06-15T18:34:04.5702007Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-06-15T18:34:04.5702772Z hint:
+2026-06-15T18:34:04.5703049Z hint: 	git branch -m <name>
+2026-06-15T18:34:04.5703317Z hint:
+2026-06-15T18:34:04.5703677Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-06-15T18:34:04.5704861Z Initialized empty Git repository in /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2/.git/
+2026-06-15T18:34:04.5712696Z [command]/usr/bin/git remote add origin https://github.com/diddy62626/eaglercraft-26.1.2
+2026-06-15T18:34:04.5761118Z ##[endgroup]
+2026-06-15T18:34:04.5761624Z ##[group]Disabling automatic garbage collection
+2026-06-15T18:34:04.5767459Z [command]/usr/bin/git config --local gc.auto 0
+2026-06-15T18:34:04.5800819Z ##[endgroup]
+2026-06-15T18:34:04.5801514Z ##[group]Setting up auth
+2026-06-15T18:34:04.5809358Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-15T18:34:04.5846845Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-15T18:34:04.6236832Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-15T18:34:04.6269966Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-15T18:34:04.6499769Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-15T18:34:04.6534035Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-15T18:34:04.6759524Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-06-15T18:34:04.6794617Z ##[endgroup]
+2026-06-15T18:34:04.6803878Z ##[group]Fetching the repository
+2026-06-15T18:34:04.6804728Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e5ec05d1f54010996ccb9c9baaa7b0d50fb303af:refs/remotes/origin/main
+2026-06-15T18:34:05.0561188Z From https://github.com/diddy62626/eaglercraft-26.1.2
+2026-06-15T18:34:05.0562580Z  * [new ref]         e5ec05d1f54010996ccb9c9baaa7b0d50fb303af -> origin/main
+2026-06-15T18:34:05.0601489Z ##[endgroup]
+2026-06-15T18:34:05.0602325Z ##[group]Determining the checkout info
+2026-06-15T18:34:05.0603795Z ##[endgroup]
+2026-06-15T18:34:05.0610141Z [command]/usr/bin/git sparse-checkout disable
+2026-06-15T18:34:05.0660342Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-06-15T18:34:05.0692604Z ##[group]Checking out the ref
+2026-06-15T18:34:05.0697194Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-06-15T18:34:05.0849462Z Switched to a new branch 'main'
+2026-06-15T18:34:05.0856635Z branch 'main' set up to track 'origin/main'.
+2026-06-15T18:34:05.0864256Z ##[endgroup]
+2026-06-15T18:34:05.0903701Z [command]/usr/bin/git log -1 --format=%H
+2026-06-15T18:34:05.0929425Z e5ec05d1f54010996ccb9c9baaa7b0d50fb303af

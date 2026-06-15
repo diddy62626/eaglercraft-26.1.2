@@ -129,7 +129,7 @@ jobs:
         run: |
           if [ -f sources/setup/workspace_template/CompileEPK.sh ]; then
             chmod +x sources/setup/workspace_template/CompileEPK.sh
-            sources/setup/workspace_template/CompileEPK.sh --output public/assets.epk 2>&1 || true
+            sources/setup/workspace_template/CompileEPK.sh 2>&1 || true
           fi
 
       # ── Assemble public/ for deployment ──────────────────────
@@ -143,15 +143,11 @@ jobs:
             echo "classes.js ($(stat -c%s public/classes.js) bytes)"
           elif [ ! -f public/classes.js ]; then
             echo "classes.js not found - generating build placeholder"
-            cat > public/classes.js << 'STUB'
-            // EaglerCraftX 26.1.2 - Build Stub
-            // This file will be replaced by the actual TeaVM compilation output.
-            // Run the full build pipeline with a Minecraft 26.1.2 JAR to generate it.
-            console.warn("[EaglerCraftX] Build stub loaded. Full compilation required.");
-            if (window.__eaglercraftLoadingProgress) {
-              window.__eaglercraftLoadingProgress(100, "Build stub - full compilation needed");
-            }
-            STUB
+            echo '// EaglerCraftX 26.1.2 - Build Stub' > public/classes.js
+            echo '// This file will be replaced by the actual TeaVM compilation output.' >> public/classes.js
+            echo '// Run the full build pipeline with a Minecraft 26.1.2 JAR to generate it.' >> public/classes.js
+            echo 'console.warn("[EaglerCraftX] Build stub loaded. Full compilation required.");' >> public/classes.js
+            echo 'if (window.__eaglercraftLoadingProgress) { window.__eaglercraftLoadingProgress(100, "Build stub"); }' >> public/classes.js
           fi
 
           # Copy source map if available
