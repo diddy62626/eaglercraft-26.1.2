@@ -461,14 +461,8 @@ public class EaglerCraft {
          * <p>MC's rendering pipeline is driven by GameRenderer, which
          * handles world rendering, GUI overlay, and screen rendering.</p>
          *
-         * <p>TODO: Once MC 26.1.2 is decompiled, this should call:</p>
-         * <pre>
-         *   Minecraft mc = Minecraft.getInstance();
-         *   GameRenderer renderer = mc.gameRenderer;
-         *   renderer.render(deltaTime);
-         *   // or: mc.getMainRenderTarget().bindWrite(true);
-         *   //     mc.gameRenderer.render(partialTick, startTime, tick);
-         * </pre>
+         * <p>Currently renders a Minecraft-style sky background with a
+         * title screen until the full MC renderer is integrated.</p>
          */
         private static void renderFrame() {
                 // Check for viewport changes
@@ -476,10 +470,40 @@ public class EaglerCraft {
                 int height = PlatformRuntime.getCanvasDrawableHeight();
                 if (width <= 0 || height <= 0) return;
 
-                // TODO: Call MC 26.1.2 render pipeline
-                // Expected: Minecraft.getInstance().gameRenderer.render(partialTick)
+                // Clear the framebuffer with MC sky blue
+                PlatformOpenGL._wglClear(
+                        WebGL2RenderingContext.COLOR_BUFFER_BIT
+                        | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+
+                // Render the title screen using WebGL2
+                renderTitleScreen(width, height);
 
                 firstFrameRendered = true;
+        }
+
+        /**
+         * Renders the EaglerCraft title screen directly via WebGL2.
+         *
+         * <p>This is a placeholder title screen rendered before the full
+         * MC GUI system is integrated. It draws:</p>
+         * <ul>
+         *   <li>A gradient sky background (MC-style)</li>
+         *   <li>The EaglerCraftX title text</li>
+         *   <li>Version info and status</li>
+         * </ul>
+         */
+        private static void renderTitleScreen(int width, int height) {
+                WebGL2RenderingContext gl = ClientMain.getWebGL2();
+                if (gl == null) return;
+
+                // Use a simple fullscreen quad with a gradient shader
+                // to render the title screen background
+                EaglerShaderImpl.renderTitleScreen(gl, width, height,
+                        EaglerCraftConfig.CLIENT_IDENTIFIER,
+                        "Protocol " + EaglerCraftConfig.PROTOCOL_VERSION,
+                        EaglerProfile.getUsername(),
+                        (int)(totalTicks / 20),
+                        (int)totalFrames);
         }
 
         // ========== State Queries ==========
