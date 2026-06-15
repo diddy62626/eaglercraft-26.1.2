@@ -23,15 +23,12 @@ def minecraftVersion = rootProject.ext.minecraftVersion
 def protocolVersion = rootProject.ext.protocolVersion
 
 dependencies {
-    // TeaVM dependencies for compilation
-    implementation "org.teavm:teavm-classlib:${teaVMVersion}"
-    implementation "org.teavm:teavm-jso:${teaVMVersion}"
-    implementation "org.teavm:teavm-jso-apis:${teaVMVersion}"
-    implementation "org.teavm:teavm-platform:${teaVMVersion}"
-    implementation "org.teavm:teavm-core:${teaVMVersion}"
+    // TeaVM dependencies using the new DSL shortcuts (0.15.0+)
+    implementation teavm.libs.jso
+    implementation teavm.libs.jsoApis
 
-    // TeaVM annotation processor
-    annotationProcessor "org.teavm:teavm-core:${teaVMVersion}"
+    // TeaVM classlib and core (needed for compilation)
+    implementation "org.teavm:teavm-classlib:${teaVMVersion}"
 
     // Minecraft 26.1.2 (unobfuscated - no MCP needed)
     implementation files("libs/minecraft-${minecraftVersion}.jar")
@@ -51,6 +48,9 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
+// Note: TeaVM 0.15.0 plugin automatically creates a 'teavm' source set
+// at src/teavm/java. Our code is at teavm/java so we configure it here.
+// The plugin also creates a 'teavm' configuration for TeaVM-specific dependencies.
 sourceSets {
     main {
         java {
@@ -60,12 +60,12 @@ sourceSets {
             srcDirs = ['resources']
         }
     }
+    // The teavm source set is auto-created by the TeaVM plugin.
+    // We just need to point it to our directory.
     teavm {
         java {
             srcDirs = ['teavm/java']
         }
-        compileClasspath += sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.runtimeClasspath
     }
     lwjgl {
         java {
@@ -82,28 +82,44 @@ java {
 }
 
 // ============================================================
-// TeaVM Configuration
+// TeaVM Configuration (0.15.0 DSL)
 // ============================================================
-teavm.js {
-    // Main entry point for the browser client
+// See: https://teavm.org/docs/tooling/gradle.html
+//
+// DSL structure:
+//   teavm { }         - common configuration (mainClass, optimization, properties)
+//   teavm.js { }      - JS-specific (obfuscated, sourceMap, targetFileName, maxTopLevelNames)
+//   teavm.wasmGC { }  - Wasm GC-specific
+//   teavm.c { }       - C target-specific
+
+teavm {
+    // Common configuration (applies to all targets)
     mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-    // Obfuscation and debugging
-    obfuscated = true
-    sourceMap = true
+    // BALANCED optimization is recommended for JS target (AGGRESSIVE doesn't
+    // give significant performance growth but produces more code)
+    optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
 
-    // Aggressive optimization for production builds
-    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
-
-    // Output file name
-    targetFileName = 'classes.js'
-
-    // Additional TeaVM properties for MC 26.1.2's larger codebase
+    // Additional TeaVM properties
     properties = [
-        'teavm.maxTopLevelNames' : '80000',
-        'teavm.minHeapSize'      : '256MB',
-        'teavm.maxHeapSize'      : '1024MB'
+        'teavm.minHeapSize' : '256MB',
+        'teavm.maxHeapSize' : '1024MB'
     ]
+
+    js {
+        // Obfuscation (recommended for production - produces less code)
+        obfuscated = true
+
+        // Source maps for debugging
+        sourceMap = true
+
+        // Output file name
+        targetFileName = 'classes.js'
+
+        // Limit top-level names to avoid Chromium stack overflow bug
+        // with large codebases like Minecraft
+        maxTopLevelNames = 80000
+    }
 }
 
 // ============================================================
@@ -135,9 +151,9 @@ tasks.register('generateWeb', Copy) {
     group = 'eaglercraft'
     description = 'Assembles the web client output directory'
 
-    dependsOn tasks.named('generateJs')
+    dependsOn tasks.named('generateJavaScript')
 
-    from(layout.buildDirectory.dir('teavm')) {
+    from(layout.buildDirectory.dir('generated/teavm/js')) {
         include 'classes.js'
         include 'classes.js.map'
     }

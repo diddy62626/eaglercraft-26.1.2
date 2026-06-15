@@ -167,15 +167,12 @@ version = '2.6.0'
 
 repositories {
     mavenCentral()
-    maven { url 'https://teavm.org/maven/repository' }
 }
 
 dependencies {
-    implementation "org.teavm:teavm-core:0.10.0"
-    implementation "org.teavm:teavm-jso:0.10.0"
-    implementation "org.teavm:teavm-jso-apis:0.10.0"
-    implementation "org.teavm:teavm-classlib:0.10.0"
-    implementation "org.teavm:teavm-tooling:0.10.0"
+    implementation "org.teavm:teavm-classlib:0.15.0"
+    implementation teavm.libs.jso
+    implementation teavm.libs.jsoApis
 }
 
 sourceSets {
@@ -198,7 +195,7 @@ GRADLE
     # Create gradle.properties
     cat > "$SCRIPT_DIR/workspace/gradle.properties" << 'PROPS'
 mcVersion=26.1.2
-teavmVersion=0.10.0
+teavmVersion=0.15.0
 projectGroup=net.lax1dude.eaglercraft
 projectVersion=2.6.0
 PROPS

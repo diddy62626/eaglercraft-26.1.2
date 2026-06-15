@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://teavm.org/docs/tooling/gradle.html",
+    "name": "Using Gradle - TeaVM",
+    "snippet": "TeaVM application plugin adds tasks to build your application for various targets. To add TeaVM support to your project, add following code to build.gradle",
+    "host_name": "teavm.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://teavm.org/docs/tooling/maven.html",
+    "name": "Using Maven - TeaVM",
+    "snippet": "The easiest way to run TeaVM is to use teavm-maven-plugin. Here is an example of how to use it:",
+    "host_name": "teavm.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/xvik/gradle-teavm-plugin",
+    "name": "xvik/gradle-teavm-plugin - GitHub",
+    "snippet": "Gradle TeaVM plugin: java/kotlin/scala compilation to JS or WASM. In contrast to GWT, teavm works with compiled bytecode (sources not required for compilation).",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://plugins.gradle.org/plugin/org.teavm",
+    "name": "org.teavm - Gradle Plugin Portal",
+    "snippet": "Version 0.14.1 (latest). 0.14.1. Created 25 May 2026. Installs TeaVM compilation tasks, configurations and source sets. Other versions.",
+    "host_name": "plugins.gradle.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://teavm.org/docs/intro/getting-started.html",
+    "name": "Getting started - TeaVM",
+    "snippet": "This tiny guide assumes that you are familiar with Gradle or Maven and Java language and can build a simple Java project using one of these build systems.",
+    "host_name": "teavm.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

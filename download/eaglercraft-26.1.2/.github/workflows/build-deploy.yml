@@ -115,12 +115,18 @@ jobs:
       # ── Build: TeaVM compilation ─────────────────────────────
       - name: Compile TeaVM (Java -> JavaScript)
         run: |
-          ./gradlew --no-daemon --info teavmJs 2>&1 | tee teavm.log || true
+          ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true
 
-          # Check if classes.js was produced
-          if [ -f sources/javascript/classes.js ]; then
-            echo "classes.js compiled ($(stat -c%s sources/javascript/classes.js) bytes)"
-          else
+          # Check if classes.js was produced (TeaVM 0.15.0 outputs to build/generated/teavm/js/)
+          CLASSES_JS=""
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              CLASSES_JS="$path"
+              echo "classes.js found at: $path ($(stat -c%s "$path") bytes)"
+              break
+            fi
+          done
+          if [ -z "$CLASSES_JS" ]; then
             echo "TeaVM compilation not yet complete - will generate stub"
           fi
 
@@ -137,10 +143,17 @@ jobs:
         run: |
           echo "Assembling public/ directory..."
 
-          # Copy classes.js
-          if [ -f sources/javascript/classes.js ]; then
-            cp sources/javascript/classes.js public/classes.js
-            echo "classes.js ($(stat -c%s public/classes.js) bytes)"
+          # Copy classes.js (check both old and new TeaVM output paths)
+          CLASSES_JS=""
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              CLASSES_JS="$path"
+              break
+            fi
+          done
+          if [ -n "$CLASSES_JS" ]; then
+            cp "$CLASSES_JS" public/classes.js
+            echo "classes.js copied from $CLASSES_JS ($(stat -c%s public/classes.js) bytes)"
           elif [ ! -f public/classes.js ]; then
             echo "classes.js not found - generating build placeholder"
             echo '// EaglerCraftX 26.1.2 - Build Stub' > public/classes.js
@@ -150,10 +163,14 @@ jobs:
             echo 'if (window.__eaglercraftLoadingProgress) { window.__eaglercraftLoadingProgress(100, "Build stub"); }' >> public/classes.js
           fi
 
-          # Copy source map if available
-          if [ -f sources/javascript/classes.js.map ]; then
-            cp sources/javascript/classes.js.map public/classes.js.map
-          fi
+          # Copy source map if available (check both paths)
+          for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
+            if [ -f "$smap" ]; then
+              cp "$smap" public/classes.js.map
+              echo "Source map copied from $smap"
+              break
+            fi
+          done
 
           # Copy EPK assets
           if [ -f output/assets.epk ]; then

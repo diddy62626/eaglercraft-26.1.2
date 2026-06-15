@@ -2,7 +2,7 @@
 # ============================================================================
 # EaglerCraft 26.1.2 - Compile the Client
 # ============================================================================
-# Compiles the EaglerCraft client using TeaVM 0.10.0
+# Compiles the EaglerCraft client using TeaVM 0.15.0
 # Translates Java bytecode to JavaScript for browser execution
 #
 # Usage:
@@ -87,7 +87,7 @@ main() {
     echo ""
     echo "╔══════════════════════════════════════════════════════════╗"
     echo "║   EaglerCraft 26.1.2 - Compile Client                   ║"
-    echo "║   TeaVM 0.10.0 - Java to JavaScript                     ║"
+    echo "║   TeaVM 0.15.0 - Java to JavaScript                     ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo ""
     
@@ -203,7 +203,7 @@ fallback_compile() {
     
     if [ -z "$teavm_jar" ]; then
         # Try Gradle cache
-        teavm_jar=$(find "$HOME/.gradle/caches" -name 'teavm-cli-0.10.0.jar' -type f 2>/dev/null | head -1)
+        teavm_jar=$(find "$HOME/.gradle/caches" -name 'teavm-cli-0.15.0.jar' -type f 2>/dev/null | head -1)
     fi
     
     if [ -n "$teavm_jar" ]; then
@@ -234,7 +234,7 @@ fallback_compile() {
         }
     else
         warn "TeaVM CLI JAR not found. Skipping TeaVM step."
-        warn "Please install TeaVM 0.10.0 and place the JAR in workspace/lib/teavm/"
+        warn "Please install TeaVM 0.15.0 and place the JAR in workspace/lib/teavm/"
         info "You can download TeaVM from: https://teavm.org/"
     fi
     

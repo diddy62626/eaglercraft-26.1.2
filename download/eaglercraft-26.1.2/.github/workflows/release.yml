@@ -44,15 +44,26 @@ jobs:
       - name: Build everything
         run: |
           ./gradlew --no-daemon compileJava 2>&1 || true
-          ./gradlew --no-daemon teavmJs 2>&1 || true
+          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 || true
 
       - name: Assemble release files
         run: |
           mkdir -p release
 
-          # Copy built files
-          [ -f sources/javascript/classes.js ] && cp sources/javascript/classes.js release/ || true
-          [ -f sources/javascript/classes.js.map ] && cp sources/javascript/classes.js.map release/ || true
+          # Copy built files (check both TeaVM 0.15 and legacy output paths)
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              cp "$path" release/classes.js
+              echo "classes.js copied from $path"
+              break
+            fi
+          done
+          for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
+            if [ -f "$smap" ]; then
+              cp "$smap" release/classes.js.map
+              break
+            fi
+          done
 
           # Copy public directory
           cp public/index.html release/

@@ -1,6 +1,16 @@
+/*
+ * EaglerCraft 26.1.2 - Workspace Build Configuration
+ *
+ * This is the Gradle build file for the EaglerCraft 26.1.2 workspace.
+ * It configures the TeaVM 0.15.0 compilation toolchain for converting
+ * Minecraft 26.1.2 Java source code into browser-runnable JavaScript.
+ *
+ * No MCP deobfuscation is needed since MC 26.1.2 ships unobfuscated.
+ */
+
 plugins {
     id 'java'
-    id 'org.teavm' version '0.10.0'
+    id 'org.teavm' version '0.15.0'
 }
 
 group = 'net.lax1dude.eaglercraft'
@@ -8,21 +18,18 @@ version = '2.6.0'
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.teavm.org/maven/' }
     flatDir { dirs 'desktopRuntime' }
 }
 
 dependencies {
-    // TeaVM runtime
-    implementation "org.teavm:teavm-classlib:0.10.0"
-    teavm "org.teavm:teavm-classlib:0.10.0"
-    teavm "org.teavm:teavm-jso:0.10.0"
-    teavm "org.teavm:teavm-jso-apis:0.10.0"
-    teavm "org.teavm:teavm-platform:0.10.0"
-    
+    // TeaVM dependencies using new DSL shortcuts (0.15.0+)
+    implementation teavm.libs.jso
+    implementation teavm.libs.jsoApis
+    implementation "org.teavm:teavm-classlib:0.15.0"
+
     // Minecraft 26.1.2 (unobfuscated - NO MCP needed)
     implementation files('libs/minecraft-26.1.2.jar')
-    
+
     // Desktop runtime dependencies (LWJGL)
     implementation files('desktopRuntime/lwjgl.jar')
     implementation files('desktopRuntime/lwjgl-glfw.jar')
@@ -46,6 +53,7 @@ sourceSets {
             srcDirs = ['src/resources']
         }
     }
+    // The teavm source set is auto-created by the TeaVM 0.15.0 plugin
     teavm {
         java {
             srcDirs = ['src/teavm/java']
@@ -63,17 +71,20 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
-teavm.js {
+// ============================================================
+// TeaVM Configuration (0.15.0 DSL)
+// ============================================================
+// See: https://teavm.org/docs/tooling/gradle.html
+teavm {
     mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
-    obfuscated = true
-    sourceMap = true
-    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
-    targetFileName = 'classes.js'
-    outputDir = file('javascript')
-    
-    properties = [
-        'teavm.maxTopLevelNames': '80000'
-    ]
+    optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+
+    js {
+        obfuscated = true
+        sourceMap = true
+        targetFileName = 'classes.js'
+        maxTopLevelNames = 80000
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -83,9 +94,10 @@ tasks.withType(JavaCompile) {
 
 // Custom tasks
 task compileJS(type: Copy) {
-    dependsOn teavm.js
-    from 'javascript/classes.js'
-    from 'javascript/classes.js.map'
+    dependsOn generateJavaScript
+    from layout.buildDirectory.dir('generated/teavm/js')
+    include 'classes.js'
+    include 'classes.js.map'
     into 'javascript/dist'
 }
 

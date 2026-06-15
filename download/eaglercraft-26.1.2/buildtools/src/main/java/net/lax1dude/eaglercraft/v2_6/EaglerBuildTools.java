@@ -175,7 +175,7 @@ public class EaglerBuildTools {
         System.out.println("Commands:");
         System.out.println("  init       Initialize workspace: locate MC jar, decompile, apply patches");
         System.out.println("  workspace  Create development workspace with IDE project files");
-        System.out.println("  compile    Compile the EaglerCraft client via TeaVM 0.10.0");
+        System.out.println("  compile    Compile the EaglerCraft client via TeaVM 0.15.0");
         System.out.println("  clean      Remove all build artifacts");
         System.out.println("  patch      Apply/update EaglerCraft patches to decompiled source");
         System.out.println("  dist       Create distribution packages");

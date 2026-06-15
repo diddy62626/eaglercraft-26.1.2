@@ -43,7 +43,7 @@ import net.lax1dude.eaglercraft.v2_6.EaglerBuildTools.BuildException;
 public class SetupWorkspace {
 
     private static final String MC_VERSION = "26.1.2";
-    private static final String TEAVM_VERSION = "0.10.0";
+    private static final String TEAVM_VERSION = "0.15.0";
 
     // Source directories
     private static final String DIR_EAGLERCRAFT_SRC = "sources/main/java";

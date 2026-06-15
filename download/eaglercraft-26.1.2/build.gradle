@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.teavm' version '0.14.1' apply false
+    id 'org.teavm' version '0.15.0' apply false
 }
 
 group = 'net.lax1dude.eaglercraft'
@@ -9,13 +9,12 @@ version = '2.6.0'
 subprojects {
     repositories {
         mavenCentral()
-        maven { url 'https://repo.teavm.org/maven/' }
     }
 }
 
 // Define project-wide properties
 ext {
-    teaVMVersion = '0.14.1'
+    teaVMVersion = '0.15.0'
     minecraftVersion = '26.1.2'
     protocolVersion = 775
     javaVersion = JavaVersion.VERSION_25

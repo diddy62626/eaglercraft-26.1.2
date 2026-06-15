@@ -44,13 +44,21 @@ jobs:
 
       - name: Compile TeaVM
         run: |
-          ./gradlew --no-daemon teavmJs 2>&1 || true
-
-      - name: Assemble preview
-        run: |
+          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 || true
           # Copy any built files to public/
-          [ -f sources/javascript/classes.js ] && cp sources/javascript/classes.js public/classes.js || true
-          [ -f sources/javascript/classes.js.map ] && cp sources/javascript/classes.js.map public/classes.js.map || true
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              cp "$path" public/classes.js
+              echo "classes.js copied from $path"
+              break
+            fi
+          done
+          for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
+            if [ -f "$smap" ]; then
+              cp "$smap" public/classes.js.map
+              break
+            fi
+          done
 
       - name: Upload PR preview artifact
         uses: actions/upload-artifact@v4

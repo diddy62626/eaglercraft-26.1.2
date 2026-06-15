@@ -16,7 +16,7 @@ import net.lax1dude.eaglercraft.v2_6.EaglerBuildTools.BuildException;
 /**
  * TeaVM Compilation Bridge for EaglerCraft 26.1.2
  * 
- * Bridges the EaglerCraft build system with TeaVM 0.10.0, which compiles
+ * Bridges the EaglerCraft build system with TeaVM 0.15.0, which compiles
  * Java bytecode to JavaScript for running in web browsers.
  * 
  * TeaVM is the core technology that makes EaglerCraft possible - it translates
@@ -30,18 +30,21 @@ import net.lax1dude.eaglercraft.v2_6.EaglerBuildTools.BuildException;
  *   - Manages TeaVM's classpath including MC dependencies
  *   - Handles WebGL2/WASM-adjacent compilation targets
  * 
- * TeaVM 0.10.0 changes from older versions:
+ * TeaVM 0.15.0 changes from older versions:
+ *   - Java 25 support
+ *   - WebAssembly GC backend
+ *   - Coroutines support in Wasm GC
  *   - Improved JSO (JavaScript Overlay) API
  *   - Better async/await support
- *   - Faster compilation with incremental mode
- *   - Improved obfuscation
- *   - Better source map generation
+ *   - Development server with hot-reload
+ *   - New Gradle DSL (mainClass at common level)
+ *   - generateJavaScript task (replaces generateJs)
  * 
  * Copyright (c) 2024-2025 lax1dude. All Rights Reserved.
  */
 public class TeaVMBridge {
 
-    private static final String TEAVM_VERSION = "0.10.0";
+    private static final String TEAVM_VERSION = "0.15.0";
     private static final String TEAVM_MAIN_CLASS = "org.teavm.cli.TeaVMRunner";
     private static final String EAGLERCRAFT_ENTRY_POINT = "net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass";
 
