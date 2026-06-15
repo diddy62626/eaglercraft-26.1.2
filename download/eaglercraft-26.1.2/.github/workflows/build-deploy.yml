@@ -19,6 +19,7 @@ env:
   JAVA_VERSION: '25'
   NODE_VERSION: '22'
   GRADLE_OPTS: '-Xmx4g -XX:+UseG1GC'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   build:
@@ -46,8 +47,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: scripts/package.json
+          # No cache — scripts/package.json does not exist yet
 
       # ── Cache Minecraft JAR ──────────────────────────────────
       - name: Cache Minecraft JAR
@@ -61,19 +61,19 @@ jobs:
       - name: Download Minecraft JAR
         if: steps.cache-mc-jar.outputs.cache-hit != 'true' && inputs.minecraft_jar_url != ''
         run: |
-          echo "📥 Downloading Minecraft 26.1.2 JAR..."
+          echo "Downloading Minecraft 26.1.2 JAR..."
           curl -L -o minecraft-26.1.2.jar "${{ inputs.minecraft_jar_url }}"
-          echo "✅ Downloaded $(stat -c%s minecraft-26.1.2.jar) bytes"
+          echo "Downloaded $(stat -c%s minecraft-26.1.2.jar) bytes"
 
       - name: Check for Minecraft JAR
         id: check-jar
         run: |
           if [ -f minecraft-26.1.2.jar ] && [ -s minecraft-26.1.2.jar ]; then
             echo "found=true" >> $GITHUB_OUTPUT
-            echo "✅ Minecraft JAR found ($(stat -c%s minecraft-26.1.2.jar) bytes)"
+            echo "Minecraft JAR found ($(stat -c%s minecraft-26.1.2.jar) bytes)"
           else
             echo "found=false" >> $GITHUB_OUTPUT
-            echo "⚠️ No Minecraft JAR found - will build platform layer only"
+            echo "No Minecraft JAR found - will build platform layer only"
           fi
 
       # ── Setup Gradle ─────────────────────────────────────────
@@ -82,49 +82,47 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
-      # ── Install Node dependencies ────────────────────────────
-      - name: Install build scripts dependencies
+      # ── Make scripts executable ──────────────────────────────
+      - name: Make scripts executable
         run: |
-          if [ -f scripts/package.json ]; then
-            cd scripts && npm ci && cd ..
-          else
-            echo "No scripts/package.json - skipping npm install"
-          fi
+          chmod +x gradlew 2>/dev/null || true
+          chmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true
+          chmod +x build_init.sh build_compile.sh build_dist.sh build_clean.sh build_workspace.sh CompileLatestClient.sh 2>/dev/null || true
 
       # ── Build: Init workspace ────────────────────────────────
       - name: Initialize workspace
         if: steps.check-jar.outputs.found == 'true'
         run: |
-          chmod +x build_init.sh
           ./build_init.sh --jar ../minecraft-26.1.2.jar --headless 2>&1 || true
           echo "Init step completed (may have warnings - continuing)"
 
-      # ── Build: Compile with Gradle + TeaVM ───────────────────
+      # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle
         run: |
-          chmod +x build_compile.sh
-          chmod +x sources/setup/workspace_template/CompileJS.sh
-          chmod +x run_chmod.sh
-          ./run_chmod.sh 2>/dev/null || true
+          echo "=== Gradle build info ==="
+          ./gradlew --no-daemon buildInfo 2>&1 || true
 
-          # Try Gradle build first
-          cd sources
-          ../gradlew --no-daemon --info compileJava 2>&1 | tee build.log || true
-          cd ..
+          echo "=== Compiling Java sources ==="
+          ./gradlew --no-daemon --info compileJava 2>&1 | tee gradle-compile.log || true
+
+          echo "=== Checking compile result ==="
+          if grep -qi "BUILD SUCCESSFUL" gradle-compile.log 2>/dev/null; then
+            echo "Gradle compileJava succeeded"
+          else
+            echo "Gradle compileJava had issues (expected for stub project) - continuing"
+          fi
 
       # ── Build: TeaVM compilation ─────────────────────────────
-      - name: Compile TeaVM (Java → JavaScript)
+      - name: Compile TeaVM (Java -> JavaScript)
         run: |
-          cd sources
-          ../gradlew --no-daemon --info teavmJs 2>&1 | tee teavm.log || true
+          ./gradlew --no-daemon --info teavmJs 2>&1 | tee teavm.log || true
 
           # Check if classes.js was produced
-          if [ -f javascript/classes.js ]; then
-            echo "✅ classes.js compiled ($(stat -c%s javascript/classes.js) bytes)"
+          if [ -f sources/javascript/classes.js ]; then
+            echo "classes.js compiled ($(stat -c%s sources/javascript/classes.js) bytes)"
           else
-            echo "⚠️ TeaVM compilation not yet complete - generating stub"
+            echo "TeaVM compilation not yet complete - will generate stub"
           fi
-          cd ..
 
       # ── Build: Compile EPK assets ────────────────────────────
       - name: Compile EPK assets
@@ -137,14 +135,14 @@ jobs:
       # ── Assemble public/ for deployment ──────────────────────
       - name: Assemble public/ directory
         run: |
-          echo "📦 Assembling public/ directory..."
+          echo "Assembling public/ directory..."
 
           # Copy classes.js
           if [ -f sources/javascript/classes.js ]; then
             cp sources/javascript/classes.js public/classes.js
-            echo "✅ classes.js ($(stat -c%s public/classes.js) bytes)"
+            echo "classes.js ($(stat -c%s public/classes.js) bytes)"
           elif [ ! -f public/classes.js ]; then
-            echo "⚠️ classes.js not found - generating build placeholder"
+            echo "classes.js not found - generating build placeholder"
             cat > public/classes.js << 'STUB'
             // EaglerCraftX 26.1.2 - Build Stub
             // This file will be replaced by the actual TeaVM compilation output.
@@ -165,7 +163,7 @@ jobs:
           if [ -f output/assets.epk ]; then
             cp output/assets.epk public/assets.epk
           elif [ ! -f public/assets.epk ]; then
-            echo "⚠️ assets.epk not found - creating minimal placeholder"
+            echo "assets.epk not found - creating minimal placeholder"
             # Create minimal valid EPK file (EAGPK!! header)
             printf 'EAGPK!!\x00\x00\x00\x00\x00\x00\x00\x00' > public/assets.epk
           fi
@@ -184,9 +182,9 @@ jobs:
             cp sources/setup/workspace_template/javascript/favicon.png public/favicon.png 2>/dev/null || true
           fi
 
-          echo "📋 public/ contents:"
+          echo "public/ contents:"
           ls -la public/
-          echo "📋 Total size: $(du -sh public/ | cut -f1)"
+          echo "Total size: $(du -sh public/ | cut -f1)"
 
       # ── Upload build artifacts ───────────────────────────────
       - name: Upload build artifacts
@@ -220,12 +218,12 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           if [ -n "$VERCEL_TOKEN" ]; then
-            echo "🚀 Deploying to Vercel..."
-            vercel deploy public/ --prod --yes --token "$VERCEL_TOKEN" 2>&1 || echo "⚠️ Vercel deploy failed - check secrets"
+            echo "Deploying to Vercel..."
+            vercel deploy public/ --prod --yes --token "$VERCEL_TOKEN" 2>&1 || echo "Vercel deploy failed - check secrets"
           else
-            echo "⚠️ VERCEL_TOKEN secret not set - skipping Vercel deploy"
+            echo "VERCEL_TOKEN secret not set - skipping Vercel deploy"
             echo "To enable Vercel deploys, add these secrets to your repo:"
-            echo "  VERCEL_TOKEN     - From https://vercel.com/account/tokens"
-            echo "  VERCEL_ORG_ID    - From https://vercel.com/account"
+            echo "  VERCEL_TOKEN      - From https://vercel.com/account/tokens"
+            echo "  VERCEL_ORG_ID     - From https://vercel.com/account"
             echo "  VERCEL_PROJECT_ID - Run: vercel link && cat .vercel/project.json"
           fi

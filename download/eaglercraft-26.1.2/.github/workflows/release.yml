@@ -9,6 +9,7 @@ env:
   JAVA_VERSION: '25'
   NODE_VERSION: '22'
   GRADLE_OPTS: '-Xmx4g -XX:+UseG1GC'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   release:
@@ -35,12 +36,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Make scripts executable
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          chmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true
+
       - name: Build everything
         run: |
-          chmod +x run_chmod.sh && ./run_chmod.sh 2>/dev/null || true
-          cd sources && ../gradlew --no-daemon compileJava 2>&1 || true
-          ../gradlew --no-daemon teavmJs 2>&1 || true
-          cd ..
+          ./gradlew --no-daemon compileJava 2>&1 || true
+          ./gradlew --no-daemon teavmJs 2>&1 || true
 
       - name: Assemble release files
         run: |
@@ -62,7 +66,7 @@ jobs:
             [ -f output/offline_download.html ] && cp output/offline_download.html release/EaglerCraftX-26.1.2-Offline.html || true
           fi
 
-          echo "📋 Release files:"
+          echo "Release files:"
           ls -la release/
 
       - name: Create GitHub Release
