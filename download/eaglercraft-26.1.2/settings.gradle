@@ -5,7 +5,7 @@
  * Key differences from original EaglerCraft:
  *   - No MCP deobfuscation step (MC 26.1.2 ships unobfuscated)
  *   - Requires Java 25 with preview features
- *   - Uses TeaVM 0.10.0 for Java-to-JavaScript compilation
+ *   - Uses TeaVM 0.14.1 for Java-to-JavaScript compilation
  *   - Targets WebGL2 with WebGPU readiness
  *   - Protocol version 775
  */
@@ -17,7 +17,7 @@ pluginManagement {
         maven { url 'https://repo.teavm.org/maven/' }
     }
     plugins {
-        id 'org.teavm' version '0.10.0'
+        id 'org.teavm' version '0.14.1'
     }
 }
 

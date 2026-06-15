@@ -95,7 +95,7 @@ public class EaglercraftXVelocity {
     public static final int PROTOCOL_VERSION = 775;
 
     /** Minecraft protocol version string */
-    public static final String MC_PROTOCOL_VERSION = "1.21.4";
+    public static final String MC_PROTOCOL_VERSION = "26.1.2";
 
     /** Gson instance for JSON serialization/deserialization */
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
