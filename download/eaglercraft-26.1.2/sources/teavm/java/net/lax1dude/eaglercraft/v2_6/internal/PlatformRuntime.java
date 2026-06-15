@@ -433,7 +433,7 @@ public class PlatformRuntime {
                 ArrayBuffer buffer = ArrayBuffer.create(arr.length);
                 Uint8Array view = Uint8Array.create(buffer);
                 for (int i = 0; i < arr.length; i++) {
-                        view.set(i, arr[i] & 0xFF);
+                        view.set(i, (short)(arr[i] & 0xFF));
                 }
                 return view;
         }
@@ -463,7 +463,7 @@ public class PlatformRuntime {
                 ArrayBuffer buffer = ArrayBuffer.create(arr.length);
                 Uint8Array view = Uint8Array.create(buffer);
                 for (int i = 0; i < arr.length; i++) {
-                        view.set(i, arr[i] & 0xFF);
+                        view.set(i, (short)(arr[i] & 0xFF));
                 }
                 return buffer;
         }

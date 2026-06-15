@@ -47,7 +47,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          # No cache — scripts/package.json does not exist yet
 
       # ── Cache Minecraft JAR ──────────────────────────────────
       - name: Cache Minecraft JAR
@@ -85,7 +84,7 @@ jobs:
       # ── Make scripts executable ──────────────────────────────
       - name: Make scripts executable
         run: |
-          chmod +x gradlew 2>/dev/null || true
+          chmod +x gradlew
           chmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true
           chmod +x build_init.sh build_compile.sh build_dist.sh build_clean.sh build_workspace.sh CompileLatestClient.sh 2>/dev/null || true
 
@@ -103,19 +102,20 @@ jobs:
           ./gradlew --no-daemon buildInfo 2>&1 || true
 
           echo "=== Compiling Java sources ==="
-          ./gradlew --no-daemon --info compileJava 2>&1 | tee gradle-compile.log || true
+          ./gradlew --no-daemon --info compileJava 2>&1 | tee gradle-compile.log
 
           echo "=== Checking compile result ==="
           if grep -qi "BUILD SUCCESSFUL" gradle-compile.log 2>/dev/null; then
             echo "Gradle compileJava succeeded"
           else
-            echo "Gradle compileJava had issues (expected for stub project) - continuing"
+            echo "ERROR: Gradle compileJava FAILED"
+            exit 1
           fi
 
       # ── Build: TeaVM compilation ─────────────────────────────
       - name: Compile TeaVM (Java -> JavaScript)
         run: |
-          ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log || true
+          ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log
 
           # Check if classes.js was produced (TeaVM 0.15.0 outputs to build/generated/teavm/js/)
           CLASSES_JS=""
@@ -127,7 +127,10 @@ jobs:
             fi
           done
           if [ -z "$CLASSES_JS" ]; then
-            echo "TeaVM compilation not yet complete - will generate stub"
+            echo "ERROR: TeaVM compilation did not produce classes.js"
+            echo "TeaVM log tail:"
+            tail -50 teavm.log
+            exit 1
           fi
 
       # ── Build: Compile EPK assets ────────────────────────────
@@ -176,7 +179,6 @@ jobs:
             cp output/assets.epk public/assets.epk
           elif [ ! -f public/assets.epk ]; then
             echo "assets.epk not found - creating minimal placeholder"
-            # Create minimal valid EPK file (EAGPK!! header)
             printf 'EAGPK!!\x00\x00\x00\x00\x00\x00\x00\x00' > public/assets.epk
           fi
 

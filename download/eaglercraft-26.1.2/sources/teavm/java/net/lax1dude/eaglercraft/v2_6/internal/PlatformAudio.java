@@ -185,7 +185,7 @@ public class PlatformAudio {
         public static void setMasterVolume(float volume) {
                 masterVolume = Math.max(0.0f, Math.min(1.0f, volume));
                 if (masterGain != null) {
-                        rampGainValue(masterGain, masterVolume, 0.05);
+                        rampGainValue(masterGain, masterVolume, 0.05f);
                 }
         }
 
@@ -195,7 +195,7 @@ public class PlatformAudio {
         public static void setMusicVolume(float volume) {
                 musicVolume = Math.max(0.0f, Math.min(1.0f, volume));
                 if (musicGain != null) {
-                        rampGainValue(musicGain, musicVolume, 0.05);
+                        rampGainValue(musicGain, musicVolume, 0.05f);
                 }
         }
 
@@ -205,7 +205,7 @@ public class PlatformAudio {
         public static void setSFXVolume(float volume) {
                 sfxVolume = Math.max(0.0f, Math.min(1.0f, volume));
                 if (sfxGain != null) {
-                        rampGainValue(sfxGain, sfxVolume, 0.05);
+                        rampGainValue(sfxGain, sfxVolume, 0.05f);
                 }
         }
 

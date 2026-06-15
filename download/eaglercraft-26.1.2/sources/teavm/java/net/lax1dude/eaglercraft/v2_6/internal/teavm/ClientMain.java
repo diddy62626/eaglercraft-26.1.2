@@ -9,6 +9,10 @@ import org.teavm.jso.dom.html.HTMLDocument;
 import org.teavm.jso.dom.html.HTMLElement;
 
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.opts.IClientConfig;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformInput;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformAudio;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformApplication;
 
 /**
  * Client initialization and startup logic for EaglerCraft 26.1.2 TeaVM platform.
@@ -35,7 +39,7 @@ public class ClientMain {
         static WebGL2RenderingContext webgl;
 
         /** The client configuration loaded from the bootstrap page. */
-        static IClientConfig config;
+        public static IClientConfig config;
 
         /** Whether the client has been initialized. */
         private static boolean initialized = false;
@@ -44,25 +48,25 @@ public class ClientMain {
         static boolean isDedicatedWorker = false;
 
         /** Whether OffscreenCanvas is available for the integrated server. */
-        static boolean offscreenCanvasSupported = false;
+        public static boolean offscreenCanvasSupported = false;
 
         /** Whether the Pointer Lock API 2.0 is available. */
-        static boolean pointerLockSupported = false;
+        public static boolean pointerLockSupported = false;
 
         /** Whether the Gamepad API is available. */
-        static boolean gamepadSupported = false;
+        public static boolean gamepadSupported = false;
 
         /** Whether the Web Audio API is available. */
-        static boolean audioSupported = false;
+        public static boolean audioSupported = false;
 
         /** Whether the Performance API is available. */
         static boolean performanceSupported = false;
 
         /** Whether the Clipboard API (async) is available. */
-        static boolean clipboardSupported = false;
+        public static boolean clipboardSupported = false;
 
         /** Whether the Fullscreen API is available. */
-        static boolean fullscreenSupported = false;
+        public static boolean fullscreenSupported = false;
 
         /** Whether WebCodecs API is available. */
         static boolean webCodecsSupported = false;
@@ -71,10 +75,10 @@ public class ClientMain {
         static boolean webGPUSupported = false;
 
         /** Whether the Screen Orientation API is available. */
-        static boolean screenOrientationSupported = false;
+        public static boolean screenOrientationSupported = false;
 
         /** Whether the Page Visibility API is available. */
-        static boolean pageVisibilitySupported = false;
+        public static boolean pageVisibilitySupported = false;
 
         /** Frame timing via Performance API. */
         static long lastFrameTime = 0;

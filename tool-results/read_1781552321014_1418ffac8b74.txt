@@ -1,0 +1,847 @@
+     1→     1→package net.lax1dude.eaglercraft.v2_6.internal;
+     2→     2→
+     3→     3→import org.teavm.jso.JSBody;
+     4→     4→import org.teavm.jso.JSObject;
+     5→     5→import org.teavm.jso.browser.Window;
+     6→     6→import org.teavm.jso.dom.events.Event;
+     7→     7→import org.teavm.jso.dom.events.EventListener;
+     8→     8→import org.teavm.jso.dom.events.KeyboardEvent;
+     9→     9→import org.teavm.jso.dom.events.MouseEvent;
+    10→    10→import org.teavm.jso.dom.events.TouchEvent;
+    11→    11→import org.teavm.jso.dom.html.HTMLCanvasElement;
+    12→    12→
+    13→    13→import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
+    14→    14→
+    15→    15→/**
+    16→    16→ * Platform input implementation for EaglerCraft 26.1.2 on the TeaVM/browser platform.
+    17→    17→ * Handles keyboard, mouse, touch, gamepad, and pointer lock input.
+    18→    18→ *
+    19→    19→ * <p>Key 26.1.2 improvements:</p>
+    20→    20→ * <ul>
+    21→    21→ *   <li>Pointer Lock API 2.0 with unadjustedMovement</li>
+    22→    22→ *   <li>Full keyboard layout independence using event.code property</li>
+    23→    23→ *   <li>IME composition event support (critical for CJK input)</li>
+    24→    24→ *   <li>Gamepad API polling with standard mapping</li>
+    25→    25→ *   <li>Touch events with pressure sensitivity</li>
+    26→    26→ *   <li>Mouse wheel with deltaMode handling (pixel/line/page)</li>
+    27→    27→ *   <li>Async Clipboard API (navigator.clipboard)</li>
+    28→    28→ *   <li>Context menu suppression</li>
+    29→    29→ * </ul>
+    30→    30→ */
+    31→    31→public class PlatformInput {
+    32→    32→
+    33→    33→        private static final Window window = Window.current();
+    34→    34→        private static HTMLCanvasElement canvas;
+    35→    35→
+    36→    36→        // ========== Keyboard State ==========
+    37→    37→        private static final int MAX_KEYCODE = 256;
+    38→    38→        private static final boolean[] keyDown = new boolean[MAX_KEYCODE];
+    39→    39→        private static final boolean[] keyDownOnce = new boolean[MAX_KEYCODE];
+    40→    40→
+    41→    41→        /** Current keyboard event key string. */
+    42→    42→        private static String currentKeyStr = null;
+    43→    43→
+    44→    44→        /** Current keyboard event code string (layout-independent). */
+    45→    45→        private static String currentKeyCode = null;
+    46→    46→
+    47→    47→        /** Whether an IME composition is in progress. */
+    48→    48→        private static boolean imeComposing = false;
+    49→    49→
+    50→    50→        /** The composition text from IME. */
+    51→    51→        private static String compositionText = "";
+    52→    52→
+    53→    53→        // ========== Mouse State ==========
+    54→    54→        private static final int MAX_MOUSEBUTTON = 8;
+    55→    55→        private static final boolean[] mouseDown = new boolean[MAX_MOUSEBUTTON];
+    56→    56→
+    57→    57→        /** Current mouse position in canvas coordinates. */
+    58→    58→        private static int mouseX = 0;
+    59→    59→        private static int mouseY = 0;
+    60→    60→
+    61→    61→        /** Mouse delta from pointer lock movement. */
+    62→    62→        private static int dx = 0;
+    63→    63→        private static int dy = 0;
+    64→    64→
+    65→    65→        /** Accumulated mouse wheel delta. */
+    66→    66→        private static int dwheel = 0;
+    67→    67→
+    68→    68→        /** Whether the pointer is currently locked. */
+    69→    69→        private static boolean pointerLocked = false;
+    70→    70→
+    71→    71→        // ========== Touch State ==========
+    72→    72→        /** Maximum number of tracked touch points. */
+    73→    73→        private static final int MAX_TOUCH_POINTS = 8;
+    74→    74→
+    75→    75→        /** Touch point coordinates [pointIndex][0=x, 1=y, 2=pressure]. */
+    76→    76→        private static final float[][] touchPoints = new float[MAX_TOUCH_POINTS][3];
+    77→    77→
+    78→    78→        /** Whether each touch point is currently active. */
+    79→    79→        private static final boolean[] touchActive = new boolean[MAX_TOUCH_POINTS];
+    80→    80→
+    81→    81→        /** Number of active touch points. */
+    82→    82→        private static int touchCount = 0;
+    83→    83→
+    84→    84→        // ========== Gamepad State ==========
+    85→    85→        /** Gamepad state: axes values. */
+    86→    86→        private static final float[] gamepadAxes = new float[8];
+    87→    87→
+    88→    88→        /** Gamepad state: button values. */
+    89→    89→        private static final boolean[] gamepadButtons = new boolean[24];
+    90→    90→
+    91→    91→        /** Whether a gamepad is connected. */
+    92→    92→        private static boolean gamepadConnected = false;
+    93→    93→
+    94→    94→        /** Index of the active gamepad. */
+    95→    95→        private static int activeGamepadIndex = -1;
+    96→    96→
+    97→    97→        // ========== Clipboard State ==========
+    98→    98→        /** Clipboard text to paste. */
+    99→    99→        private static String clipboardText = null;
+   100→   100→
+   101→   101→        /** Whether a clipboard paste event has occurred. */
+   102→   102→        private static boolean clipboardPasted = false;
+   103→   103→
+   104→   104→        // ========== Event Types ==========
+   105→   105→        private static final int EVENT_KEYBOARD = 1;
+   106→   106→        private static final int EVENT_MOUSE = 2;
+   107→   107→        private static final int EVENT_WHEEL = 3;
+   108→   108→        private static final int EVENT_TOUCH = 4;
+   109→   109→        private static final int EVENT_POINTER_LOCK = 5;
+   110→   110→
+   111→   111→        /** Event queue for buffering input events. */
+   112→   112→        private static final int MAX_EVENTS = 256;
+   113→   113→        private static final int[] eventTypes = new int[MAX_EVENTS];
+   114→   114→        private static final int[] eventKeys = new int[MAX_EVENTS];
+   115→   115→        private static final String[] eventKeyStrs = new String[MAX_EVENTS];
+   116→   116→        private static final int[] eventMouseButtons = new int[MAX_EVENTS];
+   117→   117→        private static final int[] eventCoordsX = new int[MAX_EVENTS];
+   118→   118→        private static final int[] eventCoordsY = new int[MAX_EVENTS];
+   119→   119→        private static float[] eventWheels = new float[MAX_EVENTS];
+   120→   120→        private static int eventCount = 0;
+   121→   121→
+   122→   122→        /**
+   123→   123→         * Initializes the input system. Called by ClientMain during startup.
+   124→   124→         * Registers all DOM event listeners on the canvas element.
+   125→   125→         */
+   126→   126→        public static void _init() {
+   127→   127→                canvas = ClientMain.getCanvas();
+   128→   128→                if (canvas == null) {
+   129→   129→                        throw new RuntimeException("Canvas is null during PlatformInput init!");
+   130→   130→                }
+   131→   131→
+   132→   132→                // Keyboard events
+   133→   133→                registerKeyListeners();
+   134→   134→
+   135→   135→                // Mouse events
+   136→   136→                registerMouseListeners();
+   137→   137→
+   138→   138→                // Touch events
+   139→   139→                registerTouchListeners();
+   140→   140→
+   141→   141→                // Wheel events
+   142→   142→                registerWheelListener();
+   143→   143→
+   144→   144→                // Pointer lock change
+   145→   145→                registerPointerLockListener();
+   146→   146→
+   147→   147→                // Gamepad events
+   148→   148→                registerGamepadListeners();
+   149→   149→
+   150→   150→                // Context menu suppression
+   151→   151→                suppressContextMenu();
+   152→   152→
+   153→   153→                // Prevent default for drag events
+   154→   154→                suppressDragDrop();
+   155→   155→
+   156→   156→                ClientMain.log("[PlatformInput] Input system initialized");
+   157→   157→        }
+   158→   158→
+   159→   159→        // ========== Event Listener Registration ==========
+   160→   160→
+   161→   161→        private static void registerKeyListeners() {
+   162→   162→                canvas.addEventListener("keydown", (EventListener<KeyboardEvent>) event -> {
+   163→   163→                        if (imeComposing) return;
+   164→   164→                        event.preventDefault();
+   165→   165→
+   166→   166→                        String code = event.getCode();
+   167→   167→                        int keyCode = mapKeyCode(code);
+   168→   168→
+   169→   169→                        if (keyCode >= 0 && keyCode < MAX_KEYCODE) {
+   170→   170→                                if (!keyDown[keyCode]) {
+   171→   171→                                        keyDownOnce[keyCode] = true;
+   172→   172→                                }
+   173→   173→                                keyDown[keyCode] = true;
+   174→   174→                        }
+   175→   175→
+   176→   176→                        currentKeyStr = event.getKey();
+   177→   177→                        currentKeyCode = code;
+   178→   178→
+   179→   179→                        enqueueKeyEvent(keyCode, event.getKey(), code);
+   180→   180→                });
+   181→   181→
+   182→   182→                canvas.addEventListener("keyup", (EventListener<KeyboardEvent>) event -> {
+   183→   183→                        if (imeComposing) return;
+   184→   184→                        event.preventDefault();
+   185→   185→
+   186→   186→                        String code = event.getCode();
+   187→   187→                        int keyCode = mapKeyCode(code);
+   188→   188→
+   189→   189→                        if (keyCode >= 0 && keyCode < MAX_KEYCODE) {
+   190→   190→                                keyDown[keyCode] = false;
+   191→   191→                        }
+   192→   192→
+   193→   193→                        currentKeyStr = event.getKey();
+   194→   194→                        currentKeyCode = code;
+   195→   195→                });
+   196→   196→
+   197→   197→                // IME composition events
+   198→   198→                canvas.addEventListener("compositionstart", (EventListener<Event>) event -> {
+   199→   199→                        imeComposing = true;
+   200→   200→                        compositionText = "";
+   201→   201→                });
+   202→   202→
+   203→   203→                canvas.addEventListener("compositionupdate", (EventListener<Event>) event -> {
+   204→   204→                        compositionText = getCompositionData(event);
+   205→   205→                });
+   206→   206→
+   207→   207→                canvas.addEventListener("compositionend", (EventListener<Event>) event -> {
+   208→   208→                        imeComposing = false;
+   209→   209→                        compositionText = getCompositionData(event);
+   210→   210→                        // Insert the final composition text as if it were typed
+   211→   211→                        currentKeyStr = compositionText;
+   212→   212→                        currentKeyCode = "";
+   213→   213→                });
+   214→   214→        }
+   215→   215→
+   216→   216→        private static void registerMouseListeners() {
+   217→   217→                canvas.addEventListener("mousedown", (EventListener<MouseEvent>) event -> {
+   218→   218→                        event.preventDefault();
+   219→   219→                        if (pointerLocked) return;
+   220→   220→
+   221→   221→                        int button = event.getButton();
+   222→   222→                        if (button >= 0 && button < MAX_MOUSEBUTTON) {
+   223→   223→                                mouseDown[button] = true;
+   224→   224→                        }
+   225→   225→                });
+   226→   226→
+   227→   227→                canvas.addEventListener("mouseup", (EventListener<MouseEvent>) event -> {
+   228→   228→                        event.preventDefault();
+   229→   229→                        if (pointerLocked) return;
+   230→   230→
+   231→   231→                        int button = event.getButton();
+   232→   232→                        if (button >= 0 && button < MAX_MOUSEBUTTON) {
+   233→   233→                                mouseDown[button] = false;
+   234→   234→                        }
+   235→   235→                });
+   236→   236→
+   237→   237→                canvas.addEventListener("mousemove", (EventListener<MouseEvent>) event -> {
+   238→   238→                        if (pointerLocked) {
+   239→   239→                                // In pointer lock mode, use movementX/Y for delta
+   240→   240→                                dx += getMovementX(event);
+   241→   241→                                dy += getMovementY(event);
+   242→   242→                        } else {
+   243→   243→                                // Normal mode: track absolute position relative to canvas
+   244→   244→                                int[] coords = getCanvasRelativeCoords(event);
+   245→   245→                                mouseX = coords[0];
+   246→   246→                                mouseY = coords[1];
+   247→   247→                        }
+   248→   248→                });
+   249→   249→        }
+   250→   250→
+   251→   251→        private static void registerTouchListeners() {
+   252→   252→                canvas.addEventListener("touchstart", (EventListener<TouchEvent>) event -> {
+   253→   253→                        event.preventDefault();
+   254→   254→                        updateTouchState(event);
+   255→   255→                });
+   256→   256→
+   257→   257→                canvas.addEventListener("touchmove", (EventListener<TouchEvent>) event -> {
+   258→   258→                        event.preventDefault();
+   259→   259→                        updateTouchState(event);
+   260→   260→                });
+   261→   261→
+   262→   262→                canvas.addEventListener("touchend", (EventListener<TouchEvent>) event -> {
+   263→   263→                        event.preventDefault();
+   264→   264→                        updateTouchState(event);
+   265→   265→                });
+   266→   266→
+   267→   267→                canvas.addEventListener("touchcancel", (EventListener<TouchEvent>) event -> {
+   268→   268→                        event.preventDefault();
+   269→   269→                        clearTouchState();
+   270→   270→                });
+   271→   271→        }
+   272→   272→
+   273→   273→        private static void registerWheelListener() {
+   274→   274→                // Use native JS to register with { passive: false } so preventDefault() works
+   275→   275→                registerWheelListener0();
+   276→   276→        }
+   277→   277→
+   278→   278→        /**
+   279→   279→         * Native method to register wheel listener with passive: false option.
+   280→   280→         * Required for Chrome which makes wheel events passive by default.
+   281→   281→         */
+   282→   282→        @JSBody(params = {}, script = ""
+   283→   283→                        + "var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');"
+   284→   284→                        + "if (c) {"
+   285→   285→                        + "  c.addEventListener('wheel', function(e) {"
+   286→   286→                        + "    e.preventDefault();"
+   287→   287→                        + "    var mode = e.deltaMode || 0;"
+   288→   288→                        + "    var raw = e.deltaY;"
+   289→   289→                        + "    var normalized;"
+   290→   290→                        + "    if (mode === 0) normalized = raw;"
+   291→   291→                        + "    else if (mode === 1) normalized = raw * 40;"
+   292→   292→                        + "    else normalized = raw * 800;"
+   293→   293→                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___onWheel(normalized);"
+   294→   294→                        + "  }, { passive: false });"
+   295→   295→                        + "}")
+   296→   296→        private static native void registerWheelListener0();
+   297→   297→
+   298→   298→        /** Callback from JavaScript when a wheel event occurs. */
+   299→   299→        private static void __onWheel(double normalizedDelta) {
+   300→   300→                dwheel += (int) normalizedDelta;
+   301→   301→        }
+   302→   302→
+   303→   303→        private static void registerPointerLockListener() {
+   304→   304→                documentAddPointerLockChangeListener((event) -> {
+   305→   305→                        if (isPointerLocked0()) {
+   306→   306→                                pointerLocked = true;
+   307→   307→                        } else {
+   308→   308→                                pointerLocked = false;
+   309→   309→                                dx = 0;
+   310→   310→                                dy = 0;
+   311→   311→                        }
+   312→   312→                });
+   313→   313→        }
+   314→   314→
+   315→   315→        private static void registerGamepadListeners() {
+   316→   316→                if (!ClientMain.gamepadSupported) return;
+   317→   317→
+   318→   318→                windowAddGamepadConnectedListener((event) -> {
+   319→   319→                        int index = getGamepadEventIndex(event);
+   320→   320→                        if (activeGamepadIndex < 0) {
+   321→   321→                                activeGamepadIndex = index;
+   322→   322→                        }
+   323→   323→                        gamepadConnected = true;
+   324→   324→                        ClientMain.log("[PlatformInput] Gamepad connected: index=" + index);
+   325→   325→                });
+   326→   326→
+   327→   327→                windowAddGamepadDisconnectedListener((event) -> {
+   328→   328→                        int index = getGamepadEventIndex(event);
+   329→   329→                        if (index == activeGamepadIndex) {
+   330→   330→                                activeGamepadIndex = -1;
+   331→   331→                                gamepadConnected = false;
+   332→   332→                                // Clear state
+   333→   333→                                for (int i = 0; i < gamepadAxes.length; i++) gamepadAxes[i] = 0;
+   334→   334→                                for (int i = 0; i < gamepadButtons.length; i++) gamepadButtons[i] = false;
+   335→   335→                        }
+   336→   336→                        ClientMain.log("[PlatformInput] Gamepad disconnected: index=" + index);
+   337→   337→                });
+   338→   338→        }
+   339→   339→
+   340→   340→        private static void suppressContextMenu() {
+   341→   341→                canvas.addEventListener("contextmenu", (EventListener<Event>) event -> {
+   342→   342→                        event.preventDefault();
+   343→   343→                });
+   344→   344→        }
+   345→   345→
+   346→   346→        private static void suppressDragDrop() {
+   347→   347→                canvas.addEventListener("dragover", (EventListener<Event>) event -> {
+   348→   348→                        event.preventDefault();
+   349→   349→                });
+   350→   350→                canvas.addEventListener("drop", (EventListener<Event>) event -> {
+   351→   351→                        event.preventDefault();
+   352→   352→                });
+   353→   353→        }
+   354→   354→
+   355→   355→        // ========== Gamepad Polling ==========
+   356→   356→
+   357→   357→        /**
+   358→   358→         * Polls the gamepad state. Should be called once per frame.
+   359→   359→         */
+   360→   360→        public static void pollGamepad() {
+   361→   361→                if (!gamepadConnected || activeGamepadIndex < 0) return;
+   362→   362→                pollGamepad0(activeGamepadIndex);
+   363→   363→        }
+   364→   364→
+   365→   365→        // ========== Pointer Lock ==========
+   366→   366→
+   367→   367→        /**
+   368→   368→         * Requests pointer lock on the canvas element.
+   369→   369→         */
+   370→   370→        public static void requestPointerLock() {
+   371→   371→                if (ClientMain.pointerLockSupported) {
+   372→   372→                        requestPointerLock0();
+   373→   373→                }
+   374→   374→        }
+   375→   375→
+   376→   376→        /**
+   377→   377→         * Exits pointer lock mode.
+   378→   378→         */
+   379→   379→        public static void exitPointerLock() {
+   380→   380→                exitPointerLock0();
+   381→   381→        }
+   382→   382→
+   383→   383→        /**
+   384→   384→         * Checks if the pointer is currently locked.
+   385→   385→         */
+   386→   386→        public static boolean isPointerLocked() {
+   387→   387→                return pointerLocked;
+   388→   388→        }
+   389→   389→
+   390→   390→        // ========== Clipboard ==========
+   391→   391→
+   392→   392→        /**
+   393→   393→         * Copies text to the clipboard using the async Clipboard API.
+   394→   394→         */
+   395→   395→        public static void setClipboardText(String text) {
+   396→   396→                if (ClientMain.clipboardSupported) {
+   397→   397→                        setClipboardText0(text);
+   398→   398→                } else {
+   399→   399→                        // Fallback using deprecated document.execCommand
+   400→   400→                        setClipboardTextFallback(text);
+   401→   401→                }
+   402→   402→        }
+   403→   403→
+   404→   404→        /**
+   405→   405→         * Gets the clipboard text. Returns null if no text is available.
+   406→   406→         */
+   407→   407→        public static String getClipboardText() {
+   408→   408→                if (ClientMain.clipboardSupported) {
+   409→   409→                        getClipboardText0();
+   410→   410→                }
+   411→   411→                return clipboardText;
+   412→   412→        }
+   413→   413→
+   414→   414→        // ========== State Query Methods ==========
+   415→   415→
+   416→   416→        /**
+   417→   417→         * Checks if a key is currently held down.
+   418→   418→         */
+   419→   419→        public static boolean isKeyDown(int keyCode) {
+   420→   420→                if (keyCode < 0 || keyCode >= MAX_KEYCODE) return false;
+   421→   421→                return keyDown[keyCode];
+   422→   422→        }
+   423→   423→
+   424→   424→        /**
+   425→   425→         * Checks if a key was pressed this frame (edge-triggered).
+   426→   426→         * Resets after checking.
+   427→   427→         */
+   428→   428→        public static boolean isKeyDownOnce(int keyCode) {
+   429→   429→                if (keyCode < 0 || keyCode >= MAX_KEYCODE) return false;
+   430→   430→                boolean result = keyDownOnce[keyCode];
+   431→   431→                keyDownOnce[keyCode] = false;
+   432→   432→                return result;
+   433→   433→        }
+   434→   434→
+   435→   435→        /**
+   436→   436→         * Gets the current mouse X position (canvas-relative).
+   437→   437→         */
+   438→   438→        public static int getMouseX() {
+   439→   439→                return mouseX;
+   440→   440→        }
+   441→   441→
+   442→   442→        /**
+   443→   443→         * Gets the current mouse Y position (canvas-relative).
+   444→   444→         */
+   445→   445→        public static int getMouseY() {
+   446→   446→                return mouseY;
+   447→   447→        }
+   448→   448→
+   449→   449→        /**
+   450→   450→         * Gets and clears the accumulated mouse DX from pointer lock.
+   451→   451→         */
+   452→   452→        public static int getMouseDX() {
+   453→   453→                int result = dx;
+   454→   454→                dx = 0;
+   455→   455→                return result;
+   456→   456→        }
+   457→   457→
+   458→   458→        /**
+   459→   459→         * Gets and clears the accumulated mouse DY from pointer lock.
+   460→   460→         */
+   461→   461→        public static int getMouseDY() {
+   462→   462→                int result = dy;
+   463→   463→                dy = 0;
+   464→   464→                return result;
+   465→   465→        }
+   466→   466→
+   467→   467→        /**
+   468→   468→         * Gets and clears the accumulated mouse wheel delta.
+   469→   469→         */
+   470→   470→        public static int getMouseDWheel() {
+   471→   471→                int result = dwheel;
+   472→   472→                dwheel = 0;
+   473→   473→                return result;
+   474→   474→        }
+   475→   475→
+   476→   476→        /**
+   477→   477→         * Checks if a mouse button is currently held down.
+   478→   478→         */
+   479→   479→        public static boolean isMouseDown(int button) {
+   480→   480→                if (button < 0 || button >= MAX_MOUSEBUTTON) return false;
+   481→   481→                return mouseDown[button];
+   482→   482→        }
+   483→   483→
+   484→   484→        /**
+   485→   485→         * Gets the current keyboard event key string.
+   486→   486→         */
+   487→   487→        public static String getCurrentKeyStr() {
+   488→   488→                return currentKeyStr;
+   489→   489→        }
+   490→   490→
+   491→   491→        /**
+   492→   492→         * Gets the current keyboard event code string (layout-independent).
+   493→   493→         */
+   494→   494→        public static String getCurrentKeyCode() {
+   495→   495→                return currentKeyCode;
+   496→   496→        }
+   497→   497→
+   498→   498→        /**
+   499→   499→         * Checks if an IME composition is in progress.
+   500→   500→         */
+   501→   501→        public static boolean isIMEComposing() {
+   502→   502→                return imeComposing;
+   503→   503→        }
+   504→   504→
+   505→   505→        /**
+   506→   506→         * Gets the current IME composition text.
+   507→   507→         */
+   508→   508→        public static String getCompositionText() {
+   509→   509→                return compositionText;
+   510→   510→        }
+   511→   511→
+   512→   512→        /**
+   513→   513→         * Gets the number of active touch points.
+   514→   514→         */
+   515→   515→        public static int getTouchCount() {
+   516→   516→                return touchCount;
+   517→   517→        }
+   518→   518→
+   519→   519→        /**
+   520→   520→         * Gets the X coordinate of a touch point.
+   521→   521→         */
+   522→   522→        public static float getTouchX(int index) {
+   523→   523→                if (index < 0 || index >= MAX_TOUCH_POINTS) return 0;
+   524→   524→                return touchPoints[index][0];
+   525→   525→        }
+   526→   526→
+   527→   527→        /**
+   528→   528→         * Gets the Y coordinate of a touch point.
+   529→   529→         */
+   530→   530→        public static float getTouchY(int index) {
+   531→   531→                if (index < 0 || index >= MAX_TOUCH_POINTS) return 0;
+   532→   532→                return touchPoints[index][1];
+   533→   533→        }
+   534→   534→
+   535→   535→        /**
+   536→   536→         * Gets the pressure of a touch point.
+   537→   537→         */
+   538→   538→        public static float getTouchPressure(int index) {
+   539→   539→                if (index < 0 || index >= MAX_TOUCH_POINTS) return 0;
+   540→   540→                return touchPoints[index][2];
+   541→   541→        }
+   542→   542→
+   543→   543→        /**
+   544→   544→         * Checks if a touch point is active.
+   545→   545→         */
+   546→   546→        public static boolean isTouchActive(int index) {
+   547→   547→                if (index < 0 || index >= MAX_TOUCH_POINTS) return false;
+   548→   548→                return touchActive[index];
+   549→   549→        }
+   550→   550→
+   551→   551→        /**
+   552→   552→         * Gets a gamepad axis value.
+   553→   553→         */
+   554→   554→        public static float getGamepadAxis(int index) {
+   555→   555→                if (index < 0 || index >= gamepadAxes.length) return 0;
+   556→   556→                return gamepadAxes[index];
+   557→   557→        }
+   558→   558→
+   559→   559→        /**
+   560→   560→         * Checks if a gamepad button is pressed.
+   561→   561→         */
+   562→   562→        public static boolean isGamepadButton(int index) {
+   563→   563→                if (index < 0 || index >= gamepadButtons.length) return false;
+   564→   564→                return gamepadButtons[index];
+   565→   565→        }
+   566→   566→
+   567→   567→        /**
+   568→   568→         * Checks if a gamepad is connected.
+   569→   569→         */
+   570→   570→        public static boolean isGamepadConnected() {
+   571→   571→                return gamepadConnected;
+   572→   572→        }
+   573→   573→
+   574→   574→        // ========== Frame Reset ==========
+   575→   575→
+   576→   576→        /**
+   577→   577→         * Resets per-frame input state. Called at the start of each game tick.
+   578→   578→         */
+   579→   579→        public static void frameReset() {
+   580→   580→                eventCount = 0;
+   581→   581→        }
+   582→   582→
+   583→   583→        // ========== Event Queue ==========
+   584→   584→
+   585→   585→        private static void enqueueKeyEvent(int keyCode, String keyStr, String code) {
+   586→   586→                if (eventCount < MAX_EVENTS) {
+   587→   587→                        eventTypes[eventCount] = EVENT_KEYBOARD;
+   588→   588→                        eventKeys[eventCount] = keyCode;
+   589→   589→                        eventKeyStrs[eventCount] = keyStr;
+   590→   590→                        eventCount++;
+   591→   591→                }
+   592→   592→        }
+   593→   593→
+   594→   594→        // ========== Native JS Methods ==========
+   595→   595→
+   596→   596→        /**
+   597→   597→         * Maps a keyboard event code string to an internal key code.
+   598→   598→         * Uses the code property for layout independence.
+   599→   599→         */
+   600→   600→        @JSBody(params = { "code" }, script = ""
+   601→   601→                        + "var map = {"
+   602→   602→                        + "  'KeyA':30,'KeyB':48,'KeyC':46,'KeyD':32,'KeyE':18,'KeyF':33,'KeyG':34,'KeyH':35,"
+   603→   603→                        + "  'KeyI':23,'KeyJ':36,'KeyK':37,'KeyL':38,'KeyM':50,'KeyN':49,'KeyO':24,'KeyP':25,"
+   604→   604→                        + "  'KeyQ':16,'KeyR':19,'KeyS':31,'KeyT':20,'KeyU':22,'KeyV':47,'KeyW':17,'KeyX':45,"
+   605→   605→                        + "  'KeyY':21,'KeyZ':44,"
+   606→   606→                        + "  'Digit0':11,'Digit1':2,'Digit2':3,'Digit3':4,'Digit4':5,'Digit5':6,"
+   607→   607→                        + "  'Digit6':7,'Digit7':8,'Digit8':9,'Digit9':10,"
+   608→   608→                        + "  'F1':59,'F2':60,'F3':61,'F4':62,'F5':63,'F6':64,'F7':65,'F8':66,"
+   609→   609→                        + "  'F9':67,'F10':68,'F11':87,'F12':88,"
+   610→   610→                        + "  'Backquote':41,'Minus':12,'Equal':13,'Backspace':14,'Tab':15,"
+   611→   611→                        + "  'BracketLeft':26,'BracketRight':27,'Backslash':43,'Semicolon':39,'Quote':40,"
+   612→   612→                        + "  'Enter':28,'CapsLock':58,"
+   613→   613→                        + "  'ShiftLeft':42,'ShiftRight':54,'ControlLeft':29,'ControlRight':157,"
+   614→   614→                        + "  'AltLeft':56,'AltRight':184,'MetaLeft':221,'MetaRight':220,"
+   615→   615→                        + "  'Space':57,'ContextMenu':58,"
+   616→   616→                        + "  'ArrowLeft':203,'ArrowUp':200,'ArrowRight':205,'ArrowDown':208,"
+   617→   617→                        + "  'Insert':210,'Home':199,'PageUp':201,'Delete':211,'End':207,'PageDown':209,"
+   618→   618→                        + "  'NumLock':69,'ScrollLock':70,'Pause':197,"
+   619→   619→                        + "  'NumpadDivide':181,'NumpadMultiply':55,'NumpadSubtract':74,'NumpadAdd':78,"
+   620→   620→                        + "  'NumpadEnter':156,'NumpadDecimal':83,"
+   621→   621→                        + "  'Numpad0':82,'Numpad1':79,'Numpad2':80,'Numpad3':81,'Numpad4':75,"
+   622→   622→                        + "  'Numpad5':76,'Numpad6':77,'Numpad7':71,'Numpad8':72,'Numpad9':73"
+   623→   623→                        + "};"
+   624→   624→                        + "return map[code] || -1;")
+   625→   625→        private static native int mapKeyCode(String code);
+   626→   626→
+   627→   627→        /**
+   628→   628→         * Gets canvas-relative coordinates from a mouse event.
+   629→   629→         */
+   630→   630→        @JSBody(params = { "event" }, script = ""
+   631→   631→                        + "var rect = event.target.getBoundingClientRect();"
+   632→   632→                        + "var x = event.clientX - rect.left;"
+   633→   633→                        + "var y = event.clientY - rect.top;"
+   634→   634→                        + "var scaleX = event.target.clientWidth / rect.width;"
+   635→   635→                        + "var scaleY = event.target.clientHeight / rect.height;"
+   636→   636→                        + "return [Math.round(x * scaleX), Math.round(y * scaleY)];")
+   637→   637→        private static native int[] getCanvasRelativeCoords(MouseEvent event);
+   638→   638→
+   639→   639→        /**
+   640→   640→         * Gets movementX from a mouse event (pointer lock delta).
+   641→   641→         */
+   642→   642→        @JSBody(params = { "event" }, script = "return event.movementX || 0;")
+   643→   643→        private static native int getMovementX(MouseEvent event);
+   644→   644→
+   645→   645→        /**
+   646→   646→         * Gets movementY from a mouse event (pointer lock delta).
+   647→   647→         */
+   648→   648→        @JSBody(params = { "event" }, script = "return event.movementY || 0;")
+   649→   649→        private static native int getMovementY(MouseEvent event);
+   650→   650→
+   651→   651→        /**
+   652→   652→         * Gets the composition data from a composition event.
+   653→   653→         */
+   654→   654→        @JSBody(params = { "event" }, script = "return event.data || '';")
+   655→   655→        private static native String getCompositionData(Event event);
+   656→   656→
+   657→   657→        /**
+   658→   658→         * Requests pointer lock on the canvas.
+   659→   659→         */
+   660→   660→        @JSBody(params = {}, script = ""
+   661→   661→                        + "var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');"
+   662→   662→                        + "if (c && c.requestPointerLock) {"
+   663→   663→                        + "  if (c.requestPointerLock.length > 0) {"
+   664→   664→                        + "    c.requestPointerLock({ unadjustedMovement: true });"
+   665→   665→                        + "  } else {"
+   666→   666→                        + "    c.requestPointerLock();"
+   667→   667→                        + "  }"
+   668→   668→                        + "}")
+   669→   669→        private static native void requestPointerLock0();
+   670→   670→
+   671→   671→        /**
+   672→   672→         * Exits pointer lock.
+   673→   673→         */
+   674→   674→        @JSBody(params = {}, script = ""
+   675→   675→                        + "if (document.exitPointerLock) document.exitPointerLock();"
+   676→   676→                        + "else if (document.mozExitPointerLock) document.mozExitPointerLock();")
+   677→   677→        private static native void exitPointerLock0();
+   678→   678→
+   679→   679→        /**
+   680→   680→         * Checks if the pointer is currently locked.
+   681→   681→         */
+   682→   682→        @JSBody(params = {}, script = ""
+   683→   683→                        + "return !!(document.pointerLockElement || document.mozPointerLockElement);")
+   684→   684→        private static native boolean isPointerLocked0();
+   685→   685→
+   686→   686→        /**
+   687→   687→         * Adds a pointer lock change event listener to the document.
+   688→   688→         */
+   689→   689→        @JSBody(params = { "callback" }, script = ""
+   690→   690→                        + "document.addEventListener('pointerlockchange', callback);"
+   691→   691→                        + "document.addEventListener('mozpointerlockchange', callback);")
+   692→   692→        private static native void documentAddPointerLockChangeListener(EventListener<Event> callback);
+   693→   693→
+   694→   694→        /**
+   695→   695→         * Sets the clipboard text using the async Clipboard API.
+   696→   696→         */
+   697→   697→        @JSBody(params = { "text" }, script = ""
+   698→   698→                        + "if (navigator.clipboard && navigator.clipboard.writeText) {"
+   699→   699→                        + "  navigator.clipboard.writeText(text).catch(function(e) {"
+   700→   700→                        + "    console.warn('Clipboard write failed:', e);"
+   701→   701→                        + "  });"
+   702→   702→                        + "}")
+   703→   703→        private static native void setClipboardText0(String text);
+   704→   704→
+   705→   705→        /**
+   706→   706→         * Sets the clipboard text using a fallback method.
+   707→   707→         */
+   708→   708→        @JSBody(params = { "text" }, script = ""
+   709→   709→                        + "var ta = document.createElement('textarea');"
+   710→   710→                        + "ta.value = text;"
+   711→   711→                        + "ta.style.position = 'fixed';"
+   712→   712→                        + "ta.style.left = '-9999px';"
+   713→   713→                        + "document.body.appendChild(ta);"
+   714→   714→                        + "ta.select();"
+   715→   715→                        + "document.execCommand('copy');"
+   716→   716→                        + "document.body.removeChild(ta);")
+   717→   717→        private static native void setClipboardTextFallback(String text);
+   718→   718→
+   719→   719→        /**
+   720→   720→         * Reads clipboard text using the async Clipboard API.
+   721→   721→         */
+   722→   722→        @JSBody(params = {}, script = ""
+   723→   723→                        + "if (navigator.clipboard && navigator.clipboard.readText) {"
+   724→   724→                        + "  navigator.clipboard.readText().then(function(text) {"
+   725→   725→                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___onClipboardRead(text);"
+   726→   726→                        + "  }).catch(function(e) {"
+   727→   727→                        + "    console.warn('Clipboard read failed:', e);"
+   728→   728→                        + "  });"
+   729→   729→                        + "}")
+   730→   730→        private static native void getClipboardText0();
+   731→   731→
+   732→   732→        /**
+   733→   733→         * Callback from JavaScript when clipboard text is read.
+   734→   734→         */
+   735→   735→        private static void __onClipboardRead(String text) {
+   736→   736→                clipboardText = text;
+   737→   737→                clipboardPasted = true;
+   738→   738→        }
+   739→   739→
+   740→   740→        /**
+   741→   741→         * Updates touch state from a TouchEvent.
+   742→   742→         */
+   743→   743→        @JSBody(params = { "event" }, script = ""
+   744→   744→                        + "var touches = event.changedTouches;"
+   745→   745→                        + "var result = [];"
+   746→   746→                        + "for (var i = 0; i < touches.length; i++) {"
+   747→   747→                        + "  var t = touches[i];"
+   748→   748→                        + "  var rect = t.target.getBoundingClientRect();"
+   749→   749→                        + "  var x = t.clientX - rect.left;"
+   750→   750→                        + "  var y = t.clientY - rect.top;"
+   751→   751→                        + "  var p = t.force || 0;"
+   752→   752→                        + "  result.push({ id: t.identifier, x: x, y: y, pressure: p });"
+   753→   753→                        + "}"
+   754→   754→                        + "return result;")
+   755→   755→        private static native JSObject extractTouchData(TouchEvent event);
+   756→   756→
+   757→   757→        private static void updateTouchState(TouchEvent event) {
+   758→   758→                // Reset touch state
+   759→   759→                for (int i = 0; i < MAX_TOUCH_POINTS; i++) {
+   760→   760→                        touchActive[i] = false;
+   761→   761→                }
+   762→   762→                touchCount = 0;
+   763→   763→                updateTouchState0(event);
+   764→   764→        }
+   765→   765→
+   766→   766→        @JSBody(params = { "event" }, script = ""
+   767→   767→                        + "var touches = event.touches;"
+   768→   768→                        + "for (var i = 0; i < Math.min(touches.length, 8); i++) {"
+   769→   769→                        + "  var t = touches[i];"
+   770→   770→                        + "  var rect = t.target.getBoundingClientRect();"
+   771→   771→                        + "  var scaleX = t.target.clientWidth / rect.width;"
+   772→   772→                        + "  var scaleY = t.target.clientHeight / rect.height;"
+   773→   773→                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateTouchPoint("
+   774→   774→                        + "    i,"
+   775→   775→                        + "    (t.clientX - rect.left) * scaleX,"
+   776→   776→                        + "    (t.clientY - rect.top) * scaleY,"
+   777→   777→                        + "    t.force || 1.0"
+   778→   778→                        + "  );"
+   779→   779→                        + "}")
+   780→   780→        private static native void updateTouchState0(TouchEvent event);
+   781→   781→
+   782→   782→        private static void __updateTouchPoint(int index, float x, float y, float pressure) {
+   783→   783→                if (index >= 0 && index < MAX_TOUCH_POINTS) {
+   784→   784→                        touchPoints[index][0] = x;
+   785→   785→                        touchPoints[index][1] = y;
+   786→   786→                        touchPoints[index][2] = pressure;
+   787→   787→                        touchActive[index] = true;
+   788→   788→                        touchCount = Math.max(touchCount, index + 1);
+   789→   789→                }
+   790→   790→        }
+   791→   791→
+   792→   792→        private static void clearTouchState() {
+   793→   793→                for (int i = 0; i < MAX_TOUCH_POINTS; i++) {
+   794→   794→                        touchActive[i] = false;
+   795→   795→                        touchPoints[i][0] = 0;
+   796→   796→                        touchPoints[i][1] = 0;
+   797→   797→                        touchPoints[i][2] = 0;
+   798→   798→                }
+   799→   799→                touchCount = 0;
+   800→   800→        }
+   801→   801→
+   802→   802→        /**
+   803→   803→         * Polls the gamepad state from JavaScript.
+   804→   804→         */
+   805→   805→        @JSBody(params = { "index" }, script = ""
+   806→   806→                        + "var gamepads = navigator.getGamepads();"
+   807→   807→                        + "if (!gamepads || !gamepads[index]) return;"
+   808→   808→                        + "var gp = gamepads[index];"
+   809→   809→                        + "for (var i = 0; i < Math.min(gp.axes.length, 8); i++) {"
+   810→   810→                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateGamepadAxis(i, gp.axes[i]);"
+   811→   811→                        + "}"
+   812→   812→                        + "for (var i = 0; i < Math.min(gp.buttons.length, 24); i++) {"
+   813→   813→                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateGamepadButton(i, gp.buttons[i].pressed);"
+   814→   814→                        + "}")
+   815→   815→        private static native void pollGamepad0(int index);
+   816→   816→
+   817→   817→        private static void __updateGamepadAxis(int index, float value) {
+   818→   818→                if (index >= 0 && index < gamepadAxes.length) {
+   819→   819→                        gamepadAxes[index] = value;
+   820→   820→                }
+   821→   821→        }
+   822→   822→
+   823→   823→        private static void __updateGamepadButton(int index, boolean pressed) {
+   824→   824→                if (index >= 0 && index < gamepadButtons.length) {
+   825→   825→                        gamepadButtons[index] = pressed;
+   826→   826→                }
+   827→   827→        }
+   828→   828→
+   829→   829→        /**
+   830→   830→         * Gets the gamepad index from a GamepadEvent.
+   831→   831→         */
+   832→   832→        @JSBody(params = { "event" }, script = "return event.gamepad.index;")
+   833→   833→        private static native int getGamepadEventIndex(Event event);
+   834→   834→
+   835→   835→        /**
+   836→   836→         * Adds a gamepadconnected event listener.
+   837→   837→         */
+   838→   838→        @JSBody(params = { "callback" }, script = "window.addEventListener('gamepadconnected', callback);")
+   839→   839→        private static native void windowAddGamepadConnectedListener(EventListener<Event> callback);
+   840→   840→
+   841→   841→        /**
+   842→   842→         * Adds a gamepaddisconnected event listener.
+   843→   843→         */
+   844→   844→        @JSBody(params = { "callback" }, script = "window.addEventListener('gamepaddisconnected', callback);")
+   845→   845→        private static native void windowAddGamepadDisconnectedListener(EventListener<Event> callback);
+   846→   846→}
+   847→   847→
