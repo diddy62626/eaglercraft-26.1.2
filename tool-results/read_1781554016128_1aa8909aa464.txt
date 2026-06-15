@@ -1,0 +1,1147 @@
+     1→package net.lax1dude.eaglercraft.v2_6.internal.teavm;
+     2→
+     3→import org.teavm.jso.JSMethod;
+     4→import org.teavm.jso.JSObject;
+     5→import org.teavm.jso.JSProperty;
+     6→import org.teavm.jso.typedarrays.ArrayBuffer;
+     7→import org.teavm.jso.typedarrays.Float32Array;
+     8→import org.teavm.jso.typedarrays.Int32Array;
+     9→import org.teavm.jso.typedarrays.Uint8Array;
+    10→
+    11→/**
+    12→ * Complete WebGL2 rendering context JSO interface for EaglerCraft 26.1.2.
+    13→ * Provides type-safe access to all WebGL2 constants and methods via TeaVM.
+    14→ * WebGL1 fallback is NOT supported in 26.1.2 - WebGL2 is required.
+    15→ */
+    16→public abstract class WebGL2RenderingContext implements JSObject {
+    17→
+    18→        // ========== Clearing Masks ==========
+    19→        public static final int DEPTH_BUFFER_BIT = 0x00000100;
+    20→        public static final int STENCIL_BUFFER_BIT = 0x00000400;
+    21→        public static final int COLOR_BUFFER_BIT = 0x00004000;
+    22→
+    23→        // ========== Begin/End Mode ==========
+    24→        public static final int POINTS = 0x0000;
+    25→        public static final int LINES = 0x0001;
+    26→        public static final int LINE_LOOP = 0x0002;
+    27→        public static final int LINE_STRIP = 0x0003;
+    28→        public static final int TRIANGLES = 0x0004;
+    29→        public static final int TRIANGLE_STRIP = 0x0005;
+    30→        public static final int TRIANGLE_FAN = 0x0006;
+    31→
+    32→        // ========== Alpha Blending ==========
+    33→        public static final int ZERO = 0;
+    34→        public static final int ONE = 1;
+    35→        public static final int SRC_COLOR = 0x0300;
+    36→        public static final int ONE_MINUS_SRC_COLOR = 0x0301;
+    37→        public static final int SRC_ALPHA = 0x0302;
+    38→        public static final int ONE_MINUS_SRC_ALPHA = 0x0303;
+    39→        public static final int DST_ALPHA = 0x0304;
+    40→        public static final int ONE_MINUS_DST_ALPHA = 0x0305;
+    41→        public static final int DST_COLOR = 0x0306;
+    42→        public static final int ONE_MINUS_DST_COLOR = 0x0307;
+    43→        public static final int SRC_ALPHA_SATURATE = 0x0308;
+    44→        public static final int CONSTANT_COLOR = 0x8001;
+    45→        public static final int ONE_MINUS_CONSTANT_COLOR = 0x8002;
+    46→        public static final int CONSTANT_ALPHA = 0x8003;
+    47→        public static final int ONE_MINUS_CONSTANT_ALPHA = 0x8004;
+    48→
+    49→        // ========== Blend Equations ==========
+    50→        public static final int FUNC_ADD = 0x8006;
+    51→        public static final int FUNC_SUBTRACT = 0x800A;
+    52→        public static final int FUNC_REVERSE_SUBTRACT = 0x800B;
+    53→        public static final int MIN = 0x8007;
+    54→        public static final int MAX = 0x8008;
+    55→
+    56→        // ========== Buffer Objects ==========
+    57→        public static final int ARRAY_BUFFER = 0x8892;
+    58→        public static final int ELEMENT_ARRAY_BUFFER = 0x8893;
+    59→        public static final int COPY_READ_BUFFER = 0x8F36;
+    60→        public static final int COPY_WRITE_BUFFER = 0x8F37;
+    61→        public static final int PIXEL_PACK_BUFFER = 0x88EB;
+    62→        public static final int PIXEL_UNPACK_BUFFER = 0x88EC;
+    63→        public static final int TRANSFORM_FEEDBACK_BUFFER = 0x8C8E;
+    64→        public static final int UNIFORM_BUFFER = 0x8A11;
+    65→        public static final int TEXTURE_BUFFER = 0x8C2A;
+    66→
+    67→        public static final int STREAM_DRAW = 0x88E0;
+    68→        public static final int STATIC_DRAW = 0x88E4;
+    69→        public static final int DYNAMIC_DRAW = 0x88E8;
+    70→        public static final int STREAM_READ = 0x88E1;
+    71→        public static final int STATIC_READ = 0x88E5;
+    72→        public static final int DYNAMIC_READ = 0x88E9;
+    73→        public static final int STREAM_COPY = 0x88E2;
+    74→        public static final int STATIC_COPY = 0x88E6;
+    75→        public static final int DYNAMIC_COPY = 0x88EA;
+    76→
+    77→        // ========== Buffer Access ==========
+    78→        public static final int BUFFER_SIZE = 0x8764;
+    79→        public static final int BUFFER_USAGE = 0x8765;
+    80→        public static final int BUFFER_ACCESS = 0x88BB;
+    81→        public static final int BUFFER_MAPPED = 0x88BC;
+    82→        public static final int BUFFER_MAP_POINTER = 0x88BD;
+    83→        public static final int ACCESS_READ_ONLY = 0x88B8;
+    84→        public static final int ACCESS_WRITE_ONLY = 0x88B9;
+    85→        public static final int ACCESS_READ_WRITE = 0x88BA;
+    86→
+    87→        // ========== Shaders ==========
+    88→        public static final int FRAGMENT_SHADER = 0x8B30;
+    89→        public static final int VERTEX_SHADER = 0x8B31;
+    90→        public static final int GEOMETRY_SHADER = 0x8DD9;
+    91→        public static final int TESS_EVALUATION_SHADER = 0x8E87;
+    92→        public static final int TESS_CONTROL_SHADER = 0x8E88;
+    93→        public static final int COMPUTE_SHADER = 0x91B9;
+    94→
+    95→        public static final int COMPILE_STATUS = 0x8B81;
+    96→        public static final int DELETE_STATUS = 0x8B80;
+    97→        public static final int LINK_STATUS = 0x8B82;
+    98→        public static final int VALIDATE_STATUS = 0x8B83;
+    99→        public static final int INFO_LOG_LENGTH = 0x8B84;
+   100→        public static final int ATTACHED_SHADERS = 0x8B85;
+   101→        public static final int ACTIVE_UNIFORMS = 0x8B86;
+   102→        public static final int ACTIVE_ATTRIBUTES = 0x8B89;
+   103→        public static final int SHADER_TYPE = 0x8B4F;
+   104→        public static final int SHADER_SOURCE_LENGTH = 0x8B88;
+   105→
+   106→        // ========== Data Types ==========
+   107→        public static final int FLOAT = 0x1406;
+   108→        public static final int FLOAT_VEC2 = 0x8B50;
+   109→        public static final int FLOAT_VEC3 = 0x8B51;
+   110→        public static final int FLOAT_VEC4 = 0x8B52;
+   111→        public static final int INT = 0x1404;
+   112→        public static final int INT_VEC2 = 0x8B53;
+   113→        public static final int INT_VEC3 = 0x8B54;
+   114→        public static final int INT_VEC4 = 0x8B55;
+   115→        public static final int BOOL = 0x8B56;
+   116→        public static final int BOOL_VEC2 = 0x8B57;
+   117→        public static final int BOOL_VEC3 = 0x8B58;
+   118→        public static final int BOOL_VEC4 = 0x8B59;
+   119→        public static final int FLOAT_MAT2 = 0x8B5A;
+   120→        public static final int FLOAT_MAT3 = 0x8B5B;
+   121→        public static final int FLOAT_MAT4 = 0x8B5C;
+   122→        public static final int SAMPLER_2D = 0x8B5E;
+   123→        public static final int SAMPLER_CUBE = 0x8B60;
+   124→        public static final int SAMPLER_3D = 0x8B5F;
+   125→        public static final int SAMPLER_2D_SHADOW = 0x8B62;
+   126→        public static final int SAMPLER_2D_ARRAY = 0x8DC1;
+   127→        public static final int SAMPLER_2D_ARRAY_SHADOW = 0x8DC4;
+   128→        public static final int SAMPLER_CUBE_SHADOW = 0x8DC5;
+   129→        public static final int INT_SAMPLER_2D = 0x8DCA;
+   130→        public static final int INT_SAMPLER_3D = 0x8DCB;
+   131→        public static final int INT_SAMPLER_CUBE = 0x8DCC;
+   132→        public static final int INT_SAMPLER_2D_ARRAY = 0x8DCF;
+   133→        public static final int UNSIGNED_INT_SAMPLER_2D = 0x8DD2;
+   134→        public static final int UNSIGNED_INT_SAMPLER_3D = 0x8DD3;
+   135→        public static final int UNSIGNED_INT_SAMPLER_CUBE = 0x8DD4;
+   136→        public static final int UNSIGNED_INT_SAMPLER_2D_ARRAY = 0x8DD7;
+   137→        public static final int FLOAT_MAT2x3 = 0x8B65;
+   138→        public static final int FLOAT_MAT2x4 = 0x8B66;
+   139→        public static final int FLOAT_MAT3x2 = 0x8B67;
+   140→        public static final int FLOAT_MAT3x4 = 0x8B68;
+   141→        public static final int FLOAT_MAT4x2 = 0x8B69;
+   142→        public static final int FLOAT_MAT4x3 = 0x8B6A;
+   143→        public static final int UNSIGNED_INT = 0x1405;
+   144→        public static final int UNSIGNED_INT_VEC2 = 0x8DC6;
+   145→        public static final int UNSIGNED_INT_VEC3 = 0x8DC7;
+   146→        public static final int UNSIGNED_INT_VEC4 = 0x8DC8;
+   147→
+   148→        // ========== Texture ==========
+   149→        public static final int TEXTURE_2D = 0x0DE1;
+   150→        public static final int TEXTURE_3D = 0x806F;
+   151→        public static final int TEXTURE_CUBE_MAP = 0x8513;
+   152→        public static final int TEXTURE_2D_ARRAY = 0x8C1A;
+   153→
+   154→        public static final int TEXTURE0 = 0x84C0;
+   155→        public static final int TEXTURE1 = 0x84C1;
+   156→        public static final int TEXTURE2 = 0x84C2;
+   157→        public static final int TEXTURE3 = 0x84C3;
+   158→        public static final int TEXTURE4 = 0x84C4;
+   159→        public static final int TEXTURE5 = 0x84C5;
+   160→        public static final int TEXTURE6 = 0x84C6;
+   161→        public static final int TEXTURE7 = 0x84C7;
+   162→        public static final int TEXTURE8 = 0x84C8;
+   163→        public static final int TEXTURE9 = 0x84C9;
+   164→        public static final int TEXTURE10 = 0x84CA;
+   165→        public static final int TEXTURE11 = 0x84CB;
+   166→        public static final int TEXTURE12 = 0x84CC;
+   167→        public static final int TEXTURE13 = 0x84CD;
+   168→        public static final int TEXTURE14 = 0x84CE;
+   169→        public static final int TEXTURE15 = 0x84CF;
+   170→
+   171→        public static final int NEAREST = 0x2600;
+   172→        public static final int LINEAR = 0x2601;
+   173→        public static final int NEAREST_MIPMAP_NEAREST = 0x2700;
+   174→        public static final int LINEAR_MIPMAP_NEAREST = 0x2701;
+   175→        public static final int NEAREST_MIPMAP_LINEAR = 0x2702;
+   176→        public static final int LINEAR_MIPMAP_LINEAR = 0x2703;
+   177→
+   178→        public static final int TEXTURE_MAG_FILTER = 0x2800;
+   179→        public static final int TEXTURE_MIN_FILTER = 0x2801;
+   180→        public static final int TEXTURE_WRAP_S = 0x2802;
+   181→        public static final int TEXTURE_WRAP_T = 0x2803;
+   182→        public static final int TEXTURE_WRAP_R = 0x8072;
+   183→        public static final int TEXTURE_MIN_LOD = 0x813A;
+   184→        public static final int TEXTURE_MAX_LOD = 0x813B;
+   185→        public static final int TEXTURE_BASE_LEVEL = 0x813C;
+   186→        public static final int TEXTURE_MAX_LEVEL = 0x813D;
+   187→        public static final int TEXTURE_COMPARE_MODE = 0x884C;
+   188→        public static final int TEXTURE_COMPARE_FUNC = 0x884D;
+   189→        public static final int TEXTURE_IMMUTABLE_FORMAT = 0x912F;
+   190→        public static final int TEXTURE_IMMUTABLE_LEVELS = 0x82DF;
+   191→
+   192→        public static final int REPEAT = 0x2901;
+   193→        public static final int CLAMP_TO_EDGE = 0x812F;
+   194→        public static final int MIRRORED_REPEAT = 0x8370;
+   195→
+   196→        public static final int R8 = 0x8229;
+   197→        public static final int R8_SNORM = 0x8F94;
+   198→        public static final int R16F = 0x822D;
+   199→        public static final int R32F = 0x822E;
+   200→        public static final int R8UI = 0x8232;
+   201→        public static final int R8I = 0x8231;
+   202→        public static final int R16UI = 0x8234;
+   203→        public static final int R16I = 0x8233;
+   204→        public static final int R32UI = 0x8236;
+   205→        public static final int R32I = 0x8235;
+   206→        public static final int RG8 = 0x822B;
+   207→        public static final int RG8_SNORM = 0x8F95;
+   208→        public static final int RG16F = 0x822F;
+   209→        public static final int RG32F = 0x8230;
+   210→        public static final int RG8UI = 0x8238;
+   211→        public static final int RG8I = 0x8237;
+   212→        public static final int RG16UI = 0x823A;
+   213→        public static final int RG16I = 0x8239;
+   214→        public static final int RG32UI = 0x823C;
+   215→        public static final int RG32I = 0x823B;
+   216→        public static final int RGB8 = 0x8051;
+   217→        public static final int RGB8_SNORM = 0x8F96;
+   218→        public static final int RGB16F = 0x881B;
+   219→        public static final int RGB32F = 0x8815;
+   220→        public static final int RGB565 = 0x8D62;
+   221→        public static final int RGB9_E5 = 0x8C3D;
+   222→        public static final int RGBA8 = 0x8058;
+   223→        public static final int RGBA8_SNORM = 0x8F97;
+   224→        public static final int RGBA16F = 0x881A;
+   225→        public static final int RGBA32F = 0x8814;
+   226→        public static final int RGB5_A1 = 0x8057;
+   227→        public static final int RGBA4 = 0x8056;
+   228→        public static final int RGB10_A2 = 0x8059;
+   229→        public static final int RGB10_A2UI = 0x906F;
+   230→        public static final int SRGB8 = 0x8C41;
+   231→        public static final int SRGB8_ALPHA8 = 0x8C43;
+   232→        public static final int R11F_G11F_B10F = 0x8C3A;
+   233→        public static final int DEPTH_COMPONENT16 = 0x81A5;
+   234→        public static final int DEPTH_COMPONENT24 = 0x81A6;
+   235→        public static final int DEPTH_COMPONENT32F = 0x8CAC;
+   236→        public static final int DEPTH24_STENCIL8 = 0x88F0;
+   237→        public static final int DEPTH32F_STENCIL8 = 0x8CAD;
+   238→        public static final int STENCIL_INDEX8 = 0x8D48;
+   239→
+   240→        public static final int RED = 0x1903;
+   241→        public static final int RG = 0x8227;
+   242→        public static final int RGB = 0x1907;
+   243→        public static final int RGBA = 0x1908;
+   244→        public static final int RED_INTEGER = 0x8D94;
+   245→        public static final int RG_INTEGER = 0x8228;
+   246→        public static final int RGB_INTEGER = 0x8D98;
+   247→        public static final int RGBA_INTEGER = 0x8D99;
+   248→        public static final int DEPTH_COMPONENT = 0x1902;
+   249→        public static final int DEPTH_STENCIL = 0x84F9;
+   250→
+   251→        public static final int UNSIGNED_BYTE = 0x1401;
+   252→        public static final int BYTE = 0x1400;
+   253→        public static final int UNSIGNED_SHORT = 0x1403;
+   254→        public static final int SHORT = 0x1402;
+   255→        public static final int HALF_FLOAT = 0x140B;
+   256→        public static final int UNSIGNED_SHORT_5_6_5 = 0x8363;
+   257→        public static final int UNSIGNED_SHORT_4_4_4_4 = 0x8033;
+   258→        public static final int UNSIGNED_SHORT_5_5_5_1 = 0x8034;
+   259→        public static final int UNSIGNED_INT_2_10_10_10_REV = 0x8368;
+   260→        public static final int UNSIGNED_INT_10F_11F_11F_REV = 0x8C3B;
+   261→        public static final int UNSIGNED_INT_24_8 = 0x84FA;
+   262→        public static final int FLOAT_32_UNSIGNED_INT_24_8_REV = 0x8DAD;
+   263→
+   264→        // ========== Framebuffer ==========
+   265→        public static final int FRAMEBUFFER = 0x8D40;
+   266→        public static final int READ_FRAMEBUFFER = 0x8CA8;
+   267→        public static final int DRAW_FRAMEBUFFER = 0x8CA9;
+   268→        public static final int RENDERBUFFER = 0x8D41;
+   269→
+   270→        public static final int COLOR_ATTACHMENT0 = 0x8CE0;
+   271→        public static final int COLOR_ATTACHMENT1 = 0x8CE1;
+   272→        public static final int COLOR_ATTACHMENT2 = 0x8CE2;
+   273→        public static final int COLOR_ATTACHMENT3 = 0x8CE3;
+   274→        public static final int COLOR_ATTACHMENT4 = 0x8CE4;
+   275→        public static final int COLOR_ATTACHMENT5 = 0x8CE5;
+   276→        public static final int COLOR_ATTACHMENT6 = 0x8CE6;
+   277→        public static final int COLOR_ATTACHMENT7 = 0x8CE7;
+   278→        public static final int COLOR_ATTACHMENT8 = 0x8CE8;
+   279→        public static final int COLOR_ATTACHMENT9 = 0x8CE9;
+   280→        public static final int COLOR_ATTACHMENT10 = 0x8CEA;
+   281→        public static final int COLOR_ATTACHMENT11 = 0x8CEB;
+   282→        public static final int COLOR_ATTACHMENT12 = 0x8CEC;
+   283→        public static final int COLOR_ATTACHMENT13 = 0x8CED;
+   284→        public static final int COLOR_ATTACHMENT14 = 0x8CEE;
+   285→        public static final int COLOR_ATTACHMENT15 = 0x8CEF;
+   286→        public static final int DEPTH_ATTACHMENT = 0x8D00;
+   287→        public static final int STENCIL_ATTACHMENT = 0x8D20;
+   288→        public static final int DEPTH_STENCIL_ATTACHMENT = 0x821A;
+   289→
+   290→        public static final int FRAMEBUFFER_COMPLETE = 0x8CD5;
+   291→        public static final int FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8CD6;
+   292→        public static final int FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7;
+   293→        public static final int FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 0x8CD9;
+   294→        public static final int FRAMEBUFFER_UNSUPPORTED = 0x8CDD;
+   295→        public static final int FRAMEBUFFER_INCOMPLETE_MULTISAMPLE = 0x8D56;
+   296→
+   297→        public static final int RENDERBUFFER_WIDTH = 0x8D42;
+   298→        public static final int RENDERBUFFER_HEIGHT = 0x8D43;
+   299→        public static final int RENDERBUFFER_INTERNAL_FORMAT = 0x8D44;
+   300→        public static final int RENDERBUFFER_RED_SIZE = 0x8D50;
+   301→        public static final int RENDERBUFFER_GREEN_SIZE = 0x8D51;
+   302→        public static final int RENDERBUFFER_BLUE_SIZE = 0x8D52;
+   303→        public static final int RENDERBUFFER_ALPHA_SIZE = 0x8D53;
+   304→        public static final int RENDERBUFFER_DEPTH_SIZE = 0x8D54;
+   305→        public static final int RENDERBUFFER_STENCIL_SIZE = 0x8D55;
+   306→        public static final int RENDERBUFFER_SAMPLES = 0x8CAB;
+   307→
+   308→        // ========== Pixel Store ==========
+   309→        public static final int UNPACK_ALIGNMENT = 0x0CF5;
+   310→        public static final int PACK_ALIGNMENT = 0x0D05;
+   311→        public static final int UNPACK_ROW_LENGTH = 0x0CF2;
+   312→        public static final int UNPACK_SKIP_ROWS = 0x0CF3;
+   313→        public static final int UNPACK_SKIP_PIXELS = 0x0CF4;
+   314→        public static final int UNPACK_IMAGE_HEIGHT = 0x806E;
+   315→        public static final int UNPACK_SKIP_IMAGES = 0x806D;
+   316→        public static final int UNPACK_FLIP_Y_WEBGL = 0x9240;
+   317→        public static final int UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
+   318→        public static final int UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
+   319→        public static final int PACK_ROW_LENGTH = 0x0D02;
+   320→        public static final int PACK_SKIP_ROWS = 0x0D03;
+   321→        public static final int PACK_SKIP_PIXELS = 0x0D04;
+   322→
+   323→        // ========== Depth / Stencil ==========
+   324→        public static final int NEVER = 0x0200;
+   325→        public static final int LESS = 0x0201;
+   326→        public static final int EQUAL = 0x0202;
+   327→        public static final int LEQUAL = 0x0203;
+   328→        public static final int GREATER = 0x0204;
+   329→        public static final int NOTEQUAL = 0x0205;
+   330→        public static final int GEQUAL = 0x0206;
+   331→        public static final int ALWAYS = 0x0207;
+   332→
+   333→        public static final int KEEP = 0x1E00;
+   334→        public static final int REPLACE = 0x1E01;
+   335→        public static final int INCR = 0x1E02;
+   336→        public static final int DECR = 0x1E03;
+   337→        public static final int INVERT = 0x150A;
+   338→        public static final int INCR_WRAP = 0x8507;
+   339→        public static final int DECR_WRAP = 0x8508;
+   340→
+   341→        // ========== Enable / Disable Caps ==========
+   342→        public static final int CULL_FACE = 0x0B44;
+   343→        public static final int BLEND = 0x0BE2;
+   344→        public static final int DITHER = 0x0BD0;
+   345→        public static final int STENCIL_TEST = 0x0B90;
+   346→        public static final int DEPTH_TEST = 0x0B71;
+   347→        public static final int SCISSOR_TEST = 0x0C11;
+   348→        public static final int POLYGON_OFFSET_FILL = 0x8037;
+   349→        public static final int SAMPLE_ALPHA_TO_COVERAGE = 0x809F;
+   350→        public static final int SAMPLE_COVERAGE = 0x80A0;
+   351→        public static final int PRIMITIVE_RESTART_FIXED_INDEX = 0x8D69;
+   352→        public static final int RASTERIZER_DISCARD = 0x8C89;
+   353→
+   354→        // ========== Hints ==========
+   355→        public static final int DONT_CARE = 0x1100;
+   356→        public static final int FASTEST = 0x1101;
+   357→        public static final int NICEST = 0x1102;
+   358→        public static final int GENERATE_MIPMAP_HINT = 0x8192;
+   359→        public static final int FRAGMENT_SHADER_DERIVATIVE_HINT = 0x8B8B;
+   360→
+   361→        // ========== Face Culling ==========
+   362→        public static final int FRONT = 0x0404;
+   363→        public static final int BACK = 0x0405;
+   364→        public static final int FRONT_AND_BACK = 0x0408;
+   365→        public static final int CW = 0x0900;
+   366→        public static final int CCW = 0x0901;
+   367→
+   368→        // ========== Error ==========
+   369→        public static final int NO_ERROR = 0;
+   370→        public static final int INVALID_ENUM = 0x0500;
+   371→        public static final int INVALID_VALUE = 0x0501;
+   372→        public static final int INVALID_OPERATION = 0x0502;
+   373→        public static final int OUT_OF_MEMORY = 0x0505;
+   374→        public static final int CONTEXT_LOST_WEBGL = 0x9242;
+   375→
+   376→        // ========== Transform Feedback ==========
+   377→        public static final int TRANSFORM_FEEDBACK_VARYINGS = 0x8F45;
+   378→        public static final int TRANSFORM_FEEDBACK_BUFFER_MODE = 0x8F47;
+   379→        public static final int INTERLEAVED_ATTRIBS = 0x8C8C;
+   380→        public static final int SEPARATE_ATTRIBS = 0x8C8D;
+   381→        public static final int TRANSFORM_FEEDBACK_BUFFER_START = 0x8D84;
+   382→        public static final int TRANSFORM_FEEDBACK_BUFFER_SIZE = 0x8D85;
+   383→        public static final int TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN = 0x8C88;
+   384→
+   385→        // ========== Uniform Buffer ==========
+   386→        public static final int UNIFORM_BUFFER_UNIFROM_BLOCK_INDEX = 0x8DC9;
+   387→        public static final int UNIFORM_BLOCK_DATA_SIZE = 0x8A40;
+   388→        public static final int UNIFORM_BLOCK_BINDING = 0x8A3F;
+   389→        public static final int UNIFORM_BUFFER_START = 0x8A29;
+   390→        public static final int UNIFORM_BUFFER_SIZE = 0x8A2A;
+   391→        public static final int MAX_UNIFORM_BLOCK_SIZE = 0x8A33;
+   392→        public static final int MAX_UNIFORM_BUFFER_BINDINGS = 0x8A2F;
+   393→        public static final int MAX_COMBINED_UNIFORM_BLOCKS = 0x8A2E;
+   394→        public static final int UNIFORM_OFFSET = 0x8A3B;
+   395→        public static final int UNIFORM_ARRAY_STRIDE = 0x8A3C;
+   396→        public static final int UNIFORM_MATRIX_STRIDE = 0x8A3D;
+   397→        public static final int UNIFORM_IS_ROW_MAJOR = 0x8A3E;
+   398→
+   399→        // ========== Query Objects ==========
+   400→        public static final int ANY_SAMPLES_PASSED = 0x8C2F;
+   401→        public static final int ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8D6A;
+   402→        public static final int TRANSFORM_FEEDBACK_OVERFLOW = 0x82ED;
+   403→        public static final int QUERY_RESULT = 0x8866;
+   404→        public static final int QUERY_RESULT_AVAILABLE = 0x8867;
+   405→
+   406→        // ========== Sampler Objects ==========
+   407→        public static final int SAMPLER_BINDING = 0x8919;
+   408→
+   409→        // ========== Sync Objects ==========
+   410→        public static final int SYNC_GPU_COMMANDS_COMPLETE = 0x9117;
+   411→        public static final int SYNC_FENCE = 0x9116;
+   412→        public static final int UNSIGNALED = 0x9118;
+   413→        public static final int SIGNALED = 0x9119;
+   414→        public static final int ALREADY_SIGNALED = 0x911A;
+   415→        public static final int TIMEOUT_EXPIRED = 0x911B;
+   416→        public static final int CONDITION_SATISFIED = 0x911C;
+   417→        public static final int WAIT_FAILED = 0x911D;
+   418→        public static final int OBJECT_TYPE = 0x9112;
+   419→        public static final int SYNC_STATUS = 0x9114;
+   420→        public static final int SYNC_CONDITION = 0x9113;
+   421→        public static final int SYNC_FLUSH_COMMANDS_BIT = 0x00000001;
+   422→
+   423→        // ========== Draw Buffers ==========
+   424→        public static final int NONE = 0;
+   425→        public static final int COLOR = 0x1800;
+   426→        public static final int DEPTH = 0x1801;
+   427→        public static final int STENCIL = 0x1802;
+   428→        public static final int MAX_DRAW_BUFFERS = 0x8824;
+   429→        public static final int DRAW_BUFFER0 = 0x8825;
+   430→        public static final int DRAW_BUFFER1 = 0x8826;
+   431→        public static final int DRAW_BUFFER2 = 0x8827;
+   432→        public static final int DRAW_BUFFER3 = 0x8828;
+   433→        public static final int DRAW_BUFFER4 = 0x8829;
+   434→        public static final int DRAW_BUFFER5 = 0x882A;
+   435→        public static final int DRAW_BUFFER6 = 0x882B;
+   436→        public static final int DRAW_BUFFER7 = 0x882C;
+   437→
+   438→        // ========== Multisample ==========
+   439→        public static final int SAMPLES = 0x80A9;
+   440→        public static final int MAX_SAMPLES = 0x8D57;
+   441→
+   442→        // ========== Pixel Store for Buffer ==========
+   443→        public static final int PIXEL_PACK_BUFFER_BINDING = 0x88ED;
+   444→        public static final int PIXEL_UNPACK_BUFFER_BINDING = 0x88EF;
+   445→
+   446→        // ========== Internal Format Info ==========
+   447→        public static final int INTERNALFORMAT_SUPPORTED = 0x8C6B;
+   448→        public static final int INTERNALFORMAT_PREFERRED = 0x8C70;
+   449→        public static final int INTERNALFORMAT_RED_SIZE = 0x8C76;
+   450→        public static final int INTERNALFORMAT_GREEN_SIZE = 0x8C77;
+   451→        public static final int INTERNALFORMAT_BLUE_SIZE = 0x8C78;
+   452→        public static final int INTERNALFORMAT_ALPHA_SIZE = 0x8C79;
+   453→        public static final int INTERNALFORMAT_DEPTH_SIZE = 0x8C7A;
+   454→        public static final int INTERNALFORMAT_STENCIL_SIZE = 0x8C7B;
+   455→
+   456→        // ========== Miscellaneous ==========
+   457→        public static final int MAX_TEXTURE_SIZE = 0x0D33;
+   458→        public static final int MAX_CUBE_MAP_TEXTURE_SIZE = 0x851C;
+   459→        public static final int MAX_TEXTURE_IMAGE_UNITS = 0x8872;
+   460→        public static final int MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8B4C;
+   461→        public static final int MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8B4D;
+   462→        public static final int MAX_RENDERBUFFER_SIZE = 0x84E8;
+   463→        public static final int MAX_VERTEX_ATTRIBS = 0x8869;
+   464→        public static final int MAX_VERTEX_UNIFORM_VECTORS = 0x8DFB;
+   465→        public static final int MAX_VARYING_VECTORS = 0x8DFC;
+   466→        public static final int MAX_FRAGMENT_UNIFORM_VECTORS = 0x8DFD;
+   467→        public static final int MAX_VERTEX_OUTPUT_COMPONENTS = 0x9122;
+   468→        public static final int MAX_FRAGMENT_INPUT_COMPONENTS = 0x9125;
+   469→        public static final int MAX_VERTEX_UNIFORM_BLOCKS = 0x9123;
+   470→        public static final int MAX_FRAGMENT_UNIFORM_BLOCKS = 0x9125;
+   471→        public static final int MAX_3D_TEXTURE_SIZE = 0x8073;
+   472→        public static final int MAX_ARRAY_TEXTURE_LAYERS = 0x88FF;
+   473→        public static final int MAX_ELEMENTS_VERTICES = 0x80E8;
+   474→        public static final int MAX_ELEMENTS_INDICES = 0x80E9;
+   475→        public static final int MAX_VARYING_COMPONENTS = 0x8B4B;
+   476→        public static final int MAX_SERVER_WAIT_TIMEOUT = 0x9111;
+   477→        public static final int MAX_ELEMENT_INDEX = 0x8D6B;
+   478→        public static final int MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS = 0x8A31;
+   479→        public static final int MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS = 0x8A33;
+   480→        public static final int SUBPIXEL_BITS = 0x0D50;
+   481→        public static final int RED_BITS = 0x0D52;
+   482→        public static final int GREEN_BITS = 0x0D53;
+   483→        public static final int BLUE_BITS = 0x0D54;
+   484→        public static final int ALPHA_BITS = 0x0D55;
+   485→        public static final int DEPTH_BITS = 0x0D56;
+   486→        public static final int STENCIL_BITS = 0x0D57;
+   487→        public static final int ALIASED_LINE_WIDTH_RANGE = 0x846E;
+   488→        public static final int ALIASED_POINT_SIZE_RANGE = 0x846D;
+   489→
+   490→        // ========== Get Parameter PNames ==========
+   491→        public static final int VERSION = 0x1F02;
+   492→        public static final int SHADING_LANGUAGE_VERSION = 0x8B8C;
+   493→        public static final int VENDOR = 0x1F00;
+   494→        public static final int RENDERER = 0x1F01;
+   495→
+   496→        // ==================== Core WebGL2 Methods ====================
+   497→
+   498→        // ----- Context State -----
+   499→        @JSMethod
+   500→        public abstract void viewport(int x, int y, int width, int height);
+   501→
+   502→        @JSMethod
+   503→        public abstract void scissor(int x, int y, int width, int height);
+   504→
+   505→        @JSMethod
+   506→        public abstract void clearColor(float red, float green, float blue, float alpha);
+   507→
+   508→        @JSMethod
+   509→        public abstract void clearDepth(double depth);
+   510→
+   511→        @JSMethod
+   512→        public abstract void clearStencil(int s);
+   513→
+   514→        @JSMethod
+   515→        public abstract void clear(int mask);
+   516→
+   517→        @JSMethod
+   518→        public abstract void enable(int cap);
+   519→
+   520→        @JSMethod
+   521→        public abstract void disable(int cap);
+   522→
+   523→        @JSMethod
+   524→        public abstract boolean isEnabled(int cap);
+   525→
+   526→        @JSMethod
+   527→        public abstract int getError();
+   528→
+   529→        @JSMethod
+   530→        public abstract JSObject getParameter(int pname);
+   531→
+   532→        @JSMethod
+   533→        public abstract String getString(int pname);
+   534→
+   535→        @JSMethod
+   536→        public abstract void hint(int target, int mode);
+   537→
+   538→        // ----- Blending -----
+   539→        @JSMethod
+   540→        public abstract void blendFunc(int sfactor, int dfactor);
+   541→
+   542→        @JSMethod
+   543→        public abstract void blendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
+   544→
+   545→        @JSMethod
+   546→        public abstract void blendEquation(int mode);
+   547→
+   548→        @JSMethod
+   549→        public abstract void blendEquationSeparate(int modeRGB, int modeAlpha);
+   550→
+   551→        @JSMethod
+   552→        public abstract void blendColor(float red, float green, float blue, float alpha);
+   553→
+   554→        // ----- Depth / Stencil -----
+   555→        @JSMethod
+   556→        public abstract void depthFunc(int func);
+   557→
+   558→        @JSMethod
+   559→        public abstract void depthMask(boolean flag);
+   560→
+   561→        @JSMethod
+   562→        public abstract void depthRange(double zNear, double zFar);
+   563→
+   564→        @JSMethod
+   565→        public abstract void stencilFunc(int func, int ref, int mask);
+   566→
+   567→        @JSMethod
+   568→        public abstract void stencilFuncSeparate(int face, int func, int ref, int mask);
+   569→
+   570→        @JSMethod
+   571→        public abstract void stencilOp(int fail, int zfail, int zpass);
+   572→
+   573→        @JSMethod
+   574→        public abstract void stencilOpSeparate(int face, int sfail, int dpfail, int dppass);
+   575→
+   576→        @JSMethod
+   577→        public abstract void stencilMask(int mask);
+   578→
+   579→        @JSMethod
+   580→        public abstract void stencilMaskSeparate(int face, int mask);
+   581→
+   582→        // ----- Color Mask / Dither -----
+   583→        @JSMethod
+   584→        public abstract void colorMask(boolean red, boolean green, boolean blue, boolean alpha);
+   585→
+   586→        @JSMethod
+   587→        public abstract void sampleCoverage(float value, boolean invert);
+   588→
+   589→        // ----- Face Culling -----
+   590→        @JSMethod
+   591→        public abstract void cullFace(int mode);
+   592→
+   593→        @JSMethod
+   594→        public abstract void frontFace(int mode);
+   595→
+   596→        @JSMethod
+   597→        public abstract void polygonOffset(float factor, float units);
+   598→
+   599→        @JSMethod
+   600→        public abstract void lineWidth(float width);
+   601→
+   602→        // ----- Shader Objects -----
+   603→        @JSMethod
+   604→        public abstract JSObject createShader(int type);
+   605→
+   606→        @JSMethod
+   607→        public abstract void shaderSource(JSObject shader, String source);
+   608→
+   609→        @JSMethod
+   610→        public abstract void compileShader(JSObject shader);
+   611→
+   612→        @JSMethod
+   613→        public abstract void deleteShader(JSObject shader);
+   614→
+   615→        @JSMethod
+   616→        public abstract int getShaderParameter(JSObject shader, int pname);
+   617→
+   618→        @JSMethod
+   619→        public abstract String getShaderInfoLog(JSObject shader);
+   620→
+   621→        @JSMethod
+   622→        public abstract String getShaderSource(JSObject shader);
+   623→
+   624→        // ----- Program Objects -----
+   625→        @JSMethod
+   626→        public abstract JSObject createProgram();
+   627→
+   628→        @JSMethod
+   629→        public abstract void attachShader(JSObject program, JSObject shader);
+   630→
+   631→        @JSMethod
+   632→        public abstract void detachShader(JSObject program, JSObject shader);
+   633→
+   634→        @JSMethod
+   635→        public abstract void linkProgram(JSObject program);
+   636→
+   637→        @JSMethod
+   638→        public abstract void useProgram(JSObject program);
+   639→
+   640→        @JSMethod
+   641→        public abstract void deleteProgram(JSObject program);
+   642→
+   643→        @JSMethod
+   644→        public abstract void validateProgram(JSObject program);
+   645→
+   646→        @JSMethod
+   647→        public abstract int getProgramParameter(JSObject program, int pname);
+   648→
+   649→        @JSMethod
+   650→        public abstract String getProgramInfoLog(JSObject program);
+   651→
+   652→        @JSMethod
+   653→        public abstract int getAttribLocation(JSObject program, String name);
+   654→
+   655→        @JSMethod
+   656→        public abstract JSObject getActiveAttrib(JSObject program, int index);
+   657→
+   658→        @JSMethod
+   659→        public abstract JSObject getActiveUniform(JSObject program, int index);
+   660→
+   661→        @JSMethod
+   662→        public abstract JSObject getActiveUniformBlockName(JSObject program, int uniformBlockIndex);
+   663→
+   664→        @JSMethod
+   665→        public abstract JSObject getActiveUniformBlockParameter(JSObject program, int uniformBlockIndex, int pname);
+   666→
+   667→        @JSMethod
+   668→        public abstract int getUniformBlockIndex(JSObject program, String uniformBlockName);
+   669→
+   670→        @JSMethod
+   671→        public abstract JSObject getActiveUniforms(JSObject program, int uniformIndices, int pname);
+   672→
+   673→        @JSMethod
+   674→        public abstract int getUniformOffset(int program, int uniformIndex);
+   675→
+   676→        @JSMethod
+   677→        public abstract JSObject getUniform(JSObject program, JSObject location);
+   678→
+   679→        @JSMethod
+   680→        public abstract JSObject getUniformLocation(JSObject program, String name);
+   681→
+   682→        // ----- Uniforms -----
+   683→        @JSMethod
+   684→        public abstract void uniform1f(JSObject location, float x);
+   685→
+   686→        @JSMethod
+   687→        public abstract void uniform2f(JSObject location, float x, float y);
+   688→
+   689→        @JSMethod
+   690→        public abstract void uniform3f(JSObject location, float x, float y, float z);
+   691→
+   692→        @JSMethod
+   693→        public abstract void uniform4f(JSObject location, float x, float y, float z, float w);
+   694→
+   695→        @JSMethod
+   696→        public abstract void uniform1i(JSObject location, int x);
+   697→
+   698→        @JSMethod
+   699→        public abstract void uniform2i(JSObject location, int x, int y);
+   700→
+   701→        @JSMethod
+   702→        public abstract void uniform3i(JSObject location, int x, int y, int z);
+   703→
+   704→        @JSMethod
+   705→        public abstract void uniform4i(JSObject location, int x, int y, int z, int w);
+   706→
+   707→        @JSMethod
+   708→        public abstract void uniform1ui(JSObject location, int x);
+   709→
+   710→        @JSMethod
+   711→        public abstract void uniform2ui(JSObject location, int x, int y);
+   712→
+   713→        @JSMethod
+   714→        public abstract void uniform3ui(JSObject location, int x, int y, int z);
+   715→
+   716→        @JSMethod
+   717→        public abstract void uniform4ui(JSObject location, int x, int y, int z, int w);
+   718→
+   719→        @JSMethod
+   720→        public abstract void uniform1fv(JSObject location, Float32Array v);
+   721→
+   722→        @JSMethod
+   723→        public abstract void uniform2fv(JSObject location, Float32Array v);
+   724→
+   725→        @JSMethod
+   726→        public abstract void uniform3fv(JSObject location, Float32Array v);
+   727→
+   728→        @JSMethod
+   729→        public abstract void uniform4fv(JSObject location, Float32Array v);
+   730→
+   731→        @JSMethod
+   732→        public abstract void uniform1iv(JSObject location, Int32Array v);
+   733→
+   734→        @JSMethod
+   735→        public abstract void uniform2iv(JSObject location, Int32Array v);
+   736→
+   737→        @JSMethod
+   738→        public abstract void uniform3iv(JSObject location, Int32Array v);
+   739→
+   740→        @JSMethod
+   741→        public abstract void uniform4iv(JSObject location, Int32Array v);
+   742→
+   743→        @JSMethod
+   744→        public abstract void uniformMatrix2fv(JSObject location, boolean transpose, Float32Array value);
+   745→
+   746→        @JSMethod
+   747→        public abstract void uniformMatrix3fv(JSObject location, boolean transpose, Float32Array value);
+   748→
+   749→        @JSMethod
+   750→        public abstract void uniformMatrix4fv(JSObject location, boolean transpose, Float32Array value);
+   751→
+   752→        @JSMethod
+   753→        public abstract void uniformMatrix2x3fv(JSObject location, boolean transpose, Float32Array value);
+   754→
+   755→        @JSMethod
+   756→        public abstract void uniformMatrix2x4fv(JSObject location, boolean transpose, Float32Array value);
+   757→
+   758→        @JSMethod
+   759→        public abstract void uniformMatrix3x2fv(JSObject location, boolean transpose, Float32Array value);
+   760→
+   761→        @JSMethod
+   762→        public abstract void uniformMatrix3x4fv(JSObject location, boolean transpose, Float32Array value);
+   763→
+   764→        @JSMethod
+   765→        public abstract void uniformMatrix4x2fv(JSObject location, boolean transpose, Float32Array value);
+   766→
+   767→        @JSMethod
+   768→        public abstract void uniformMatrix4x3fv(JSObject location, boolean transpose, Float32Array value);
+   769→
+   770→        @JSMethod
+   771→        public abstract void uniformBlockBinding(JSObject program, int uniformBlockIndex, int uniformBlockBinding);
+   772→
+   773→        // ----- Buffer Objects -----
+   774→        @JSMethod
+   775→        public abstract JSObject createBuffer();
+   776→
+   777→        @JSMethod
+   778→        public abstract void deleteBuffer(JSObject buffer);
+   779→
+   780→        @JSMethod
+   781→        public abstract void bindBuffer(int target, JSObject buffer);
+   782→
+   783→        @JSMethod
+   784→        public abstract void bufferData(int target, int size, int usage);
+   785→
+   786→        @JSMethod
+   787→        public abstract void bufferData(int target, ArrayBuffer data, int usage);
+   788→
+   789→        @JSMethod
+   790→        public abstract void bufferData(int target, Float32Array data, int usage);
+   791→
+   792→        @JSMethod
+   793→        public abstract void bufferData(int target, Int32Array data, int usage);
+   794→
+   795→        @JSMethod
+   796→        public abstract void bufferData(int target, Uint8Array data, int usage);
+   797→
+   798→        @JSMethod
+   799→        public abstract void bufferSubData(int target, int offset, Float32Array data);
+   800→
+   801→        @JSMethod
+   802→        public abstract void bufferSubData(int target, int offset, Int32Array data);
+   803→
+   804→        @JSMethod
+   805→        public abstract void bufferSubData(int target, int offset, Uint8Array data);
+   806→
+   807→        @JSMethod
+   808→        public abstract void bufferSubData(int target, int offset, ArrayBuffer data);
+   809→
+   810→        @JSMethod
+   811→        public abstract JSObject getBufferParameter(int target, int pname);
+   812→
+   813→        @JSMethod
+   814→        public abstract void copyBufferSubData(int readTarget, int writeTarget, int readOffset, int writeOffset, int size);
+   815→
+   816→        @JSMethod
+   817→        public abstract void bindBufferRange(int target, int index, JSObject buffer, int offset, int size);
+   818→
+   819→        @JSMethod
+   820→        public abstract void bindBufferBase(int target, int index, JSObject buffer);
+   821→
+   822→        @JSMethod
+   823→        public abstract void clearBufferfv(int buffer, int drawbuffer, Float32Array value);
+   824→
+   825→        @JSMethod
+   826→        public abstract void clearBufferiv(int buffer, int drawbuffer, Int32Array value);
+   827→
+   828→        @JSMethod
+   829→        public abstract void clearBufferuiv(int buffer, int drawbuffer, Int32Array value);
+   830→
+   831→        @JSMethod
+   832→        public abstract void clearBufferfi(int buffer, int drawbuffer, float depth, int stencil);
+   833→
+   834→        // ----- Vertex Attributes -----
+   835→        @JSMethod
+   836→        public abstract void vertexAttribPointer(int index, int size, int type, boolean normalized, int stride, int offset);
+   837→
+   838→        @JSMethod
+   839→        public abstract void vertexAttribIPointer(int index, int size, int type, int stride, int offset);
+   840→
+   841→        @JSMethod
+   842→        public abstract void vertexAttribDivisor(int index, int divisor);
+   843→
+   844→        @JSMethod
+   845→        public abstract void enableVertexAttribArray(int index);
+   846→
+   847→        @JSMethod
+   848→        public abstract void disableVertexAttribArray(int index);
+   849→
+   850→        @JSMethod
+   851→        public abstract void vertexAttrib1f(int index, float x);
+   852→
+   853→        @JSMethod
+   854→        public abstract void vertexAttrib2f(int index, float x, float y);
+   855→
+   856→        @JSMethod
+   857→        public abstract void vertexAttrib3f(int index, float x, float y, float z);
+   858→
+   859→        @JSMethod
+   860→        public abstract void vertexAttrib4f(int index, float x, float y, float z, float w);
+   861→
+   862→        @JSMethod
+   863→        public abstract JSObject getVertexAttrib(int index, int pname);
+   864→
+   865→        @JSMethod
+   866→        public abstract int getVertexAttribOffset(int index, int pname);
+   867→
+   868→        // ----- Drawing -----
+   869→        @JSMethod
+   870→        public abstract void drawArrays(int mode, int first, int count);
+   871→
+   872→        @JSMethod
+   873→        public abstract void drawElements(int mode, int count, int type, int offset);
+   874→
+   875→        @JSMethod
+   876→        public abstract void drawRangeElements(int mode, int start, int end, int count, int type, int offset);
+   877→
+   878→        @JSMethod
+   879→        public abstract void drawArraysInstanced(int mode, int first, int count, int instanceCount);
+   880→
+   881→        @JSMethod
+   882→        public abstract void drawElementsInstanced(int mode, int count, int type, int offset, int instanceCount);
+   883→
+   884→        // ----- Vertex Array Objects -----
+   885→        @JSMethod
+   886→        public abstract JSObject createVertexArray();
+   887→
+   888→        @JSMethod
+   889→        public abstract void deleteVertexArray(JSObject vertexArray);
+   890→
+   891→        @JSMethod
+   892→        public abstract void bindVertexArray(JSObject vertexArray);
+   893→
+   894→        @JSMethod
+   895→        public abstract boolean isVertexArray(JSObject vertexArray);
+   896→
+   897→        // ----- Texture Objects -----
+   898→        @JSMethod
+   899→        public abstract JSObject createTexture();
+   900→
+   901→        @JSMethod
+   902→        public abstract void deleteTexture(JSObject texture);
+   903→
+   904→        @JSMethod
+   905→        public abstract void bindTexture(int target, JSObject texture);
+   906→
+   907→        @JSMethod
+   908→        public abstract void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, JSObject source);
+   909→
+   910→        @JSMethod
+   911→        public abstract void texImage2D(int target, int level, int internalformat, int format, int type, JSObject source);
+   912→
+   913→        @JSMethod
+   914→        public abstract void texSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, JSObject source);
+   915→
+   916→        @JSMethod
+   917→        public abstract void texSubImage2D(int target, int level, int xoffset, int yoffset, int format, int type, JSObject source);
+   918→
+   919→        @JSMethod
+   920→        public abstract void texParameterf(int target, int pname, float param);
+   921→
+   922→        @JSMethod
+   923→        public abstract void texParameteri(int target, int pname, int param);
+   924→
+   925→        @JSMethod
+   926→        public abstract JSObject getTexParameter(int target, int pname);
+   927→
+   928→        @JSMethod
+   929→        public abstract void generateMipmap(int target);
+   930→
+   931→        @JSMethod
+   932→        public abstract void activeTexture(int texture);
+   933→
+   934→        @JSMethod
+   935→        public abstract void pixelStorei(int pname, int param);
+   936→
+   937→        @JSMethod
+   938→        public abstract void readPixels(int x, int y, int width, int height, int format, int type, ArrayBuffer pixels);
+   939→
+   940→        @JSMethod
+   941→        public abstract void readPixels(int x, int y, int width, int height, int format, int type, int offset);
+   942→
+   943→        // ----- WebGL2 Texture Methods -----
+   944→        @JSMethod
+   945→        public abstract void texImage3D(int target, int level, int internalformat, int width, int height, int depth, int border, int format, int type, JSObject source);
+   946→
+   947→        @JSMethod
+   948→        public abstract void texImage3D(int target, int level, int internalformat, int width, int height, int depth, int border, int format, int type, int offset);
+   949→
+   950→        @JSMethod
+   951→        public abstract void texSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, int format, int type, JSObject source);
+   952→
+   953→        @JSMethod
+   954→        public abstract void texSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, int format, int type, int offset);
+   955→
+   956→        @JSMethod
+   957→        public abstract void texStorage2D(int target, int levels, int internalformat, int width, int height);
+   958→
+   959→        @JSMethod
+   960→        public abstract void texStorage3D(int target, int levels, int internalformat, int width, int height, int depth);
+   961→
+   962→        @JSMethod
+   963→        public abstract void copyTexSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset, int x, int y, int width, int height);
+   964→
+   965→        @JSMethod
+   966→        public abstract void compressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, ArrayBuffer data);
+   967→
+   968→        @JSMethod
+   969→        public abstract void compressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int imageSize, int offset);
+   970→
+   971→        @JSMethod
+   972→        public abstract void compressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, ArrayBuffer data);
+   973→
+   974→        @JSMethod
+   975→        public abstract void compressedTexImage3D(int target, int level, int internalformat, int width, int height, int depth, int border, int imageSize, int offset);
+   976→
+   977→        @JSMethod
+   978→        public abstract void compressedTexSubImage3D(int target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, int format, int imageSize, int offset);
+   979→
+   980→        // ----- Sampler Objects -----
+   981→        @JSMethod
+   982→        public abstract JSObject createSampler();
+   983→
+   984→        @JSMethod
+   985→        public abstract void deleteSampler(JSObject sampler);
+   986→
+   987→        @JSMethod
+   988→        public abstract void bindSampler(int unit, JSObject sampler);
+   989→
+   990→        @JSMethod
+   991→        public abstract void samplerParameteri(JSObject sampler, int pname, int param);
+   992→
+   993→        @JSMethod
+   994→        public abstract void samplerParameterf(JSObject sampler, int pname, float param);
+   995→
+   996→        @JSMethod
+   997→        public abstract JSObject getSamplerParameter(JSObject sampler, int pname);
+   998→
+   999→        @JSMethod
+  1000→        public abstract boolean isSampler(JSObject sampler);
+  1001→
+  1002→        // ----- Query Objects -----
+  1003→        @JSMethod
+  1004→        public abstract JSObject createQuery();
+  1005→
+  1006→        @JSMethod
+  1007→        public abstract void deleteQuery(JSObject query);
+  1008→
+  1009→        @JSMethod
+  1010→        public abstract boolean isQuery(JSObject query);
+  1011→
+  1012→        @JSMethod
+  1013→        public abstract void beginQuery(int target, JSObject query);
+  1014→
+  1015→        @JSMethod
+  1016→        public abstract void endQuery(int target);
+  1017→
+  1018→        @JSMethod
+  1019→        public abstract JSObject getQuery(int target, int pname);
+  1020→
+  1021→        @JSMethod
+  1022→        public abstract JSObject getQueryParameter(JSObject query, int pname);
+  1023→
+  1024→        @JSMethod
+  1025→        public abstract void queryCounter(JSObject query, int target);
+  1026→
+  1027→        // ----- Transform Feedback -----
+  1028→        @JSMethod
+  1029→        public abstract JSObject createTransformFeedback();
+  1030→
+  1031→        @JSMethod
+  1032→        public abstract void deleteTransformFeedback(JSObject transformFeedback);
+  1033→
+  1034→        @JSMethod
+  1035→        public abstract void bindTransformFeedback(int target, JSObject transformFeedback);
+  1036→
+  1037→        @JSMethod
+  1038→        public abstract void beginTransformFeedback(int primitiveMode);
+  1039→
+  1040→        @JSMethod
+  1041→        public abstract void endTransformFeedback();
+  1042→
+  1043→        @JSMethod
+  1044→        public abstract void transformFeedbackVaryings(JSObject program, JSObject varyings, int bufferMode);
+  1045→
+  1046→        @JSMethod
+  1047→        public abstract JSObject getTransformFeedbackVarying(JSObject program, int index);
+  1048→
+  1049→        @JSMethod
+  1050→        public abstract void pauseTransformFeedback();
+  1051→
+  1052→        @JSMethod
+  1053→        public abstract void resumeTransformFeedback();
+  1054→
+  1055→        // ----- Framebuffer Objects -----
+  1056→        @JSMethod
+  1057→        public abstract JSObject createFramebuffer();
+  1058→
+  1059→        @JSMethod
+  1060→        public abstract void deleteFramebuffer(JSObject framebuffer);
+  1061→
+  1062→        @JSMethod
+  1063→        public abstract void bindFramebuffer(int target, JSObject framebuffer);
+  1064→
+  1065→        @JSMethod
+  1066→        public abstract int checkFramebufferStatus(int target);
+  1067→
+  1068→        @JSMethod
+  1069→        public abstract void framebufferTexture2D(int target, int attachment, int textarget, JSObject texture, int level);
+  1070→
+  1071→        @JSMethod
+  1072→        public abstract void framebufferTextureLayer(int target, int attachment, JSObject texture, int level, int layer);
+  1073→
+  1074→        @JSMethod
+  1075→        public abstract void framebufferRenderbuffer(int target, int attachment, int renderbuffertarget, JSObject renderbuffer);
+  1076→
+  1077→        @JSMethod
+  1078→        public abstract JSObject getFramebufferAttachmentParameter(int target, int attachment, int pname);
+  1079→
+  1080→        @JSMethod
+  1081→        public abstract void blitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter);
+  1082→
+  1083→        @JSMethod
+  1084→        public abstract void invalidateFramebuffer(int target, JSObject attachments);
+  1085→
+  1086→        @JSMethod
+  1087→        public abstract void invalidateSubFramebuffer(int target, JSObject attachments, int x, int y, int width, int height);
+  1088→
+  1089→        @JSMethod
+  1090→        public abstract void readBuffer(int src);
+  1091→
+  1092→        @JSMethod
+  1093→        public abstract void drawBuffers(JSObject buffers);
+  1094→
+  1095→        // ----- Renderbuffer Objects -----
+  1096→        @JSMethod
+  1097→        public abstract JSObject createRenderbuffer();
+  1098→
+  1099→        @JSMethod
+  1100→        public abstract void deleteRenderbuffer(JSObject renderbuffer);
+  1101→
+  1102→        @JSMethod
+  1103→        public abstract void bindRenderbuffer(int target, JSObject renderbuffer);
+  1104→
+  1105→        @JSMethod
+  1106→        public abstract void renderbufferStorage(int target, int internalformat, int width, int height);
+  1107→
+  1108→        @JSMethod
+  1109→        public abstract void renderbufferStorageMultisample(int target, int samples, int internalformat, int width, int height);
+  1110→
+  1111→        @JSMethod
+  1112→        public abstract JSObject getRenderbufferParameter(int target, int pname);
+  1113→
+  1114→        // ----- Sync Objects -----
+  1115→        @JSMethod
+  1116→        public abstract JSObject fenceSync(int condition, int flags);
+  1117→
+  1118→        @JSMethod
+  1119→        public abstract boolean isSync(JSObject sync);
+  1120→
+  1121→        @JSMethod
+  1122→        public abstract void deleteSync(JSObject sync);
+  1123→
+  1124→        @JSMethod
+  1125→        public abstract int clientWaitSync(JSObject sync, int flags, double timeout);
+  1126→
+  1127→        @JSMethod
+  1128→        public abstract void waitSync(JSObject sync, int flags, double timeout);
+  1129→
+  1130→        @JSMethod
+  1131→        public abstract JSObject getSyncParameter(JSObject sync, int pname);
+  1132→
+  1133→        // ----- Get Extensions -----
+  1134→        @JSMethod
+  1135→        public abstract JSObject getExtension(String name);
+  1136→
+  1137→        @JSMethod
+  1138→        public abstract JSObject getSupportedExtensions();
+  1139→
+  1140→        // ----- Flush / Finish -----
+  1141→        @JSMethod
+  1142→        public abstract void flush();
+  1143→
+  1144→        @JSMethod
+  1145→        public abstract void finish();
+  1146→}
+  1147→

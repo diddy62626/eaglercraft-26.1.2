@@ -10,9 +10,11 @@ import org.teavm.jso.dom.html.HTMLElement;
 
 import net.lax1dude.eaglercraft.v2_6.internal.teavm.opts.IClientConfig;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformInput;
+import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformAudio;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformApplication;
+import net.lax1dude.eaglercraft.v2_6.EaglerCraft;
 
 /**
  * Client initialization and startup logic for EaglerCraft 26.1.2 TeaVM platform.
@@ -86,6 +88,9 @@ public class ClientMain {
         /** The animation frame callback ID for cancellation. */
         private static int animationFrameId = 0;
 
+        /** Whether the EaglerCraft adapter layer has been initialized. */
+        private static boolean eaglercraftInitialized = false;
+
         /** Callback interface for the game loop tick. */
         @JSFunctor
         public interface TickFunctor extends JSObject {
@@ -124,6 +129,7 @@ public class ClientMain {
                         }
 
                         // Initialize platform subsystems
+                        PlatformOpenGL._init();
                         PlatformInput._init();
                         PlatformRuntime._init();
                         PlatformAudio._init();
@@ -220,6 +226,15 @@ public class ClientMain {
 
                         // Update frame timing in PlatformRuntime
                         PlatformRuntime.update(deltaTime);
+
+                        // Initialize the EaglerCraft adapter layer on the first frame
+                        if (!eaglercraftInitialized) {
+                                EaglerCraft.initialize();
+                                eaglercraftInitialized = true;
+                        }
+
+                        // Tick the game
+                        EaglerCraft.tick();
 
                         // Schedule the next frame
                         animationFrameId = requestAnimationFrame(tickFunctor);
@@ -417,6 +432,16 @@ public class ClientMain {
         private static native void showCrashScreen0(String message);
 
         /**
+         * Called by the EaglerCraft adapter when the game is fully initialized.
+         * Dispatches the eaglercraftReady event to the browser so the bootstrap
+         * page knows the client is ready for interaction.
+         */
+        public static void __eaglercraftReady() {
+                __eaglercraftReady0();
+                log("[ClientMain] EaglerCraft ready event dispatched");
+        }
+
+        /**
          * Gets the WebGL2 context for use by PlatformOpenGL.
          */
         public static WebGL2RenderingContext getWebGL2() {
@@ -461,4 +486,18 @@ public class ClientMain {
          */
         @JSBody(params = { "msg" }, script = "console.error(msg);")
         public static native void error(String msg);
+
+        /**
+         * Dispatches the eaglercraftReady event to the browser.
+         * Fires a custom event on the window object so the bootstrap page
+         * can detect when the client is fully loaded and ready.
+         */
+        @JSBody(params = {}, script = ""
+                        + "if (typeof CustomEvent !== 'undefined') {"
+                        + "  window.dispatchEvent(new CustomEvent('eaglercraftReady'));"
+                        + "}"
+                        + "if (typeof window.__eaglercraftOnReady === 'function') {"
+                        + "  window.__eaglercraftOnReady();"
+                        + "}")
+        private static native void __eaglercraftReady0();
 }
