@@ -1,116 +1,92 @@
 # Deploying EaglerCraftX 26.1.2 on Vercel
 
-## What goes on Vercel vs What doesn't
+## How It Works
 
-| Component | Vercel? | Why |
-|-----------|---------|-----|
-| `index.html` | ✅ Yes | Static HTML |
-| `classes.js` | ✅ Yes | Compiled TeaVM JS (static) |
-| `assets.epk` | ✅ Yes | Game assets package (static) |
-| `lang/` | ✅ Yes | Language files (static) |
-| `favicon.png` | ✅ Yes | Static image |
-| Gateway (WebSocket server) | ❌ No | Requires persistent TCP/WebSocket |
-| Minecraft Server | ❌ No | Requires persistent Java process |
-| BungeeCord/Velocity | ❌ No | Requires persistent Java process |
+The GitHub Actions workflow (`.github/workflows/build-deploy.yml`) automatically:
+1. Builds the client with Java 25 + Node.js 22
+2. Compiles TeaVM (Java → JavaScript)
+3. Assembles everything into `public/`
+4. Deploys to both **GitHub Pages** and **Vercel**
 
-## Quick Deploy
+## One-Time Setup
 
-### Option 1: Vercel CLI
+### 1. Enable GitHub Pages
+1. Go to your repo → **Settings** → **Pages**
+2. Source → **Deploy from a branch**
+3. Branch → **gh-pages** → `/ (root)`
+4. Save
 
+### 2. Add Vercel Secrets (optional but recommended)
+
+Go to your repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+
+| Secret | How to get it |
+|--------|---------------|
+| `VERCEL_TOKEN` | Go to https://vercel.com/account/tokens → Create Token |
+| `VERCEL_ORG_ID` | Go to https://vercel.com/account → copy your ID |
+| `VERCEL_PROJECT_ID` | Run `vercel link` locally, then check `.vercel/project.json` |
+
+### 3. Add Minecraft JAR (required for full build)
+
+The MC 26.1.2 JAR can't be in the repo (copyright). Options:
+
+**Option A: Upload as workflow artifact** (recommended)
+1. Go to **Actions** → **Build & Deploy** → **Run workflow**
+2. Paste a URL to the MC 26.1.2 JAR in the `minecraft_jar_url` field
+3. Run
+
+**Option B: Base64 in a secret**
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+# Encode the JAR
+base64 -w0 minecraft-26.1.2.jar > mcjar.b64
 
-# From the project root
-cd eaglercraft-26.1.2
-
-# Deploy (the public/ folder is what gets served)
-vercel --prod
+# Add as GitHub secret: MINECRAFT_JAR_B64
 ```
 
-### Option 2: Connect GitHub Repo
+Then the workflow decodes it.
 
-1. Go to https://vercel.com/new
-2. Import your GitHub repo: `diddy62626/eaglercraft-26.1.2`
-3. Set **Root Directory** to `public/`
-4. Framework: **Other**
-5. Click **Deploy**
-
-### Option 3: Drag & Drop
-
-1. Go to https://vercel.com/new
-2. Drag the `public/` folder into the deploy area
-
-## What to put in `public/`
-
-After compiling the client, your `public/` folder should contain:
+## What Vercel Serves
 
 ```
 public/
-├── index.html          ← The HTML page (already created)
-├── classes.js          ← Compiled TeaVM output (from ./build_compile.sh)
-├── classes.js.map      ← Source map (optional, for debugging)
-├── assets.epk          ← Compiled assets (from ./build_compile.sh)
+├── index.html          ← Game client page
+├── classes.js          ← Compiled game engine (from TeaVM)
+├── assets.epk          ← Game assets
 ├── lang/               ← Language files
-│   ├── en_US.lang
-│   └── ...
-└── favicon.png         ← Your favicon
+└── favicon.png         ← Favicon
 ```
 
-## Build & Deploy Script
+## Auto-Deploy Flow
+
+```
+Push to main → GitHub Actions builds → Deploys to:
+  ├── GitHub Pages (gh-pages branch)
+  └── Vercel (if secrets configured)
+```
+
+## Manual Deploy (without GitHub Actions)
 
 ```bash
-#!/bin/bash
-# build_and_deploy.sh - Compile and prepare for Vercel
+npm i -g vercel
 
-set -e
-
-# 1. Compile the client
+# Build locally first
 ./build_compile.sh
 
-# 2. Copy compiled output to public/
+# Copy output to public/
 cp output/classes.js public/
-cp output/classes.js.map public/ 2>/dev/null || true
 cp output/assets.epk public/
 cp -r output/lang/ public/lang/
 
-# 3. Deploy to Vercel
+# Deploy
 vercel --prod
-
-echo "✅ Deployed!"
 ```
 
-## Important: WebSocket Server
+## ⚠️ WebSocket Server
 
-Vercel **cannot host WebSocket servers**. For multiplayer, you need:
+Vercel **cannot host game servers**. For multiplayer you need a separate VPS running the gateway plugin. Update `public/index.html`:
 
-1. **A VPS** (DigitalOcean, Linode, Hetzner, etc.) running:
-   - A Minecraft Java Edition server (26.1.2)
-   - EaglercraftXBungee or EaglercraftXVelocity gateway plugin
-
-2. **Point your client** to that server's WebSocket address:
-   ```js
-   // In public/index.html, change the servers array:
-   servers: [
-       { addr: "wss://your-vps.example.com/", name: "My Server" }
-   ]
-   ```
-
-3. **Enable HTTPS/WSS** on the VPS (required for browser WebSocket from Vercel's HTTPS):
-   - Use nginx + Let's Encrypt as a reverse proxy
-   - Or use Cloudflare Tunnel (free)
-
-## Environment Variables (optional)
-
-Set these in Vercel Dashboard → Settings → Environment Variables:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| None required | — | All config is in index.html's eaglercraftXOpts |
-
-## Custom Domain
-
-1. In Vercel Dashboard → Settings → Domains
-2. Add your domain (e.g., `play.yourdomain.com`)
-3. Add DNS records as instructed
-4. Update your WebSocket server address to match
+```js
+servers: [
+    { addr: "wss://your-vps.example.com/", name: "My Server" }
+]
+```
