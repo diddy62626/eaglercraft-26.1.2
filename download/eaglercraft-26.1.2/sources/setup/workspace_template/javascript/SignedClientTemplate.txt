@@ -1,0 +1,71 @@
+# ============================================================================
+# EaglerCraft 26.1.2 - Signed Client Template
+# ============================================================================
+#
+# This template defines the structure and metadata for signed client
+# distribution packages. Signed clients are used for authenticated
+# distribution through verified channels.
+#
+# Placeholders (replaced during build):
+#   {{EAGLERCRAFT_VERSION}}     - Version string (e.g., "26.1.2")
+#   {{EAGLERCRAFT_BUILD_DATE}}  - Build timestamp (ISO 8601)
+#   {{EAGLERCRAFT_BUILD_HASH}}  - Git commit hash
+#   {{EAGLERCRAFT_SIGNER}}      - Signing identity
+#   {{EAGLERCRAFT_SIGNATURE}}   - Digital signature (Base64)
+#   {{EAGLERCRAFT_PUBLIC_KEY}}  - Signer's public key (PEM)
+#   {{EAGLERCRAFT_INTEGRITY}}   - SHA-256 hash of all files
+#
+# Signed Client Package Structure:
+#   EaglerCraft_26.1.2_Signed/
+#   ├── index.html              - Main HTML entry point
+#   ├── runtime.js              - TeaVM runtime
+#   ├── classes.js              - Compiled game classes
+#   ├── classes.js.map          - Source map (if debug build)
+#   ├── assets.epk              - Game assets (EaglerCraft Package)
+#   ├── lang/                   - Localization files
+#   ├── CLIENT_SIGNATURE        - This file (client signature & metadata)
+#   ├── MANIFEST.txt            - File manifest with checksums
+#   └── public.key              - Public key for signature verification
+#
+# Verification Process:
+#   1. Read CLIENT_SIGNATURE for metadata and public key reference
+#   2. Verify MANIFEST.txt checksums match actual files
+#   3. Verify digital signature against public key
+#   4. If all checks pass, client is authenticated
+#
+# ============================================================================
+
+[Client Signature]
+Version: {{EAGLERCRAFT_VERSION}}
+BuildDate: {{EAGLERCRAFT_BUILD_DATE}}
+BuildHash: {{EAGLERCRAFT_BUILD_HASH}}
+Signer: {{EAGLERCRAFT_SIGNER}}
+
+[Signature]
+Algorithm: SHA256withRSA
+Signature: {{EAGLERCRAFT_SIGNATURE}}
+
+[Public Key]
+{{EAGLERCRAFT_PUBLIC_KEY}}
+
+[Integrity]
+ManifestHash: {{EAGLERCRAFT_INTEGRITY}}
+
+[Client Configuration]
+MinProtocolVersion: 1
+MaxProtocolVersion: 1
+AllowOfflineMode: true
+AllowUpdateService: true
+AllowBootMenu: true
+AllowedOrigins: *
+DefaultServers: 
+RelayServers: wss://relay.eaglercraft.com/
+
+[Build Info]
+TeaVMVersion: 0.10.0
+CompileMode: release
+Obfuscated: true
+SourceMaps: false
+Minified: true
+
+[End Signature]

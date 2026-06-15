@@ -1,0 +1,612 @@
+     1→package net.lax1dude.eaglercraft.v1_8.buildtools.gui.headless;
+     2→
+     3→import java.io.File;
+     4→import java.io.FileInputStream;
+     5→import java.io.FileNotFoundException;
+     6→import java.io.FileOutputStream;
+     7→import java.io.IOException;
+     8→import java.io.BufferedReader;
+     9→import java.io.InputStreamReader;
+    10→import java.io.PrintWriter;
+    11→import java.nio.charset.StandardCharsets;
+    12→import java.util.ArrayList;
+    13→import java.util.Arrays;
+    14→import java.util.HashMap;
+    15→import java.util.List;
+    16→import java.util.Map;
+    17→import java.util.zip.ZipEntry;
+    18→import java.util.zip.ZipInputStream;
+    19→
+    20→import org.apache.commons.io.FileUtils;
+    21→import org.json.JSONArray;
+    22→import org.json.JSONException;
+    23→import org.json.JSONObject;
+    24→
+    25→import net.lax1dude.eaglercraft.v1_8.buildtools.EaglerBuildTools;
+    26→import net.lax1dude.eaglercraft.v1_8.buildtools.LicensePrompt;
+    27→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.EPKCompiler;
+    28→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.JavaC;
+    29→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.MakeOfflineDownload;
+    30→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.TeaVMBinaries;
+    31→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.CompileLatestClientGUI.CompileFailureException;
+    32→import net.lax1dude.eaglercraft.v1_8.buildtools.gui.TeaVMBinaries.MissingJARsException;
+    33→import net.lax1dude.eaglercraft.v1_8.buildtools.task.init.DecompileMinecraft;
+    34→import net.lax1dude.eaglercraft.v1_8.buildtools.task.init.FFMPEG;
+    35→import net.lax1dude.eaglercraft.v1_8.buildtools.task.init.InitMCP;
+    36→import net.lax1dude.eaglercraft.v1_8.buildtools.task.teavm.TeaVMBridge;
+    37→import net.lax1dude.eaglercraft.v1_8.buildtools.task.teavm.TeaVMBridge.TeaVMClassLoadException;
+    38→import net.lax1dude.eaglercraft.v1_8.buildtools.task.teavm.TeaVMBridge.TeaVMRuntimeException;
+    39→import net.lax1dude.eaglercraft.v1_8.buildtools.util.FileReaderUTF;
+    40→import net.lax1dude.eaglercraft.v1_8.buildtools.util.FileWriterUTF;
+    41→
+    42→/**
+    43→ * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
+    44→ * 
+    45→ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    46→ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    47→ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+    48→ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    49→ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    50→ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    51→ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    52→ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    53→ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    54→ * POSSIBILITY OF SUCH DAMAGE.
+    55→ * 
+    56→ */
+    57→public class CompileLatestClientHeadless {
+    58→
+    59→        public static void main(String[] args) throws Throwable {
+    60→                
+    61→                System.out.println();
+    62→                System.out.println("Launching client compiler...");
+    63→                System.out.println("Copyright (c) 2022-2023 lax1dude");
+    64→                System.out.println();
+    65→                
+    66→                boolean yes = false;
+    67→                String configPath = null;
+    68→                
+    69→                if(args.length == 1) {
+    70→                        configPath = args[0];
+    71→                }else if(args.length == 2 && (yes = args[0].equalsIgnoreCase("-y"))) {
+    72→                        configPath = args[1];
+    73→                }else {
+    74→                        System.err.println("Usage: java -jar BuildTools.jar [-y] <config file>");
+    75→                        System.err.println();
+    76→                        System.exit(-1);
+    77→                        return;
+    78→                }
+    79→                
+    80→                System.out.println("Loading config file: " + configPath);
+    81→                System.out.println();
+    82→                
+    83→                File configFile = new File(configPath);
+    84→                String configSrc;
+    85→                try {
+    86→                        configSrc = FileUtils.readFileToString(configFile, StandardCharsets.UTF_8);
+    87→                }catch(FileNotFoundException ex) {
+    88→                        ex.printStackTrace();
+    89→                        System.err.println();
+    90→                        System.err.println("ERROR: File '" + configFile.getAbsolutePath() + "' does not exist!");
+    91→                        System.err.println();
+    92→                        System.exit(-1);
+    93→                        return;
+    94→                }
+    95→                
+    96→                JSONObject configJSON;
+    97→                try {
+    98→                        configJSON = new JSONObject(configSrc);
+    99→                }catch(JSONException ex) {
+   100→                        System.err.println("ERROR: Could not parse '" + configFile.getName() + "' as JSON!");
+   101→                        System.err.println();
+   102→                        System.err.println(ex.toString());
+   103→                        System.err.println();
+   104→                        System.exit(-1);
+   105→                        return;
+   106→                }
+   107→                
+   108→                File repositoryFolder;
+   109→                File modCoderPack;
+   110→                File minecraftJar;
+   111→                File assetsIndex;
+   112→                File outputDirectory;
+   113→                File temporaryDirectory;
+   114→                String ffmpeg = "ffmpeg";
+   115→                String mavenURL = null;
+   116→                File mavenLocal = null;
+   117→                File productionIndex = null;
+   118→                File productionFavicon = null;
+   119→                List<String> addScripts = null;
+   120→                List<String> removeScripts = null;
+   121→                List<String> injectInOfflineScripts = null;
+   122→                boolean generateOffline;
+   123→                File offlineTemplate = null;
+   124→                boolean keepTemporaryFiles;
+   125→                boolean writeSourceMap = false;
+   126→                boolean minifying = true;
+   127→                try {
+   128→                        repositoryFolder = new File(configJSON.optString("repositoryFolder", "."));
+   129→                        modCoderPack = new File(configJSON.getString("modCoderPack"));
+   130→                        minecraftJar = new File(configJSON.getString("minecraftJar"));
+   131→                        assetsIndex = new File(configJSON.getString("assetsIndex"));
+   132→                        outputDirectory = new File(configJSON.getString("outputDirectory"));
+   133→                        String tmpDir = configJSON.optString("temporaryDirectory");
+   134→                        temporaryDirectory = tmpDir == null ? new File(outputDirectory, "build") : new File(tmpDir);
+   135→                        ffmpeg = configJSON.optString("ffmpeg", ffmpeg);
+   136→                        if(ffmpeg.length() == 0) {
+   137→                                ffmpeg = "ffmpeg";
+   138→                        }
+   139→                        String prodIndex = configJSON.optString("productionIndex");
+   140→                        if(prodIndex != null) {
+   141→                                productionIndex = new File(prodIndex);
+   142→                                String prodFavicon = configJSON.optString("productionFavicon");
+   143→                                if(prodFavicon != null) {
+   144→                                        productionFavicon = new File(prodFavicon);
+   145→                                }
+   146→                                JSONArray scripts = configJSON.optJSONArray("addScripts");
+   147→                                if(scripts != null) {
+   148→                                        int l = scripts.length();
+   149→                                        if(l > 0) {
+   150→                                                addScripts = new ArrayList(l);
+   151→                                                for(int i = 0; i < l; ++i) {
+   152→                                                        addScripts.add(scripts.getString(i));
+   153→                                                }
+   154→                                        }
+   155→                                }
+   156→                                scripts = configJSON.optJSONArray("removeScripts");
+   157→                                if(scripts != null) {
+   158→                                        int l = scripts.length();
+   159→                                        if(l > 0) {
+   160→                                                removeScripts = new ArrayList(l);
+   161→                                                for(int i = 0; i < l; ++i) {
+   162→                                                        removeScripts.add(scripts.getString(i));
+   163→                                                }
+   164→                                        }
+   165→                                }
+   166→                                scripts = configJSON.optJSONArray("injectInOffline");
+   167→                                if(scripts != null) {
+   168→                                        int l = scripts.length();
+   169→                                        if(l > 0) {
+   170→                                                injectInOfflineScripts = new ArrayList(l);
+   171→                                                for(int i = 0; i < l; ++i) {
+   172→                                                        injectInOfflineScripts.add(scripts.getString(i));
+   173→                                                }
+   174→                                        }
+   175→                                }
+   176→                        }
+   177→                        mavenURL = configJSON.optString("mavenURL");
+   178→                        mavenLocal = new File(configJSON.getString("mavenLocal"));
+   179→                        generateOffline = configJSON.optBoolean("generateOfflineDownload", false);
+   180→                        if(generateOffline) {
+   181→                                offlineTemplate = new File(configJSON.getString("offlineDownloadTemplate"));
+   182→                        }
+   183→                        keepTemporaryFiles = configJSON.optBoolean("keepTemporaryFiles", false);
+   184→                        writeSourceMap = configJSON.optBoolean("writeSourceMap", false);
+   185→                        minifying = configJSON.optBoolean("minifying", true);
+   186→                }catch(JSONException ex) {
+   187→                        System.err.println("CONFIG ERROR: " + ex.toString());
+   188→                        System.err.println();
+   189→                        System.exit(-1);
+   190→                        return;
+   191→                }
+   192→                
+   193→                System.out.println("Loaded config successfully:");
+   194→                System.out.println();
+   195→                System.out.println(" - Repository Folder: " + repositoryFolder.getAbsolutePath().replace('\\', '/'));
+   196→                System.out.println(" - Mod Coder Pack: " + modCoderPack.getAbsolutePath().replace('\\', '/'));
+   197→                System.out.println(" - Minecraft 1.8.8: " + minecraftJar.getAbsolutePath().replace('\\', '/'));
+   198→                System.out.println(" - Assets Index 1.8: " + assetsIndex.getAbsolutePath().replace('\\', '/'));
+   199→                System.out.println(" - Temporary Directory: " + temporaryDirectory.getAbsolutePath().replace('\\', '/'));
+   200→                System.out.println(" - Output Directory: " + outputDirectory.getAbsolutePath().replace('\\', '/'));
+   201→                System.out.println(" - FFmpeg Executable: " + ffmpeg.replace('\\', '/'));
+   202→                System.out.println(" - Maven Repo URL: " + mavenURL);
+   203→                System.out.println(" - Maven Local Dir: " + mavenLocal.getAbsolutePath().replace('\\', '/'));
+   204→                System.out.println(" - Production Index: " + (productionIndex == null ? "null" : productionIndex.getAbsolutePath().replace('\\', '/')));
+   205→                System.out.println(" - Production Favicon: " + (productionFavicon == null ? "null" : productionFavicon.getAbsolutePath().replace('\\', '/')));
+   206→                System.out.println(" - Generate Offline: " + generateOffline);
+   207→                System.out.println(" - Offline Template: " + (offlineTemplate == null ? "null" : offlineTemplate.getAbsolutePath().replace('\\', '/')));
+   208→                System.out.println(" - Inject in Offline: " + (injectInOfflineScripts == null ? "[ ]" : "[ " + String.join(", ", injectInOfflineScripts).replace('\\', '/') + " ]"));
+   209→                System.out.println(" - Minifying: " + minifying);
+   210→                System.out.println(" - Write Source Map: " + writeSourceMap);
+   211→                System.out.println(" - Keep Temp Files: " + keepTemporaryFiles);
+   212→                System.out.println(" - Add Scripts: " + (addScripts == null ? "[ ]" : "[ " + String.join(", ", addScripts).replace('\\', '/') + " ]"));
+   213→                System.out.println(" - Remove Scripts: " + (removeScripts == null ? "[ ]" : "[ " + String.join(", ", removeScripts).replace('\\', '/') + " ]"));
+   214→                System.out.println();
+   215→                
+   216→                if(!yes) {
+   217→                        System.out.println();
+   218→                        LicensePrompt.display();
+   219→                        System.out.println();
+   220→                }
+   221→                
+   222→                EaglerBuildTools.repositoryRoot = repositoryFolder;
+   223→                
+   224→                try {
+   225→                        if(!outputDirectory.isDirectory() && !outputDirectory.mkdirs()) {
+   226→                                throw new CompileFailureException("Could not create output directory!");
+   227→                        }
+   228→                        
+   229→                        File[] existingOutput = outputDirectory.listFiles();
+   230→                        if(existingOutput.length > 0) {
+   231→                                
+   232→                                if(!yes) {
+   233→                                        System.out.print("Output directory has existing files, would you like to delete them? [y/n] ");
+   234→                                        String str = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+   235→                                        System.out.println();
+   236→                                        if(!str.equalsIgnoreCase("y") && !str.equalsIgnoreCase("yes")) {
+   237→                                                System.out.println("Build cancelled.");
+   238→                                                System.out.println();
+   239→                                                System.exit(-1);
+   240→                                                return;
+   241→                                        }
+   242→                                }
+   243→                                
+   244→                                System.out.println("Deleting existing files from the output directory...");
+   245→                                
+   246→                                try {
+   247→                                        for(int i = 0; i < existingOutput.length; ++i) {
+   248→                                                File f = existingOutput[i];
+   249→                                                if(f.isDirectory()) {
+   250→                                                        FileUtils.deleteDirectory(f);
+   251→                                                }else {
+   252→                                                        if(!f.delete()) {
+   253→                                                                throw new IOException("Could not delete: " + f.getAbsolutePath());
+   254→                                                        }
+   255→                                                }
+   256→                                        }
+   257→                                }catch(IOException t) {
+   258→                                        throw new CompileFailureException("Could not delete old output directory: " + t.getMessage());
+   259→                                }
+   260→                        }
+   261→                        
+   262→                        File mcpDataTMP = new File(temporaryDirectory, "ModCoderPack");
+   263→                        File minecraftSrcTmp = new File(temporaryDirectory, "MinecraftSrc");
+   264→                        
+   265→                        if(ffmpeg.length() == 0) {
+   266→                                FFMPEG.foundFFMPEG = "ffmpeg";
+   267→                        }else {
+   268→                                FFMPEG.foundFFMPEG = ffmpeg;
+   269→                        }
+   270→                        
+   271→                        if(!mcpDataTMP.isDirectory() && !mcpDataTMP.mkdirs()) {
+   272→                                throw new CompileFailureException("Error: failed to create \"" + mcpDataTMP.getAbsolutePath() + "\"!");
+   273→                        }
+   274→                        
+   275→                        if(!InitMCP.initTask(modCoderPack, mcpDataTMP)) {
+   276→                                throw new CompileFailureException("Error: could not initialize MCP from \"" + modCoderPack.getAbsolutePath() + "\"!");
+   277→                        }
+   278→                        
+   279→                        if(!minecraftSrcTmp.isDirectory() && !minecraftSrcTmp.mkdirs()) {
+   280→                                throw new CompileFailureException("Error: failed to create \"" + minecraftSrcTmp.getAbsolutePath() + "\"!");
+   281→                        }
+   282→                        
+   283→                        if(!DecompileMinecraft.decompileMinecraft(mcpDataTMP, minecraftJar, minecraftSrcTmp, assetsIndex, false)) {
+   284→                                throw new CompileFailureException("Error: could not decompile and patch 1.8.8.jar from \"" + minecraftJar.getAbsolutePath() + "\"!");
+   285→                        }
+   286→                        
+   287→                        try {
+   288→                                FileUtils.copyFile(new File(repositoryFolder, "patches/minecraft/output_license.txt"), new File(temporaryDirectory, "MinecraftSrc/LICENSE"));
+   289→                        }catch(IOException ex) {
+   290→                                System.err.println("Error: failed to write LICENSE in temporary directory!");
+   291→                                ex.printStackTrace();
+   292→                        }
+   293→                        
+   294→                        System.out.println();
+   295→                        
+   296→                        if(mavenURL == null) {
+   297→                                System.out.println("TeaVM JARs will be loaded from: " + mavenLocal.getAbsolutePath());
+   298→                                System.out.println();
+   299→                                try {
+   300→                                        TeaVMBinaries.loadFromDirectory(mavenLocal);
+   301→                                }catch(MissingJARsException ex) {
+   302→                                        throw new CompileFailureException(ex.getMessage());
+   303→                                }
+   304→                        }else {
+   305→                                System.out.println("TeaVM JARs will be downloaded from repository: " + mavenURL);
+   306→                                System.out.println();
+   307→                                try {
+   308→                                        TeaVMBinaries.downloadFromMaven(mavenURL, mavenLocal);
+   309→                                }catch(MissingJARsException ex) {
+   310→                                        throw new CompileFailureException(ex.getMessage());
+   311→                                }
+   312→                                System.out.println();
+   313→                                System.out.println("Notice: make sure to delete \"" + mavenLocal.getAbsolutePath() + "\" when the compiler is finished, it will not be deleted automatically");
+   314→                                System.out.println();
+   315→                        }
+   316→                        
+   317→                        int compileResultCode;
+   318→                        File compiledResultClasses = new File(temporaryDirectory, "classes");
+   319→
+   320→                        try {
+   321→                                try {
+   322→                                        compileResultCode = JavaC.runJavaC(new File(minecraftSrcTmp, "minecraft_src_javadoc.jar"),
+   323→                                                        compiledResultClasses, temporaryDirectory, TeaVMBinaries.getTeaVMRuntimeClasspath(),
+   324→                                                new File(repositoryFolder, "sources/main/java"), new File(repositoryFolder, "sources/teavm/java"));
+   325→                                }catch(IOException ex) {
+   326→                                        throw new CompileFailureException("failed to run javac compiler! " + ex.toString(), ex);
+   327→                                }
+   328→                
+   329→                                System.out.println();
+   330→                                
+   331→                                if(compileResultCode == 0) {
+   332→                                        System.out.println("Java compiler completed successfully");
+   333→                                }else {
+   334→                                        throw new CompileFailureException("failed to run javac compiler! exit code " + compileResultCode + ", check log");
+   335→                                }
+   336→                        }finally {
+   337→                                File extractedSrcTmp = new File(temporaryDirectory, "MinecraftSrc/src_javadoc_tmp");
+   338→                                if(extractedSrcTmp.exists()) {
+   339→                                        System.out.println();
+   340→                                        System.out.println("Deleting temporary directory: " + extractedSrcTmp.getAbsolutePath());
+   341→                                        try {
+   342→                                                FileUtils.deleteDirectory(extractedSrcTmp);
+   343→                                        }catch(IOException ex) {
+   344→                                                System.err.println("Failed to delete temporary directory!");
+   345→                                                ex.printStackTrace();
+   346→                                        }
+   347→                                }
+   348→                        }
+   349→                        
+   350→                        System.out.println();
+   351→                        System.out.println("Preparing arguments for TeaVM...");
+   352→                        
+   353→                        if(!TeaVMBinaries.tryLoadTeaVMBridge()) {
+   354→                                System.err.println("Failed to locate TeaVMBridge.jar, you can specify it's path manually by adding the JVM argument \"-Deaglercraft.TeaVMBridge=<path>\"");
+   355→                                throw new CompileFailureException("Failed to locate TeaVMBridge.jar!");
+   356→                        }
+   357→                        
+   358→                        Map<String, Object> teavmArgs = new HashMap();
+   359→                        
+   360→                        List<String> teavmClassPath = new ArrayList();
+   361→                        teavmClassPath.add(compiledResultClasses.getAbsolutePath());
+   362→                        teavmClassPath.addAll(Arrays.asList(TeaVMBinaries.getTeaVMRuntimeClasspath()));
+   363→                        teavmArgs.put("classPathEntries", teavmClassPath);
+   364→
+   365→                        teavmArgs.put("entryPointName", "main");
+   366→                        teavmArgs.put("mainClass", "net.lax1dude.eaglercraft.v1_8.internal.teavm.MainClass");
+   367→                        teavmArgs.put("minifying", minifying);
+   368→                        teavmArgs.put("optimizationLevel", "ADVANCED");
+   369→                        teavmArgs.put("targetDirectory", outputDirectory.getAbsolutePath());
+   370→                        teavmArgs.put("generateSourceMaps", writeSourceMap);
+   371→                        teavmArgs.put("targetFileName", "classes.js");
+   372→                        
+   373→                        System.out.println();
+   374→                        
+   375→                        boolean teavmStatus;
+   376→                        try {
+   377→                                teavmStatus = TeaVMBridge.compileTeaVM(teavmArgs);
+   378→                        }catch(TeaVMClassLoadException ex) {
+   379→                                throw new CompileFailureException("Failed to link TeaVM jar files! Did you select the wrong jar?", ex);
+   380→                        }catch(TeaVMRuntimeException ex) {
+   381→                                throw new CompileFailureException("Failed to run TeaVM! Check log", ex);
+   382→                        }
+   383→                        
+   384→                        if(!teavmStatus) {
+   385→                                System.out.println("TeaVM reported problems, check the log");
+   386→                                System.out.println();
+   387→                                System.exit(-1);
+   388→                                return;
+   389→                        }
+   390→                        
+   391→                        File epkCompiler = new File(repositoryFolder, "sources/setup/workspace_template/desktopRuntime/CompileEPK.jar");
+   392→                        
+   393→                        if(!epkCompiler.exists()) {
+   394→                                throw new CompileFailureException("EPKCompiler JAR file is missing: " + epkCompiler.getAbsolutePath());
+   395→                        }
+   396→
+   397→                        System.out.println();
+   398→                        System.out.println("Writing index.html...");
+   399→                        System.out.println();
+   400→                        
+   401→                        String faviconExt = null;
+   402→                        if(productionFavicon != null) {
+   403→                                faviconExt = productionFavicon.getName();
+   404→                                int i = faviconExt.lastIndexOf('.');
+   405→                                if(i != -1) {
+   406→                                        faviconExt = faviconExt.substring(i + 1);
+   407→                                }
+   408→                        }
+   409→                        
+   410→                        try(BufferedReader indexReader = new BufferedReader(new FileReaderUTF(productionIndex));
+   411→                                        PrintWriter indexWriter = new PrintWriter(new FileWriterUTF(new File(outputDirectory, "index.html")))) {
+   412→                                String line;
+   413→                                while((line = indexReader.readLine()) != null) {
+   414→                                        String trim = line.trim();
+   415→                                        if(trim.startsWith("<link")) {
+   416→                                                if(trim.contains("rel=\"shortcut icon\"")) {
+   417→                                                        if(faviconExt != null) {
+   418→                                                                String contentType = "image/png";
+   419→                                                                switch(faviconExt) {
+   420→                                                                case "png":
+   421→                                                                        break;
+   422→                                                                case "jpg":
+   423→                                                                case "jpeg":
+   424→                                                                        contentType = "image/jpeg";
+   425→                                                                        break;
+   426→                                                                case "ico":
+   427→                                                                        contentType = "image/x-icon";
+   428→                                                                        break;
+   429→                                                                case "gif":
+   430→                                                                        contentType = "image/gif";
+   431→                                                                        break;
+   432→                                                                case "bmp":
+   433→                                                                        contentType = "image/bmp";
+   434→                                                                        break;
+   435→                                                                case "webp":
+   436→                                                                        contentType = "image/webp";
+   437→                                                                        break;
+   438→                                                                default:
+   439→                                                                        System.err.println();
+   440→                                                                        System.err.println("WARNING: favicon extension '" + faviconExt + "' is unknown, defaulting to image/png MIME type");
+   441→                                                                        System.err.println();
+   442→                                                                        break;
+   443→                                                                }
+   444→                                                                indexWriter.println(line.replace("favicon.png", "favicon." + faviconExt).replace("image/png", contentType));
+   445→                                                                System.out.println("Setting favicon <link> href to \"favicon." + faviconExt + "\", MIME type \"" + contentType + "\" in index.html");
+   446→                                                        }else {
+   447→                                                                System.out.println("Removed favicon <link> from index.html, no favicon configured");
+   448→                                                        }
+   449→                                                        continue;
+   450→                                                }
+   451→                                        }
+   452→                                        if(trim.startsWith("<meta")) {
+   453→                                                if(trim.contains("property=\"og:image\"")) {
+   454→                                                        if(faviconExt != null) {
+   455→                                                                indexWriter.println(line.replace("favicon.png", "favicon." + faviconExt));
+   456→                                                                System.out.println("Setting og:image <link> href to \"favicon." + faviconExt + "\"");
+   457→                                                        }else {
+   458→                                                                System.out.println("Removed og:image <meta> tag in index.html, no favicon configured");
+   459→                                                        }
+   460→                                                        continue;
+   461→                                                }
+   462→                                        }
+   463→                                        if(trim.startsWith("<script")) {
+   464→                                                int idx = line.indexOf("src=\"");
+   465→                                                int idx2 = line.indexOf('"', idx + 5);
+   466→                                                String srcSubStr = line.substring(idx + 5, idx2);
+   467→                                                if(addScripts != null && srcSubStr.equals("classes.js")) {
+   468→                                                        for(int i = 0, l = addScripts.size(); i < l; ++i) {
+   469→                                                                String addSrc = addScripts.get(i);
+   470→                                                                indexWriter.println(line.replace("classes.js", addSrc));
+   471→                                                                System.out.println("Added <script> tag with src \"" + addSrc + "\" to index.html");
+   472→                                                        }
+   473→                                                }
+   474→                                                if(removeScripts != null && removeScripts.contains(srcSubStr)) {
+   475→                                                        System.out.println("Removed <script> tag with src \"" + srcSubStr + "\" from index.html");
+   476→                                                        continue;
+   477→                                                }
+   478→                                        }
+   479→                                        indexWriter.println(line);
+   480→                                }
+   481→                        }
+   482→                        
+   483→                        System.out.println();
+   484→                        
+   485→                        if(productionFavicon != null) {
+   486→                                FileUtils.copyFile(productionFavicon, new File(outputDirectory, "favicon." + faviconExt));
+   487→                        }
+   488→                        
+   489→                        System.out.println();
+   490→                        System.out.println("Running EPKCompiler on assets...");
+   491→                        
+   492→                        EPKCompiler.compilerMain(epkCompiler, new String[] {
+   493→                                        ((new File(minecraftSrcTmp, "minecraft_res_patch.jar")).getAbsolutePath() + System.getProperty("path.separator") +
+   494→                                        (new File(repositoryFolder, "sources/resources")).getAbsolutePath()), (new File(outputDirectory, "assets.epk")).getAbsolutePath() });
+   495→                        
+   496→                        System.out.println();
+   497→                        System.out.println("Running EPKCompiler on languages.zip...");
+   498→                        
+   499→                        EPKCompiler.compilerMain(epkCompiler, new String[] {
+   500→                                        (new File(minecraftSrcTmp, "minecraft_languages.zip")).getAbsolutePath(),
+   501→                                        (new File(temporaryDirectory, "languages.epk")).getAbsolutePath() });
+   502→
+   503→                        System.out.println();
+   504→                        System.out.println("Creating languages directory...");
+   505→                        File langDirectory = new File(outputDirectory, "lang");
+   506→                        
+   507→                        byte[] copyBuffer = new byte[16384];
+   508→                        int i;
+   509→                        try(ZipInputStream zis = new ZipInputStream(new FileInputStream(new File(minecraftSrcTmp, "minecraft_languages.zip")))) {
+   510→                                ZipEntry etr;
+   511→                                while((etr = zis.getNextEntry()) != null) {
+   512→                                        if(!etr.isDirectory()) {
+   513→                                                File phile = new File(langDirectory, etr.getName());
+   514→                                                File parent = phile.getParentFile();
+   515→                                                if(!parent.exists() && !parent.mkdirs()) {
+   516→                                                        throw new IOException("Could not create directory: " + parent.getAbsolutePath());
+   517→                                                }
+   518→                                                try(FileOutputStream os = new FileOutputStream(phile)) {
+   519→                                                        while((i = zis.read(copyBuffer)) != -1) {
+   520→                                                                os.write(copyBuffer, 0, i);
+   521→                                                        }
+   522→                                                }
+   523→                                        }
+   524→                                }
+   525→                        }
+   526→                        
+   527→                        System.out.println();
+   528→                        
+   529→                        if(generateOffline) {
+   530→                                System.out.println("Running offline download generator...");
+   531→                                System.out.println();
+   532→                                File offlineTemplateArg = offlineTemplate;
+   533→                                if(injectInOfflineScripts != null) {
+   534→                                        offlineTemplateArg = new File(temporaryDirectory, "offline_download_template.txt");
+   535→                                        try(BufferedReader indexReader = new BufferedReader(new FileReaderUTF(offlineTemplate));
+   536→                                                        PrintWriter indexWriter = new PrintWriter(new FileWriterUTF(offlineTemplateArg))) {
+   537→                                                String line;
+   538→                                                while((line = indexReader.readLine()) != null) {
+   539→                                                        if(line.contains("${classes_js}")) {
+   540→                                                                for(int j = 0, l = injectInOfflineScripts.size(); j < l; ++j) {
+   541→                                                                        File injectFile = new File(injectInOfflineScripts.get(j));
+   542→                                                                        String injectName = injectFile.getAbsolutePath();
+   543→                                                                        String injectNameName = injectFile.getName();
+   544→                                                                        System.out.println("Adding file to offline download template: " + injectName);
+   545→                                                                        indexWriter.println("// %%%%%%%%% " + injectNameName + " %%%%%%%%%");
+   546→                                                                        indexWriter.println();
+   547→                                                                        try(BufferedReader insertReader = new BufferedReader(new FileReaderUTF(injectFile))) {
+   548→                                                                                String line2;
+   549→                                                                                while((line2 = insertReader.readLine()) != null) {
+   550→                                                                                        indexWriter.println(line2);
+   551→                                                                                }
+   552→                                                                        }
+   553→                                                                        indexWriter.println();
+   554→                                                                        char[] percents = new char[20 + injectNameName.length()];
+   555→                                                                        for(int k = 0; k < percents.length; ++k) {
+   556→                                                                                percents[k] = '%';
+   557→                                                                        }
+   558→                                                                        indexWriter.print("// ");
+   559→                                                                        indexWriter.println(percents);
+   560→                                                                        indexWriter.println();
+   561→                                                                        indexWriter.println();
+   562→                                                                }
+   563→                                                                System.out.println();
+   564→                                                        }
+   565→                                                        indexWriter.println(line);
+   566→                                                }
+   567→                                        }
+   568→                                }
+   569→                                File offlineDownloadGenerator = new File(repositoryFolder, "sources/setup/workspace_template/desktopRuntime/MakeOfflineDownload.jar");
+   570→                                MakeOfflineDownload.compilerMain(offlineDownloadGenerator, new String[] {
+   571→                                                offlineTemplateArg.getAbsolutePath(),
+   572→                                                (new File(outputDirectory, "classes.js")).getAbsolutePath(),
+   573→                                                (new File(outputDirectory, "assets.epk")).getAbsolutePath(),
+   574→                                                (new File(outputDirectory, "EaglercraftX_1.8_Offline_en_US.html")).getAbsolutePath(),
+   575→                                                (new File(outputDirectory, "EaglercraftX_1.8_Offline_International.html")).getAbsolutePath(), 
+   576→                                                (new File(temporaryDirectory, "languages.epk")).getAbsolutePath()
+   577→                                });
+   578→                        }
+   579→
+   580→                        System.out.println("Releasing external ClassLoader(s)...");
+   581→                        System.out.println();
+   582→
+   583→                        TeaVMBridge.free();
+   584→                        EPKCompiler.free();
+   585→                        
+   586→                        if(generateOffline) {
+   587→                                MakeOfflineDownload.free();
+   588→                        }
+   589→                        
+   590→                        if(!keepTemporaryFiles) {
+   591→                                System.out.println("Cleaning up temporary files...");
+   592→                                try {
+   593→                                        FileUtils.deleteDirectory(temporaryDirectory);
+   594→                                }catch(IOException ex) {
+   595→                                        System.err.println("Failed to delete temporary directory: " + temporaryDirectory.getAbsolutePath());
+   596→                                        ex.printStackTrace();
+   597→                                }
+   598→                        }
+   599→                        
+   600→                        System.out.println();
+   601→                        System.out.println("Client build successful! Check the output directory for your files");
+   602→                        
+   603→                }catch(CompileFailureException ex) {
+   604→                        System.out.println();
+   605→                        System.err.println("COMPILATION FAILED: " + ex.getMessage());
+   606→                        System.out.println();
+   607→                        System.exit(-1);
+   608→                }
+   609→        }
+   610→
+   611→}
+   612→

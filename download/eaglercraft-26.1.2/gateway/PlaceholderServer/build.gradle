@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'net.lax1dude.eaglercraft.v2_6.placeholder_server'
+version = '1.0.0'
+archivesBaseName = 'PlaceholderServer'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.java-websocket:Java-WebSocket:1.5.4'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'org.yaml:snakeyaml:2.2'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withSourcesJar()
+}
+
+application {
+    mainClass = 'net.lax1dude.eaglercraft.v2_6.placeholder_server.PlaceholderServer'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'net.lax1dude.eaglercraft.v2_6.placeholder_server.PlaceholderServer',
+            'Implementation-Title': 'PlaceholderServer',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'Eaglercraft',
+            'Eaglercraft-Version': '26.1.2'
+        )
+    }
+}
+
+shadowJar {
+    mergeServiceFiles()
+    relocate 'org.java_websocket', 'net.lax1dude.eaglercraft.v2_6.placeholder_server.deps.websocket'
+    relocate 'com.google.gson', 'net.lax1dude.eaglercraft.v2_6.placeholder_server.deps.gson'
+    archiveClassifier.set('')
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+build.dependsOn shadowJar

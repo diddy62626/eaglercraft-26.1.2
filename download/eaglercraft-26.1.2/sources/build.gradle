@@ -1,0 +1,229 @@
+/*
+ * EaglerCraft 26.1.2 - Sources Subproject
+ *
+ * This is the main game sources subproject that compiles the Minecraft 26.1.2
+ * client code along with EaglerCraft adapter layers into JavaScript via TeaVM.
+ *
+ * Source sets:
+ *   main    - Core Minecraft 26.1.2 source code + EaglerCraft patches
+ *   teavm   - TeaVM-specific adapter layer (browser/GWT replacement)
+ *   lwjgl   - LWJGL compatibility layer for desktop runtime
+ *
+ * No MCP deobfuscation is needed since Minecraft 26.1.2 ships unobfuscated.
+ */
+
+plugins {
+    id 'java'
+    id 'org.teavm'
+}
+
+// Inherit project-wide properties from root
+def teaVMVersion = rootProject.ext.teaVMVersion
+def minecraftVersion = rootProject.ext.minecraftVersion
+def protocolVersion = rootProject.ext.protocolVersion
+
+dependencies {
+    // TeaVM dependencies for compilation
+    implementation "org.teavm:teavm-classlib:${teaVMVersion}"
+    implementation "org.teavm:teavm-jso:${teaVMVersion}"
+    implementation "org.teavm:teavm-jso-apis:${teaVMVersion}"
+    implementation "org.teavm:teavm-platform:${teaVMVersion}"
+    implementation "org.teavm:teavm-core:${teaVMVersion}"
+
+    // TeaVM annotation processor
+    annotationProcessor "org.teavm:teavm-core:${teaVMVersion}"
+
+    // Minecraft 26.1.2 (unobfuscated - no MCP needed)
+    implementation files("libs/minecraft-${minecraftVersion}.jar")
+
+    // LWJGL for desktop runtime
+    implementation files("desktopRuntime/lwjgl.jar")
+    implementation files("desktopRuntime/lwjgl-glfw.jar")
+    implementation files("desktopRuntime/lwjgl-opengles.jar")
+    implementation files("desktopRuntime/lwjgl-openal.jar")
+
+    // Audio support
+    implementation files("desktopRuntime/jorbis.jar")
+    implementation files("desktopRuntime/codecjorbis.jar")
+    implementation files("desktopRuntime/soundsystem.jar")
+
+    // Test dependencies
+    testImplementation 'junit:junit:4.13.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['main/java']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+    teavm {
+        java {
+            srcDirs = ['teavm/java']
+        }
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+    lwjgl {
+        java {
+            srcDirs = ['lwjgl/java']
+        }
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+// ============================================================
+// TeaVM Configuration
+// ============================================================
+teavm.js {
+    // Main entry point for the browser client
+    mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
+
+    // Obfuscation and debugging
+    obfuscated = true
+    sourceMap = true
+
+    // Aggressive optimization for production builds
+    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
+
+    // Output file name
+    targetFileName = 'classes.js'
+
+    // Additional TeaVM properties for MC 26.1.2's larger codebase
+    properties = [
+        'teavm.maxTopLevelNames' : '80000',
+        'teavm.minHeapSize'      : '256MB',
+        'teavm.maxHeapSize'      : '1024MB'
+    ]
+}
+
+// ============================================================
+// Java Compilation Options
+// ============================================================
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['--enable-preview']
+    options.fork = true
+    options.forkOptions.jvmArgs += ['--enable-preview']
+}
+
+// ============================================================
+// Custom Tasks
+// ============================================================
+
+// Compile the TeaVM source set alongside main
+tasks.named('compileTeavmJava') {
+    dependsOn tasks.named('compileJava')
+}
+
+// Compile the LWJGL source set alongside main
+tasks.named('compileLwjglJava') {
+    dependsOn tasks.named('compileJava')
+}
+
+// Copy compiled JavaScript and resources to the web output directory
+tasks.register('generateWeb', Copy) {
+    group = 'eaglercraft'
+    description = 'Assembles the web client output directory'
+
+    dependsOn tasks.named('generateJs')
+
+    from(layout.buildDirectory.dir('teavm')) {
+        include 'classes.js'
+        include 'classes.js.map'
+    }
+    from('resources') {
+        include 'index.html'
+        include 'worker.js'
+        include 'fix-webm-duration.js'
+        include 'assets/**'
+        include 'lang/**'
+    }
+    into(layout.buildDirectory.dir('web'))
+}
+
+// Package the web client into a distribution zip
+tasks.register('distWeb', Zip) {
+    group = 'distribution'
+    description = 'Creates a distribution ZIP of the web client'
+
+    dependsOn tasks.named('generateWeb')
+
+    archiveBaseName = 'eaglercraft'
+    archiveVersion = project.version
+    archiveClassifier = 'web'
+
+    from(layout.buildDirectory.dir('web')) {
+        into 'eaglercraft-26.1.2-web'
+    }
+}
+
+// Package the desktop runtime into a distribution zip
+tasks.register('distDesktop', Zip) {
+    group = 'distribution'
+    description = 'Creates a distribution ZIP of the desktop runtime'
+
+    dependsOn tasks.named('jar')
+
+    archiveBaseName = 'eaglercraft'
+    archiveVersion = project.version
+    archiveClassifier = 'desktop'
+
+    from(tasks.named('jar').map { it.archiveFile }) {
+        into 'eaglercraft-26.1.2-desktop'
+    }
+    from('desktopRuntime') {
+        include '*.jar'
+        into 'eaglercraft-26.1.2-desktop/libs'
+    }
+}
+
+// Full distribution build
+tasks.register('dist') {
+    group = 'distribution'
+    description = 'Creates all distribution artifacts'
+
+    dependsOn tasks.named('distWeb')
+    dependsOn tasks.named('distDesktop')
+}
+
+// ============================================================
+// JAR Configuration
+// ============================================================
+jar {
+    archiveBaseName = 'eaglercraft-sources'
+    archiveVersion = project.version
+
+    // Include all source sets in the jar for desktop runtime
+    from sourceSets.main.output
+    from sourceSets.lwjgl.output
+
+    manifest {
+        attributes(
+            'Main-Class': 'net.lax1dude.eaglercraft.v2_6.internal.lwjgl.MainClass',
+            'Implementation-Title': 'EaglerCraft',
+            'Implementation-Version': project.version,
+            'Minecraft-Version': minecraftVersion,
+            'Protocol-Version': protocolVersion.toString(),
+            'Built-By': 'EaglerCraft Build System',
+            'Built-JDK': System.getProperty('java.version'),
+            'Build-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        )
+    }
+}
+
+// ============================================================
+// Build Lifecycle
+// ============================================================
+tasks.named('build') {
+    dependsOn tasks.named('generateWeb')
+}

@@ -1,0 +1,680 @@
+     1→package net.lax1dude.eaglercraft.v2_6.internal;
+     2→
+     3→import org.teavm.jso.JSBody;
+     4→import org.teavm.jso.JSFunctor;
+     5→import org.teavm.jso.JSObject;
+     6→import org.teavm.jso.typedarrays.ArrayBuffer;
+     7→import org.teavm.jso.typedarrays.Float32Array;
+     8→import org.teavm.jso.typedarrays.Int16Array;
+     9→import org.teavm.jso.typedarrays.Uint8Array;
+    10→
+    11→import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
+    12→
+    13→/**
+    14→ * Platform audio implementation for EaglerCraft 26.1.2 on the TeaVM/browser platform.
+    15→ * Uses the Web Audio API for sound playback, with AudioWorklet for custom processing.
+    16→ *
+    17→ * <p>Key 26.1.2 improvements:</p>
+    18→ * <ul>
+    19→ *   <li>AudioContext with configurable sample rate</li>
+    20→ *   <li>AudioWorklet for custom audio processing pipelines</li>
+    21→ *   <li>DynamicsCompressorNode for loudness normalization</li>
+    22→ *   <li>Spatial audio via PannerNode for 3D positional sound</li>
+    23→ *   <li>Efficient buffer pooling to reduce GC pressure</li>
+    24→ *   <li>Music crossfade with GainNode ramping</li>
+    25→ *   <li>Vorbis decoding (via ogg-opus-decoder or WebCodecs)</li>
+    26→ *   <li>Master volume control with smooth ramping</li>
+    27→ *   <li>Channel splitting for separate music/SFX volume</li>
+    28→ * </ul>
+    29→ */
+    30→public class PlatformAudio {
+    31→
+    32→        /** The AudioContext instance. Null if audio is not available. */
+    33→        static JSObject audioContext = null;
+    34→
+    35→        /** The master gain node. */
+    36→        static JSObject masterGain = null;
+    37→
+    38→        /** The music gain node. */
+    39→        static JSObject musicGain = null;
+    40→
+    41→        /** The SFX gain node. */
+    42→        static JSObject sfxGain = null;
+    43→
+    44→        /** The compressor node for loudness normalization. */
+    45→        static JSObject compressorNode = null;
+    46→
+    47→        /** Master volume level (0.0 to 1.0). */
+    48→        static float masterVolume = 1.0f;
+    49→
+    50→        /** Music volume level (0.0 to 1.0). */
+    51→        static float musicVolume = 1.0f;
+    52→
+    53→        /** SFX volume level (0.0 to 1.0). */
+    54→        static float sfxVolume = 1.0f;
+    55→
+    56→        /** Whether audio has been initialized. */
+    57→        static boolean initialized = false;
+    58→
+    59→        /** Whether the AudioContext has been resumed (requires user gesture). */
+    60→        static boolean resumed = false;
+    61→
+    62→        /** Whether AudioWorklet is available. */
+    63→        static boolean audioWorkletAvailable = false;
+    64→
+    65→        /** Sample rate of the AudioContext. */
+    66→        static int sampleRate = 48000;
+    67→
+    68→        /** Buffer pool for reusing AudioBuffer objects. */
+    69→        private static final int BUFFER_POOL_SIZE = 64;
+    70→        private static final JSObject[] bufferPool = new JSObject[BUFFER_POOL_SIZE];
+    71→        private static int bufferPoolCount = 0;
+    72→
+    73→        /** Maximum number of simultaneous sound sources. */
+    74→        private static final int MAX_SOURCES = 256;
+    75→
+    76→        /** Active sound sources. */
+    77→        private static final JSObject[] activeSources = new JSObject[MAX_SOURCES];
+    78→        private static int activeSourceCount = 0;
+    79→
+    80→        /** Sound type constants. */
+    81→        public static final int SOUND_TYPE_SFX = 0;
+    82→        public static final int SOUND_TYPE_MUSIC = 1;
+    83→        public static final int SOUND_TYPE_VOICE = 2;
+    84→
+    85→        /**
+    86→         * Initializes the audio system. Called by ClientMain during startup.
+    87→         * AudioContext may not be usable until a user gesture resumes it.
+    88→         */
+    89→        public static void _init() {
+    90→                if (!ClientMain.audioSupported) {
+    91→                        ClientMain.warn("[PlatformAudio] Web Audio API not available");
+    92→                        return;
+    93→                }
+    94→
+    95→                // Create AudioContext with configured sample rate
+    96→                int configuredRate = 48000;
+    97→                if (ClientMain.config != null) {
+    98→                        configuredRate = ClientMain.config.getAudioSampleRate();
+    99→                }
+   100→
+   101→                audioContext = createAudioContext0(configuredRate);
+   102→                if (audioContext == null) {
+   103→                        ClientMain.warn("[PlatformAudio] Failed to create AudioContext");
+   104→                        return;
+   105→                }
+   106→
+   107→                // Check AudioWorklet availability
+   108→                audioWorkletAvailable = checkAudioWorklet0();
+   109→
+   110→                // Get actual sample rate
+   111→                sampleRate = getAudioContextSampleRate0();
+   112→
+   113→                // Create audio processing graph
+   114→                setupAudioGraph();
+   115→
+   116→                initialized = true;
+   117→                ClientMain.log("[PlatformAudio] Audio initialized (sampleRate=" + sampleRate
+   118→                                + ", worklet=" + audioWorkletAvailable + ")");
+   119→        }
+   120→
+   121→        /**
+   122→         * Sets up the audio processing graph:
+   123→         * masterGain <- musicGain <- compressor <- destination
+   124→         * masterGain <- sfxGain   <- compressor <- destination
+   125→         */
+   126→        private static void setupAudioGraph() {
+   127→                // Create compressor for loudness normalization
+   128→                compressorNode = createDynamicsCompressor0();
+   129→                if (compressorNode != null) {
+   130→                        setCompressorThreshold(compressorNode, -24);
+   131→                        setCompressorKnee(compressorNode, 30);
+   132→                        setCompressorRatio(compressorNode, 12);
+   133→                        setCompressorAttack(compressorNode, 0.003);
+   134→                        setCompressorRelease(compressorNode, 0.25);
+   135→                }
+   136→
+   137→                // Create gain nodes
+   138→                masterGain = createGainNode0();
+   139→                musicGain = createGainNode0();
+   140→                sfxGain = createGainNode0();
+   141→
+   142→                // Set initial volumes
+   143→                setGainValue(masterGain, masterVolume);
+   144→                setGainValue(musicGain, musicVolume);
+   145→                setGainValue(sfxGain, sfxVolume);
+   146→
+   147→                // Connect: musicGain -> masterGain -> compressor -> destination
+   148→                connectNodes(musicGain, masterGain);
+   149→                connectNodes(sfxGain, masterGain);
+   150→
+   151→                if (compressorNode != null) {
+   152→                        connectNodes(masterGain, compressorNode);
+   153→                        connectNodes(compressorNode, getDestination0());
+   154→                } else {
+   155→                        connectNodes(masterGain, getDestination0());
+   156→                }
+   157→        }
+   158→
+   159→        /**
+   160→         * Resumes the AudioContext. Must be called from a user gesture handler.
+   161→         */
+   162→        public static void resumeAudioContext() {
+   163→                if (audioContext != null && !resumed) {
+   164→                        resumeAudioContext0();
+   165→                        resumed = true;
+   166→                        ClientMain.log("[PlatformAudio] AudioContext resumed");
+   167→                }
+   168→        }
+   169→
+   170→        /**
+   171→         * Checks if the audio system is available and ready.
+   172→         */
+   173→        public static boolean isAvailable() {
+   174→                return initialized && audioContext != null;
+   175→        }
+   176→
+   177→        // ========== Volume Control ==========
+   178→
+   179→        /**
+   180→         * Sets the master volume with smooth ramping.
+   181→         */
+   182→        public static void setMasterVolume(float volume) {
+   183→                masterVolume = Math.max(0.0f, Math.min(1.0f, volume));
+   184→                if (masterGain != null) {
+   185→                        rampGainValue(masterGain, masterVolume, 0.05);
+   186→                }
+   187→        }
+   188→
+   189→        /**
+   190→         * Sets the music volume with smooth ramping.
+   191→         */
+   192→        public static void setMusicVolume(float volume) {
+   193→                musicVolume = Math.max(0.0f, Math.min(1.0f, volume));
+   194→                if (musicGain != null) {
+   195→                        rampGainValue(musicGain, musicVolume, 0.05);
+   196→                }
+   197→        }
+   198→
+   199→        /**
+   200→         * Sets the SFX volume with smooth ramping.
+   201→         */
+   202→        public static void setSFXVolume(float volume) {
+   203→                sfxVolume = Math.max(0.0f, Math.min(1.0f, volume));
+   204→                if (sfxGain != null) {
+   205→                        rampGainValue(sfxGain, sfxVolume, 0.05);
+   206→                }
+   207→        }
+   208→
+   209→        /**
+   210→         * Gets the master volume.
+   211→         */
+   212→        public static float getMasterVolume() {
+   213→                return masterVolume;
+   214→        }
+   215→
+   216→        /**
+   217→         * Gets the music volume.
+   218→         */
+   219→        public static float getMusicVolume() {
+   220→                return musicVolume;
+   221→        }
+   222→
+   223→        /**
+   224→         * Gets the SFX volume.
+   225→         */
+   226→        public static float getSFXVolume() {
+   227→                return sfxVolume;
+   228→        }
+   229→
+   230→        // ========== Audio Buffer Creation ==========
+   231→
+   232→        /**
+   233→         * Creates an AudioBuffer from PCM float data.
+   234→         *
+   235→         * @param pcm Float PCM data (mono or interleaved stereo)
+   236→         * @param channels Number of channels (1 or 2)
+   237→         * @param sampleRate Sample rate of the data
+   238→         * @return AudioBuffer JSObject, or null on failure
+   239→         */
+   240→        public static JSObject createAudioBuffer(float[] pcm, int channels, int sampleRate) {
+   241→                if (audioContext == null) return null;
+   242→
+   243→                int frames = pcm.length / channels;
+   244→                JSObject buffer = createAudioBuffer0(channels, frames, sampleRate);
+   245→                if (buffer == null) return null;
+   246→
+   247→                // Write channel data
+   248→                Float32Array channelData = createFloat32Array(frames);
+   249→                for (int ch = 0; ch < channels; ch++) {
+   250→                        for (int i = 0; i < frames; i++) {
+   251→                                channelData.set(i, pcm[i * channels + ch]);
+   252→                        }
+   253→                        writeAudioBufferChannel(buffer, ch, channelData);
+   254→                }
+   255→
+   256→                return buffer;
+   257→        }
+   258→
+   259→        /**
+   260→         * Creates an AudioBuffer from 16-bit PCM data.
+   261→         *
+   262→         * @param pcm 16-bit PCM data
+   263→         * @param channels Number of channels (1 or 2)
+   264→         * @param sampleRate Sample rate of the data
+   265→         * @return AudioBuffer JSObject, or null on failure
+   266→         */
+   267→        public static JSObject createAudioBuffer16(Int16Array pcm, int channels, int sampleRate) {
+   268→                if (audioContext == null) return null;
+   269→
+   270→                int frames = pcm.getLength() / channels;
+   271→                JSObject buffer = createAudioBuffer0(channels, frames, sampleRate);
+   272→                if (buffer == null) return null;
+   273→
+   274→                // Convert 16-bit to float and write
+   275→                for (int ch = 0; ch < channels; ch++) {
+   276→                        Float32Array channelData = createFloat32Array(frames);
+   277→                        for (int i = 0; i < frames; i++) {
+   278→                                short sample = (short) pcm.get(i * channels + ch);
+   279→                                channelData.set(i, sample / 32768.0f);
+   280→                        }
+   281→                        writeAudioBufferChannel(buffer, ch, channelData);
+   282→                }
+   283→
+   284→                return buffer;
+   285→        }
+   286→
+   287→        /**
+   288→         * Decodes Vorbis audio data from an ArrayBuffer.
+   289→         * Uses the browser's built-in decoder or a JavaScript Vorbis decoder.
+   290→         *
+   291→         * @param data The audio data as ArrayBuffer
+   292→         * @param callback Called with the decoded AudioBuffer
+   293→         */
+   294→        public static void decodeVorbis(ArrayBuffer data, AudioBufferCallback callback) {
+   295→                if (audioContext == null) {
+   296→                        callback.call(null);
+   297→                        return;
+   298→                }
+   299→                decodeAudioData0(data, callback);
+   300→        }
+   301→
+   302→        // ========== Sound Playback ==========
+   303→
+   304→        /**
+   305→         * Plays a sound buffer.
+   306→         *
+   307→         * @param buffer The AudioBuffer to play
+   308→         * @param pitch Playback pitch (1.0 = normal)
+   309→         * @param volume Volume (0.0 to 1.0)
+   310→         * @param type Sound type (SFX, MUSIC, or VOICE)
+   311→         * @return Source node JSObject, or null on failure
+   312→         */
+   313→        public static JSObject playSound(JSObject buffer, float pitch, float volume, int type) {
+   314→                if (audioContext == null || buffer == null) return null;
+   315→
+   316→                JSObject source = createBufferSource0();
+   317→                if (source == null) return null;
+   318→
+   319→                setSourceBuffer(source, buffer);
+   320→                setSourcePlaybackRate(source, pitch);
+   321→                setSourceLoop(source, false);
+   322→
+   323→                // Create per-source gain for volume control
+   324→                JSObject gain = createGainNode0();
+   325→                setGainValue(gain, volume);
+   326→
+   327→                // Connect: source -> gain -> type-specific gain
+   328→                connectNodes(source, gain);
+   329→
+   330→                switch (type) {
+   331→                        case SOUND_TYPE_MUSIC:
+   332→                                connectNodes(gain, musicGain);
+   333→                                break;
+   334→                        case SOUND_TYPE_VOICE:
+   335→                                connectNodes(gain, sfxGain); // Voice uses SFX channel
+   336→                                break;
+   337→                        case SOUND_TYPE_SFX:
+   338→                        default:
+   339→                                connectNodes(gain, sfxGain);
+   340→                                break;
+   341→                }
+   342→
+   343→                // Start playback
+   344→                startSource0(source, 0);
+   345→
+   346→                // Track the source for cleanup
+   347→                trackSource(source, gain);
+   348→
+   349→                return source;
+   350→        }
+   351→
+   352→        /**
+   353→         * Plays a looping sound (for music).
+   354→         *
+   355→         * @param buffer The AudioBuffer to play
+   356→         * @param volume Volume (0.0 to 1.0)
+   357→         * @param fadeIn Fade-in time in seconds
+   358→         * @return Source node JSObject, or null on failure
+   359→         */
+   360→        public static JSObject playMusic(JSObject buffer, float volume, float fadeIn) {
+   361→                if (audioContext == null || buffer == null) return null;
+   362→
+   363→                JSObject source = createBufferSource0();
+   364→                if (source == null) return null;
+   365→
+   366→                setSourceBuffer(source, buffer);
+   367→                setSourceLoop(source, true);
+   368→                setSourcePlaybackRate(source, 1.0f);
+   369→
+   370→                // Create gain for crossfade
+   371→                JSObject gain = createGainNode0();
+   372→                if (fadeIn > 0) {
+   373→                        setGainValue(gain, 0.0f);
+   374→                        rampGainValue(gain, volume, fadeIn);
+   375→                } else {
+   376→                        setGainValue(gain, volume);
+   377→                }
+   378→
+   379→                connectNodes(source, gain);
+   380→                connectNodes(gain, musicGain);
+   381→
+   382→                startSource0(source, 0);
+   383→                trackSource(source, gain);
+   384→
+   385→                return source;
+   386→        }
+   387→
+   388→        /**
+   389→         * Stops a playing sound with optional fade-out.
+   390→         *
+   391→         * @param source The source node to stop
+   392→         * @param fadeOut Fade-out time in seconds (0 for immediate)
+   393→         */
+   394→        public static void stopSound(JSObject source, float fadeOut) {
+   395→                if (source == null) return;
+   396→
+   397→                if (fadeOut > 0) {
+   398→                        // Schedule stop after fade
+   399→                        scheduleSourceStop(source, getCurrentAudioTime0() + fadeOut);
+   400→                } else {
+   401→                        stopSource0(source);
+   402→                }
+   403→        }
+   404→
+   405→        /**
+   406→         * Plays a 3D positional sound.
+   407→         *
+   408→         * @param buffer The AudioBuffer to play
+   409→         * @param x X position
+   410→         * @param y Y position
+   411→         * @param z Z position
+   412→         * @param pitch Playback pitch
+   413→         * @param volume Volume
+   414→         * @return Source node JSObject, or null on failure
+   415→         */
+   416→        public static JSObject playPositionedSound(JSObject buffer, float x, float y, float z,
+   417→                                                                                                float pitch, float volume) {
+   418→                if (audioContext == null || buffer == null) return null;
+   419→
+   420→                JSObject source = createBufferSource0();
+   421→                if (source == null) return null;
+   422→
+   423→                setSourceBuffer(source, buffer);
+   424→                setSourcePlaybackRate(source, pitch);
+   425→                setSourceLoop(source, false);
+   426→
+   427→                // Create panner for 3D positioning
+   428→                JSObject panner = createPanner0();
+   429→                if (panner != null) {
+   430→                        setPannerPosition(panner, x, y, z);
+   431→                        setPannerDistanceModel(panner, "inverse");
+   432→                        setPannerRefDistance(panner, 1.0f);
+   433→                        setPannerMaxDistance(panner, 64.0f);
+   434→                        setPannerRolloffFactor(panner, 1.0f);
+   435→
+   436→                        // Create gain for volume
+   437→                        JSObject gain = createGainNode0();
+   438→                        setGainValue(gain, volume);
+   439→
+   440→                        connectNodes(source, panner);
+   441→                        connectNodes(panner, gain);
+   442→                        connectNodes(gain, sfxGain);
+   443→                } else {
+   444→                        // Fallback without panner
+   445→                        JSObject gain = createGainNode0();
+   446→                        setGainValue(gain, volume);
+   447→                        connectNodes(source, gain);
+   448→                        connectNodes(gain, sfxGain);
+   449→                }
+   450→
+   451→                startSource0(source, 0);
+   452→                trackSource(source, null);
+   453→
+   454→                return source;
+   455→        }
+   456→
+   457→        /**
+   458→         * Updates the listener position for 3D audio.
+   459→         */
+   460→        public static void updateListener(float x, float y, float z,
+   461→                                                                           float forwardX, float forwardY, float forwardZ,
+   462→                                                                           float upX, float upY, float upZ) {
+   463→                if (audioContext == null) return;
+   464→                setListenerPosition0(x, y, z, forwardX, forwardY, forwardZ, upX, upY, upZ);
+   465→        }
+   466→
+   467→        // ========== Buffer Pool ==========
+   468→
+   469→        /**
+   470→         * Returns an AudioBuffer to the pool for reuse.
+   471→         */
+   472→        public static void returnBufferToPool(JSObject buffer) {
+   473→                if (buffer != null && bufferPoolCount < BUFFER_POOL_SIZE) {
+   474→                        bufferPool[bufferPoolCount++] = buffer;
+   475→                }
+   476→        }
+   477→
+   478→        /**
+   479→         * Gets a buffer from the pool, or null if empty.
+   480→         */
+   481→        public static JSObject getBufferFromPool() {
+   482→                if (bufferPoolCount > 0) {
+   483→                        return bufferPool[--bufferPoolCount];
+   484→                }
+   485→                return null;
+   486→        }
+   487→
+   488→        // ========== Source Tracking ==========
+   489→
+   490→        private static void trackSource(JSObject source, JSObject gainNode) {
+   491→                if (activeSourceCount < MAX_SOURCES) {
+   492→                        activeSources[activeSourceCount++] = source;
+   493→                }
+   494→
+   495→                // Set up onended callback for cleanup
+   496→                setSourceOnEnded(source, () -> {
+   497→                        for (int i = 0; i < activeSourceCount; i++) {
+   498→                                if (activeSources[i] == source) {
+   499→                                        activeSources[i] = activeSources[--activeSourceCount];
+   500→                                        activeSources[activeSourceCount] = null;
+   501→                                        break;
+   502→                                }
+   503→                        }
+   504→                });
+   505→        }
+   506→
+   507→        /**
+   508→         * Stops all currently playing sounds.
+   509→         */
+   510→        public static void stopAllSounds() {
+   511→                for (int i = 0; i < activeSourceCount; i++) {
+   512→                        if (activeSources[i] != null) {
+   513→                                stopSource0(activeSources[i]);
+   514→                                activeSources[i] = null;
+   515→                        }
+   516→                }
+   517→                activeSourceCount = 0;
+   518→        }
+   519→
+   520→        // ========== AudioWorklet ==========
+   521→
+   522→        /**
+   523→         * Adds an AudioWorklet module for custom audio processing.
+   524→         *
+   525→         * @param url The URL of the AudioWorklet processor script
+   526→         * @return true if the module was added successfully
+   527→         */
+   528→        public static boolean addAudioWorkletModule(String url) {
+   529→                if (!audioWorkletAvailable || audioContext == null) return false;
+   530→                addAudioWorkletModule0(url);
+   531→                return true;
+   532→        }
+   533→
+   534→        // ========== Callback Interfaces ==========
+   535→
+   536→        @JSFunctor
+   537→        public interface AudioBufferCallback extends JSObject {
+   538→                void call(JSObject buffer);
+   539→        }
+   540→
+   541→        @JSFunctor
+   542→        public interface SourceEndCallback extends JSObject {
+   543→                void call();
+   544→        }
+   545→
+   546→        // ========== Native JS Methods ==========
+   547→
+   548→        @JSBody(params = { "sampleRate" }, script = ""
+   549→                        + "try {"
+   550→                        + "  return new (window.AudioContext || window.webkitAudioContext)({ sampleRate: sampleRate });"
+   551→                        + "} catch(e) { return null; }")
+   552→        private static native JSObject createAudioContext0(int sampleRate);
+   553→
+   554→        @JSBody(params = {}, script = ""
+   555→                        + "return !!(window.AudioContext && AudioContext.prototype.audioWorklet);")
+   556→        private static native boolean checkAudioWorklet0();
+   557→
+   558→        @JSBody(params = {}, script = "return ctx.sampleRate;", alias = "ctx")
+   559→        private static native int getAudioContextSampleRate0();
+   560→
+   561→        @JSBody(params = {}, script = "return ctx.destination;", alias = "ctx")
+   562→        private static native JSObject getDestination0();
+   563→
+   564→        @JSBody(params = {}, script = "return ctx.createDynamicsCompressor();", alias = "ctx")
+   565→        private static native JSObject createDynamicsCompressor0();
+   566→
+   567→        @JSBody(params = {}, script = "return ctx.createGain();", alias = "ctx")
+   568→        private static native JSObject createGainNode0();
+   569→
+   570→        @JSBody(params = { "channels", "frames", "sr" }, script = "return ctx.createBuffer(channels, frames, sr);", alias = "ctx")
+   571→        private static native JSObject createAudioBuffer0(int channels, int frames, int sr);
+   572→
+   573→        @JSBody(params = {}, script = "return ctx.createBufferSource();", alias = "ctx")
+   574→        private static native JSObject createBufferSource0();
+   575→
+   576→        @JSBody(params = {}, script = "return ctx.createPanner();", alias = "ctx")
+   577→        private static native JSObject createPanner0();
+   578→
+   579→        @JSBody(params = {}, script = "ctx.resume();", alias = "ctx")
+   580→        private static native void resumeAudioContext0();
+   581→
+   582→        @JSBody(params = {}, script = "return ctx.currentTime;", alias = "ctx")
+   583→        private static native double getCurrentAudioTime0();
+   584→
+   585→        @JSBody(params = { "size" }, script = "return new Float32Array(size);")
+   586→        private static native Float32Array createFloat32Array(int size);
+   587→
+   588→        @JSBody(params = { "buffer", "channel", "data" }, script = "buffer.copyToChannel(data, channel);")
+   589→        private static native void writeAudioBufferChannel(JSObject buffer, int channel, Float32Array data);
+   590→
+   591→        @JSBody(params = { "data", "callback" }, script = ""
+   592→                        + "ctx.decodeAudioData(data, function(buffer) { callback.call(buffer); },"
+   593→                        + "  function(err) { console.warn('Audio decode failed:', err); callback.call(null); }"
+   594→                        + ");", alias = "ctx")
+   595→        private static native void decodeAudioData0(ArrayBuffer data, AudioBufferCallback callback);
+   596→
+   597→        @JSBody(params = { "source", "buffer" }, script = "source.buffer = buffer;")
+   598→        private static native void setSourceBuffer(JSObject source, JSObject buffer);
+   599→
+   600→        @JSBody(params = { "source", "rate" }, script = "source.playbackRate.value = rate;")
+   601→        private static native void setSourcePlaybackRate(JSObject source, float rate);
+   602→
+   603→        @JSBody(params = { "source", "loop" }, script = "source.loop = loop;")
+   604→        private static native void setSourceLoop(JSObject source, boolean loop);
+   605→
+   606→        @JSBody(params = { "source", "when" }, script = "source.start(when);")
+   607→        private static native void startSource0(JSObject source, double when);
+   608→
+   609→        @JSBody(params = { "source" }, script = "try { source.stop(); } catch(e) {}")
+   610→        private static native void stopSource0(JSObject source);
+   611→
+   612→        @JSBody(params = { "source", "when" }, script = "try { source.stop(when); } catch(e) {}")
+   613→        private static native void scheduleSourceStop(JSObject source, double when);
+   614→
+   615→        @JSBody(params = { "source", "callback" }, script = "source.onended = function() { callback.call(); };")
+   616→        private static native void setSourceOnEnded(JSObject source, SourceEndCallback callback);
+   617→
+   618→        @JSBody(params = { "node", "value" }, script = "node.gain.value = value;")
+   619→        private static native void setGainValue(JSObject node, float value);
+   620→
+   621→        @JSBody(params = { "node", "value", "time" }, script = "node.gain.linearRampToValueAtTime(value, ctx.currentTime + time);", alias = "ctx")
+   622→        private static native void rampGainValue(JSObject node, float value, float time);
+   623→
+   624→        @JSBody(params = { "from", "to" }, script = "from.connect(to);")
+   625→        private static native void connectNodes(JSObject from, JSObject to);
+   626→
+   627→        @JSBody(params = { "node", "threshold" }, script = "node.threshold.value = threshold;")
+   628→        private static native void setCompressorThreshold(JSObject node, int threshold);
+   629→
+   630→        @JSBody(params = { "node", "knee" }, script = "node.knee.value = knee;")
+   631→        private static native void setCompressorKnee(JSObject node, int knee);
+   632→
+   633→        @JSBody(params = { "node", "ratio" }, script = "node.ratio.value = ratio;")
+   634→        private static native void setCompressorRatio(JSObject node, int ratio);
+   635→
+   636→        @JSBody(params = { "node", "attack" }, script = "node.attack.value = attack;")
+   637→        private static native void setCompressorAttack(JSObject node, double attack);
+   638→
+   639→        @JSBody(params = { "node", "release" }, script = "node.release.value = release;")
+   640→        private static native void setCompressorRelease(JSObject node, double release);
+   641→
+   642→        @JSBody(params = { "panner", "x", "y", "z" }, script = ""
+   643→                        + "panner.positionX.value = x; panner.positionY.value = y; panner.positionZ.value = z;")
+   644→        private static native void setPannerPosition(JSObject panner, float x, float y, float z);
+   645→
+   646→        @JSBody(params = { "panner", "model" }, script = "panner.distanceModel = model;")
+   647→        private static native void setPannerDistanceModel(JSObject panner, String model);
+   648→
+   649→        @JSBody(params = { "panner", "dist" }, script = "panner.refDistance = dist;")
+   650→        private static native void setPannerRefDistance(JSObject panner, float dist);
+   651→
+   652→        @JSBody(params = { "panner", "dist" }, script = "panner.maxDistance = dist;")
+   653→        private static native void setPannerMaxDistance(JSObject panner, float dist);
+   654→
+   655→        @JSBody(params = { "panner", "factor" }, script = "panner.rolloffFactor = factor;")
+   656→        private static native void setPannerRolloffFactor(JSObject panner, float factor);
+   657→
+   658→        @JSBody(params = { "x", "y", "z", "fx", "fy", "fz", "ux", "uy", "uz" }, script = ""
+   659→                        + "var l = ctx.listener;"
+   660→                        + "if (l.positionX) { l.positionX.value = x; l.positionY.value = y; l.positionZ.value = z; }"
+   661→                        + "  else { l.setPosition(x, y, z); }"
+   662→                        + "if (l.forwardX) { l.forwardX.value = fx; l.forwardY.value = fy; l.forwardZ.value = fz;"
+   663→                        + "  l.upX.value = ux; l.upY.value = uy; l.upZ.value = uz; }"
+   664→                        + "  else { l.setOrientation(fx, fy, fz, ux, uy, uz); }", alias = "ctx")
+   665→        private static native void setListenerPosition0(float x, float y, float z,
+   666→                                                                                                         float fx, float fy, float fz,
+   667→                                                                                                         float ux, float uy, float uz);
+   668→
+   669→        @JSBody(params = { "url" }, script = "ctx.audioWorklet.addModule(url);", alias = "ctx")
+   670→        private static native void addAudioWorkletModule0(String url);
+   671→
+   672→        /**
+   673→         * Gets the current audio time in seconds.
+   674→         */
+   675→        public static double getCurrentAudioTime() {
+   676→                if (audioContext == null) return 0;
+   677→                return getCurrentAudioTime0();
+   678→        }
+   679→}
+   680→

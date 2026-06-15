@@ -1,0 +1,650 @@
+     1→package net.lax1dude.eaglercraft.v1_8.internal;
+     2→
+     3→import java.io.IOException;
+     4→import java.io.InputStream;
+     5→import java.io.OutputStream;
+     6→import java.text.SimpleDateFormat;
+     7→import java.util.Date;
+     8→import java.util.function.Consumer;
+     9→
+    10→import net.lax1dude.eaglercraft.v1_8.Base64;
+    11→import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+    12→import net.lax1dude.eaglercraft.v1_8.EaglercraftVersion;
+    13→import net.lax1dude.eaglercraft.v1_8.profile.EaglerProfile;
+    14→import org.teavm.interop.Async;
+    15→import org.teavm.interop.AsyncCallback;
+    16→import org.teavm.jso.JSBody;
+    17→import org.teavm.jso.JSExceptions;
+    18→import org.teavm.jso.JSFunctor;
+    19→import org.teavm.jso.JSObject;
+    20→import org.teavm.jso.ajax.XMLHttpRequest;
+    21→import org.teavm.jso.browser.Window;
+    22→import org.teavm.jso.canvas.CanvasRenderingContext2D;
+    23→import org.teavm.jso.core.JSError;
+    24→import org.teavm.jso.dom.css.CSSStyleDeclaration;
+    25→import org.teavm.jso.dom.events.Event;
+    26→import org.teavm.jso.dom.events.EventListener;
+    27→import org.teavm.jso.dom.html.HTMLAnchorElement;
+    28→import org.teavm.jso.dom.html.HTMLCanvasElement;
+    29→import org.teavm.jso.dom.html.HTMLDocument;
+    30→import org.teavm.jso.dom.html.HTMLElement;
+    31→import org.teavm.jso.typedarrays.ArrayBuffer;
+    32→import org.teavm.jso.webaudio.MediaStream;
+    33→import org.teavm.jso.webgl.WebGLFramebuffer;
+    34→
+    35→import com.jcraft.jzlib.DeflaterOutputStream;
+    36→import com.jcraft.jzlib.GZIPInputStream;
+    37→import com.jcraft.jzlib.GZIPOutputStream;
+    38→import com.jcraft.jzlib.InflaterInputStream;
+    39→
+    40→import net.lax1dude.eaglercraft.v1_8.internal.PlatformFilesystem.FilesystemDatabaseLockedException;
+    41→import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
+    42→import net.lax1dude.eaglercraft.v1_8.internal.buffer.EaglerArrayBufferAllocator;
+    43→import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
+    44→import net.lax1dude.eaglercraft.v1_8.internal.buffer.IntBuffer;
+    45→import net.lax1dude.eaglercraft.v1_8.internal.teavm.EPKLoader;
+    46→import net.lax1dude.eaglercraft.v1_8.internal.teavm.EarlyLoadScreen;
+    47→import net.lax1dude.eaglercraft.v1_8.internal.teavm.FixWebMDurationJS;
+    48→import net.lax1dude.eaglercraft.v1_8.internal.teavm.ClientMain;
+    49→import net.lax1dude.eaglercraft.v1_8.internal.teavm.ClientMain.EPKFileEntry;
+    50→import net.lax1dude.eaglercraft.v1_8.internal.teavm.DebugConsoleWindow;
+    51→import net.lax1dude.eaglercraft.v1_8.internal.teavm.TeaVMClientConfigAdapter;
+    52→import net.lax1dude.eaglercraft.v1_8.internal.teavm.TeaVMUtils;
+    53→import net.lax1dude.eaglercraft.v1_8.internal.teavm.WebGL2RenderingContext;
+    54→import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+    55→import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+    56→import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerFolderResourcePack;
+    57→import net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums;
+    58→
+    59→/**
+    60→ * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+    61→ * 
+    62→ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    63→ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    64→ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+    65→ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    66→ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    67→ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    68→ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    69→ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    70→ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    71→ * POSSIBILITY OF SUCH DAMAGE.
+    72→ * 
+    73→ */
+    74→public class PlatformRuntime {
+    75→        
+    76→        static final Logger logger = LogManager.getLogger("BrowserRuntime");
+    77→
+    78→        public static Window win = null;
+    79→        public static HTMLDocument doc = null;
+    80→        public static HTMLElement parent = null;
+    81→        public static HTMLCanvasElement canvas = null;
+    82→        public static WebGL2RenderingContext webgl = null;
+    83→        
+    84→        static WebGLFramebuffer mainFramebuffer = null;
+    85→
+    86→        public static void create() {
+    87→                win = Window.current();
+    88→                doc = win.getDocument();
+    89→                DebugConsoleWindow.initialize(win);
+    90→                
+    91→                logger.info("Creating main game canvas");
+    92→                
+    93→                parent = doc.getElementById(ClientMain.configRootElementId);
+    94→                if(parent == null) {
+    95→                        throw new RuntimeInitializationFailureException("Root element \"" + ClientMain.configRootElementId + "\" was not found in this document!");
+    96→                }
+    97→
+    98→                CSSStyleDeclaration style = parent.getStyle();
+    99→                style.setProperty("overflowX", "hidden");
+   100→                style.setProperty("overflowY", "hidden");
+   101→                
+   102→                canvas = (HTMLCanvasElement) doc.createElement("canvas");
+   103→                
+   104→                style = canvas.getStyle();
+   105→                style.setProperty("width", "100%");
+   106→                style.setProperty("height", "100%");
+   107→                style.setProperty("image-rendering", "pixelated");
+   108→                
+   109→                double r = win.getDevicePixelRatio();
+   110→                int iw = parent.getClientWidth();
+   111→                int ih = parent.getClientHeight();
+   112→                int sw = (int)(r * iw);
+   113→                int sh = (int)(r * ih);
+   114→
+   115→                canvas.setWidth(sw);
+   116→                canvas.setHeight(sh);
+   117→                
+   118→                parent.appendChild(canvas);
+   119→                
+   120→                try {
+   121→                        PlatformInput.initHooks(win, canvas);
+   122→                }catch(Throwable t) {
+   123→                        throw new RuntimeInitializationFailureException("Exception while registering window event handlers", t);
+   124→                }
+   125→                
+   126→                try {
+   127→                        doc.exitPointerLock();
+   128→                }catch(Throwable t) {
+   129→                        throw new PlatformIncompatibleException("Mouse cursor lock is not available on this device!");
+   130→                }
+   131→
+   132→                logger.info("Creating WebGL context");
+   133→                
+   134→                JSObject webgl_ = canvas.getContext("webgl2", youEagler());
+   135→                if(webgl_ == null) {
+   136→                        throw new PlatformIncompatibleException("WebGL 2.0 is not supported on this device!");
+   137→                }
+   138→                
+   139→                webgl = (WebGL2RenderingContext) webgl_;
+   140→                PlatformOpenGL.setCurrentContext(webgl);
+   141→                
+   142→                mainFramebuffer = webgl.createFramebuffer();
+   143→                PlatformInput.initFramebuffer(webgl, mainFramebuffer, sw, sh);
+   144→                
+   145→                EarlyLoadScreen.paintScreen();
+   146→                
+   147→                EPKFileEntry[] epkFiles = ClientMain.configEPKFiles;
+   148→                
+   149→                for(int i = 0; i < epkFiles.length; ++i) {
+   150→                        String url = epkFiles[i].url;
+   151→                        String logURL = url.startsWith("data:") ? "<data: " + url.length() + " chars>" : url;
+   152→                        
+   153→                        logger.info("Downloading: {}", logURL);
+   154→                        
+   155→                        ArrayBuffer epkFileData = downloadRemoteURI(url);
+   156→                        
+   157→                        if(epkFileData == null) {
+   158→                                throw new RuntimeInitializationFailureException("Could not download EPK file \"" + url + "\"");
+   159→                        }
+   160→                        
+   161→                        logger.info("Decompressing: {}", logURL);
+   162→                        
+   163→                        try {
+   164→                                EPKLoader.loadEPK(epkFileData, epkFiles[i].path, PlatformAssets.assets);
+   165→                        }catch(Throwable t) {
+   166→                                throw new RuntimeInitializationFailureException("Could not extract EPK file \"" + url + "\"", t);
+   167→                        }
+   168→                }
+   169→
+   170→                logger.info("Loaded {} resources from EPKs", PlatformAssets.assets.size());
+   171→
+   172→                byte[] finalLoadScreen = PlatformAssets.getResourceBytes("/assets/eagler/eagtek.png");
+   173→
+   174→                logger.info("Initializing filesystem...");
+   175→
+   176→                try {
+   177→                        PlatformFilesystem.initialize(getClientConfigAdapter().getResourcePacksDB());
+   178→                        EaglerFolderResourcePack.setSupported(true);
+   179→                }catch(FilesystemDatabaseLockedException t) {
+   180→                        logger.error("Could not initialize filesystem, database is locked!");
+   181→                }catch(Throwable t) {
+   182→                        logger.error("Could not initialize filesystem, encountered an exception!");
+   183→                        logger.error(t);
+   184→                }
+   185→
+   186→                if(!EaglerFolderResourcePack.isSupported()) {
+   187→                        logger.error("Resource packs will be disabled for this session");
+   188→                }
+   189→
+   190→                logger.info("Initializing sound engine...");
+   191→
+   192→                PlatformInput.pressAnyKeyScreen();
+   193→
+   194→                PlatformAudio.initialize();
+   195→
+   196→                if(finalLoadScreen != null) {
+   197→                        EarlyLoadScreen.paintFinal(finalLoadScreen);
+   198→                }
+   199→
+   200→                EarlyLoadScreen.destroy();
+   201→
+   202→                logger.info("Platform initialization complete");
+   203→
+   204→                FixWebMDurationJS.checkOldScriptStillLoaded();
+   205→        }
+   206→        
+   207→        @JSBody(params = { }, script = "return {antialias: false, depth: false, powerPreference: \"high-performance\", desynchronized: true, preserveDrawingBuffer: false, premultipliedAlpha: false, alpha: false};")
+   208→        public static native JSObject youEagler();
+   209→        
+   210→        public static class RuntimeInitializationFailureException extends IllegalStateException {
+   211→
+   212→                public RuntimeInitializationFailureException(String message, Throwable cause) {
+   213→                        super(message, cause);
+   214→                }
+   215→
+   216→                public RuntimeInitializationFailureException(String s) {
+   217→                        super(s);
+   218→                }
+   219→                
+   220→        }
+   221→        
+   222→        public static class PlatformIncompatibleException extends IllegalStateException {
+   223→
+   224→                public PlatformIncompatibleException(String s) {
+   225→                        super(s);
+   226→                }
+   227→                
+   228→        }
+   229→
+   230→        public static void destroy() {
+   231→                logger.fatal("Game tried to destroy the context! Browser runtime can't do that");
+   232→        }
+   233→
+   234→        public static EnumPlatformType getPlatformType() {
+   235→                return EnumPlatformType.JAVASCRIPT;
+   236→        }
+   237→
+   238→        public static EnumPlatformAgent getPlatformAgent() {
+   239→                return EnumPlatformAgent.getFromUA(getUserAgentString());
+   240→        }
+   241→
+   242→        @JSBody(params = { }, script = "return window.navigator.userAgent;")
+   243→        public static native String getUserAgentString();
+   244→
+   245→        public static EnumPlatformOS getPlatformOS() {
+   246→                return EnumPlatformOS.getFromUA(getUserAgentString());
+   247→        }
+   248→
+   249→        public static void requestANGLE(EnumPlatformANGLE plaf) {
+   250→        }
+   251→
+   252→        public static EnumPlatformANGLE getPlatformANGLE() {
+   253→                return EnumPlatformANGLE.fromGLRendererString(getGLRenderer());
+   254→        }
+   255→
+   256→        public static String getGLVersion() {
+   257→                return PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_VERSION);
+   258→        }
+   259→
+   260→        public static String getGLRenderer() {
+   261→                return PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_RENDERER);
+   262→        }
+   263→
+   264→        public static ByteBuffer allocateByteBuffer(int length) {
+   265→                return EaglerArrayBufferAllocator.allocateByteBuffer(length);
+   266→        }
+   267→
+   268→        public static IntBuffer allocateIntBuffer(int length) {
+   269→                return EaglerArrayBufferAllocator.allocateIntBuffer(length);
+   270→        }
+   271→
+   272→        public static FloatBuffer allocateFloatBuffer(int length) {
+   273→                return EaglerArrayBufferAllocator.allocateFloatBuffer(length);
+   274→        }
+   275→
+   276→        public static ByteBuffer castPrimitiveByteArray(byte[] array) {
+   277→                return EaglerArrayBufferAllocator.wrapByteBufferTeaVM(TeaVMUtils.unwrapByteArray(array));
+   278→        }
+   279→
+   280→        public static IntBuffer castPrimitiveIntArray(int[] array) {
+   281→                return EaglerArrayBufferAllocator.wrapIntBufferTeaVM(TeaVMUtils.unwrapIntArray(array));
+   282→        }
+   283→
+   284→        public static FloatBuffer castPrimitiveFloatArray(float[] array) {
+   285→                return EaglerArrayBufferAllocator.wrapFloatBufferTeaVM(TeaVMUtils.unwrapFloatArray(array));
+   286→        }
+   287→
+   288→        public static byte[] castNativeByteBuffer(ByteBuffer buffer) {
+   289→                return TeaVMUtils.wrapUnsignedByteArray(EaglerArrayBufferAllocator.getDataView8Unsigned(buffer));
+   290→        }
+   291→
+   292→        public static int[] castNativeIntBuffer(IntBuffer buffer) {
+   293→                return TeaVMUtils.wrapIntArray(EaglerArrayBufferAllocator.getDataView32(buffer));
+   294→        }
+   295→
+   296→        public static float[] castNativeFloatBuffer(FloatBuffer buffer) {
+   297→                return TeaVMUtils.wrapFloatArray(EaglerArrayBufferAllocator.getDataView32F(buffer));
+   298→        }
+   299→
+   300→        public static void freeByteBuffer(ByteBuffer byteBuffer) {
+   301→                
+   302→        }
+   303→        
+   304→        public static void freeIntBuffer(IntBuffer intBuffer) {
+   305→                
+   306→        }
+   307→        
+   308→        public static void freeFloatBuffer(FloatBuffer floatBuffer) {
+   309→                
+   310→        }
+   311→
+   312→        public static void downloadRemoteURIByteArray(String assetPackageURI, final Consumer<byte[]> cb) {
+   313→                downloadRemoteURI(assetPackageURI, arr -> cb.accept(TeaVMUtils.wrapByteArrayBuffer(arr)));
+   314→        }
+   315→
+   316→        public static void downloadRemoteURI(String assetPackageURI, final Consumer<ArrayBuffer> cb) {
+   317→                downloadRemoteURI(assetPackageURI, false, cb);
+   318→        }
+   319→
+   320→        public static void downloadRemoteURI(String assetPackageURI, boolean useCache, final Consumer<ArrayBuffer> cb) {
+   321→                downloadRemoteURI(assetPackageURI, useCache, new AsyncCallback<ArrayBuffer>() {
+   322→                        @Override
+   323→                        public void complete(ArrayBuffer result) {
+   324→                                cb.accept(result);
+   325→                        }
+   326→
+   327→                        @Override
+   328→                        public void error(Throwable e) {
+   329→                                EagRuntime.debugPrintStackTrace(e);
+   330→                                cb.accept(null);
+   331→                        }
+   332→                });
+   333→        }
+   334→        
+   335→        @Async
+   336→        public static native ArrayBuffer downloadRemoteURIOld(String assetPackageURI);
+   337→
+   338→        private static void downloadRemoteURIOld(String assetPackageURI, final AsyncCallback<ArrayBuffer> cb) {
+   339→                final XMLHttpRequest request = XMLHttpRequest.create();
+   340→                request.setResponseType("arraybuffer");
+   341→                request.open("GET", assetPackageURI, true);
+   342→                
+   343→                TeaVMUtils.addEventListener(request, "load", new EventListener<Event>() {
+   344→                        @Override
+   345→                        public void handleEvent(Event evt) {
+   346→                                int stat = request.getStatus();
+   347→                                if(stat == 0 || (stat >= 200 && stat < 400)) {
+   348→                                        cb.complete((ArrayBuffer)request.getResponse());
+   349→                                }else {
+   350→                                        cb.complete(null);
+   351→                                }
+   352→                        }
+   353→                });
+   354→                
+   355→                TeaVMUtils.addEventListener(request, "error", new EventListener<Event>() {
+   356→                        @Override
+   357→                        public void handleEvent(Event evt) {
+   358→                                cb.complete(null);
+   359→                        }
+   360→                });
+   361→                
+   362→                request.send();
+   363→        }
+   364→        
+   365→        @JSFunctor
+   366→        private static interface FetchHandler extends JSObject {
+   367→                void onFetch(ArrayBuffer data);
+   368→        }
+   369→        
+   370→        @JSBody(params = { "uri", "forceCache", "callback" }, script = "fetch(uri, { cache: forceCache, mode: \"cors\" })"
+   371→                        + ".then(function(res) { return res.arrayBuffer(); }).then(function(arr) { callback(arr); })"
+   372→                        + ".catch(function(err) { console.error(err); callback(null); });")
+   373→        private static native void doFetchDownload(String uri, String forceCache, FetchHandler callback);
+   374→
+   375→        public static ArrayBuffer downloadRemoteURI(String assetPackageURI) {
+   376→                return downloadRemoteURI(assetPackageURI, true);
+   377→        }
+   378→
+   379→        @Async
+   380→        public static native ArrayBuffer downloadRemoteURI(final String assetPackageURI, final boolean forceCache);
+   381→
+   382→        private static void downloadRemoteURI(final String assetPackageURI, final boolean useCache, final AsyncCallback<ArrayBuffer> cb) {
+   383→                doFetchDownload(assetPackageURI, useCache ? "force-cache" : "no-store",
+   384→                                assetPackageURI.startsWith("data:application/octet-stream;base64,") ? (data) -> {
+   385→                                        if(data != null) {
+   386→                                                cb.complete(data);
+   387→                                        }else {
+   388→                                                logger.error("Caught an error decoding base64 via fetch, doing it the slow way instead...");
+   389→                                                byte[] b = null;
+   390→                                                try {
+   391→                                                        b = Base64.decodeBase64(assetPackageURI.substring(37));
+   392→                                                }catch(Throwable t) {
+   393→                                                        logger.error("Failed to manually decode base64!", t);
+   394→                                                        cb.complete(null);
+   395→                                                        return;
+   396→                                                }
+   397→                                                cb.complete(TeaVMUtils.unwrapArrayBuffer(b));
+   398→                                        }
+   399→                                } : cb::complete);
+   400→        }
+   401→        
+   402→        public static boolean isDebugRuntime() {
+   403→                return false;
+   404→        }
+   405→        
+   406→        public static void writeCrashReport(String crashDump) {
+   407→                ClientMain.showCrashScreen(crashDump);
+   408→        }
+   409→
+   410→        public static void removeEventHandlers() {
+   411→                try {
+   412→                        PlatformInput.removeEventHandlers();
+   413→                }catch(Throwable t) {
+   414→                }
+   415→        }
+   416→        
+   417→        public static void getStackTrace(Throwable t, Consumer<String> ret) {
+   418→                JSObject o = JSExceptions.getJSException(t);
+   419→                if(o != null) {
+   420→                        try {
+   421→                                JSError err = o.cast();
+   422→                                String stack = err.getStack();
+   423→                                if(stack != null) {
+   424→                                        String[] stackElements = stack.split("[\\r\\n]+");
+   425→                                        if(stackElements.length > 0) {
+   426→                                                for(int i = 0; i < stackElements.length; ++i) {
+   427→                                                        String str = stackElements[i].trim();
+   428→                                                        if(str.startsWith("at ")) {
+   429→                                                                str = str.substring(3).trim();
+   430→                                                        }
+   431→                                                        ret.accept(str);
+   432→                                                }
+   433→                                                return;
+   434→                                        }
+   435→                                }
+   436→                        }catch(Throwable tt) {
+   437→                                ret.accept("[ error: " + t.toString() + " ]");
+   438→                        }
+   439→                }
+   440→                getFallbackStackTrace(t, ret);
+   441→        }
+   442→        
+   443→        private static void getFallbackStackTrace(Throwable t, Consumer<String> ret) {
+   444→                StackTraceElement[] el = t.getStackTrace();
+   445→                if(el.length > 0) {
+   446→                        for(int i = 0; i < el.length; ++i) {
+   447→                                ret.accept(el[i].toString());
+   448→                        }
+   449→                }else {
+   450→                        ret.accept("[no stack trace]");
+   451→                }
+   452→        }
+   453→        
+   454→        @JSBody(params = { "o" }, script = "console.error(o);")
+   455→        public static native void printNativeExceptionToConsoleTeaVM(JSObject o);
+   456→        
+   457→        public static boolean printJSExceptionIfBrowser(Throwable t) {
+   458→                if(t != null) {
+   459→                        JSObject o = JSExceptions.getJSException(t);
+   460→                        if(o != null) {
+   461→                                printNativeExceptionToConsoleTeaVM(o);
+   462→                                return true;
+   463→                        }
+   464→                }
+   465→                return false;
+   466→        }
+   467→
+   468→        public static void exit() {
+   469→                logger.fatal("Game is attempting to exit!");
+   470→        }
+   471→
+   472→        public static void setThreadName(String string) {
+   473→                currentThreadName = string;
+   474→        }
+   475→
+   476→        public static long maxMemory() {
+   477→                return 1073741824l;
+   478→        }
+   479→
+   480→        public static long totalMemory() {
+   481→                return 1073741824l;
+   482→        }
+   483→
+   484→        public static long freeMemory() {
+   485→                return 1073741824l;
+   486→        }
+   487→        
+   488→        public static String getCallingClass(int backTrace) {
+   489→                return null;
+   490→        }
+   491→        
+   492→        public static OutputStream newDeflaterOutputStream(OutputStream os) throws IOException {
+   493→                return new DeflaterOutputStream(os);
+   494→        }
+   495→        
+   496→        public static OutputStream newGZIPOutputStream(OutputStream os) throws IOException {
+   497→                return new GZIPOutputStream(os);
+   498→        }
+   499→        
+   500→        public static InputStream newInflaterInputStream(InputStream is) throws IOException {
+   501→                return new InflaterInputStream(is);
+   502→        }
+   503→        
+   504→        public static InputStream newGZIPInputStream(InputStream is) throws IOException {
+   505→                return new GZIPInputStream(is);
+   506→        }
+   507→        
+   508→        @JSBody(params = { }, script = "return window.location.protocol && window.location.protocol.toLowerCase().startsWith(\"https\");")
+   509→        public static native boolean requireSSL();
+   510→        
+   511→        @JSBody(params = { }, script = "return window.location.protocol && window.location.protocol.toLowerCase().startsWith(\"file\");")
+   512→        public static native boolean isOfflineDownloadURL();
+   513→        
+   514→        public static IClientConfigAdapter getClientConfigAdapter() {
+   515→                return TeaVMClientConfigAdapter.instance;
+   516→        }
+   517→
+   518→        static boolean canRec = false;
+   519→        static boolean recording = false;
+   520→        static long lastFrame = 0l;
+   521→        static JSObject mediaRec = null;
+   522→        static HTMLCanvasElement recCanvas = null;
+   523→        static CanvasRenderingContext2D recCtx = null;
+   524→        static MediaStream recStream = null;
+   525→
+   526→        public static boolean isRec() {
+   527→                return recording && canRec;
+   528→        }
+   529→
+   530→        @JSBody(params = { "canvas", "audio" }, script = "const stream = canvas.captureStream(); stream.addTrack(audio.getTracks()[0]); return stream;")
+   531→        private static native MediaStream captureStreamAndAddAudio(HTMLCanvasElement canvas, MediaStream audio);
+   532→
+   533→        @JSBody(params = { "stream" }, script = "const rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported(\"video/webm;codecs=vp9,opus\") ? \"video/webm;codecs=vp9,opus\" : \"video/webm\" }); rec.start(); return rec;")
+   534→        private static native JSObject createMediaRecorder(MediaStream stream);
+   535→
+   536→        @JSBody(params = { "rec" }, script = "rec.stop();")
+   537→        private static native void stopRec(JSObject rec);
+   538→
+   539→        @JSBody(params = { }, script = "return \"MediaRecorder\" in window;")
+   540→        private static native boolean canRec();
+   541→
+   542→        public static boolean recSupported() {
+   543→                return true;
+   544→        }
+   545→
+   546→        public static String getRecText() {
+   547→                if (recording && !canRec) {
+   548→                        return "recording.unsupported";
+   549→                }
+   550→                return recording ? "recording.stop" : "recording.start";
+   551→        }
+   552→
+   553→        static void recFrame() {
+   554→                if (mediaRec != null) {
+   555→                        int w = PlatformRuntime.canvas.getWidth();
+   556→                        int h = PlatformRuntime.canvas.getHeight();
+   557→                        if (recCanvas.getWidth() != w || recCanvas.getHeight() != h) {
+   558→                                recCanvas.setWidth(w);
+   559→                                recCanvas.setHeight(h);
+   560→                        }
+   561→                        recCtx.drawImage(canvas, 0, 0);
+   562→                }
+   563→        }
+   564→
+   565→        @JSFunctor
+   566→        private static interface MediaHandler extends JSObject {
+   567→                void onMedia(MediaStream stream);
+   568→        }
+   569→
+   570→        @JSBody(params = { "cb" }, script = "if (\"navigator\" in window && \"mediaDevices\" in window.navigator && \"getUserMedia\" in window.navigator.mediaDevices) { try { window.navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) { cb(stream); }).catch(function(err) { console.error(err); cb(null); }); } catch(e) { console.error(\"getUserMedia Error!\"); cb(null); } } else { console.error(\"No getUserMedia!\"); cb(null); }")
+   571→        private static native void getMic0(MediaHandler cb);
+   572→
+   573→        @Async
+   574→        private static native MediaStream getMic1();
+   575→
+   576→        private static void getMic1(AsyncCallback<MediaStream> cb) {
+   577→                getMic0(cb::complete);
+   578→        }
+   579→
+   580→        private static boolean canMic = true;
+   581→        private static MediaStream mic = null;
+   582→
+   583→        protected static MediaStream getMic() {
+   584→                if (canMic) {
+   585→                        if (mic == null) {
+   586→                                mic = getMic1();
+   587→                                if (mic == null) {
+   588→                                        canMic = false;
+   589→                                        return null;
+   590→                                }
+   591→                                return mic;
+   592→                        }
+   593→                        return mic;
+   594→                }
+   595→                return null;
+   596→        }
+   597→
+   598→        private static final SimpleDateFormat fmt = EagRuntime.fixDateFormat(new SimpleDateFormat("yyyy-MM-dd hh-mm-ss"));
+   599→        private static final Date dateInstance = new Date();
+   600→
+   601→        public static void toggleRec() {
+   602→                if (recording && !canRec) {
+   603→                        return;
+   604→                }
+   605→                recording = !recording;
+   606→                if (recording) {
+   607→                        if (!canRec) {
+   608→                                canRec = canRec();
+   609→                                if (!canRec) {
+   610→                                        return;
+   611→                                }
+   612→                        }
+   613→                        if (recCanvas == null) {
+   614→                                recCanvas = (HTMLCanvasElement) Window.current().getDocument().createElement("canvas");
+   615→                                recCtx = (CanvasRenderingContext2D) recCanvas.getContext("2d");
+   616→                                PlatformAudio.initRecDest();
+   617→                                recStream = captureStreamAndAddAudio(recCanvas, PlatformAudio.getRecStream());
+   618→                        }
+   619→                        mediaRec = createMediaRecorder(recStream);
+   620→                        long startTime = System.currentTimeMillis();
+   621→                        TeaVMUtils.addEventListener(mediaRec, "dataavailable", new EventListener<Event>() {
+   622→                                @Override
+   623→                                public void handleEvent(Event evt) {
+   624→                                        FixWebMDurationJS.getRecUrl(evt, (int) (System.currentTimeMillis() - startTime), url -> {
+   625→                                                HTMLAnchorElement a = (HTMLAnchorElement) doc.createElement("a");
+   626→                                                dateInstance.setTime(startTime);
+   627→                                                a.setDownload(EaglercraftVersion.mainMenuStringB + " - " + EaglerProfile.getName() + " - " + fmt.format(dateInstance) + ".webm");
+   628→                                                a.setHref(url);
+   629→                                                a.click();
+   630→                                                TeaVMUtils.freeDataURL(url);
+   631→                                        }, logger::info);
+   632→                                }
+   633→                        });
+   634→                } else {
+   635→                        stopRec(mediaRec);
+   636→                        mediaRec = null;
+   637→                }
+   638→        }
+   639→
+   640→        public static long randomSeed() {
+   641→                return (long)(Math.random() * 9007199254740991.0);
+   642→        }
+   643→
+   644→        private static String currentThreadName = "main";
+   645→
+   646→        public static String currentThreadName() {
+   647→                return currentThreadName;
+   648→        }
+   649→}
+   650→

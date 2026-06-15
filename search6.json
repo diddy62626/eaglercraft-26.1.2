@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.minecraft.net/en-us/article/removing-obfuscation-in-java-edition",
+    "name": "Removing obfuscation in Java Edition - Minecraft",
+    "snippet": "We know that this change may pose challenges for existing modding tools, which are typically designed for obfuscated code, and we're going to ...",
+    "host_name": "www.minecraft.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Minecraft/comments/1oj8974/removing_obfuscation_in_java_edition",
+    "name": "Removing obfuscation in Java Edition : r/Minecraft - Reddit",
+    "snippet": "The modding API will probably never happen. But like you said, there's datapacks now which already can do a lot of stuff. Even modloaders/mods ...",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/ru-ru/article/removing-obfuscation-in-java-edition",
+    "name": "Removing obfuscation in Java Edition - Minecraft",
+    "snippet": "Do you like to mod Java, tinker with builds, or take deep dives into Minecraft's code? Then this article is for you!",
+    "host_name": "www.minecraft.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Vp-EvLvodJ4",
+    "name": "What Removing Obfuscation in Minecraft Java Edition  - YouTube",
+    "snippet": "COURSES == ▶️ NeoForge Modding with Minecraft 1.21.X: https://url.kaupenjoe.net/CourseNeoForge121X ▶️ Fabric Modding ... article/removing ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.spigotmc.org/threads/minecraft-blog-removing-obfuscation-in-java-edition.714405",
+    "name": "Minecraft Blog: \"Removing obfuscation in Java Edition\" - SpigotMC",
+    "snippet": "Minecraft: Java Edition has been obfuscated since its release. This obfuscation meant that people couldn't see our source code. Instead, ...",
+    "host_name": "www.spigotmc.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pappp.net/?p=100880",
+    "name": "Removing obfuscation in Minecraft: Java Edition - PAPPP's Rambling",
+    "snippet": "Minecraft: Java Edition has been obfuscated since its release. This obfuscation meant that people couldn't see our source code. Instead, ...",
+    "host_name": "pappp.net",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://totalfreedom.tf/threads/minecraft-java-edition-will-no-longer-be-obfuscated-in-future-versions.483",
+    "name": "Minecraft: Java Edition will no longer be obfuscated in future versions",
+    "snippet": "11, compiled binaries for Minecraft: Java Edition will no longer be obfuscated. This means that anyone will be able to crack open the game and ...",
+    "host_name": "totalfreedom.tf",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/shorts/M2tQgr6xgms",
+    "name": "Obfuscation in Minecraft Java Edition QUICKLY EXPLAINED!",
+    "snippet": "In this Short, I talk about the Removing of the Obfuscation in Minecraft Java Edition (but in a little less time) == 1.21 MODDING COURSES ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.wiki/w/Java_Edition_26.1",
+    "name": "Java Edition 26.1 - Minecraft Wiki",
+    "snippet": "26.1, the release of Tiny Takeover, is a game drop for Java Edition released on March 24, 2026, which adds new textures and models for every ...",
+    "host_name": "minecraft.wiki",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DQcw0Q4CRmk",
+    "name": "Better Engineer on Instagram: \"Minecraft just made a huge change",
+    "snippet": "MOJANG IS REMOVING OBFUSCATION TO MAKE REMOVING OBFUSCATION IN JAVA EDITION What this means for our modding community Written By Cliff Published ...",
+    "host_name": "www.instagram.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

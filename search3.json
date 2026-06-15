@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.reddit.com/r/feedthebeast/comments/1s3033i/since_minecraft_java_edition_is_now_unobfuscated",
+    "name": "Java Edition is now unobfuscated starting in version 26.1, how many",
+    "snippet": "Since Minecraft: Java Edition is now unobfuscated starting in version 26.1, how many modders will jump to it? Question. I know it's been only a ...\nMinecraft: Java Edition is now unobfuscated starting in version 26.1, Deobfuscation does nothing to help modders. At minimum it might make ...",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.wiki/w/Java_Edition_26.1",
+    "name": "Java Edition 26.1 - Minecraft Wiki",
+    "snippet": "26.1, the release of Tiny Takeover, is a game drop for Java Edition released on March 24, 2026, which adds new textures and models for every ...\n26.1, the release of Tiny Takeover, is a game drop for Java Edition released on March 24, 2026, fixes bugs. This is the first Java Edition ...",
+    "host_name": "minecraft.wiki",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-26-1",
+    "name": "Minecraft Java Edition 26.1",
+    "snippet": "Technical Changes. The Data Pack version is now 101.1; The Resource Pack version is now 84; Game executables are no longer obfuscated - see this ...\nThe Resource Pack version is now 84; Game executables are no longer obfuscated - see this Minecraft.net article for more details; If a ...",
+    "host_name": "www.minecraft.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=w4VOsgazv8E",
+    "name": "View Unobfuscated bUgS and Code | Minecraft 26.1 Snapshot 1",
+    "snippet": "Go watch the videos going over some specific bugs! Shorter, high overview https://www.youtube.com/watch?v=xJX7J83IU_g Longer, more in-depth ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.javacodegeeks.com/2026/02/minecraft-java-deobfuscation-the-game-changing-2026-update.html",
+    "name": "Minecraft Java Deobfuscation: The Game-Changing 2026 Update",
+    "snippet": "Mojang removes code obfuscation from Minecraft Java Edition in 2026. Learn how this historic change affects modders, the deobfuscation ...",
+    "host_name": "www.javacodegeeks.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=zE0gW2ejiC0&vl=en",
+    "name": "Everything NEW In Minecraft 26.1 Update - YouTube",
+    "snippet": "Showing Everything New Mojang Added in the Minecraft 26.1 Update Tiny Takeover. They Added New Baby Mobs, Craftable Nametag, ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.fandom.com/wiki/Java_Edition_26.1",
+    "name": "Java Edition 26.1 - Minecraft Wiki - Fandom",
+    "snippet": "Mobs · Cats now have a new \"royal\" sound. · Chickens now have a new \"picky\" sound. · Cows now have a new \"moody\" sound. · Pigs now have new \"mini\" and \"big\" sounds.",
+    "host_name": "minecraft.fandom.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/en-us/article/removing-obfuscation-in-java-edition",
+    "name": "Removing obfuscation in Java Edition - Minecraft",
+    "snippet": "Now we're changing how we ship Minecraft: Java Edition to remove obfuscation completely. We hope that, with this change, we can pave a future ...\nThese mappings were essentially a long list that allowed people to match the obfuscated terms to un-obfuscated terms. This alleviated the issue ...",
+    "host_name": "www.minecraft.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=49q_Hf_0-o8",
+    "name": "Exploits and Checkboxes - What's New in Minecraft 26.1.2? - YouTube",
+    "snippet": "\"Better late than never.\" No matter how small the update or how far behind he is, slicedlime will give us an individual video for everything ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.wiki/w/Java_Edition_26.1_Pre-Release_1",
+    "name": "Java Edition 26.1 Pre-Release 1 - Minecraft Wiki",
+    "snippet": "This is the first pre-release released in 2026, and the first pre-release to be released with only an unobfuscated build. Minecraft 26.1 Pre- ...",
+    "host_name": "minecraft.wiki",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

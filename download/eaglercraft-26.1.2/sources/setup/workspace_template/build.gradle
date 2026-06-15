@@ -1,0 +1,102 @@
+plugins {
+    id 'java'
+    id 'org.teavm' version '0.10.0'
+}
+
+group = 'net.lax1dude.eaglercraft'
+version = '2.6.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.teavm.org/maven/' }
+    flatDir { dirs 'desktopRuntime' }
+}
+
+dependencies {
+    // TeaVM runtime
+    implementation "org.teavm:teavm-classlib:0.10.0"
+    teavm "org.teavm:teavm-classlib:0.10.0"
+    teavm "org.teavm:teavm-jso:0.10.0"
+    teavm "org.teavm:teavm-jso-apis:0.10.0"
+    teavm "org.teavm:teavm-platform:0.10.0"
+    
+    // Minecraft 26.1.2 (unobfuscated - NO MCP needed)
+    implementation files('libs/minecraft-26.1.2.jar')
+    
+    // Desktop runtime dependencies (LWJGL)
+    implementation files('desktopRuntime/lwjgl.jar')
+    implementation files('desktopRuntime/lwjgl-glfw.jar')
+    implementation files('desktopRuntime/lwjgl-opengles.jar')
+    implementation files('desktopRuntime/lwjgl-openal.jar')
+    implementation files('desktopRuntime/lwjgl-egl.jar')
+    implementation files('desktopRuntime/lwjgl-jemalloc.jar')
+    implementation files('desktopRuntime/codecjorbis-20101023.jar')
+    implementation files('desktopRuntime/codecwav-20101023.jar')
+    implementation files('desktopRuntime/soundsystem-20120107.jar')
+    implementation files('desktopRuntime/Java-WebSocket-1.5.1-with-dependencies.jar')
+    implementation files('desktopRuntime/UnsafeMemcpy.jar')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/resources']
+        }
+    }
+    teavm {
+        java {
+            srcDirs = ['src/teavm/java']
+        }
+    }
+    lwjgl {
+        java {
+            srcDirs = ['src/lwjgl/java']
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+teavm.js {
+    mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
+    obfuscated = true
+    sourceMap = true
+    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
+    targetFileName = 'classes.js'
+    outputDir = file('javascript')
+    
+    properties = [
+        'teavm.maxTopLevelNames': '80000'
+    ]
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['--enable-preview']
+}
+
+// Custom tasks
+task compileJS(type: Copy) {
+    dependsOn teavm.js
+    from 'javascript/classes.js'
+    from 'javascript/classes.js.map'
+    into 'javascript/dist'
+}
+
+task makeOfflineDownload(type: JavaExec) {
+    mainClass = 'net.lax1dude.eaglercraft.v2_6.gui.MakeOfflineDownload'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['javascript/dist', 'output/offline_download.html']
+}
+
+task makeEPK(type: JavaExec) {
+    mainClass = 'net.lax1dude.eaglercraft.v2_6.gui.EPKCompiler'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['src/resources', 'output/assets.epk']
+}

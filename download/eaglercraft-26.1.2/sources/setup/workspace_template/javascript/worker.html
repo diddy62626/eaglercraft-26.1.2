@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaglerCraft 26.1.2 - Integrated Server Worker</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #1a1a2e;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            color: #e0e0e0;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* ===== Worker Status Screen ===== */
+        #worker-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #worker-status.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .worker-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .worker-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .worker-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e94560;
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .worker-subtitle {
+            font-size: 0.9rem;
+            color: #a0a0b0;
+            margin-bottom: 0.3rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .worker-badge {
+            font-size: 0.65rem;
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            border-radius: 3px;
+            padding: 2px 8px;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 300px;
+            max-width: 80vw;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            border-radius: 3px;
+            transition: width 0.3s ease-out;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.6rem;
+        }
+
+        .progress-detail {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #555;
+            margin-top: 0.2rem;
+        }
+
+        /* Server Info */
+        .server-info {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .server-info .label {
+            color: #888;
+        }
+
+        .server-info .value {
+            color: #e94560;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ===== Worker Canvas (hidden, used for offscreen rendering) ===== */
+        #worker-canvas {
+            display: none;
+        }
+
+        /* ===== Error Overlay ===== */
+        #error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        #error-overlay.visible {
+            display: flex;
+        }
+
+        .error-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e94560;
+            margin-bottom: 0.8rem;
+        }
+
+        .error-message {
+            font-size: 0.85rem;
+            color: #ccc;
+            text-align: center;
+            max-width: 450px;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        .error-details {
+            font-size: 0.7rem;
+            color: #666;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 0.8rem;
+            max-width: 550px;
+            max-height: 180px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .error-button {
+            margin-top: 1.2rem;
+            padding: 0.5rem 1.5rem;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .error-button:hover {
+            background: #ff6b6b;
+        }
+
+        /* ===== Connection Status ===== */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 0.6rem;
+            color: #555;
+            z-index: 100;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .connection-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #555;
+            transition: background 0.3s;
+        }
+
+        .connection-dot.connected {
+            background: #4ade80;
+        }
+
+        .connection-dot.connecting {
+            background: #facc15;
+            animation: blink 1s infinite;
+        }
+
+        .connection-dot.error {
+            background: #e94560;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Worker Status Screen -->
+    <div id="worker-status">
+        <div class="worker-icon">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Server rack icon -->
+                <rect x="15" y="10" width="70" height="22" rx="3" fill="#2d6b2d" stroke="#4a8f4a" stroke-width="1.5"/>
+                <rect x="15" y="39" width="70" height="22" rx="3" fill="#2d6b2d" stroke="#4a8f4a" stroke-width="1.5"/>
+                <rect x="15" y="68" width="70" height="22" rx="3" fill="#2d6b2d" stroke="#4a8f4a" stroke-width="1.5"/>
+                <!-- LED indicators -->
+                <circle cx="25" cy="21" r="3" fill="#4ade80"/>
+                <circle cx="25" cy="50" r="3" fill="#facc15"/>
+                <circle cx="25" cy="79" r="3" fill="#4ade80"/>
+                <!-- Drive slots -->
+                <rect x="40" y="17" width="30" height="3" rx="1" fill="#1a1a2e"/>
+                <rect x="40" y="23" width="30" height="3" rx="1" fill="#1a1a2e"/>
+                <rect x="40" y="46" width="30" height="3" rx="1" fill="#1a1a2e"/>
+                <rect x="40" y="52" width="30" height="3" rx="1" fill="#1a1a2e"/>
+                <rect x="40" y="75" width="30" height="3" rx="1" fill="#1a1a2e"/>
+                <rect x="40" y="81" width="30" height="3" rx="1" fill="#1a1a2e"/>
+            </svg>
+        </div>
+        <div class="worker-title">Integrated Server</div>
+        <div class="worker-subtitle">Web Worker</div>
+        <div class="worker-badge">EAGLERCRAFT 26.1.2</div>
+        <div class="progress-container">
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Initializing server worker...</div>
+            <div class="progress-detail" id="progress-detail"></div>
+        </div>
+        <div class="server-info">
+            <div><span class="label">World: </span><span class="value" id="world-name">Loading...</span></div>
+            <div><span class="label">Seed: </span><span class="value" id="world-seed">---</span></div>
+            <div><span class="label">Players: </span><span class="value" id="player-count">0</span></div>
+        </div>
+    </div>
+
+    <!-- Worker Canvas (offscreen) -->
+    <canvas id="worker-canvas"></canvas>
+
+    <!-- Connection Status Indicator -->
+    <div class="connection-status">
+        <div class="connection-dot" id="connection-dot"></div>
+        <span id="connection-label">Offline</span>
+    </div>
+
+    <!-- Error Overlay -->
+    <div id="error-overlay">
+        <div class="error-title">Server Worker Error</div>
+        <div class="error-message" id="error-message">The integrated server worker encountered an error.</div>
+        <div class="error-details" id="error-details"></div>
+        <button class="error-button" onclick="restartWorker()">Restart Worker</button>
+    </div>
+
+    <!-- EaglerCraft Server Worker Configuration -->
+    <script type="text/javascript">
+        // ===== Integrated Server Worker Configuration =====
+        // This page hosts the EaglerCraft integrated server as a Web Worker.
+        // The main client page communicates with this worker via MessageChannel
+        // to run the Minecraft server logic off the main thread.
+
+        window.eaglercraftXServerOpts = {
+            // World generation settings
+            worldName: "Default",
+            worldSeed: null,  // null = random
+            generator: "default",
+            generatorSettings: "",
+
+            // Server settings
+            maxPlayers: 20,
+            viewDistance: 8,
+            simulationDistance: 6,
+            difficulty: "normal",
+            gameMode: "survival",
+            allowCheats: true,
+            pvpEnabled: true,
+            spawnAnimals: true,
+            spawnMonsters: true,
+            spawnNPCs: true,
+
+            // Performance settings
+            tickRate: 20,
+            autosaveInterval: 300,  // seconds
+            maxTickTime: 60000,     // ms before watchdog kills tick
+
+            // Connection settings
+            listenPort: -1,  // -1 = internal only (Web Worker IPC)
+            enableQuery: false,
+            enableRcon: false,
+            motd: "An EaglerCraft Integrated Server",
+            motdVersion: "26.1.2",
+
+            // Security
+            onlineMode: false,
+            preventProxyConnections: false,
+            enforceSecureProfile: false,
+
+            // Internal IPC channel (set by client at runtime)
+            ipcChannel: null
+        };
+
+        // ===== Worker Management =====
+        var serverWorker = null;
+        var workerReady = false;
+
+        function createWorker() {
+            try {
+                // Create the Web Worker for the integrated server
+                // The server code is loaded from the compiled TeaVM output
+                serverWorker = new Worker('classes.js');
+
+                serverWorker.onmessage = function(e) {
+                    handleWorkerMessage(e.data);
+                };
+
+                serverWorker.onerror = function(e) {
+                    console.error('[Server Worker] Error:', e.message);
+                    showError(
+                        'Server worker crashed!',
+                        e.message + '\nFile: ' + e.filename + '\nLine: ' + e.lineno
+                    );
+                    setConnectionStatus('error');
+                };
+
+                setConnectionStatus('connecting');
+                setLoadingProgress(10, 'Starting server worker...', 'Loading TeaVM runtime');
+            } catch (e) {
+                console.error('[Server Worker] Failed to create worker:', e);
+                showError(
+                    'Failed to start server worker',
+                    'The browser may not support Web Workers or the server script failed to load.\n\n' + e.message
+                );
+            }
+        }
+
+        function handleWorkerMessage(data) {
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'progress':
+                    setLoadingProgress(data.progress, data.text, data.detail);
+                    break;
+
+                case 'ready':
+                    workerReady = true;
+                    setConnectionStatus('connected');
+                    hideStatusScreen();
+                    if (data.worldName) {
+                        document.getElementById('world-name').textContent = data.worldName;
+                    }
+                    if (data.seed) {
+                        document.getElementById('world-seed').textContent = data.seed;
+                    }
+                    console.log('[Server Worker] Ready:', data);
+                    break;
+
+                case 'playerCount':
+                    var el = document.getElementById('player-count');
+                    if (el) el.textContent = data.count;
+                    break;
+
+                case 'error':
+                    showError(data.message || 'Server error', data.details || '');
+                    setConnectionStatus('error');
+                    break;
+
+                case 'crash':
+                    showError('Server crashed!', data.report || 'No crash report available');
+                    setConnectionStatus('error');
+                    break;
+
+                default:
+                    console.log('[Server Worker] Message:', data.type, data);
+            }
+        }
+
+        function restartWorker() {
+            if (serverWorker) {
+                serverWorker.terminate();
+                serverWorker = null;
+            }
+            workerReady = false;
+            setConnectionStatus('offline');
+            document.getElementById('error-overlay').classList.remove('visible');
+            document.getElementById('worker-status').style.display = 'flex';
+            createWorker();
+        }
+
+        // ===== UI Helpers =====
+        function setLoadingProgress(progress, text, detail) {
+            var fill = document.getElementById('progress-fill');
+            var textEl = document.getElementById('progress-text');
+            var detailEl = document.getElementById('progress-detail');
+
+            if (fill) fill.style.width = Math.max(0, Math.min(100, progress)) + '%';
+            if (textEl) textEl.textContent = text || '';
+            if (detailEl) detailEl.textContent = detail || '';
+        }
+
+        function hideStatusScreen() {
+            var screen = document.getElementById('worker-status');
+            if (screen) {
+                screen.classList.add('fade-out');
+                setTimeout(function() {
+                    screen.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        function showError(message, details) {
+            var overlay = document.getElementById('error-overlay');
+            var msgEl = document.getElementById('error-message');
+            var detEl = document.getElementById('error-details');
+
+            if (msgEl) msgEl.textContent = message;
+            if (detEl) detEl.textContent = details || '';
+            if (overlay) overlay.classList.add('visible');
+        }
+
+        function setConnectionStatus(status) {
+            var dot = document.getElementById('connection-dot');
+            var label = document.getElementById('connection-label');
+
+            if (dot) {
+                dot.className = 'connection-dot';
+                switch (status) {
+                    case 'connected':
+                        dot.classList.add('connected');
+                        break;
+                    case 'connecting':
+                        dot.classList.add('connecting');
+                        break;
+                    case 'error':
+                        dot.classList.add('error');
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (label) {
+                switch (status) {
+                    case 'connected': label.textContent = 'Connected'; break;
+                    case 'connecting': label.textContent = 'Connecting...'; break;
+                    case 'error': label.textContent = 'Error'; break;
+                    default: label.textContent = 'Offline'; break;
+                }
+            }
+        }
+
+        // ===== Prevent Default Behaviors =====
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('dragover', function(e) { e.preventDefault(); });
+        document.addEventListener('drop', function(e) { e.preventDefault(); });
+
+        // ===== Initialize =====
+        (function() {
+            setLoadingProgress(5, 'Checking Web Worker support...', '');
+
+            if (typeof Worker === 'undefined') {
+                showError(
+                    'Web Workers are not supported!',
+                    'The integrated server requires Web Worker support.\n\n' +
+                    'Please use a modern browser:\n' +
+                    '• Chrome 4+\n' +
+                    '• Firefox 3.5+\n' +
+                    '• Safari 4+\n' +
+                    '• Edge 12+'
+                );
+                return;
+            }
+
+            setLoadingProgress(8, 'Checking WebGL2 support...', '');
+
+            try {
+                var canvas = document.createElement('canvas');
+                var gl = canvas.getContext('webgl2') || canvas.getContext('experimental-webgl2');
+                if (!gl) {
+                    showError(
+                        'WebGL2 is not supported!',
+                        'The integrated server requires WebGL2 for world rendering.\n\n' +
+                        'Please update your browser or enable hardware acceleration.'
+                    );
+                    return;
+                }
+            } catch (e) {
+                showError('WebGL2 check failed', e.message);
+                return;
+            }
+
+            // Wait for the page to fully load before starting the worker
+            // This ensures all scripts and stylesheets are available
+            setLoadingProgress(10, 'Preparing to launch worker...', 'Waiting for resources');
+        })();
+
+        // Start the worker on full page load
+        window.addEventListener('load', function() {
+            // Small delay to ensure everything is settled
+            setTimeout(function() {
+                setLoadingProgress(15, 'Launching server worker...', 'Creating Web Worker');
+                createWorker();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
