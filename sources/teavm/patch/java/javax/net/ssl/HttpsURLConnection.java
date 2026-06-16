@@ -1,13 +1,12 @@
 package javax.net.ssl;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
  * TeaVM stub for javax.net.ssl.HttpsURLConnection.
  */
-public abstract class HttpsURLConnection extends HttpURLConnection {
+public abstract class HttpsURLConnection extends java.net.HttpURLConnection {
     protected HttpsURLConnection(URL url) {
         super(url);
     }

@@ -6,12 +6,20 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
 
     public Date() { this(System.currentTimeMillis()); }
     public Date(long date) { fastTime = date; }
-    @Deprecated public Date(int year, int month, int date) { this(year, month, date, 0, 0, 0); }
-    @Deprecated public Date(int year, int month, int date, int hrs, int min) { this(year, month, date, hrs, min, 0); }
-    @Deprecated public Date(int year, int month, int date, int hrs, int min, int sec) {
-        fastTime = UTC(year, month, date, hrs, min, sec);
+    public Date(int year, int month, int date) { this(year, month, date, 0, 0, 0); }
+    public Date(int year, int month, int date, int hrs, int min) { this(year, month, date, hrs, min, 0); }
+    public Date(int year, int month, int date, int hrs, int min, int sec) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year + 1900, month, date, hrs, min, sec);
+        fastTime = cal.getTimeInMillis();
     }
-    @Deprecated public Date(String s) { fastTime = parse(s); }
+    public Date(String s) {
+        try {
+            fastTime = java.text.DateFormat.getDateInstance().parse(s).getTime();
+        } catch (java.text.ParseException e) {
+            fastTime = 0;
+        }
+    }
 
     public Object clone() { return new Date(fastTime); }
     public long getTime() { return fastTime; }
@@ -23,32 +31,34 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
     public boolean equals(Object obj) { return obj instanceof Date && fastTime == ((Date) obj).fastTime; }
     public String toString() { return java.text.DateFormat.getDateTimeInstance().format(this); }
 
-    @Deprecated public int getYear() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.YEAR) - 1900; }
-    @Deprecated public int getMonth() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.MONTH); }
-    @Deprecated public int getDate() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.DAY_OF_MONTH); }
-    @Deprecated public int getDay() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.DAY_OF_WEEK) - 1; }
-    @Deprecated public int getHours() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.HOUR_OF_DAY); }
-    @Deprecated public int getMinutes() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.MINUTE); }
-    @Deprecated public int getSeconds() { return new java.util.GregorianCalendar(this).get(java.util.Calendar.SECOND); }
-    @Deprecated public void setYear(int year) {}
-    @Deprecated public void setMonth(int month) {}
-    @Deprecated public void setDate(int date) {}
-    @Deprecated public void setHours(int hours) { fastTime = fastTime; }
-    @Deprecated public void setMinutes(int minutes) {}
-    @Deprecated public void setSeconds(int seconds) {}
-    @Deprecated public long getTimezoneOffset() { return 0; }
-    @Deprecated public static long UTC(int year, int month, int date, int hrs, int min, int sec) {
-        return new java.util.GregorianCalendar(year + 1900, month, date, hrs, min, sec).getTimeInMillis();
+    public int getYear() { return 0; }
+    public int getMonth() { return 0; }
+    public int getDate() { return 1; }
+    public int getDay() { return 0; }
+    public int getHours() { return 0; }
+    public int getMinutes() { return 0; }
+    public int getSeconds() { return 0; }
+    public void setYear(int year) {}
+    public void setMonth(int month) {}
+    public void setDate(int date) {}
+    public void setHours(int hours) {}
+    public void setMinutes(int minutes) {}
+    public void setSeconds(int seconds) {}
+    public long getTimezoneOffset() { return 0; }
+    public static long UTC(int year, int month, int date, int hrs, int min, int sec) {
+        Calendar cal = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+        cal.set(year + 1900, month, date, hrs, min, sec);
+        return cal.getTimeInMillis();
     }
-    @Deprecated public static long parse(String s) {
+    public static long parse(String s) {
         try {
             return java.text.DateFormat.getDateInstance().parse(s).getTime();
         } catch (java.text.ParseException e) {
             throw new IllegalArgumentException(s, e);
         }
     }
-    @Deprecated public String toLocaleString() { return toString(); }
-    @Deprecated public String toGMTString() { return toString(); }
+    public String toLocaleString() { return toString(); }
+    public String toGMTString() { return toString(); }
 
     public java.time.Instant toInstant() {
         return java.time.Instant.ofEpochMilli(fastTime);

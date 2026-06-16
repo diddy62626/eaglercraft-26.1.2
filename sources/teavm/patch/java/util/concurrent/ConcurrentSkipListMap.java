@@ -1,14 +1,10 @@
 package java.util.concurrent;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * TeaVM stub for java.util.concurrent.ConcurrentSkipListMap.
- * Browser: simple ConcurrentHashMap-backed implementation.
+ * Simple synchronized TreeMap-backed implementation.
  */
 public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentNavigableMap<K, V>, Cloneable, java.io.Serializable {
@@ -71,7 +67,7 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
 
     @Override
     public synchronized Set<Entry<K, V>> entrySet() {
-        return map.entrySet();
+        return new HashSet<>(map.entrySet());
     }
 
     @Override
@@ -80,17 +76,25 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
     public synchronized K lastKey() { return map.lastKey(); }
 
     @Override
-    public synchronized Entry<K, V> firstEntry() { return map.firstEntry(); }
+    public synchronized Entry<K, V> firstEntry() {
+        return map.isEmpty() ? null : map.firstEntry();
+    }
     @Override
-    public synchronized Entry<K, V> lastEntry() { return map.lastEntry(); }
+    public synchronized Entry<K, V> lastEntry() {
+        return map.isEmpty() ? null : map.lastEntry();
+    }
     @Override
     public synchronized Entry<K, V> pollFirstEntry() {
-        Entry<K, V> e = map.pollFirstEntry();
+        if (map.isEmpty()) return null;
+        Entry<K, V> e = map.firstEntry();
+        map.remove(e.getKey());
         return e;
     }
     @Override
     public synchronized Entry<K, V> pollLastEntry() {
-        Entry<K, V> e = map.pollLastEntry();
+        if (map.isEmpty()) return null;
+        Entry<K, V> e = map.lastEntry();
+        map.remove(e.getKey());
         return e;
     }
 
@@ -111,37 +115,33 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
     @Override
     public synchronized K higherKey(K key) { return map.higherKey(key); }
 
-    @Override
-    public ConcurrentNavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
-        ConcurrentSkipListMap<K, V> result = new ConcurrentSkipListMap<>();
-        synchronized (this) {
-            for (Entry<K, V> e : map.subMap(fromKey, fromInclusive, toKey, toInclusive)) {
-                result.put(e.getKey(), e.getValue());
-            }
+    private ConcurrentSkipListMap<K, V> copyFrom(NavigableMap<K, V> sub) {
+        ConcurrentSkipListMap<K, V> result = new ConcurrentSkipListMap<>(comparator());
+        for (Entry<K, V> e : sub.entrySet()) {
+            result.put(e.getKey(), e.getValue());
         }
         return result;
+    }
+
+    @Override
+    public ConcurrentNavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        synchronized (this) {
+            return copyFrom(map.subMap(fromKey, fromInclusive, toKey, toInclusive));
+        }
     }
 
     @Override
     public ConcurrentNavigableMap<K, V> headMap(K toKey, boolean inclusive) {
-        ConcurrentSkipListMap<K, V> result = new ConcurrentSkipListMap<>();
         synchronized (this) {
-            for (Entry<K, V> e : map.headMap(toKey, inclusive)) {
-                result.put(e.getKey(), e.getValue());
-            }
+            return copyFrom(map.headMap(toKey, inclusive));
         }
-        return result;
     }
 
     @Override
     public ConcurrentNavigableMap<K, V> tailMap(K fromKey, boolean inclusive) {
-        ConcurrentSkipListMap<K, V> result = new ConcurrentSkipListMap<>();
         synchronized (this) {
-            for (Entry<K, V> e : map.tailMap(fromKey, inclusive)) {
-                result.put(e.getKey(), e.getValue());
-            }
+            return copyFrom(map.tailMap(fromKey, inclusive));
         }
-        return result;
     }
 
     @Override
@@ -172,17 +172,25 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
 
     @Override
     public NavigableSet<K> navigableKeySet() {
-        synchronized (this) { return map.navigableKeySet(); }
+        synchronized (this) {
+            return new java.util.TreeSet<>(map.keySet());
+        }
     }
 
     @Override
     public NavigableSet<K> keySet() {
-        synchronized (this) { return map.navigableKeySet(); }
+        synchronized (this) {
+            return new java.util.TreeSet<>(map.keySet());
+        }
     }
 
     @Override
     public NavigableSet<K> descendingKeySet() {
-        synchronized (this) { return map.descendingKeySet(); }
+        synchronized (this) {
+            java.util.TreeSet<K> set = new java.util.TreeSet<>(Collections.reverseOrder());
+            set.addAll(map.keySet());
+            return set;
+        }
     }
 
     @Override
@@ -225,6 +233,7 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ConcurrentSkipListMap<K, V> clone() {
         ConcurrentSkipListMap<K, V> result = new ConcurrentSkipListMap<>(comparator());
         synchronized (this) {
@@ -233,5 +242,25 @@ public class ConcurrentSkipListMap<K, V> extends AbstractMap<K, V>
             }
         }
         return result;
+    }
+
+    @Override
+    public synchronized java.util.Map.Entry<K, V> ceilingEntry(K key) {
+        return map.ceilingEntry(key);
+    }
+
+    @Override
+    public synchronized java.util.Map.Entry<K, V> floorEntry(K key) {
+        return map.floorEntry(key);
+    }
+
+    @Override
+    public synchronized java.util.Map.Entry<K, V> higherEntry(K key) {
+        return map.higherEntry(key);
+    }
+
+    @Override
+    public synchronized java.util.Map.Entry<K, V> lowerEntry(K key) {
+        return map.lowerEntry(key);
     }
 }

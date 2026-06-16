@@ -155,9 +155,6 @@ public final class HexFormat {
         return out;
     }
 
-    public boolean isHexDigit(char ch) {
-        return Character.digit(ch, 16) >= 0;
-    }
 
     public boolean isValidHexDigit(char ch) {
         return isHexDigit(ch);

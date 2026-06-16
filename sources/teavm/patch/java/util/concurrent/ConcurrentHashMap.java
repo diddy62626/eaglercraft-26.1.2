@@ -270,9 +270,6 @@ public class ConcurrentHashMap<K, V> implements ConcurrentMap<K, V>, java.io.Ser
     public static <K> java.util.Set<K> newKeySet(int initialCapacity) {
         return new java.util.concurrent.ConcurrentHashMap<K, Boolean>(initialCapacity).keySet();
     }
-    public java.util.Set<K> keySet(K mappedValue) {
-        return keySet();
-    }
     public K search(long parallelismThreshold, java.util.function.BiFunction<? super K, ? super V, ? extends K> searchFunction) {
         return null;
     }

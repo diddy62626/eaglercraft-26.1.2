@@ -157,5 +157,4 @@ public final class Character implements java.io.Serializable, Comparable<Charact
         return new String(toChars(codePoint));
     }
 
-    public static String valueOf(char c) { return String.valueOf(c); }
 }
