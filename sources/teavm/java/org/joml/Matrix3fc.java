@@ -13,4 +13,7 @@ public interface Matrix3fc {
     float m20();
     float m21();
     float m22();
+
+    default Vector3f getRow(int row, Vector3f dest) { return dest; }
+    default Vector3f getColumn(int column, Vector3f dest) { return dest; }
 }

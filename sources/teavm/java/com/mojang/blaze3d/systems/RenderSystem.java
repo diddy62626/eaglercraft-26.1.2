@@ -580,15 +580,9 @@ public class RenderSystem {
         // Browser: render thread is the main browser thread
     }
 
-    public static boolean isOnRenderThread() {
-        return true;
-    }
 
-    public static void assertOnRenderThread() {}
 
-    public static String getApiDescription() {
-        return "WebGL 2.0";
-    }
+
 
     public static void flipFrame(com.mojang.blaze3d.TracyFrameCapture capture) {
         // Browser: frame is presented by browser

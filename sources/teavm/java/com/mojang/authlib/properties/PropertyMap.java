@@ -34,8 +34,9 @@ public class PropertyMap extends ForwardingMultimap<String, PropertyMap.Property
         return properties.get(key);
     }
 
-    public void put(String key, Property property) {
+    public boolean put(String key, Property property) {
         properties.put(key, property);
+        return true;
     }
 
     public boolean containsKey(String key) {

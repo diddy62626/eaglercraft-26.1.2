@@ -13,5 +13,4 @@ public interface GpuBackend {
     String getName();
     String getVendor();
     String getVersion();
-    default String toString() { return getName(); }
 }

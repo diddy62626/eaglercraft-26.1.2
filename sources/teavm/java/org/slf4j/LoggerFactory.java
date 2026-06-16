@@ -53,6 +53,7 @@ public class LoggerFactory {
         @Override public void error(String format, Object arg1, Object arg2) {}
         @Override public void error(String format, Object... arguments) {}
         @Override public void error(String msg, Throwable t) {}
+        @Override public void error(Marker marker, String format, Object arg1, Object arg2) {}
     }
 
     public static org.slf4j.ILoggerFactory getILoggerFactory() {

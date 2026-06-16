@@ -116,5 +116,4 @@ public class Matrix3f implements Matrix3fc {
     @Override public float m20() { return m20; }
     @Override public float m21() { return m21; }
     @Override public float m22() { return m22; }
-    @Override public Vector3f get(Vector3f dest) { return dest; }
 }

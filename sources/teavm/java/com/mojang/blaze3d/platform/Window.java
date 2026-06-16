@@ -13,10 +13,6 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
  */
 public class Window {
 
-	private com.mojang.blaze3d.platform.WindowEventHandler eventHandler;
-	private DisplayData displayData;
-	private String title;
-
 	/** The event handler for window resize/close events. */
 	private final WindowEventHandler eventHandler;
 
@@ -356,15 +352,4 @@ public class Window {
         return getHeight();
     }
 
-    public boolean isFullscreen() {
-        return displayData != null && displayData.isFullscreen();
-    }
-
-    public void toggleFullScreen() {
-        // No-op in browser
-    }
-
-    public void setFullscreen(boolean fullscreen) {
-        // No-op in browser
-    }
 }
