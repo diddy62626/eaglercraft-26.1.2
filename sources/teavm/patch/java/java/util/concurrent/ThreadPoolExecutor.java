@@ -6,4 +6,5 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     public java.util.List<Runnable> shutdownNow() { return java.util.Collections.emptyList(); }
     public boolean isShutdown() { return false; }
     public boolean isTerminated() { return false; }
+    public boolean awaitTermination(long timeout, TimeUnit unit) { return true; }
 }

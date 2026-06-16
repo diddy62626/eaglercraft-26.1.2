@@ -17,5 +17,7 @@ public class BigInteger extends Number {
     public byte[] toByteArray() { return new byte[0]; }
     public int intValue() { return 0; }
     public long longValue() { return 0L; }
+    public float floatValue() { return 0f; }
+    public double doubleValue() { return 0.0; }
     public String toString() { return "0"; }
 }

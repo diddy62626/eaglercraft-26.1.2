@@ -3,7 +3,7 @@ public class AccessibleObject {
     public void setAccessible(boolean flag) {}
     public static void setAccessible(AccessibleObject[] array, boolean flag) {}
     public boolean isAccessible() { return false; }
-    public Annotation getAnnotation(Class<? extends Annotation> annotationClass) { return null; }
-    public Annotation[] getAnnotations() { return new Annotation[0]; }
-    public Annotation[] getDeclaredAnnotations() { return new Annotation[0]; }
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> annotationClass) { return null; }
+    public java.lang.annotation.Annotation[] getAnnotations() { return new java.lang.annotation.Annotation[0]; }
+    public java.lang.annotation.Annotation[] getDeclaredAnnotations() { return new java.lang.annotation.Annotation[0]; }
 }

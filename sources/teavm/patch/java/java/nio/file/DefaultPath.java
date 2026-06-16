@@ -1,4 +1,6 @@
 package java.nio.file;
+import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchEvent.Modifier;
 class DefaultPath implements Path {
     public FileSystem getFileSystem() { return FileSystems.getDefault(); }
     public boolean isAbsolute() { return false; }
@@ -25,4 +27,6 @@ class DefaultPath implements Path {
     public java.util.Iterator<Path> iterator() { return java.util.Collections.<Path>emptyList().iterator(); }
     public int compareTo(Path other) { return 0; }
     public String toString() { return ""; }
+    public WatchKey register(WatchService watcher, Kind<?>... events) { return null; }
+    public WatchKey register(WatchService watcher, Kind<?>[] events, Modifier... modifiers) { return null; }
 }
