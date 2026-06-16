@@ -115,4 +115,23 @@ public class Vector3i {
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
     }
+
+    public int get(int component) {
+        switch (component) {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: throw new IndexOutOfBoundsException();
+        }
+    }
+
+    public Vector3i setComponent(int component, int value) {
+        switch (component) {
+            case 0: x = value; break;
+            case 1: y = value; break;
+            case 2: z = value; break;
+            default: throw new IndexOutOfBoundsException();
+        }
+        return this;
+    }
 }

@@ -52,4 +52,8 @@ public class FramerateLimitTracker {
 	public boolean isFramerateLimited() {
 		return getFramerateLimit() > 0 && getFramerateLimit() < DEFAULT_FRAMERATE_LIMIT;
 	}
+
+    public FramerateLimitTracker(net.minecraft.client.Options options, net.minecraft.client.Minecraft minecraft) {
+        // Browser stub: real tracker needs the Minecraft instance
+    }
 }

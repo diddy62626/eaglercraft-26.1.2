@@ -36,4 +36,6 @@ public interface Logger {
     void error(String format, Object arg1, Object arg2);
     void error(String format, Object... arguments);
     void error(String msg, Throwable t);
+
+    void error(Marker marker, String format, Object arg1, Object arg2);
 }

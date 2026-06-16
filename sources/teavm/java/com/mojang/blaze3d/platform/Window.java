@@ -13,6 +13,10 @@ import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
  */
 public class Window {
 
+	private com.mojang.blaze3d.platform.WindowEventHandler eventHandler;
+	private DisplayData displayData;
+	private String title;
+
 	/** The event handler for window resize/close events. */
 	private final WindowEventHandler eventHandler;
 
@@ -289,10 +293,78 @@ public class Window {
 		return 1L;
 	}
 
-	/**
-	 * Interface for window event callbacks.
-	 */
-	public interface WindowEventHandler {
-		void resizeDisplay();
-	}
+
+    // ===== MC 26.1.2 constructor (WindowEventHandler, DisplayData, String, String, GpuBackend) =====
+    public Window(com.mojang.blaze3d.platform.WindowEventHandler eventHandler,
+                  DisplayData displayData,
+                  String title,
+                  String vsyncTitle,
+                  com.mojang.blaze3d.systems.GpuBackend backend)
+            throws com.mojang.blaze3d.systems.BackendCreationException {
+        this.eventHandler = eventHandler;
+        this.displayData = displayData;
+        this.title = title;
+    }
+
+    public void close() {
+        shouldClose = true;
+    }
+
+    public int getGuiScaledWidth() {
+        return (int)(getWidth() / getGuiScale());
+    }
+
+    public int getGuiScaledHeight() {
+        return (int)(getHeight() / getGuiScale());
+    }
+
+    public void setIcon(net.minecraft.server.packs.PackResources pack,
+                        com.mojang.blaze3d.platform.IconSet iconSet)
+            throws java.io.IOException {
+        // Browser: icon is set via favicon, not programmatically
+    }
+
+    public void setWindowCloseCallback(Runnable callback) {
+        // Browser: window close is handled by beforeunload event
+    }
+
+    public void setWindowed(int width, int height) {
+        // Browser: window size is controlled by CSS / fullscreen API
+    }
+
+    public void updateVsync(boolean vsync) {
+        // Browser: vsync is controlled by requestAnimationFrame
+    }
+
+    public int getRefreshRate() {
+        return 60;
+    }
+
+    public static String getPlatform() {
+        return "EaglerCraft";
+    }
+
+    public long getHandle() {
+        return 0L;
+    }
+
+    public int getFramebufferWidth() {
+        return getWidth();
+    }
+
+    public int getFramebufferHeight() {
+        return getHeight();
+    }
+
+    public boolean isFullscreen() {
+        return displayData != null && displayData.isFullscreen();
+    }
+
+    public void toggleFullScreen() {
+        // No-op in browser
+    }
+
+    public void setFullscreen(boolean fullscreen) {
+        // No-op in browser
+    }
 }

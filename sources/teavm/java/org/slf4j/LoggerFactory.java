@@ -54,4 +54,8 @@ public class LoggerFactory {
         @Override public void error(String format, Object... arguments) {}
         @Override public void error(String msg, Throwable t) {}
     }
+
+    public static org.slf4j.ILoggerFactory getILoggerFactory() {
+        return null; // Stub
+    }
 }

@@ -36,4 +36,10 @@ public class Logger {
     public String getName() { return ""; }
     public Level getLevel() { return Level.INFO; }
     public void setLevel(Level level) {}
+
+    public boolean isEnabledFor(Priority priority) { return false; }
+
+    public void log(String fqcn, Priority priority, Object message, Throwable t) {
+        // No-op stub
+    }
 }

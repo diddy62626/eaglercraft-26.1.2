@@ -263,4 +263,27 @@ public class ConcurrentHashMap<K, V> implements ConcurrentMap<K, V>, java.io.Ser
             return added;
         }
     }
+
+    public static <K> java.util.Set<K> newKeySet() {
+        return new java.util.concurrent.ConcurrentHashMap<K, Boolean>().keySet();
+    }
+    public static <K> java.util.Set<K> newKeySet(int initialCapacity) {
+        return new java.util.concurrent.ConcurrentHashMap<K, Boolean>(initialCapacity).keySet();
+    }
+    public java.util.Set<K> keySet(K mappedValue) {
+        return keySet();
+    }
+    public K search(long parallelismThreshold, java.util.function.BiFunction<? super K, ? super V, ? extends K> searchFunction) {
+        return null;
+    }
+    public K searchKeys(long parallelismThreshold, java.util.function.Function<? super K, ? extends K> searchFunction) {
+        return null;
+    }
+    public V searchValues(long parallelismThreshold, java.util.function.Function<? super V, ? extends V> searchFunction) {
+        return null;
+    }
+    public void forEach(long parallelismThreshold, java.util.function.BiConsumer<? super K, ? super V> action) {
+        forEach(action);
+    }
+
 }

@@ -158,6 +158,15 @@ jobs:
             $(find java -name "*.java" -type f)
           $JAVA_HOME/bin/jar cf ../../libs/teavm-patches.jar -C classes .
           echo "teavm-patches.jar built ($(stat -c%s ../../libs/teavm-patches.jar) bytes)"
+          echo "=== Patch JAR contents (first 50 entries) ==="
+          $JAVA_HOME/bin/jar tf ../../libs/teavm-patches.jar | head -50
+          echo "=== Verify key patched classes have our methods ==="
+          echo "Runtime.maxMemory() present:"
+          $JAVA_HOME/bin/javap -p -classpath ../../libs/teavm-patches.jar java.lang.Runtime 2>&1 | grep -i "maxMemory\|addShutdownHook" || echo "  NOT FOUND"
+          echo "UUID.getMostSignificantBits() present:"
+          $JAVA_HOME/bin/javap -p -classpath ../../libs/teavm-patches.jar java.util.UUID 2>&1 | grep -i "getMostSignificantBits\|nameUUIDFromBytes" || echo "  NOT FOUND"
+          echo "HexFormat.withUpperCase() present:"
+          $JAVA_HOME/bin/javap -p -classpath ../../libs/teavm-patches.jar java.util.HexFormat 2>&1 | grep -i "withUpperCase\|fromHexDigits" || echo "  NOT FOUND"
           cd $GITHUB_WORKSPACE
 
           echo "=== Compiling TeaVM JavaScript ==="

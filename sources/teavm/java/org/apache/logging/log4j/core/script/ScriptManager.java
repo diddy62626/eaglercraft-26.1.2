@@ -1,15 +1,28 @@
 package org.apache.logging.log4j.core.script;
 
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.util.WatchManager;
+
 /**
  * TeaVM/browser stub for log4j2's ScriptManager.
  *
  * The real ScriptManager uses javax.script which doesn't have a
- * usable impl in the browser. This stub skips all script execution
- * so log4j configurations that reference scripts simply ignore them.
+ * usable impl in the browser. This stub skips all script execution.
  */
 public class ScriptManager {
-    public void addScript(AbstractScript script) {
+    private final Configuration configuration;
+    private final WatchManager watchManager;
+    private final String language;
+
+    public ScriptManager(Configuration configuration, WatchManager watchManager, String language) {
+        this.configuration = configuration;
+        this.watchManager = watchManager;
+        this.language = language;
+    }
+
+    public boolean addScript(AbstractScript script) {
         // No-op: scripts are not executed in browser environment
+        return true;
     }
 
     public ScriptRunner createScriptRunner() {

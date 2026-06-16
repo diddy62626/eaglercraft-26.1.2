@@ -40,4 +40,9 @@ public final class Files {
     public static java.util.stream.Stream<Path> walk(Path start, int maxDepth, FileVisitOption... options) { return java.util.stream.Stream.empty(); }
     public static java.util.stream.Stream<Path> list(Path dir) throws java.io.IOException { return java.util.stream.Stream.empty(); }
     public static java.util.stream.Stream<Path> find(Path start, int maxDepth, BiPredicate<Path, BasicFileAttributes> matcher, FileVisitOption... options) { return java.util.stream.Stream.empty(); }
+
+    public static FileStore getFileStore(Path path) throws IOException {
+        return null;
+    }
+
 }

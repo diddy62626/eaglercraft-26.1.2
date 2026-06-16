@@ -356,4 +356,8 @@ public class InputConstants {
 
         /** Constant for the GLFW window pointer (unused in browser). */
         public static final long WINDOW_NULL = 0L;
+
+    public static boolean isKeyDown(Window window, int key) {
+        return net.lax1dude.eaglercraft.v2_6.internal.PlatformInput.isKeyDown(key);
+    }
 }

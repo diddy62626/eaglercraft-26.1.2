@@ -34,4 +34,6 @@ public interface Bundle {
     void update();
     void update(java.io.InputStream in);
     void uninstall();
+
+    default <A> A adapt(Class<A> adapterType) { return null; }
 }

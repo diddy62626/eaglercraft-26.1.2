@@ -177,4 +177,18 @@ public final class System {
 
     public static void setSecurityManager(SecurityManager s) {}
     public static SecurityManager getSecurityManager() { return null; }
+
+    public static java.util.Map<String, String> getenv() {
+        return java.util.Collections.emptyMap();
+    }
+    public static String getenv(String name) {
+        return null;
+    }
+    public static java.nio.channels.Channel inheritedChannel() throws java.io.IOException { return null; }
+    public static void exit(int status) { Runtime.getRuntime().exit(status); }
+    public static void runFinalizersOnExit(boolean value) {}
+    public static void load(String filename) { Runtime.getRuntime().load(filename); }
+    public static void loadLibrary(String libname) { Runtime.getRuntime().loadLibrary(libname); }
+    public static java.util.Map<String, String> getenvImpl() { return java.util.Collections.emptyMap(); }
+
 }

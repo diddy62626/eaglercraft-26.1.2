@@ -685,4 +685,40 @@ public class Matrix4f {
         result = 31 * result + Float.floatToIntBits(m33);
         return result;
     }
+
+    /** Set element at (row, col) to value. */
+    public Matrix4f setRowColumn(int row, int col, float value) {
+        set(row, col, value);
+        return this;
+    }
+
+    /** Set element at (row, col) to value. */
+    public Matrix4f set(int row, int col, float value) {
+        switch (row * 4 + col) {
+            case 0: m00 = value; break;
+            case 1: m01 = value; break;
+            case 2: m02 = value; break;
+            case 3: m03 = value; break;
+            case 4: m10 = value; break;
+            case 5: m11 = value; break;
+            case 6: m12 = value; break;
+            case 7: m13 = value; break;
+            case 8: m20 = value; break;
+            case 9: m21 = value; break;
+            case 10: m22 = value; break;
+            case 11: m23 = value; break;
+            case 12: m30 = value; break;
+            case 13: m31 = value; break;
+            case 14: m32 = value; break;
+            case 15: m33 = value; break;
+            default: throw new IndexOutOfBoundsException();
+        }
+        return this;
+    }
+
+    /** Stub - determine matrix properties (affine, orthogonal, etc.). */
+    public Matrix4f determineProperties() {
+        // No-op stub for TeaVM compatibility
+        return this;
+    }
 }

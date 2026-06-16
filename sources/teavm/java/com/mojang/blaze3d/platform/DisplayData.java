@@ -54,4 +54,12 @@ public class DisplayData {
         public boolean isFullscreen() {
                 return isFullscreen;
         }
+
+    public DisplayData withFullscreen(boolean fullscreen) {
+        return new DisplayData(width, height, fullscreenWidth, fullscreenHeight, fullscreen);
+    }
+
+    public DisplayData withSize(int width, int height) {
+        return new DisplayData(width, height, fullscreenWidth, fullscreenHeight, isFullscreen);
+    }
 }

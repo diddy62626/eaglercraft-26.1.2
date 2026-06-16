@@ -1,15 +1,31 @@
 package oshi.hardware;
-
 /**
  * TeaVM stub for oshi HardwareAbstractionLayer.
  */
 public class HardwareAbstractionLayer {
-    public oshi.hardware.ComputerSystem getComputerSystem() { return new ComputerSystem(); }
-    public oshi.hardware.CentralProcessor getProcessor() { return new CentralProcessor(); }
-    public oshi.hardware.GlobalMemory getMemory() { return new GlobalMemory(); }
-    public java.util.List<oshi.hardware.HWDiskStore> getDiskStores() { return new java.util.ArrayList<>(); }
-    public java.util.List<oshi.hardware.NetworkIF> getNetworkIFs() { return new java.util.ArrayList<>(); }
-    public java.util.List<oshi.hardware.UsbDevice> getUsbDevices(boolean tree) { return new java.util.ArrayList<>(); }
-    public oshi.hardware.Sensors getSensors() { return new Sensors(); }
-    public oshi.hardware.PowerSource[] getPowerSources() { return new oshi.hardware.PowerSource[0]; }
+    public ComputerSystem getComputerSystem() { return new ComputerSystem(); }
+    public CentralProcessor getProcessor() { return new CentralProcessor(); }
+    public GlobalMemory getMemory() { return new GlobalMemory(); }
+    public oshi.software.os.OperatingSystem getOperatingSystem() { return null; }
+    public PowerSource[] getPowerSources() { return new PowerSource[0]; }
+    public HWDiskStore[] getDiskStores() { return new HWDiskStore[0]; }
+    public NetworkIF[] getNetworkIFs() { return new NetworkIF[0]; }
+    public NetworkIF[] getNetworkIFs(boolean includeLocalInterfaces) { return new NetworkIF[0]; }
+    public Displays getDisplays() { return null; }
+    public Sensors getSensors() { return new Sensors(); }
+    public UsbDevice[] getUsbDevices(boolean tree) { return new UsbDevice[0]; }
+    public SoundCard[] getSoundCards() { return new SoundCard[0]; }
+    public GraphicsCard[] getGraphicsCards() { return new GraphicsCard[0]; }
 }
+
+// Stub GraphicsCard class
+class GraphicsCard {
+    public String getName() { return "WebGL2"; }
+    public String getDeviceId() { return "webgl2"; }
+    public String getVendor() { return "Browser"; }
+    public String getVersionInfo() { return "WebGL 2.0"; }
+    public long getVRam() { return 0L; }
+}
+
+class Displays {}
+class SoundCard {}

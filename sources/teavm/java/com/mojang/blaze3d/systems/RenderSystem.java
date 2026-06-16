@@ -536,4 +536,61 @@ public class RenderSystem {
         public static String getApiDescription() {
                 return "WebGL2 (EaglerCraft 26.1.2)";
         }
+
+    // ===== MC 26.1.2 missing methods =====
+
+    private static com.mojang.blaze3d.systems.GpuDevice device;
+    private static com.mojang.blaze3d.systems.SamplerCache samplerCache = new com.mojang.blaze3d.systems.SamplerCache();
+    private static String backendDescription = "WebGL2 (EaglerCraft)";
+
+    public static String getBackendDescription() {
+        return backendDescription;
+    }
+
+    public static com.mojang.blaze3d.systems.GpuDevice getDevice() {
+        return device;
+    }
+
+    public static com.mojang.blaze3d.systems.GpuDevice tryGetDevice() {
+        return device;
+    }
+
+    public static com.mojang.blaze3d.systems.SamplerCache getSamplerCache() {
+        return samplerCache;
+    }
+
+    public static net.minecraft.util.TimeSource.NanoTimeSource initBackendSystem(
+            com.mojang.blaze3d.platform.BackendOptions options) {
+        return System::nanoTime;
+    }
+
+    public static void initRenderer(com.mojang.blaze3d.systems.GpuDevice gpuDevice) {
+        device = gpuDevice;
+    }
+
+    public static void setErrorCallback(org.lwjgl.glfw.GLFWErrorCallbackI callback) {
+        // Browser: errors are reported via console
+    }
+
+    public static void setupDefaultState() {
+        // Browser: WebGL2 default state is set by browser
+    }
+
+    public static void initRenderThread() {
+        // Browser: render thread is the main browser thread
+    }
+
+    public static boolean isOnRenderThread() {
+        return true;
+    }
+
+    public static void assertOnRenderThread() {}
+
+    public static String getApiDescription() {
+        return "WebGL 2.0";
+    }
+
+    public static void flipFrame(com.mojang.blaze3d.TracyFrameCapture capture) {
+        // Browser: frame is presented by browser
+    }
 }
