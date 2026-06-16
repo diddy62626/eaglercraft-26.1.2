@@ -12,4 +12,5 @@ public class ArrayBlockingQueue<E> extends java.util.AbstractQueue<E> implements
     public java.util.Iterator<E> iterator() { return queue.iterator(); }
     public int drainTo(java.util.Collection<? super E> c) { int n = 0; while (!queue.isEmpty()) { c.add(queue.poll()); n++; } return n; }
     public int drainTo(java.util.Collection<? super E> c, int maxElements) { int n = 0; while (n < maxElements && !queue.isEmpty()) { c.add(queue.poll()); n++; } return n; }
+    public int remainingCapacity() { return Integer.MAX_VALUE; }
 }
