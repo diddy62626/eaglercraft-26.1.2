@@ -1,5 +1,7 @@
 package org.apache.logging.log4j.core.util;
 
+import org.apache.logging.log4j.core.config.ConfigurationScheduler;
+
 /**
  * TeaVM stub for log4j2 Watcher interface.
  * Real Watcher monitors a Source for changes. Browser: no-op.

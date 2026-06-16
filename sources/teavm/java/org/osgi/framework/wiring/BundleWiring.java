@@ -1,6 +1,7 @@
 package org.osgi.framework.wiring;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * TeaVM stub for OSGi BundleWiring.
