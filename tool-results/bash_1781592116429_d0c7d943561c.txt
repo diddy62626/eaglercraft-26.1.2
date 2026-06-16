@@ -1,0 +1,1092 @@
+Method descriptors in Minecraft.class:
+  (Ljava/lang/String;Z)V
+  (D)J
+  (Lnet/minecraft/client/Minecraft;)Lit/unimi/dsi/fastutil/floats/FloatUnaryOperator;
+  (FJLit/unimi/dsi/fastutil/floats/FloatUnaryOperator;)V
+  ()Lit/unimi/dsi/fastutil/objects/Object2BooleanFunction;
+  (Lnet/minecraft/resources/Identifier;Lit/unimi/dsi/fastutil/objects/Object2BooleanFunction;)V
+  ()J
+  ()V
+  ()Ljava/nio/file/Path;
+  (Ljava/lang/String;)Ljava/nio/file/Path;
+  (Ljava/nio/file/Path;)Lnet/minecraft/world/level/validation/DirectoryValidator;
+  (Ljava/nio/file/Path;Lnet/minecraft/world/level/validation/DirectoryValidator;)V
+  (Lnet/minecraft/client/Minecraft;Ljava/nio/file/Path;Lnet/minecraft/client/main/GameConfig$UserData;)V
+  (Ljava/nio/file/Path;Lnet/minecraft/server/packs/PackType;Lnet/minecraft/server/packs/repository/PackSource;Lnet/minecraft/world/level/validation/DirectoryValidator;)V
+  ()Lnet/minecraft/server/packs/repository/RepositorySource;
+  ([Lnet/minecraft/server/packs/repository/RepositorySource;)V
+  ()Lnet/minecraft/server/packs/VanillaPackResources;
+  (Ljava/net/Proxy;)Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;
+  (Ljava/net/Proxy;)V
+  (Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;Ljava/io/File;)Lnet/minecraft/server/Services;
+  (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;
+  (Lnet/minecraft/client/Minecraft;)Ljava/util/function/Supplier;
+  ()Lnet/minecraft/TracingExecutor;
+  (Ljava/util/function/Supplier;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;
+  (Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;Lnet/minecraft/client/main/GameConfig;)Lcom/mojang/authlib/minecraft/UserApiService;
+  ()Ljava/lang/String;
+  (Ljava/lang/String;Ljava/lang/Object;)V
+  (Session ID is {})
+  ()Ljava/util/function/Function;
+  (Ljava/util/function/Function;)V
+  ()Lcom/mojang/datafixers/DataFixer;
+  ()Ljava/lang/Thread;
+  (Lnet/minecraft/client/Minecraft;Ljava/io/File;)V
+  (Ljava/io/File;Lcom/mojang/datafixers/DataFixer;)V
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/Options;)V
+  (Ljava/nio/file/Path;Lcom/mojang/datafixers/DataFixer;)V
+  (II)Lcom/mojang/blaze3d/platform/DisplayData;
+  (Z)Lcom/mojang/blaze3d/platform/DisplayData;
+  (Ljava/lang/String;)V
+  ()Lnet/minecraft/client/OptionInstance;
+  ()Ljava/lang/Object;
+  ()Z
+  (Z)V
+  (Lcom/mojang/blaze3d/platform/BackendOptions;)Lnet/minecraft/util/TimeSource$NanoTimeSource;
+  (Lcom/mojang/blaze3d/platform/WindowEventHandler;Lcom/mojang/blaze3d/platform/DisplayData;Ljava/lang/String;Ljava/lang/String;Lcom/mojang/blaze3d/systems/GpuBackend;)V
+  ()Lcom/mojang/blaze3d/systems/GpuBackend;
+  (Lnet/minecraft/client/Minecraft;)Lcom/mojang/blaze3d/shaders/ShaderSource;
+  (IZZ)V
+  (JLcom/mojang/blaze3d/shaders/ShaderSource;Lcom/mojang/blaze3d/shaders/GpuDebugOptions;)Lcom/mojang/blaze3d/systems/GpuDevice;
+  (Lcom/mojang/blaze3d/systems/GpuDevice;)V
+  (Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+  (Ljava/lang/String;)Ljava/lang/StringBuilder;
+  (Lcom/mojang/blaze3d/platform/Window;)V
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/main/GameConfig;)V
+  (Ljava/lang/Runnable;)V
+  (Lnet/minecraft/client/telemetry/TelemetryProperty;)V
+  ()Lnet/minecraft/WorldVersion;
+  (Lnet/minecraft/server/packs/PackResources;Lcom/mojang/blaze3d/platform/IconSet;)V
+  (Ljava/lang/String;Ljava/lang/Throwable;)V
+  (Lnet/minecraft/client/Minecraft;)V
+  (Lnet/minecraft/client/GraphicsPreset;)V
+  ()Lcom/mojang/blaze3d/systems/GpuDevice;
+  ()Ljava/util/List;
+  (Ljava/lang/CharSequence;Ljava/lang/Iterable;)Ljava/lang/String;
+  ()I
+  (II)V
+  (Lnet/minecraft/server/packs/PackType;)V
+  (Lnet/minecraft/server/packs/repository/PackRepository;)V
+  (Lnet/minecraft/client/Minecraft;)Ljava/util/function/Consumer;
+  (Ljava/lang/String;Ljava/util/function/Consumer;)V
+  (Lnet/minecraft/server/packs/resources/PreparableReloadListener;)V
+  (Lnet/minecraft/server/packs/resources/ResourceManager;)V
+  (Lnet/minecraft/client/renderer/texture/TextureManager;Ljava/util/function/Consumer;)V
+  (Ljava/net/Proxy;Lnet/minecraft/client/renderer/texture/TextureManager;Ljava/util/concurrent/Executor;)V
+  (Ljava/nio/file/Path;Lnet/minecraft/server/Services;Lnet/minecraft/client/renderer/texture/SkinTextureDownloader;Ljava/util/concurrent/Executor;)V
+  (Ljava/nio/file/Path;Ljava/nio/file/Path;Lnet/minecraft/world/level/validation/DirectoryValidator;Lcom/mojang/datafixers/DataFixer;)V
+  (Ljava/nio/file/Path;)V
+  (Lnet/minecraft/client/Options;)V
+  (Lnet/minecraft/client/User;)V
+  (Lnet/minecraft/client/renderer/texture/TextureManager;I)V
+  ()Lnet/minecraft/server/players/ProfileResolver;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/server/players/ProfileResolver;)V
+  (Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/resources/SkinManager;Lnet/minecraft/server/players/ProfileResolver;)V
+  (Lnet/minecraft/client/renderer/PlayerSkinRenderCache;)V
+  (Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/resources/model/sprite/AtlasManager;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;)V
+  ()Lnet/minecraft/client/gui/Font;
+  ()Lnet/minecraft/client/color/block/BlockColors;
+  (Lnet/minecraft/client/color/block/BlockColors;Lnet/minecraft/client/resources/model/sprite/AtlasManager;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;)V
+  (Lnet/minecraft/client/resources/model/ModelManager;)V
+  (Lnet/minecraft/client/renderer/texture/TextureManager;)V
+  (Lnet/minecraft/client/resources/model/sprite/AtlasManager;Lnet/minecraft/client/resources/MapTextureManager;)V
+  ()Ljava/lang/Runtime;
+  (I)V
+  (Ljava/lang/Object;)Ljava/lang/String;
+  (Ljava/lang/String;)Ljava/lang/String;
+  (Lnet/minecraft/client/Minecraft;Lcom/mojang/authlib/minecraft/UserApiService;)V
+  ()Ljava/util/function/Supplier;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/renderer/block/BlockModelResolver;Lnet/minecraft/client/renderer/item/ItemModelResolver;Lnet/minecraft/client/renderer/MapRenderer;Lnet/minecraft/client/resources/model/sprite/AtlasManager;Lnet/minecraft/client/gui/Font;Lnet/minecraft/client/Options;Ljava/util/function/Supplier;Lnet/minecraft/client/resources/model/EquipmentAssetManager;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;)V
+  (Lnet/minecraft/client/gui/Font;Ljava/util/function/Supplier;Lnet/minecraft/client/renderer/block/BlockModelResolver;Lnet/minecraft/client/renderer/item/ItemModelResolver;Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;)V
+  (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/particle/ParticleResources;)V
+  (Ljava/lang/Object;)Ljava/lang/Object;
+  (Lnet/minecraft/client/particle/ParticleEngine;)Ljava/lang/Runnable;
+  ()Lnet/minecraft/client/renderer/ItemInHandRenderer;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/renderer/ItemInHandRenderer;Lnet/minecraft/client/renderer/RenderBuffers;Lnet/minecraft/client/resources/model/ModelManager;)V
+  ()Lnet/minecraft/client/renderer/state/GameRenderState;
+  ()Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;Lnet/minecraft/client/renderer/RenderBuffers;Lnet/minecraft/client/renderer/state/GameRenderState;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;)V
+  ()Lnet/minecraft/client/renderer/CloudRenderer;
+  (Lnet/minecraft/client/Minecraft;)Lcom/mojang/realmsclient/client/RealmsClient;
+  (Lcom/mojang/realmsclient/client/RealmsClient;)V
+  (Lnet/minecraft/client/Minecraft;)Lorg/lwjgl/glfw/GLFWErrorCallbackI;
+  (Lorg/lwjgl/glfw/GLFWErrorCallbackI;)V
+  (II)Ljava/lang/String;
+  (Z)Ljava/lang/Boolean;
+  (Ljava/lang/Object;)V
+  ()Lnet/minecraft/server/packs/resources/ResourceProvider;
+  (Lnet/minecraft/server/packs/resources/ResourceProvider;)V
+  (Lnet/minecraft/client/Minecraft;Lcom/mojang/authlib/minecraft/UserApiService;Lnet/minecraft/client/User;)V
+  (Lcom/mojang/authlib/minecraft/UserApiService;Lnet/minecraft/client/User;Ljava/nio/file/Path;)Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;
+  ()D
+  (D)V
+  ()Lnet/minecraft/client/multiplayer/chat/report/ReportEnvironment;
+  (Lnet/minecraft/client/multiplayer/chat/report/ReportEnvironment;Lcom/mojang/authlib/minecraft/UserApiService;)Lnet/minecraft/client/multiplayer/chat/report/ReportingContext;
+  (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  (Lnet/minecraft/network/chat/Component;)V
+  (Lnet/minecraft/client/gui/screens/Screen;)V
+  (Lnet/minecraft/client/ResourceLoadStateTracker$ReloadReason;Ljava/util/List;)V
+  (Ljava/lang/String;)Ljava/util/concurrent/Executor;
+  (Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/server/packs/resources/ReloadInstance;
+  (Lcom/mojang/realmsclient/client/RealmsClient;Lnet/minecraft/client/main/GameConfig$QuickPlayData;)V
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/function/Consumer;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/server/packs/resources/ReloadInstance;Ljava/util/function/Consumer;Z)V
+  (Lnet/minecraft/client/gui/screens/Overlay;)V
+  (Ljava/lang/String;)Lnet/minecraft/client/quickplay/QuickPlayLog;
+  (Lnet/minecraft/client/Options;Lnet/minecraft/client/Minecraft;)V
+  (Lnet/minecraft/client/Minecraft;)Ljava/util/function/IntSupplier;
+  (Lcom/mojang/blaze3d/platform/FramerateLimitTracker;)Ljava/util/function/BooleanSupplier;
+  (Ljava/util/function/LongSupplier;Ljava/util/function/IntSupplier;Ljava/util/function/BooleanSupplier;)V
+  (Ljava/lang/Thread;)V
+  ()Lcom/mojang/blaze3d/platform/Window;
+  (Lcom/mojang/blaze3d/platform/Window;I)Z
+  (Lnet/minecraft/client/Minecraft$GameLoadCookie;)V
+  (Lnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/lang/Runnable;
+  ()Lnet/minecraft/client/telemetry/TelemetryEventSender;
+  (Lnet/minecraft/client/telemetry/TelemetryEventSender;)V
+  (Ljava/util/List;)Z
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/Minecraft$GameLoadCookie;Z)Ljava/lang/Runnable;
+  (Ljava/util/List;)Ljava/util/List;
+  ()Ljava/util/Iterator;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/Screen;)Ljava/lang/Runnable;
+  (Lnet/minecraft/client/Minecraft;)Ljava/util/function/Function;
+  (Ljava/lang/Object;)Z
+  ()Lcom/mojang/authlib/minecraft/BanDetails;
+  (Lcom/mojang/authlib/minecraft/BanDetails;)Ljava/util/function/Function;
+  ()Lcom/mojang/authlib/GameProfile;
+  ()Ljava/util/Set;
+  (Lcom/mojang/authlib/GameProfile;)Ljava/util/function/Function;
+  ()Ljava/util/Locale;
+  ()Lnet/minecraft/util/ModCheck;
+  ()Lnet/minecraft/client/multiplayer/ClientPacketListener;
+  ()Lnet/minecraft/network/Connection;
+  ()Lnet/minecraft/client/multiplayer/ServerData;
+  (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+  (Ljava/lang/String;)Lcom/mojang/authlib/minecraft/UserApiService;
+  (Ljava/lang/String;Ljava/util/function/Supplier;Ljava/lang/String;Ljava/lang/Class;)Lnet/minecraft/util/ModCheck;
+  ()Ljava/util/Collection;
+  (Ljava/lang/Throwable;Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/Minecraft$GameLoadCookie;)V
+  (Ljava/lang/Throwable;)V
+  (Ljava/util/Collection;)V
+  (ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)Ljava/lang/Runnable;
+  (Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;
+  ()Lnet/minecraft/client/gui/components/toasts/ToastManager;
+  (Lnet/minecraft/client/gui/components/toasts/ToastManager;Lnet/minecraft/client/gui/components/toasts/SystemToast$SystemToastId;Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+  (Lorg/slf4j/Marker;Ljava/lang/String;Ljava/lang/Throwable;)V
+  (Lnet/minecraft/CrashReport;)V
+  (Lnet/minecraft/client/Minecraft;)Ljava/lang/Runnable;
+  (Ljava/lang/String;)Lcom/mojang/jtracy/DiscontinuousFrame;
+  (Ljava/lang/String;)Lnet/minecraft/util/profiling/SingleTickProfiler;
+  ()Lnet/minecraft/client/gui/components/DebugScreenOverlay;
+  (ZLnet/minecraft/util/profiling/SingleTickProfiler;)Lnet/minecraft/util/profiling/ProfilerFiller;
+  (Lnet/minecraft/util/profiling/ProfilerFiller;)Lnet/minecraft/util/profiling/Profiler$Scope;
+  (ZLnet/minecraft/util/profiling/SingleTickProfiler;)V
+  ()Lnet/minecraft/CrashReport;
+  (Lnet/minecraft/CrashReport;)Lnet/minecraft/CrashReport;
+  (Lnet/minecraft/client/Minecraft;Ljava/io/File;Lnet/minecraft/CrashReport;)I
+  (Lnet/minecraft/ReportType;)Ljava/lang/String;
+  (Ljava/nio/file/Path;Lnet/minecraft/ReportType;)Z
+  (Ljava/io/File;Lnet/minecraft/CrashReport;)I
+  (Lnet/minecraft/client/Minecraft;ZLnet/minecraft/client/Minecraft$GameLoadCookie;Ljava/util/concurrent/CompletableFuture;)Ljava/util/function/Consumer;
+  ()Lnet/minecraft/client/resources/model/ModelManager;
+  ()Lnet/minecraft/client/renderer/block/BlockStateModelSet;
+  ()Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;
+  ()Lnet/minecraft/world/level/block/state/StateDefinition;
+  ()Lcom/google/common/collect/ImmutableList;
+  ()Lcom/google/common/collect/UnmodifiableIterator;
+  ()Lnet/minecraft/world/level/block/RenderShape;
+  (Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;
+  ()Lnet/minecraft/client/resources/model/sprite/Material$Baked;
+  ()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+  (Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/sprite/Material$Baked;
+  ()Ljava/util/stream/Stream;
+  ()Ljava/util/function/Consumer;
+  (Ljava/util/function/Consumer;)V
+  ()Lnet/minecraft/client/gui/components/ChatComponent;
+  ()Lnet/minecraft/client/gui/screens/ChatScreen$ChatConstructor;
+  (Lnet/minecraft/client/gui/components/ChatComponent$ChatMethod;Lnet/minecraft/client/gui/screens/ChatScreen$ChatConstructor;)V
+  (Lnet/minecraft/client/InputType;)V
+  ()Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;
+  (Lnet/minecraft/network/chat/Component;ZLnet/minecraft/client/player/LocalPlayer;)V
+  ()Lnet/minecraft/client/gui/screens/ChatScreen;
+  ()Lnet/minecraft/util/TimeSource$NanoTimeSource;
+  ()Lcom/mojang/blaze3d/systems/SamplerCache;
+  ()Ljava/util/concurrent/CompletableFuture;
+  (Ljava/util/concurrent/CompletableFuture;)Ljava/lang/Runnable;
+  (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;
+  (J)I
+  ()Lnet/minecraft/util/profiling/ProfilerFiller;
+  ()Lnet/minecraft/gizmos/Gizmos$TemporaryCollection;
+  (II)I
+  ()Lnet/minecraft/world/TickRateManager;
+  ()Lnet/minecraft/client/Camera;
+  (Lnet/minecraft/client/Camera;)V
+  ([Lnet/minecraft/sounds/SoundSource;)V
+  (J)V
+  (Lnet/minecraft/resources/Identifier;)Z
+  ()Lcom/mojang/blaze3d/systems/TimerQuery;
+  (Lnet/minecraft/client/DeltaTracker;Z)V
+  (Z)F
+  (F)V
+  ()Lcom/mojang/blaze3d/systems/TimerQuery$FrameProfile;
+  (Lcom/mojang/blaze3d/pipeline/RenderTarget;)V
+  (Lcom/mojang/blaze3d/TracyFrameCapture;)V
+  (Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/ProfilerFiller;)Lnet/minecraft/util/profiling/ProfilerFiller;
+  (Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/SingleTickProfiler;)Lnet/minecraft/util/profiling/ProfilerFiller;
+  ()Lnet/minecraft/client/gui/components/debugchart/ProfilerPieChart;
+  ()Lnet/minecraft/util/profiling/ProfileResults;
+  (Lnet/minecraft/util/profiling/ProfileResults;)V
+  (IZ)I
+  (Lnet/minecraft/client/Minecraft;Ljava/util/function/Consumer;)Ljava/util/function/Consumer;
+  (Lnet/minecraft/SystemReport;Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/resources/language/LanguageManager;Ljava/lang/String;Lnet/minecraft/client/Options;)Lnet/minecraft/SystemReport;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/SystemReport;Ljava/util/function/Consumer;)Ljava/util/function/Consumer;
+  (Ljava/util/function/Consumer;)Ljava/util/function/Consumer;
+  (Lnet/minecraft/SystemReport;)Lnet/minecraft/SystemReport;
+  ([Ljava/util/concurrent/CompletableFuture;)Ljava/util/concurrent/CompletableFuture;
+  (Ljava/util/function/Consumer;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;)Ljava/lang/Runnable;
+  (Ljava/util/concurrent/CompletableFuture;)Ljava/util/function/Consumer;
+  (Ljava/util/function/Consumer;Ljava/util/function/Consumer;)V
+  (Ljava/util/function/LongSupplier;Lnet/minecraft/client/renderer/LevelRenderer;)V
+  (Lnet/minecraft/util/profiling/metrics/MetricsSamplerProvider;Ljava/util/function/LongSupplier;Ljava/util/concurrent/Executor;Lnet/minecraft/util/profiling/metrics/storage/MetricsPersister;Ljava/util/function/Consumer;Ljava/util/function/Consumer;)Lnet/minecraft/util/profiling/metrics/profiling/ActiveMetricsRecorder;
+  ()Lnet/minecraft/client/server/IntegratedServer;
+  ()Lnet/minecraft/world/level/storage/WorldData;
+  (Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+  (Ljava/nio/file/Path;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  (Ljava/io/IOException;)V
+  (Ljava/lang/String;[Ljava/lang/String;)Ljava/nio/file/Path;
+  (Ljava/nio/file/Path;Ljava/lang/String;)V
+  ()Ljava/io/File;
+  (Lnet/minecraft/util/FileZipper;)Ljava/util/function/Consumer;
+  (Ljava/io/File;)V
+  (Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;
+  (Lnet/minecraft/core/component/DataComponentType;)Z
+  ()Lnet/minecraft/world/phys/HitResult$Type;
+  ()Lnet/minecraft/core/BlockPos;
+  (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+  ()Lnet/minecraft/core/Direction;
+  (Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z
+  (Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)V
+  (Lnet/minecraft/world/InteractionHand;)V
+  ()Lnet/minecraft/world/entity/Entity;
+  (Lnet/minecraft/world/entity/Entity;)V
+  ()Lnet/minecraft/world/flag/FeatureFlagSet;
+  (Lnet/minecraft/world/flag/FeatureFlagSet;)Z
+  (Lnet/minecraft/world/item/ItemStack;I)Z
+  (Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;
+  (Lnet/minecraft/world/item/component/PiercingWeapon;)V
+  ()Lnet/minecraft/world/phys/Vec3;
+  (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;)Z
+  (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V
+  ()[Lnet/minecraft/world/InteractionHand;
+  ()Lnet/minecraft/world/level/border/WorldBorder;
+  (Lnet/minecraft/core/BlockPos;)Z
+  (Lnet/minecraft/world/entity/Entity;D)Z
+  (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;
+  ()Lnet/minecraft/world/InteractionResult$SwingSource;
+  (Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;
+  (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;
+  (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/phys/HitResult;)V
+  (Ljava/lang/Throwable;Ljava/lang/String;)Lnet/minecraft/CrashReport;
+  ()Lnet/minecraft/resources/Identifier;
+  (Ljava/lang/String;)Lnet/minecraft/network/chat/Component;
+  (Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;
+  (Lnet/minecraft/client/gui/Font;Lnet/minecraft/client/gui/components/toasts/TutorialToast$Icons;Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;ZI)V
+  (Lnet/minecraft/client/gui/components/toasts/Toast;)V
+  ()Ljava/util/function/BooleanSupplier;
+  (Ljava/util/function/BooleanSupplier;)V
+  (Ljava/lang/String;)Lnet/minecraft/CrashReportCategory;
+  (Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraft/CrashReportCategory;
+  (Lnet/minecraft/CrashReport;)Lnet/minecraft/CrashReportCategory;
+  (III)V
+  (Lnet/minecraft/network/protocol/Packet;)V
+  ()Lnet/minecraft/client/CameraType;
+  (Lnet/minecraft/client/CameraType;)V
+  ()Lnet/minecraft/client/gui/components/spectator/SpectatorGui;
+  (Lnet/minecraft/client/Minecraft;IZZ)V
+  ()Lnet/minecraft/world/entity/player/Inventory;
+  (Lnet/minecraft/world/entity/player/Player;)V
+  ()Lnet/minecraft/client/multiplayer/ClientAdvancements;
+  (Lnet/minecraft/client/multiplayer/ClientAdvancements;)V
+  ()Ljava/util/Optional;
+  (Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)V
+  (Z)Z
+  (Lnet/minecraft/client/gui/components/ChatComponent$ChatMethod;)V
+  ()Lnet/minecraft/core/RegistryAccess$Frozen;
+  (Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/core/Registry;
+  (Lnet/minecraft/tags/TagKey;)Ljava/util/Optional;
+  (Lnet/minecraft/core/Registry;)Ljava/util/function/Function;
+  (Ljava/util/function/Function;)Ljava/util/Optional;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/world/level/storage/LevelStorageSource;)V
+  ()Ljava/time/Instant;
+  (Lnet/minecraft/client/multiplayer/LevelLoadTracker;Lnet/minecraft/client/gui/screens/LevelLoadingScreen$Reason;)V
+  ()Lnet/minecraft/world/level/storage/LevelDataAndDimensions$WorldDataAndGenSettings;
+  (Lnet/minecraft/world/level/storage/WorldData;)V
+  ()Lnet/minecraft/server/level/progress/LoggingLevelLoadListener;
+  (Lnet/minecraft/server/level/progress/LevelLoadListener;Lnet/minecraft/server/level/progress/LevelLoadListener;)Lnet/minecraft/server/level/progress/LevelLoadListener;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/util/Optional;Lnet/minecraft/server/level/progress/LevelLoadListener;)Ljava/util/function/Function;
+  (Ljava/util/function/Function;)Lnet/minecraft/server/MinecraftServer;
+  (I)Lnet/minecraft/server/level/progress/ChunkLoadStatusView;
+  (Lnet/minecraft/server/level/progress/ChunkLoadStatusView;)V
+  (Lnet/minecraft/client/multiplayer/chat/report/ReportEnvironment;)V
+  (Lnet/minecraft/client/quickplay/QuickPlayLog$Type;Ljava/lang/String;Ljava/lang/String;)V
+  (Lnet/minecraft/server/WorldStem;)Lnet/minecraft/CrashReportDetail;
+  (Ljava/lang/String;Lnet/minecraft/CrashReportDetail;)Lnet/minecraft/CrashReportCategory;
+  (J)J
+  (J)Ljava/util/function/BooleanSupplier;
+  (Ljava/time/temporal/Temporal;Ljava/time/temporal/Temporal;)Ljava/time/Duration;
+  ()Lnet/minecraft/server/network/ServerConnectionListener;
+  ()Ljava/net/SocketAddress;
+  (Ljava/net/SocketAddress;)Lnet/minecraft/network/Connection;
+  (Lnet/minecraft/network/Connection;Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/multiplayer/ServerData;Lnet/minecraft/client/gui/screens/Screen;ZLjava/time/Duration;Ljava/util/function/Consumer;Lnet/minecraft/client/multiplayer/LevelLoadTracker;Lnet/minecraft/client/multiplayer/TransferState;)V
+  (Ljava/lang/String;ILnet/minecraft/network/protocol/login/ClientLoginPacketListener;)V
+  ()Lnet/minecraft/client/User;
+  ()Ljava/util/UUID;
+  (Ljava/lang/String;Ljava/util/UUID;)V
+  (Lnet/minecraft/client/multiplayer/ClientLevel;)V
+  (Lnet/minecraft/client/gui/screens/Screen;Z)V
+  (Lnet/minecraft/client/gui/screens/Screen;ZZ)V
+  (Lnet/minecraft/client/multiplayer/ClientLevel;Z)V
+  (Ljava/lang/String;)Lnet/minecraft/util/profiling/Zone;
+  ()Lcom/mojang/authlib/minecraft/UserApiService$UserProperties;
+  (Lcom/mojang/authlib/minecraft/UserApiService$UserFlag;)Z
+  ()Ljava/util/Map;
+  (Ljava/util/UUID;)Z
+  (Lnet/minecraft/client/multiplayer/chat/ChatRestriction;)Lnet/minecraft/client/multiplayer/chat/ChatAbilities$Builder;
+  ()Lnet/minecraft/client/multiplayer/chat/ChatAbilities;
+  (Lnet/minecraft/world/phys/HitResult;I)I
+  (Lnet/minecraft/core/BlockPos;Z)V
+  (Lnet/minecraft/world/entity/Entity;Z)V
+  ()Lnet/minecraft/SystemReport;
+  (Lnet/minecraft/CrashReportCategory;)V
+  (D)Ljava/lang/Double;
+  ()Lnet/minecraft/CrashReportDetail;
+  (Lnet/minecraft/client/Minecraft;)Lnet/minecraft/CrashReportDetail;
+  (Ljava/lang/String;)Ljava/util/function/Supplier;
+  (Ljava/lang/String;Ljava/util/function/Supplier;)V
+  (Ljava/lang/String;Ljava/lang/String;)V
+  ()Lnet/minecraft/client/renderer/GpuWarnlistManager;
+  (ILjava/lang/String;)Ljava/lang/String;
+  (Lnet/minecraft/client/resources/language/LanguageManager;)Ljava/util/function/Supplier;
+  (Ljava/util/function/Supplier;)Ljava/util/concurrent/CompletableFuture;
+  (Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;
+  (Lnet/minecraft/client/multiplayer/chat/report/ReportEnvironment;)Z
+  (Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+  (Ljava/util/UUID;Ljava/lang/String;)V
+  ()Lnet/minecraft/world/level/Level;
+  ()Lnet/minecraft/resources/ResourceKey;
+  ()Lnet/minecraft/client/gui/components/BossHealthOverlay;
+  ()Lnet/minecraft/world/attribute/EnvironmentAttributeProbe;
+  (Lnet/minecraft/world/attribute/EnvironmentAttribute;F)Ljava/lang/Object;
+  ()Lnet/minecraft/world/entity/player/Abilities;
+  (ZZ)Ljava/util/Optional;
+  ()Lnet/minecraft/sounds/Music;
+  ()F
+  ()Lcom/mojang/blaze3d/pipeline/RenderTarget;
+  (Lnet/minecraft/client/DeltaTracker;)V
+  (I)Ljava/lang/String;
+  (Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V
+  (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  (Ljava/io/File;)Ljava/util/function/UnaryOperator;
+  (Ljava/util/function/UnaryOperator;)Lnet/minecraft/network/chat/MutableComponent;
+  (Lnet/minecraft/client/gui/components/events/GuiEventListener;)V
+  (Lnet/minecraft/client/gui/components/events/GuiEventListener;Lnet/minecraft/client/input/PreeditEvent;)V
+  ()Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;
+  (FF)F
+  (Lnet/minecraft/gizmos/GizmoCollector;)Lnet/minecraft/gizmos/Gizmos$TemporaryCollection;
+  (FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;
+  (Lnet/minecraft/network/chat/ClickEvent;)Lnet/minecraft/network/chat/Style;
+  (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  ()Lnet/minecraft/client/sounds/SoundManager;
+  (Lnet/minecraft/client/sounds/SoundBufferLibrary$DebugOutput;)V
+  (J)Ljava/lang/Long;
+  (I)Ljava/lang/Integer;
+  ()Lnet/minecraft/server/packs/repository/PackRepository;
+  (Ljava/util/Collection;)Ljava/lang/String;
+  (J)Ljava/lang/String;
+  (D)Ljava/lang/String;
+  ()Ljava/lang/management/RuntimeMXBean;
+  (Ljava/lang/Thread;Lnet/minecraft/client/Minecraft;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/util/Optional;Lnet/minecraft/server/Services;Lnet/minecraft/server/level/progress/LevelLoadListener;)V
+  (I)Lnet/minecraft/core/Holder;
+  (Ljava/lang/Object;)Ljava/util/Optional;
+  (Lnet/minecraft/resources/ResourceKey;)Ljava/util/Optional;
+  (Lnet/minecraft/core/Holder;Lnet/minecraft/client/gui/screens/Screen;)V
+  (Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableList;
+  (Ljava/lang/Object;)Lcom/google/common/collect/ImmutableList;
+  (Lnet/minecraft/SystemReport;Ljava/util/List;)Ljava/nio/file/Path;
+  (Ljava/nio/file/Path;)Ljava/util/function/UnaryOperator;
+  (Ljava/util/function/Consumer;Lnet/minecraft/network/chat/Component;)Ljava/lang/Runnable;
+  (Ljava/util/function/Consumer;DI)Ljava/lang/Runnable;
+  (Ljava/util/Locale;)Ljava/lang/String;
+  (Ljava/lang/String;[Ljava/lang/Object;)V
+  (Lnet/minecraft/client/Minecraft;ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/function/Consumer;
+  (Lnet/minecraft/client/Minecraft;Ljava/util/concurrent/CompletableFuture;Lnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/lang/Runnable;
+  (Ljava/util/Optional;Ljava/util/function/Consumer;Ljava/lang/Runnable;)Ljava/util/Optional;
+  (Ljava/lang/Throwable;Lnet/minecraft/client/Minecraft$GameLoadCookie;)V
+  (Ljava/lang/String;Ljava/lang/Runnable;)Lnet/minecraft/client/gui/screens/ConfirmLinkScreen;
+  (Ljava/lang/Runnable;)Lit/unimi/dsi/fastutil/booleans/BooleanConsumer;
+  (Lit/unimi/dsi/fastutil/booleans/BooleanConsumer;Lcom/mojang/authlib/minecraft/BanDetails;)Lnet/minecraft/client/gui/screens/ConfirmLinkScreen;
+  ()Lnet/minecraft/util/Util$OS;
+  (Ljava/net/URI;)V
+  (Lnet/minecraft/client/Options;Ljava/lang/Runnable;)V
+  ()Lnet/minecraft/client/main/GameConfig$QuickPlayVariant;
+  ()Lcom/mojang/realmsclient/client/RealmsClient;
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/main/GameConfig$QuickPlayVariant;Lcom/mojang/realmsclient/client/RealmsClient;)V
+  (ZLnet/minecraft/client/gui/components/LogoRenderer;)V
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/lang/Runnable;
+  ()Lnet/minecraft/client/renderer/ShaderManager;
+  (Lnet/minecraft/resources/Identifier;Lcom/mojang/blaze3d/shaders/ShaderType;)Ljava/lang/String;
+  ()Lcom/mojang/authlib/minecraft/MinecraftSessionService;
+  (Ljava/util/UUID;Z)Lcom/mojang/authlib/yggdrasil/ProfileResult;
+  ()Lorg/slf4j/Logger;
+  (Ljava/lang/String;)Lnet/minecraft/resources/Identifier;
+  Please make sure you have up-to-date drivers (see aka.ms/mcdriver for instructions).
+  (Lnet/minecraft/client/main/GameConfig;)V
+  (Ljava/util/List<Ljava/util/function/Function<Ljava/lang/Runnable;Lnet/minecraft/client/gui/screens/Screen;>;>;)Z
+  (Ljava/lang/Exception;)V
+  (IJ)V
+  (Lnet/minecraft/client/Minecraft;Ljava/io/File;Lnet/minecraft/CrashReport;)V
+  ()Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+  (ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+  ()Lnet/minecraft/world/level/storage/LevelStorageSource;
+  (Ljava/util/function/Consumer;)Z
+  (Ljava/util/function/Consumer<Lnet/minecraft/network/chat/Component;>;)Z
+  (Lnet/minecraft/SystemReport;Ljava/util/List<Ljava/nio/file/Path;>;)Ljava/nio/file/Path;
+  ()Lnet/minecraft/client/sounds/MusicManager;
+  ()Ljava/util/Optional<Lnet/minecraft/core/Holder<Lnet/minecraft/server/dialog/Dialog;>;>;
+  ()Lnet/minecraft/client/telemetry/ClientTelemetryManager;
+  ()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;
+  (Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/util/Optional;Z)V
+  (Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/util/Optional<Lnet/minecraft/world/level/gamerules/GameRules;>;Z)V
+  (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/resources/language/LanguageManager;Ljava/lang/String;Lnet/minecraft/client/Options;Lnet/minecraft/CrashReport;)V
+  ()Lnet/minecraft/client/Minecraft;
+  ()Ljava/net/Proxy;
+  ()Lnet/minecraft/client/renderer/texture/TextureManager;
+  ()Lnet/minecraft/server/packs/resources/ResourceManager;
+  ()Lnet/minecraft/client/resources/server/DownloadedPackSource;
+  ()Lnet/minecraft/client/resources/language/LanguageManager;
+  ()Lnet/minecraft/server/Services;
+  ()Lnet/minecraft/client/resources/SkinManager;
+  (Lnet/minecraft/world/entity/Entity;)Z
+  (Ljava/lang/Runnable;)Ljava/lang/Runnable;
+  (Ljava/lang/Runnable;)Z
+  ()Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
+  ()Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;
+  ()Lnet/minecraft/client/renderer/MapRenderer;
+  ()Lnet/minecraft/client/DeltaTracker;
+  ()Lnet/minecraft/client/tutorial/Tutorial;
+  ()Lnet/minecraft/client/HotbarManager;
+  ()Lnet/minecraft/client/resources/model/sprite/AtlasManager;
+  ()Lnet/minecraft/client/resources/MapTextureManager;
+  ()Lnet/minecraft/client/resources/WaypointStyleManager;
+  (Ljava/io/File;)Lnet/minecraft/network/chat/Component;
+  ()Lnet/minecraft/client/resources/SplashManager;
+  ()Lnet/minecraft/client/gui/screens/Overlay;
+  ()Lnet/minecraft/client/gui/screens/social/PlayerSocialManager;
+  ()Lcom/mojang/blaze3d/platform/TextInputManager;
+  (Lnet/minecraft/client/gui/components/events/GuiEventListener;Z)V
+  ()Lcom/mojang/blaze3d/platform/FramerateLimitTracker;
+  ()Lnet/minecraft/client/renderer/RenderBuffers;
+  ()Lnet/minecraft/client/model/geom/EntityModelSet;
+  ()Lnet/minecraft/client/InputType;
+  ()Lnet/minecraft/client/GameNarrator;
+  ()Lnet/minecraft/client/multiplayer/chat/ChatListener;
+  ()Lnet/minecraft/client/multiplayer/chat/report/ReportingContext;
+  ()Lcom/mojang/realmsclient/gui/RealmsDataFetcher;
+  ()Lnet/minecraft/client/quickplay/QuickPlayLog;
+  ()Lnet/minecraft/client/CommandHistory;
+  ()Lnet/minecraft/world/level/validation/DirectoryValidator;
+  ()Lnet/minecraft/client/renderer/PlayerSkinRenderCache;
+  (F)F
+  ()Lnet/minecraft/client/renderer/item/ItemModelResolver;
+  ()Lnet/minecraft/network/PacketProcessor;
+  ()Ljava/util/Collection<Lnet/minecraft/gizmos/SimpleGizmoCollector$GizmoInstance;>;
+  (Ljava/io/File;Lnet/minecraft/network/chat/Style;)Lnet/minecraft/network/chat/Style;
+  (Ljava/util/concurrent/CompletableFuture;)Ljava/util/concurrent/CompletionStage;
+  (Lnet/minecraft/client/resources/language/LanguageManager;)Ljava/lang/String;
+  (Lnet/minecraft/client/Minecraft;)Ljava/lang/String;
+  (J)Z
+  (Lnet/minecraft/server/WorldStem;)Ljava/lang/String;
+  (Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/util/Optional;Lnet/minecraft/server/level/progress/LevelLoadListener;Ljava/lang/Thread;)Lnet/minecraft/client/server/IntegratedServer;
+  (Lnet/minecraft/core/Registry;Lnet/minecraft/core/HolderSet$Named;)Ljava/util/Optional;
+  (Lnet/minecraft/core/Holder;)V
+  (Ljava/util/function/Consumer;Lnet/minecraft/util/profiling/ProfileResults;)V
+  (Ljava/util/function/Consumer;Ljava/util/concurrent/CompletableFuture;Ljava/util/concurrent/CompletableFuture;)V
+  (Ljava/util/function/Consumer;Ljava/nio/file/Path;)V
+  (Lnet/minecraft/SystemReport;Ljava/util/function/Consumer;Ljava/util/List;)V
+  (Ljava/util/function/Consumer;Lnet/minecraft/network/chat/Component;)V
+  (Ljava/nio/file/Path;Lnet/minecraft/network/chat/Style;)Lnet/minecraft/network/chat/Style;
+  (Ljava/util/function/Consumer;DI)V
+  (Ljava/util/concurrent/CompletableFuture;)V
+  (Lnet/minecraft/core/Holder$Reference;)V
+  (ZLnet/minecraft/client/Minecraft$GameLoadCookie;Ljava/util/concurrent/CompletableFuture;Ljava/util/Optional;)V
+  (Ljava/util/concurrent/CompletableFuture;Lnet/minecraft/client/Minecraft$GameLoadCookie;)V
+  (ZLnet/minecraft/client/Minecraft$GameLoadCookie;Ljava/lang/Throwable;)V
+  (Lcom/mojang/authlib/GameProfile;Ljava/lang/Runnable;)Lnet/minecraft/client/gui/screens/Screen;
+  (Lcom/mojang/authlib/minecraft/BanDetails;Ljava/lang/Runnable;)Lnet/minecraft/client/gui/screens/Screen;
+  (Ljava/lang/Runnable;Z)V
+  (Ljava/lang/Runnable;)Lnet/minecraft/client/gui/screens/Screen;
+  (Lnet/minecraft/client/Minecraft$GameLoadCookie;Z)V
+  (Lnet/minecraft/client/Minecraft$GameLoadCookie;Ljava/util/Optional;)V
+  (Lnet/minecraft/client/Minecraft$GameLoadCookie;Ljava/lang/Throwable;)V
+  (Lnet/minecraft/client/resources/language/ClientLanguage;)V
+  ()Lcom/mojang/authlib/yggdrasil/ProfileResult;
+  Recovering from unsupported resolution (x).
+Please make sure you have up-to-date drivers (see aka.ms/mcdriver for instructions).
+  (Ljava/util/Optional;)V
+  (Ljava/lang/Runnable;)Lnet/minecraft/client/gui/screens/ConfirmLinkScreen;
+  (Ljava/lang/String;Z)Lnet/minecraft/client/gui/screens/ChatScreen;
+  (Ljava/util/List;)V
+  (Lnet/minecraft/core/HolderSet$Named;)Ljava/util/Optional;
+  (Ljava/lang/Thread;)Lnet/minecraft/client/server/IntegratedServer;
+  (Lnet/minecraft/client/multiplayer/ClientPacketListener;)Lnet/minecraft/client/multiplayer/ServerData;
+  (Lnet/minecraft/client/gui/screens/Screen;)Lnet/minecraft/sounds/Music;
+  (Lnet/minecraft/network/chat/Style;)Lnet/minecraft/network/chat/Style;
+  (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  G   `� a   b H 7   M 7   R 7    6 7   n7 c   d ��   Y�   e � a   f       � �   67 c   hi   
+  j         ��   Z[   cd    ' (   ��   {|      ��   ��   ��   ;<   ./    �    ��   ��   \]   ��   ��   ��   ��   ��   ��    1 .    � �    � �    � �      	 O   +,   ` O   g O   m O   ��    � �    � �    � �   ��   ��   ��   �� i     j   DE   ;<   �   MN   ��    A B   >?   C7 c   k  !   ^_   ��   ��   OP   ��   ��      '(   ��   �   ��   ��      pq   34 i     j   45 i     j   IJ i     j   pq i     j   �� i     j   
+R O   �� i     j    i     j   ��   
+��   B	W O    K    	�    	��   `a i     j   �� i     j   k O   ��   B� O   
+	��   	�    ��   l O    N O    U    �7 c   mi     j   DE i     j   
+�   ��    ^ [    f g   	�    	�	�   �� i     j   
+      67   45    � �   � O    �    �    ��    m n    t u c   n �  	o p  ?    �*� * � � *� Y	*�   � "� %*� )� /*� 2Y� 4� 8  � <� ?*� C� I*� L*� P� S*� V� \*� _Y� a� d*� hY� j� k*� oY� q� r*� v*� z� *+� �� �� �+� �� �M*+� �� �� �� �*+� �� �� �*+� �� �� �*� �� �N*-�� � � �� �� �Y+� �� �*� �� �:*� �Y*-˹ � +� ͷ ѵ Ի �Y*� �� ڲ �*� �� �:*� �Y� �YSY*� Զ �SYS� � �*� �� �*+� ʹ �*+� ���
+*�
+� *��� �Y*��:**� ���*+� ʹ�!**�
+� 
+�"� *�(  �,�0�4**+�8�<**�@  �,�0�A�DH*�!�J�P �DV*�!�X�[ *+� ��^�a*+� ��b� � �e*+� ��h� � �k*�n�r  �u*�{��*����*��Y**� �����*��Y*� �*������*��Y**������*����6*����*����*��*��Y**������*��Y-*�������DøŹP +��:*���Ξ $*���Ҟ +��*����*���ζ�:� ��:*���߲D�� ��Y*������������� �Y�Y�S:	�	Y�:
+::	:�66� �2:�Y**����*��:��*�  �!Y*���#�&+� ��)�,�/ :�3� M:�D9�; �< 
+@�B�; �BF�B�H�BW� �K:���[� 
+�N:�Q�UY�W�*�X*�\Y*�X�^�a*�X�eY*+�g�j�n�s�y*�X*� ��}�� � 	��� ����� :�D��� *��Y*����*��*�X��*��Y*����*��*�X��*��*�����������D�������ŹP *��Y*�X��*�X�ѷԵ�*��Y� ڷݵ�*� ���*��*� ���*��Y*����*��  ����*��*����*��Y*���*��*���*�Y*�*�
+  ��*��*����Y*�*�*�:*�Y,� �� � *�*��*� �Y-"� � -$� � *� �*���&�)*�-Y-�/�2*�6Y*�8�9*�=Y*���?�B*��*�B��*�FY*�!�H�K*��*�K��*�OY*�*���Q���T�V�Y�\*��*�\���`Y**��b�f:*�iY*�*��k�n*�n�r*�xY*�*�\*�n�z�}**�}����**�}����*��*�}��*��*���Y����*���Y����*���Y����*�X�����*�X���*����*��Y*��*�\*�n����*��*������Y��:*����*��Y*������*��Y*���Ƶ�*��Y*��͵�*��Y*�\*�зֵٸݶ�6��*��Y����  :�����   �Q�Y��*�
+Y**�<��*�Y**�*��*��*��*�\*��*��*���*�n��*��*���*� Y*��*���*��*��*�*�\*�n�"�%*��*�%��*�)Y�+�,*��*�,��*�0Y*�2*�,�6�9*�,*�9Y�=W�C  �G*�JY�L�M*��*�M��*�QY**��S*��*���W�Z*�Z�^�b:*�X�͵h*�X�ѵm*�pY**�*�%*��*�Z�^*�Z�r�v�y*��*�y��*��*�y�}��*��Y����*��*����*��*� ?��*��Y*����*��:*��Y����*��  ��*�״�*�X�͠ *�״�*�X�џ i�	Y*�X��*�X�Ѻ�  �:��:�� � ��B��ŶBW� :*�X*�״�*�״����N�Q� Q*���������� >*�X��� 4� !*�X��*����*�X���Ƕʧ *�����Ƕ�*�X*���ζ������*�X*���Զ������*�X*���ڶ������*�X��*��*�Z*� ����*��Y**�<*�!���**�
+� 	��� *�<*�!-���*�Y*��*�*������ � �*�Y*��*�*������ �!�%*�)*�<�/�4*��8*��=*�Z*��@*�CYE�G�M�P*� ��T:*� d�W�]*��ad�f*�l�o:�n�s�v�yY+�{�:*�>Y**��  ����*+�{������*��Y*��*����*��Y� *��  *��Y�=W��  ������� +� ���� *��Y����� *��*��Y*���Ƶɱ _��7Bad�Rjm�	h	�	�� q  j �  �  ) %> ,Y ?y F� K� R� Y� d� o� z� ~� �� �� �� �� �� �� �� �� �� ���9�B�M�X�v���������������������	��!�)�0�7�G�Z�j�s�{������������������������#�3�?�B�E�_ x������	�
+�����
+)9&B)a,d*f+s./�1�2�6�8�:�<�>�?AF(H7IBKWLbNtO�Q�R�T�U�V�X�Y["\-^>_S`Zbqc|d�e�f�h�i�j�l�n�p�r�t�u w	xz!{0}?R�Z�]�j�m�o�}������������%�8�M�X�c�~�����������������	�	�	�	!�	*�	L�	h�	o�	y�	��	��	��	��	��	��	��	��	��
+ �
+�
+.�
+E�
+L�
+P�
+^�
+r�
+��
+��
+��
+��
+��
+��
+��
+�����'�?�H�W�n�|���������� �r  $ � Bst _ �u  v � f wx Z y� o wz 	o { u 	h G|}   �~ y    ��  �I� �  �� �  �
+��� 
+��� v
+k�� s	n� O �	&�� 3��� 	?��} 
+B��[ E��� tm�� >��� 	��� �Wfg 	��  �� u ? ��� W ��� �    	o {�  ��� �  v "�i   � � � � �  J� (   � � � � �  �    � � � � �  #� [ �     � � � � �  Q �     � � � � �  � ��� J   � � � � ���	��  � ]   � � � � ���	�� 7� C� � F   � � � � ���	� ��    � � � � ���	� ��E���   � � � � ���	��� ���i�� @	B�� ?�  �    � � � � ���	���i�  �f�     � � � � ���	���i� ���y�     �� p   h     *��L+T�Ӛ +X�ә � �   q   
+    r       ~ y    Z[ �    � @ C� p   h     *��L+U�Ӛ +Y�ә � �   q   
+   	 
+r       ~ y    Z[ �    � @ �� p   h     *��L+V�Ӛ +Z�ә � �   q   
+    r       ~ y    Z[ �    � @ �� p   [     *�ך *��*+�ڱ   q         r       ~ y     �� �    �   � i   	   j   �� p   �     ;*+��M�n�s�y�n��y�n*�����,�� *����*�����   q   "       %  +" 3# :$r        ;~ y     ;��   5�� �   � i   	   j   	�� p   /     *�׬   q      'r       ~ y   �� p       W� oY� qM*,��>*+��  :,���� :� � *� �
+:� �:*�  :����   q   "   + , . 6 97 G8 Q9 T;r   H  G 
+`a  9 ��    W~ y     W��   O� u   I� O   ?�� �     9 ��   O�� �    � #  y��  � 0�   � i   	   j   �� p  l     �=*���� 	�� +*�  � W=*� N-� +-�$  � W*�4�'�):� E�+:�/:�3�9 � +�>  � W�A�9 � +�D  � W�   q   B   ? @ A B !E &F *G 7O CP HQ OR VS cT qV ~W �Zr   H  O ;-�  V 41�    �~ y     �� u   �� O  & f"�  C I�� �     V 41�    ��� �    � � �� 9)�:� �   � c   � 
+� p   ^     �E�K*�N�L�    
+ Q q      _ ` ar      w�    ��  �    KQ�   �  � c p   :     *�X*��S�   q   
+   f gr       ~ y   O p  n     ɻ	YV�L�X�\� +a�BW+c�BW+�}�e �BW*�hM,� �,�l�q� �+v�BW*�xN*�n� *�n�|� +������BW� S-� -��� +������BW� 6*�n� -� -��� +������BW� +������BW+�N�   q   F   j k l n $o 1q 6r Ds Lt Qu bv tw x �y �z �| ��r   *  Q s��    �~ y    ��}  6 � �    � 	� Wm��  :; p   l     ,� ��� ���+,� ʹ�����   q      � 
+� �r        ~ y     ��    �� �    �   	� �  �� p   /     *�
+�   q      �r       ~ y   	Z[ p   (      ���  ���   q      � �� p   s     *� ����� � *+,��� +���   q      � � � �r        ~ y     ��    �� �    �   	� � i   	  j   �� p   �     W�D�+�� *� d+��*� Զ�*� ��ȶ�*���ѹ� *���׹� *����*-��*,��  *��W�   q   * 
+  � � � � %� 1� =� D� R� V�r   *    W~ y     W��    W|�    W�� �   � | � i     j   j   � c p   v     +*��*�2� *�2���*��*�9Y��P*��   q      � � � � � %� *�r       +~ y  �     �O p   Z     *��M,����G+��   q      � � �r        ~ y     |�   �� �   | i   	   j   �� p   �     U*� ��� A*� ����� � &�D�
++�+� *�Y+�+��� **�  � �*+#�G���   q   "   � 
+� � *� =� G� H� T�r       U~ y     Us� �    =	 �   s  E c p  �    *�����ݶ�� *��
+�%(�*L=*��� �.�0N*�6�:6*-�?�C:*� \�I +�N*�X�S�V*� � �Y+�\*� \�_ � *�b �  :� �b � :�e�*-�h��yN� -�*�l*�oY�q�P�r�D�
+u-� =��L� =M�D�
+y,� *,�{�� "M�D�
+,� *�Y�,���  F w �� � � �� * � �� ! � �w ! � �� q   � &  � � � � !� #� *� 1� :� F� O� S� Z� ]� j� n� w� �� �� �� �� �� �� �� �� �� �� �� �� �� �� �� �� �� �� ����r   \ 	 F ]��  1 y��  : p� O  � )wz  # �� O  � w�  � ��   ~ y   ! ��� �   � � O� B  O1c  �    O1c  ^��   O1c� �� � 	  O �� �� %BwZ�  � c p   :     *�}*�����   q   
+   � �r       ~ y   �� p   \     *�����Ƕ�*�����   q         r        ~ y     >�    �  �   	> �  DE p   /     *�װ   q      r       ~ y   �O p   /     *� ��   q      	r       ~ y   �O p   /     *� ��   q      r       ~ y   � p   B     
+**+�����   q   
+    	r       
+~ y     
+�� �   �   p   x     ��*+��M**� �,��>*�l���   q        	   r   *    ~ y     ��  	 ��   	�� �   �  	�� p  \     �*� ��� � M,����  � � N+�������D��� +���  +���� ����  ��6���+-����� -�� ����  ��6�������6���:���  1 O �   U t �   z � �   � � �   q   R      " &% 1) 8* L+ O4 R+ U, `- q. t4 w. z0 �1 �4 �1 �4 �5r   *    � � �     ���   �� �   v� � �    � U � �$O��   	 � �  	�� p   \     *+,��>���   q      9 : ;r   *    � y      � �    ��   �� �   �  � � i   	   j   
+�� p   s     +,��>*� 
+*�B���   q      > @ 
+B Dr   *    � y      � �    ��   �� �    � �   �  � � i   	   j   
+;� p   ;     *���ɶ�����   q      Hr       ~ y   �� p   1     *�ڰ   q      Lr       ~ y  c   � �� p  { 	    *��� *�̰�#Y��N� *���>� 
+*-��-�*� ���*� ��T:� *� d���]*�>Y**��ad�f*�l�o*,-��  � � ����-�   q   2   R S U V "W 'X )\ 0] 9^ =_ Ib }tr   4    ~ y     � O    ��   k�7  9 F� u �      k�m  9 F�� �   \ � #� �� ,  y#�   J J �f�    y#�   J J �f�   	� � c   �i   	  j   < c p  a  
+  )<*�ڶ�M,��N��� :� � `� ��:�����:� � :� �:���  ,�:-� �D�[ <��§��-� �:��� :� � _� ��:�����:� � 9� �:,��:	�#� 	� �D&�[ ��ç���(�+ �/  �2 �8�<�=�<� �BYD�F��   q   j   x { 
+| ~ / R� ]� e� k� x� z� }� �� �� �� �� �� �� �� �� ������(�r   p  e ��  R (��  / N��  � �� 	 � '��  � M��   )~ y   '> O  
+��  ��  � ��� �   @ �   �  � "�=� � � �� "�<� � , �� p   /     *�)�   q      �r       ~ y   MN p   ]     *�G� *���K+�O  �R�   q      � � �r       ~ y     �� �    �   �  RS p  �     ��X� ��*��� �D[�] *�^� *�^�b� 
+*� )�e+� j*�i� �BYl�F�*�2� �9Y��L� F*�G�n� 1*�G�s� �vY*�2�x�|*�G��L� *�G��� *���K��L*+�^*�^� 
+*�^��+� "*������+*�X��*�X����� "*�a��*�2� ��*�B��*����*���   q   v   � � � "� ,� 3� 7� >� I� P� [� e� o� �� �� �� �� �� �� �� �� �� �� �� �� �� �� �� ��r       �~ y     �`a �    -	
+"�   `  i   	   j   �� p   >     *+�б   q   
+   � �r       ~ y     �� �   � i   	   j   � c p       n�D��� *���� L*�2� *�2���*�� L*�^� 
+*�^�b*����  � *���  ��� M��  � *��� ��,��    �  + .�   A W   q   R   � � � � � � '� +� .� /� 6� = A I P W ` g k mr       n~ y  �    	U� F� Y��  ��  M c p  h     �*��� 
+*����*����*� ?��*�\��*�}��*�Z��*���*�y��*�B��*�ж�*���*���*��� 
+*���иѸԸ׶۸���*�X�K� L�D�+�� +�M*�X�K,��   { ��  { �   � � �   q   n        # * 1 8 ? F M T [ b i l o  u! {& �' �" �# �$ �& �' �(r     � ��    �~ y  �    � Z[�N�	 [� p  �    c*�X��*�X�� *��*��� %*���>� *��M*��*��,��  ��W� *� %� P�� =��N� �*��:-��	  *�ɶ	-	�	
+ *�	-�	 � &�	� :� �	� :�e�-	�	  �  *�	� -	�	  *��	-�	 6
+�	� D-	#�	% *��:*�	(� &�	� :� �	� :�e������ "*�2� *�2�	)�	-� **� k�	2� r-�	 *�X	5��*�y�	7:-	:�	  *�B*�Z�	<�	@-	D�	
+ *���	F-	I�	
+ *���	K-	N�	
+ *�	P-�	 � &�	� :� �	� :�e�*�X	S��*�	U6**�	X� 3*�^� *�^�	[� *��� *�ж	^� *�n�|� � �	U� !*�	U� *�B�	aY�	cSY�	gS�	j*� %*�	U�	n*� %*�	� � �	q�  b � �� � � �� � ���b������� q   � 7  + 
+- . 2 )3 .4 35 A8 T: X< \= b> k? r@ {A B �C �= �E �F �G �H �I �J �M �N �O �P �QO M&S>TIVOYYZb[k\y]�^�_�`�a�b�c�d�Z�f�h�i!j-kDmOnbor   f 
+ . �7  b K��  � ,��  � L�� b s��   c~ y    c� O  T��  X�� � ~� O �     . �m �   � (@� >  		 ��   		� �� )� � *  		 ��   		� �� � 
+� j  		 ��   		� �� � (  	  P M �    	  %Y �    	  �   �  	R� p  �    ��M,	t�	  *� %� P�	u*���	y�	~� *� \�	� � 0*��� *���	�� �	��	�� � >� �	��	�� 
+>*�	�� C7*�	�*�X�	�*�	�� � *�2� 
+*�2�	�*�Z*� %�	�*� %�	�8*�	�,	��	
+ *�Z�^*���	��	�*�Z*� %�	�,	��	
+ �	�,�	 *�Z*� %�	�,	��	  *�Z�^�b�	�� 
+*�׶	�*� Ce�	�� *�	��	ȵ�,	̹	
+ *��� *���	�*��*�׶	�*���	�,	ٹ	
+ *�Z�^�	�6� �	�,	�	
+ *Y�	�`�	� C7*� Ie7
+� 	*
+�	�*�6
+�	�*� I*��� #*���	�� **���	�	�k*�	�o�	�� P*�	�	�a�� *�	�	�*Y�	�	�a�	�*�	���,�	 �   q   � 7  r t v x 0y Pz T{ ]~ _ d� i� m� t� �� �� �� �� �� �� �� �� �� �� �� �� ������%�.�5�<�G�N�W�c�k�p�y����������������������������r   f 
+ P � O   ~ y    � O  ���  _�� O  i��   �_�O c �	�� � z�  � q�  
+�   & � 0	@� � (� !� (� *5)�   �  	� c p   �     P*�X�	�� **���	��  *���	������� *���
+ � *� P� S� � P*� Se
+�� *�
+�   q      � 1� ;� J� O�r       P~ y  �    1	 AB p  
+     r� *���
+*� \�	� � ,� �
+�� .*���
+� *�
+*���
+*Y�
+`�
+*���
+N� �
+N*� \�	� � -*� \�
+ �
+N-,�
+#�   q   :   � � � � � #� -� 2� 9� C� N� R� ^� l�r   4  K ��    r~ y     r� O    r��  R  �� �    � 	�   	� � i   	  j   jk p   �     (,� ,�
+'*�6�
+(N� -*���
+,�
+0� -�
+0�   q      � � � � � "� '�r   *    (~ y     (� O    (��     �   
+ � 
+1�   	� � i   	  j   � c p   �     H*�X*���
+6���T�V*�
+9�
+<<*�X�
+@*�^� *�^*�X��*�X���
+C*���
+F�   q      � � $� +� @ Gr       H~ y    ,
+8� �    � @ 
+K c p   6     *���
+I�   q   
+    r       ~ y   � p   .     �	��   q      
+r       ~ y    H p   /     *�	ŭ   q      r       ~ y    c p   9     **�
+L  �
+M�   q   
+    
+r       ~ y   n c p   �     %��*�
+P� *�n� *�n�
+S*�
+V� L�r�     � q   "          ! $r       %~ y  �    F�   p  B  	   �*� \�	� � 	*�
+Y�*+�
+\  M*+�
+_  N�
+`Y�
+b**��*� �*���
+c:*-�
+g  :*�n� �
+j  :� h*�n�
+mW�#Y��:�#Y��:�#YSYS�
+p�
+t  �
+w��W*�n�
+z  Y�=W�
+{  �
+~Y�=W�
+{  :*�
+�Y� *�y�
+�� �
+w�
+�Y
+��
+�*,�
+�  �
+�� \�   q   V   " # $ ' 4 "> ;? FD ME YG cI lJ uK �N �L �Q �R �T �W �T �`r   f 
+ V   l R	7  u I
+7    �~ y     �   �  " �  ; �  F �  � 0 
+     W     *� \�
+� *�n� 
+*�n�
+��   q      d 	e f hr       ~ y  �     q c p   W     *� \�
+� *�n� 
+*�n�
+��   q      k 	l m or       ~ y  �     qr p      v*�
+�� *�
+��
+��
+� :� *�x:� �
+�� 
+�:�
+�
+���Y��SYSY�}�
+� S�
+�:�
+�
+��
+�:�
+�� � N� :�
+�Y�
+ȿ�
+�Y-�
+�:
+��Ƹ
+�+�
+ն
+�
+��Ƹ
+�*���
+۶
+߹ � *���
+�
+�,Y�=W�
+�  �
+� �
+� :�
+� :�e�,�� :� � 0� � �:�
+� �
+� :�D
+��
+� ��̧ G:,�� :		� � 0	� � �:
+
+�
+� �
+� :�D
+�
+�
+� ����-�  0 m p� � � �� � � ��� | �0  PZ]�020   q   � "  u v x y 0} <� G� P} U� b� m� p� r� |� �� �� �� �� �� ������*�-�0�P�Z�]�_�n�q�t�r   �    �   ��  U  �  b  �  m  �  r 
+wx  � h  wx   � _ wx P  � 
+  v~ y    v   v u  | � �  0F � �      v �   �   �B��   
+`� �  ��   
+`� ��  � [  
+`� ��
+� �� 	  
+`� ��
+�� �� � � "  
+`� �� � �� � B�� 	 
+ 
+`� ��   �  � "  
+`� ��   � � �� � �   
+`� ��  �   	  c     � c p   4     *���   q   
+   � �r       ~ y   !� p   /     *���   q      �r       ~ y   
+� p   �     G*�^� �*�	X� *�n�|� � =� *�
+�Y� � �
+��P� *�
+�Y�
+��P�   q      � � � � #� :� F�r        G~ y     G" O   (# O �   3 @�      $ $�       $ $�   "  u� p  U     �� *�
+�*�
+�� *�G�
+�� �*�G�
+��M,��� �� ^*�� W*���� J*��#N-�%:*�2�)�#� ,-�-:*�1�5� *�2�;*�G�
+��?�*�1�C�   q   J   � � 	� � � &� 0� 1� I� Q� W� f� l� z� �� �� �� ��r   >  l #$:  Q ?%&  W 9'4    �~ y     �( O  & r)* �    	 � � ]#0�  �   (  c� p  �    y*�
+�� �*��  �DF�] *�1�H� 	*
+�
+��*�G�K� �*�1�N� !*�M,�Q� ,�QL*�1+�S�W�*�G�
+��L+*�2�[�_� �*�G+�c� �=+��g�jN-� *�1-�l*�G�
+��?��p*���v.�     �            W   �+�y�g�|:� *�G*��~��� t*�1*�G*��Q�S��� \*��#:�%:*�2�)�#� &*�1�-��W*�2�)�#� =� *�1�H� 	*
+�
+�*�G��*�G�
+��?�   q   � '  � � 	� � � %� +� -� 7� 9� C� T� _� a� l� z� |� �� �� �� �� �� �� �� �� �� �� ����$3BQV
+`fmwr   R  T +,  � 0-.  9%& $ 2'4   y~ y   l)*  � �/ O  � �01 �   % 	!%� � $j(� #|� � A f c p  �    �*�1��� �*��*�G�K� �*�� �DF�� ��L+�=>��+2:*�G�:*�2�[�_� �*���p*���v.�      �               �*��Q:�S:*�2������� �*�G��� � �*�1*�G��:��� ��:		����� *�G�?�� y*��#:	��6
+*�1*�G	��:��� G��:����� 4*�G�?�Ě #��
+� *�G�ř *�Z���̱�љ ��Ě B*�1*�G��:��� +��:����� *�G�?*�Z���̱���}�   q   � -   
+    ! "" -% @* K+ Z, [/ b0 �2 �3 �4 �5 �8 �9 �< �= �> �? �A �D �FH	IJ)K4L=OYPeTfUnVo\w]�^�_�`�c�d�%�hr   �  � 23 	 � d4,  � ])�  � '�5 ) =23  m%& 		 f6� 
+ U75 � !23 � 085  Kk)*  @v9   �~ y  �   � � :� $
+�0� "Q�� 5<��  � � _  :
+�   #<�  �  �   :
+�  � 9<��   :  �  >? p   /     *�9�   q      kr       ~ y   	 c p  � 	   O*Y��
+a��*�2� *�	U� *�2�	)��*��� *Y��d����L+۹	  *�a��*���*��*�	U��+�	 *�	�*��*�2*���+�	  *�	U� *�2� 
+*�1��+�	
+ *�^� L*�G� E*�G�n� *�^�v� *�P� H*�G�� >*�2� 7*���K���  �R� "*�^N-�� -��M*�G�� ,��*�^� 
+*'�
+�*�^� '*�^��� M,���N*�^-���wY-� �*��� 
+*�ж*�6�� 
+*���*��� (*�^� !+	�	
+ *�*�
+�� *Y�
+�d�
+�*�2� =*�	U� G+�	
+ *�Z�+�	
+ *�2�+�	
+ *�2�� *�Z�� 
+*�Z�*�9�!*�B*�	U�"*�2�,*�	U� �+#�	
+ *���$� W*�'� P*�GM,��Y.�0S�4N*�7Y*���9,-@�?�B*��*�B�F*���$*����*���J*�2�K  �N� =M,Q��N*�2� -S�U:Y[�]W� *�2-�cW�wY-� �+g�	
+ *�	U� &*�	� *�2*�G�i*�G�l*�G�o�r+u�	
+ *�	U� *�	� 
+*�9�w*�hM,� *�	U� 
+,�x�}� *��� +��	
+ *����+��	
+ *����+�	 � %(�my|� q  n [  o 
+q r "t )u 3x 7z @{ G| N} Y~ _ d� s� |� �� �� �� �� �� �� �� ���	����%�(�
+  B� ) ��   FC� 4 2|� � DE � 1B� } 9��     O~ y   7�� �   3 "� ]	2%P�+� @� �U�� '�� 2 	� p   P     *�2� *�2�	)�	-� � �   q      �r       ~ y  �    @ )� p   T     *�
+P� *�n� *�n�|� � �   q      �r       ~ y  �    @  c p  �    �*������� S*����L*��*��������+��*������� *�Z*������� 
+*��� ��*�y�����*������� *��*����� � �����*������� *��*����� � �����*������� *�Z�����<	� t*������=*������>*����2��� I*�G�ș *�����ͧ 1*�G�ř *�^� � � *�ҧ *�G���܄���*������ H*�'�  �� *����*�������*�B� *�B��*�B*��Y���P���*������� 0*�1��� *�G�����*����*�Y*�G��P���*������ *�
+Y*�G����P���*������ *�*�  ����*���$��� '*�G�Ț��*�h�'Y�)�/�5�;�}���*���>��� (*�G�Ț��*�G*�A�D���*�G�
+��?���*���H��� *��K���*�^� *��� *���O��� 
+*�R�K<*�G�
+�� K*���U��� *�1*�G�X*���[��� ���*���U��� ���*���^��� i���*���[��� *�a�<���*���U��� 
+*�d���*���^��� 
+*�g���*�G�ș *���j��� *���ɶm���*���U��� *��� *�G�
+�� *�d**�^� "� *���[��� *���p� � �s�   q   G  � �   & 7 S Z ] j � � � � � � � � � �(39!F"S#]$j&q'x(}*�.�/�0�2�3�6�7�9�:<=>8AEBOC]DjIwJ�L�M�P�Q�R�S�V�X�Z�]^`a"c/d6f@gMhZmxn|q�rr   >   EFG  � `H O  � UI O  � w��   �~ y  �J O �   � ) � N  � Q�    � Q�� 	^��     �^��     �� � B	� 
+� 0 $01!� #	!f �        p   p     &*�G��v�z�� L+���� +��  ���   q   
+   u vr       &~ y    KL �      KM c   N OP p   /     *���   q      �r       ~ y   Q$ p   /     *�	��   q      �r       ~ y   �� p   /     *��   q      �r       ~ y   RS p   7     ��Y**�)���   q      �r       ~ y   TU p  �    �*���:��Y� 	
+� 	��:��Y����:*�P����``6	+-���Ķ��ϸ�:
+**+,-
+��  ���}�n*�n	���*�
+P*�)��*����+��-���Ĺ
+� ��� ?:
+
+���:��U:�+���]W�-�  �W�wY� ���:
+
+�	  �
+
+�m7*�n�� 
+*��� 5� Ca7�*��� 
+*�ж*�	P*�	*�  ����
+�	 ��� :*�n�&�):�/:�3�4Y*�6  �7�:�>Y*�@�J*�@�D�H�K*���  ? � �� q   � *  � � 	� � ,� 2� ?� J� T� k� y� ~� �� �� �� �� �� �� �� �� �� �� �� ������&�+�/�:�=�D�N�Z�a�e���������r   �  T KVW 
+ � 0B�  � &XE  � :�� 
+ 'Y    �~ y    �Z[   �\ �   �]^   �_`   �a O  	�bc  �de  ,y`f  ?fg� 	 � ��� 
+ � �h  N Wij Z Kkl a D� �      �_m �   w �   � �� �  	 	�    � �� �  	 	� � 
+ � �� ��� �;� 	� � �   Z \ ] _ a c   n �O p   G     *+�2*+�L�   q      � � 
+�r       ~ y     45 �   4  oO p       g*�
+�=*�xN*�2� *�2+��� 
+*�
+V� *��9Y��:� *�P� +-� -��� *�PY�R�P� *�TY�V�P�   q   :   � � 
+� � � � $� (� 1� 5� >� I� Y� f�r   4    g~ y     g|�   bp O  
+ ]q�  1 6rs �    � �
+� 9�   |  
+X c p   >     *�CY�W�M�Z�   q   
+   � �r       ~ y   � c p   4     *�]�   q   
+   � �r       ~ y   �� p   G     *�_Y�a�b�   q   
+   � �r       ~ y     t O �   t  �\ p   J     *+�b�   q   
+   � �r        ~ y     `a    u O �   	` u  �d p  �     �*�h:� *�e�h� *�i*��l*� \�	� � *�o*�n:*�n*�Z�r*�1*��u*�i*�2� 
+*���v*�2� =�
+S*�CY�W�M�P��:�	  �y� *�	P����	 *+�|*�
+P*�*�G*�i� :*�i��  V � �   � � �   q   � #  	  	 	 	 	 	 	 #	
+ /	 3	 9	 >	 E	 J	 Q	 V	 ]	 d	 i	 n	 t	  �	! �	" �	# �	$ �	& �	( �	) �	* �	+ �	- �	. �	- �	. �	/r   H  � !��    �~ y     �`a    �u O    �t O   �  9 ��q �    � m� 0}� ,	� \�	�   ` u t  k c p   >     *� Զ�*�	�   q      	2 	4 	5r       ~ y   vS p       a*�hM,� ,��*� \�	� � *�o*�Z�r*�1*��u*�i*+�|*���v*�2*�L*�G*�i� N*�i-��  5 P X   q   N   	8 	9 		: 	= 	> 	A $	B )	D 0	E 5	G :	K A	L F	M K	N P	P U	Q X	P ^	Q `	Rr        a~ y     a`a   \ �    � mz��   `  ~S p   �     8����� M*+�P*�	P,�  ,��� N,� ,��� :-�e-��    !� & * -� q      	X 	Y 	Z 	[ !	X 7	\r       +�w    8~ y     8`a �   / � !  � ��   �� �� �   `  NO p   ?     *+��   q   
+   	_ 	`r       ~ y     45 �   4 i   	   j   N� p   �     2� 
+*�B��*��*��*�y+��*�9+��*�Z+��*���   q   & 	  	c 	d 	f 	g 	i 	j %	k -	l 1	mr        2~ y     245    2t O �    �   	4 t i   	   j   �� p   5     *�A�'���   q      	pr       ~ y   �� p   U      *��� *���������� � �   q      	tr        ~ y  �    @ �� p   O     *��� *������� � �   q      	xr       ~ y  �    @ �� p   T     �X� ��� �*�������   q      	| 	} 	r       ~ y  �     g� p   m     (*�e� "*������� *� � *��� � �   q      	� 	� 	� 	� '	�r       (~ y  �    &@ x� p   O     *������� *� � � �   q      	�r       ~ y  �    @ "# p   =     *����ȹ� �ư   q      	�r       ~ y  i     j   �� p   m     %*�4���)L+� +�/�3�9 � � �   q   
+   	� 	�r       %~ y    �� �   
+ � #)@ y� p   X     *+�њ *�+�ՙ � �   q      	�r       ~ y     z� �    @�   z  �� p   o     '+�ضܙ �*�G� +*�G�߶ܙ � �   q      	� 
+	� 	�r       '~ y     'z� �    @�   z  { p   �     m��Y��L*�������M,�� +���W� ,��� +����W*�'� -*�k� +����W�� *������ +���W+�
+�   q   2   	� 	� 	� 	� (	� /	� 7	� >	� E	� M	� `	� h	�r        m~ y    e�|   W}� �    � (�� ~� p   /     *�a�   q      	�r       ~ y   � p   I     *�G� *�1� � �   q      	�r       ~ y  �    @ jk p   J     *�G� � 
+*�G��   q      	�r       ~ y  �    Fmi     j   	�� p   5      � v����� � �   q      	��    @ 	�� p   e     '� v�Z�^K*���� *��!� � �   q   
+   	� 
+	�r     
+ ��  �   
+ � %c@ i c p   �     u*�� *���&� �*�A<*�Y�=WM>,�)  �     G                1,�#:*�1�%�-� ,�Q:*�1�S�1� �   q   & 	  	� 	� 	� 	� H	� N	� ^	� d	� t	�r   *  N �&  d +,    u~ y    [� O �     � !�  �� p   �     \+�5M,**��*� �*���
+cW*+9�U�;*�2� *�2+�cW*�n� *�n,�
+mW*� d+�?� N�DB-�� +�   J M� q   2   	� 	� 	� "	� )	� 2	� 9	� B	� J	� M	� N	� Z	�r   *  N ��    \~ y     \B�   W �    � 2
+`J��   B  	�� p   v     �5:*+,-�
+cW�   q      	� 	� 	�r   >    � y     ��     � �    ��    B�   � �   � �  � � B i      j   j   j   
+>? p   ?     �
+�D��Y&�FS�
+��   q      	�r       �	�  �   �  => p   {     7+I�K  �W+N*�P  �W+S�U  �W+V*�X  �W�   q      	� 
+ 
+ (
+ 6
+r       7~ y     7XE �   X  
+
+e
+f p  y    J*Y-�[  �^�a:� *d�f*i�k  �^*l�n  �^*o+�q  �^*r�t  �^*u�w  �^*x�z  �^*{�}  �^*~+��  �^*��f� [+� +����:� *��f*��������� 	�� ��f*����������  �f+� *�+��  �^*�+��  �^,� *�,��  �^*��E���f*���  �^*���  �^*���  �^*�   q   z   
+	 
+
+ 
+ 
+  
+ ,
+ 8
+ E
+ Q
+ ]
+ i
+ u
+  �
+" �
+# �
+$ �
+% �
+& �
+' �
+* �
++ �
+- �
+. �
+/
+6
+
+7
+9$
+:0
+;<
+<H
+=r   H  � � �   J    J� y   J��   J � �   J��  8� � �   O �  �� ��  
+` ���� 
+`��  
+` ���� 
+`���    � �  � � i     j   j   j   		�� p         � v�   q      
+A �� p   =     **��  ����  ���   q      
+Er       ~ y  c   � �� p   ]     *�4+��� *+*�<�/�4�   q      
+I 
+J 
+Lr       ~ y     �� �    �   �  z{ p   :     *�h��  �����   q      
+Or       ~ y  i     j   
+R� p   /     *�
+P�   q      
+Sr       ~ y   	Z� p   I     *�
+P� *�n� � �   q      
+Wr       ~ y  �    @ 
+�
+� p   /     *�n�   q      
+[r       ~ y  i     j   �� p   ^     *�
+�L+� +�|� � �   q   
+   
+_ 
+`r       ~ y    pq �   
+ � }@ �� p   @     +*�@�D�ܬ   q      
+dr       ~ y     �� �   �  BC p   /     *�!�   q      
+hr       ~ y   �. p   x     **�4�'�)L+� +�+���Y*�!�D*�!�J�̰   q      
+l 
+m 
+n 
+pr       *~ y    �� �    � ) �� p   /     *��   q      
+tr       ~ y   �� p   /     *��   q      
+xr       ~ y     p   /     *��   q      
+|r       ~ y   �� p   /     *��   q      
+�r       ~ y    p   /     *� ��   q      
+�r       ~ y   � � p   /     *� ��   q      
+�r       ~ y   �� p   /     *� ԰   q      
+�r       ~ y   � � p   /     *� ��   q      
+�r       ~ y   �� p   /     *���   q      
+�r       ~ y   �� p   /     *�	U�   q      
+�r       ~ y   �� p   /     *���   q      
+�r       ~ y   �  p   /     *�B�   q      
+�r       ~ y   � p  S     �*�^��  ����L+� +�*�Z�	<M*�G� u,� q*�G��N-�ղۦ *���޶� ��,��������:*�G��� *�G��
+� � 6*�G�6���а��   q   6   
+� 
+� 
+� 
+� 
+� )
+� 1
+� H
+� L
+� \
+� }
+� �
+� �
+�r   H  1 f��  \ ;��  } � O  � � O    �~ y    ���   }�� �    � �� 5��� -�@� i     j   �& p   �     3*�^� *�^�� �*�Z�	<L+� +������!�#��   q      
+� 
+� 
+� 
+� 
+� 1
+�r       3~ y    �� �   	 � � � p   /     *��   q      
+�r       ~ y   �� p   /     *��   q      
+�r       ~ y   �V p   5     *�Z�	<�'�   q      
+�r       ~ y  i     j   �Z p   P     *�Z�	<+�**�Z+���   q      
+� 
+� 
+�r       ~ y     �� �   � i   	   j   �� p   u     5+�-� +*�G� (*�G�ș *���0��� +�3�9� � �   q      
+�r       5~ y     5)� �    /@�   )  �� p   /     *���   q      
+�r       ~ y   �� p   6     +�   q      
+�r       ~ y     �� �   �  �� p   6     �   q      
+�r       ~ y     �� �   �  �� p   /     *��   q      
+�r       ~ y   �� p   /     *�%�   q      
+�r       ~ y   �� p   /     *�ٰ   q      
+�r       ~ y   �� p   /     *���   q      
+�r       ~ y   �� p   /     *� %�   q      
+�r       ~ y   �� p   /     *���   q      
+�r       ~ y   �� p   a     **�G� *�G�<� *���?������ � �   q       r       *~ y  �    @ �� p   /     *���   q      r       ~ y   �� p   /     *���   q      r       ~ y   �� p   2     *�X�	��   q      r       ~ y   �� p   /     *���   q      r       ~ y   �� p   /     *���   q      r       ~ y   �� p   /     *�\�   q      r       ~ y   �� p   /     *�а   q      r       ~ y   �� p   /     *�M�   
+  �      �          (   <   X   t   �   �*�G	�`*�G�c� �*�G	fbgr�`*�G�c� d*�G	hbgr�`*�G�c� H*�G	ffgr�`*�G�c� ,*�G	�`*�Gi�c� *�G	�`*�Gf�c*�G*�G�I�P*�G*�G�F�L*�Z�j�	�*�Z�j�	�*�Z�j�pt�v� :+�{  �~  �����+�
+߸�����+��  ��:���YS�4:*�G�c*�G	�`*�G
+�L*�G�P*�Z�S*�X�Y*�X�\�_���:�D��� ���Y�S�4:*�G�c*�G	�`*�G
+�L*�G�P*�Z�S*�X�Y*�X�\�_���:*�G�c*�G	�`*�G
+�L*�G�P*�Z�S*�X�Y*�X�\�_��� }��y X� X��  <�  ���   q  B P  $ % & ' ( ) #+ ,, 5- >. G/ O1 X3 ]5 g6 q7 |8 �9 �; �< �= �? �@ �A �C �D �E �GHIK!L+M.P7QATOU]WhXsY}[�]�\�^�8�a�d�i�j�k�l�n�p�qrtdef(g<iEjNkWl`nhpqqzr�t�g�i�j�k�l�n�p�q�r�t�ur   �  "�� � `g�  pw�   �~ y    �� �  ���  �l�  �o�  ���  ���  #���  ,��O  5��O 	 >�NO 
+ G�RO  X��� �   < �    ���  0� Dy� � w� q��   �  �� p   /     *�K�   q      yr       ~ y   �� p   /     *�а   q      }r       ~ y  i     j   �� p   /     *��   q      �r       ~ y   �� p   /     *�X�   q      �r       ~ y   c� p   /     *�a�   q      �r       ~ y   �� p   �     $*�a��*�^� � *��+��� +���   q      � � � � � #�r        $~ y     $��    $	� O �    �   	� 	�  �� p   /     *���   q      �r       ~ y   89 p   2     *�����   q      �r       ~ y   �� p   /     *��   q      �r       ~ y   �� p   A     	*�\���   q   
+   � �r       	~ y     	S� �   S  �� p   :     *����� ���   q      �r       ~ y   �� p   5     *�������   q      �r       ~ y   � c p   D     *���*���� W�   q      � � �r       ~ y   �� p   /     *� /�   q      �r       ~ y   gh p   >     *+� /�   q   
+   � �r       ~ y      1 . �    1  �� p   /     *��   q      �r       ~ y   �� p   /     *��   q      �r       ~ y   �� p   /     *�4�   q      �r       ~ y   �� p   /     *���   q      �r       ~ y   �� p   /     *���   q      �r       ~ y   4� p   /     *�2�   q      �r       ~ y    �� p   /     *� ��   q      �r       ~ y   p� p   /     *�n�   q      �r       ~ y   �� p   x     !*�2� *�2�	)M,�	-� #,�ĸǮ#�   q      � � � � �r       ��    !~ y     !�O �    �   �  �� p   /     *�ǰ   q      �r       ~ y   �� p   T     *�^� *�^�ʙ *�i� � �   q      �r       ~ y  �    
+@ 	cO p         ͸ϰ   q      �i     j   �� p   /     *�ɰ   q      �r       ~ y   �� p   2     *� k�Ұ   q      �r       ~ y   �� p   /     *� r�   q       r       ~ y  c   � 	�	� p   �     Z*��M,� �*�2� 
+*�G� ���ع	  **�G#,�ٵ**�:�Q� �QN-�S� �ݸ��	 �   q   * 
+    	 
+ 	  $ 1 Q Yr   *  F +,    Z~ y     Z O   U�� �   " � 
+� s �    �  ��     
+ p   D     +��Y*����   q      br       � �      
+O p   +      �   q      _r       ��  
+ p   ,     *�   q      
+Er       �7  
+O p   "      
+���   q      
+;
+	O p   "      
+���   q      
+:
+
+ p   /     *���   q      
+7r       ��  
+ p   n     2��Y��L*��+��
+���Y+��
+SY+��S�
+��   q      
+0 
+1 
+2r       2� y    * 
+ p   5     *����   q      
+.r       � y  
+ p   I     *� *� � � $�   q      
+ r       � y  �    B�
+O p         �X�&�   q      
+
+O p   o     "�)K*� ,�*�.� �*���Ű1�   q      
+ 
+ 
+ 
+ 
+ 
+r      ��  �   	 � �
+O p   %      ������Ű   q      
+
+ p   U     *� *�X��*�X�Ѻ3  � 4�   q      
+r       � y  �    B�
+ p   ,     *�   q      
+	r        � �  O p   Q 	    '�
+�6��Y*�׸
+SY*�׊8o�FS�
+��   q      
+r       '~ y      
+O p   $      � P�:o�<�   q      
+    O p   ;     � z*� e�:o�<�   q      
+r       ~ y      
+O p   )      �@�F �:o�<�   q      	�    
+O p   +      �   q      �r       �  
+ p   C     � C�� � �   q      �r       Y   �    @
+ ! p   7     *���Ĺ
+� �   q      �r       ]^      "# p   | 
+    �}Y*+,-*��K�   q      �r   H    ~ y     Z[    \ �    ]^    _`    VW    $� 
+%& p   t     &+�N� �Q�+�N� +�T�W�*�Z�^ �   q      w x z | r       &KL     &'( �    )* p   D     *�G�+*�^�a�   q      :r       ~ y     +, 
+-� p         �   q      �./ p   U     *� V� \+,�e �   q      Z [ \r        ~ y         01 
+2
+5 p   +      �   q      Qr       �1  
+34 p   V     *+�'� �,�'� ��i�e �   q      Mr             	7    
+7 
+56 p   ?     *+�l�e �   q      Er             � 78 p   k     *+-�o:,�e �   q      @ A Br   4    ~ y             9 u   	: � ;6 p   }     %,�s ������,�t  ��N*+-�w  �
+M�   q      5 6 7 9 $<r   *    %~ y     %    %: �   <� 
+=> p   I     *z��Y+S�4�e �   q      :r            <� 
+?@ p   F     +��Y*�| ���   q      7r       : �      A/ p   �     +,��� �,�� >,�� ����o9*+��  �
+M�   q      ( ) , - / *2r   4    +~ y     +    +01   B�   C	� �    
+DE p   �     I*���Y�
+����Y'�FS�
+�SY�SY�
+����Y�'o�FS�
+�S�4�e �   q      0r        I     IC	�    IB� F c p   /     *���   q      r       ~ y  
+GH p   1     *��W�   q      5r       �7  
+IJ p   �     H*����L+��M,�G��N-�
+���+���N� $�D���Y*����SY,SY+S�� �   q      � � � � &� G�r   *    HKL    @MN   ;O �   3g � �    � G���PQ p   i     *,��  *-,��  ��W�   q      cr   4    ~ y     � O    ��    �7    R` ST p   s     !*�y��*� d��*� Զ�+��W*,�б   q      l m n o p  qr        !~ y     !�7    !�� UV p   {     � *� Զ�*�֧ 	*-,�ٱ   q      d f g i kr   *    ~ y     � O    ��    �� �    WO p   :     *+��   q      �r       ~ y     |� 
+XY p   =     	*��+�ް   q      Tr       	-�     	Z� 
+[\ p   ?     +��  *��   q      Gr       "�     	� 
+]^ p   ]     � ����*�� �   q      H I K Lr       	�     � O �    _` 

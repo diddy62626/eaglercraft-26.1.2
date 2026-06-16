@@ -1,35 +1,26 @@
-# EaglerCraft 26.1.2 Port - Worklog
-
 ---
 Task ID: 1
-Agent: Main Agent
-Task: Clone EaglerCraft 1.8 and port to Minecraft 26.1.2 (unobfuscated)
+Agent: main
+Task: Port MC 26.1.2 classes to work through TeaVM in browser
 
 Work Log:
-- Cloned EaglerCraft 1.8 from GitHub mirror (3kh0/eaglercraft-1.8)
-- Researched Minecraft 26.1.2 technical details via web search
-- Discovered MC 26.1.2 is the first unobfuscated version (protocol 775, Java 25, data pack 101.1, resource pack 84)
-- Analyzed EaglerCraft 1.8 architecture: build system, patch system, TeaVM bridge, platform abstraction layer
-- Designed new architecture optimized for unobfuscated MC 26.1.2
-- Created 123 files totaling 33,960 lines of Java code + shell scripts + docs + configs
-- Eliminated MCP pipeline entirely (no SpecialSource, MCInjector, Fernflower, SRG/EXC mappings needed)
-- Replaced ECR patch format with standard unified diff
-- Upgraded TeaVM from 0.9.2 to 0.10.0 with AGGRESSIVE optimization
-- Ported all platform abstraction interfaces for WebGL2 (WebGPU ready)
-- Created new networking layer for protocol 775
-- Created modern deferred PBR renderer
-- Created chunk rendering with multi-draw batching
-- Created data component adapter for MC 26.1.2's new item system
-- Created Web Worker integrated server with SharedArrayBuffer support
-- Created gateway plugins (BungeeCord + Velocity) with protocol 775 support
-- Created comprehensive documentation (README, ARCHITECTURE, MIGRATION, BUILD, PROTOCOL)
+- Downloaded MC 26.1.2 client JAR from Mojang's Piston API (38MB, 30,675 entries, 10,208 net.minecraft classes)
+- Downloaded 27 MC dependency libraries (gson, guava, fastutil, log4j, netty, brigadier, datafixerupper, etc.)
+- Installed JDK 25 (Temurin 25.0.3) for Java 25 class file compatibility
+- Configured Gradle to use JDK 25 for compilation (Java 21 was insufficient for Java 25 class files)
+- Removed conflicting NIO buffer stubs (TeaVM classlib provides these)
+- Created browser-compatible SLF4J stubs (Logger, LoggerFactory, Marker, MarkerFactory, event.Level) to replace SLF4J JAR
+- Created TeaVM classlib patches (StackWalker, CompletableFuture, Future, TimeoutException, CompletionException) compiled with --patch-module java.base
+- Fixed LWJGL stub compilation errors (GL11 duplicate constants, GL15 Uint8Array.set type, GLFW parameter type)
+- Configured build.gradle with all MC dependency libraries and teavm-patches.jar
+- Updated CI/CD to auto-download MC JAR and libraries from Mojang API
+- Successfully compiled TeaVM JavaScript: BUILD SUCCESSFUL
+- Output: 293KB classes.js with 279 source files including 39 MC/Mojang classes
+- Pushed to GitHub: diddy62626/eaglercraft-26.1.2
 
 Stage Summary:
-- Project created at /home/z/my-project/download/eaglercraft-26.1.2/
-- 80 Java source files, 33,960 lines total
-- Complete platform abstraction layer with WebGL2/WebGPU readiness
-- Simplified build system (no MCP, direct Vineflower decompilation)
-- Protocol 775 networking adapter
-- Modern deferred PBR rendering pipeline
-- Gateway plugins for BungeeCord and Velocity
-- Full documentation suite
+- TeaVM now successfully compiles MC 26.1.2 classes to JavaScript
+- classes.js grew from 180KB (adapter-only) to 293KB (with MC class references)
+- 39 MC/Mojang classes included so far (Minecraft, LogUtils, Identifier, Codec, Component, etc.)
+- Full game (30K+ classes) not yet included - TeaVM only compiles reachable code from mainClass
+- Next step: Create bootstrap class that directly references more MC game subsystems to pull them into the TeaVM call graph

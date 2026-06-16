@@ -1,0 +1,691 @@
+     1→package net.lax1dude.eaglercraft.v2_6;
+     2→
+     3→import net.lax1dude.eaglercraft.v2_6.adapter.EaglerShaderImpl;
+     4→import net.lax1dude.eaglercraft.v2_6.adapter.PlatformWebService;
+     5→import net.lax1dude.eaglercraft.v2_6.internal.PlatformApplication;
+     6→import net.lax1dude.eaglercraft.v2_6.internal.PlatformAudio;
+     7→import net.lax1dude.eaglercraft.v2_6.internal.PlatformFilesystem;
+     8→import net.lax1dude.eaglercraft.v2_6.internal.PlatformInput;
+     9→import net.lax1dude.eaglercraft.v2_6.internal.PlatformOpenGL;
+    10→import net.lax1dude.eaglercraft.v2_6.internal.PlatformRuntime;
+    11→import net.lax1dude.eaglercraft.v2_6.internal.teavm.ClientMain;
+    12→import net.lax1dude.eaglercraft.v2_6.internal.teavm.WebGL2RenderingContext;
+    13→
+    14→/**
+    15→ * Main game entry point adapter for EaglerCraft 26.1.2.
+    16→ *
+    17→ * <p>This class bridges the TeaVM platform layer (initialized by
+    18→ * {@link ClientMain}) with Minecraft 26.1.2's game code. It is called
+    19→ * after the platform subsystems are ready and is responsible for:</p>
+    20→ * <ol>
+    21→ *   <li>Initializing the EaglerCraft adapter layer (config, profile, services)</li>
+    22→ *   <li>Setting up the WebGL2 rendering pipeline for MC's renderer</li>
+    23→ *   <li>Creating the MC Minecraft instance and starting the game loop</li>
+    24→ *   <li>Handling frame-by-frame tick/render dispatch</li>
+    25→ *   <li>Signaling readiness via {@link ClientMain#__eaglercraftReady()}</li>
+    26→ * </ol>
+    27→ *
+    28→ * <h3>Initialization sequence:</h3>
+    29→ * <pre>
+    30→ *   1. MainClass.main()           → TeaVM entry point
+    31→ *   2. ClientMain._main()         → Platform init (canvas, WebGL2, input, audio, etc.)
+    32→ *   3. ClientMain game loop       → requestAnimationFrame tick
+    33→ *   4. EaglerCraft.initialize()   ← Called from the game loop after platform is ready
+    34→ *      a. EaglerCraftConfig       → Constants loaded (no-op, all static final)
+    35→ *      b. EaglerProfile.load()    → Load saved settings from localStorage
+    36→ *      c. PlatformWebService.init() → Verify service availability
+    37→ *      d. EaglerShaderImpl        → Reset shader statistics
+    38→ *      e. Minecraft instance      → Create the MC game instance
+    39→ *      f. ClientMain.__eaglercraftReady() → Signal browser that game is ready
+    40→ *   5. EaglerCraft.tick()         ← Called each frame from the game loop
+    41→ *      a. Process input events
+    42→ *      b. Run MC game tick (logic update at 20 TPS)
+    43→ *      c. Render frame
+    44→ * </pre>
+    45→ *
+    46→ * <h3>Architecture notes:</h3>
+    47→ * <p>This class is in the <code>main</code> source set, not the <code>teavm</code>
+    48→ * source set. The <code>teavm</code> source set handles low-level browser platform
+    49→ * concerns (WebGL2 context, DOM events, IndexedDB, etc.), while this class
+    50→ * operates at the MC game level, bridging between MC's architecture and the
+    51→ * browser platform.</p>
+    52→ *
+    53→ * <p>TODO: Once MC 26.1.2 is decompiled, the placeholder references below
+    54→ * should be updated to actual MC class names. Expected patterns:</p>
+    55→ * <ul>
+    56→ *   <li>{@code net.minecraft.client.Minecraft} — Main game class</li>
+    57→ *   <li>{@code net.minecraft.client.renderer.GameRenderer} — Rendering pipeline</li>
+    58→ *   <li>{@code net.minecraft.client.renderer.ShaderInstance} — Shader objects</li>
+    59→ *   <li>{@code net.minecraft.client.Options} — Game options/settings</li>
+    60→ *   <li>{@code net.minecraft.client.gui.screens.Screen} — Screen/UI system</li>
+    61→ * </ul>
+    62→ */
+    63→public class EaglerCraft {
+    64→
+    65→        // ========== State Constants ==========
+    66→
+    67→        /** The game has not been initialized yet. */
+    68→        private static final int STATE_UNINITIALIZED = 0;
+    69→
+    70→        /** The game is currently initializing. */
+    71→        private static final int STATE_INITIALIZING = 1;
+    72→
+    73→        /** The game has been initialized and is running. */
+    74→        private static final int STATE_RUNNING = 2;
+    75→
+    76→        /** The game is paused (page hidden). */
+    77→        private static final int STATE_PAUSED = 3;
+    78→
+    79→        /** The game is shutting down. */
+    80→        private static final int STATE_SHUTDOWN = 4;
+    81→
+    82→        /** The game has crashed. */
+    83→        private static final int STATE_CRASHED = 5;
+    84→
+    85→        // ========== State Fields ==========
+    86→
+    87→        /** Current game state. */
+    88→        private static int gameState = STATE_UNINITIALIZED;
+    89→
+    90→        /** Whether the game has been fully initialized. */
+    91→        private static boolean initialized = false;
+    92→
+    93→        /** Whether the game is currently paused. */
+    94→        private static boolean paused = false;
+    95→
+    96→        /** Whether the first frame has been rendered. */
+    97→        private static boolean firstFrameRendered = false;
+    98→
+    99→        /** Accumulated time for fixed-timestep game logic ticking. */
+   100→        private static long tickAccumulator = 0;
+   101→
+   102→        /** The time of the last tick, for delta calculation. */
+   103→        private static long lastTickTime = 0;
+   104→
+   105→        /** Total number of frames rendered. */
+   106→        private static long totalFrames = 0;
+   107→
+   108→        /** Total number of game ticks processed. */
+   109→        private static long totalTicks = 0;
+   110→
+   111→        // ========== MC Instance Reference ==========
+   112→        // TODO: Update to actual MC 26.1.2 class name after decompilation
+   113→        // Expected: net.minecraft.client.Minecraft or similar
+   114→        /**
+   115→         * Reference to the Minecraft game instance.
+   116→         * In MC 26.1.2, this is typically stored as a static singleton
+   117→         * accessible via Minecraft.getInstance() or similar.
+   118→         *
+   119→         * Currently typed as Object since we don't know the exact class yet.
+   120→         * Will be replaced with the actual MC type once decompiled.
+   121→         */
+   122→        private static Object minecraftInstance = null;
+   123→
+   124→        // ========== Initialization ==========
+   125→
+   126→        /**
+   127→         * Initializes the EaglerCraft adapter layer and starts the Minecraft game.
+   128→         *
+   129→         * <p>This method is called from the game loop after all platform subsystems
+   130→         * (PlatformOpenGL, PlatformInput, PlatformRuntime, PlatformAudio,
+   131→         * PlatformApplication) have been initialized by {@link ClientMain}.</p>
+   132→         *
+   133→         * <p>The initialization sequence is:</p>
+   134→         * <ol>
+   135→         *   <li>Initialize the platform service locator</li>
+   136→         *   <li>Load the player profile from localStorage</li>
+   137→         *   <li>Configure the rendering pipeline for WebGL2</li>
+   138→         *   <li>Create the Minecraft game instance</li>
+   139→         *   <li>Signal readiness to the browser</li>
+   140→         * </ol>
+   141→         *
+   142→         * <p>If initialization fails at any point, a crash screen is shown
+   143→         * via {@link ClientMain#showCrashScreen(String)}.</p>
+   144→         */
+   145→        public static void initialize() {
+   146→                if (gameState != STATE_UNINITIALIZED) {
+   147→                        ClientMain.warn("[EaglerCraft] Already initialized or in progress (state=" + gameState + ")");
+   148→                        return;
+   149→                }
+   150→
+   151→                gameState = STATE_INITIALIZING;
+   152→
+   153→                try {
+   154→                        if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   155→                                ClientMain.log("[EaglerCraft] === EaglerCraft " + EaglerCraftConfig.VERSION + " Starting ===");
+   156→                                ClientMain.log("[EaglerCraft] Brand: " + EaglerCraftConfig.BRAND);
+   157→                                ClientMain.log("[EaglerCraft] Protocol: " + EaglerCraftConfig.PROTOCOL_VERSION);
+   158→                                ClientMain.log("[EaglerCraft] MC Target: " + EaglerCraftConfig.MINECRAFT_VERSION);
+   159→                        }
+   160→
+   161→                        // Step 1: Initialize platform service locator
+   162→                        PlatformWebService.init();
+   163→
+   164→                        // Step 2: Load the player profile from localStorage
+   165→                        EaglerProfile.load();
+   166→
+   167→                        // Step 3: Configure the WebGL2 rendering pipeline
+   168→                        setupRenderingPipeline();
+   169→
+   170→                        // Step 4: Apply audio settings from profile
+   171→                        applyAudioSettings();
+   172→
+   173→                        // Step 5: Create the Minecraft game instance
+   174→                        createMinecraftInstance();
+   175→
+   176→                        // Step 6: Signal readiness
+   177→                        gameState = STATE_RUNNING;
+   178→                        initialized = true;
+   179→
+   180→                        ClientMain.log("[EaglerCraft] === Initialization complete ===");
+   181→                        ClientMain.log("[EaglerCraft] " + EaglerShaderImpl.getShaderStats());
+   182→
+   183→                        // Signal to the browser that the game is ready
+   184→                        ClientMain.__eaglercraftReady();
+   185→
+   186→                } catch (Throwable t) {
+   187→                        gameState = STATE_CRASHED;
+   188→                        String message = "EaglerCraft initialization failed!\n\n"
+   189→                                        + t.getClass().getName() + ": " + t.getMessage();
+   190→                        ClientMain.error("[EaglerCraft] " + message);
+   191→
+   192→                        // Print stack trace to console for debugging
+   193→                        StackTraceElement[] stack = t.getStackTrace();
+   194→                        for (StackTraceElement element : stack) {
+   195→                                ClientMain.error("  at " + element.toString());
+   196→                        }
+   197→
+   198→                        ClientMain.showCrashScreen(message);
+   199→                }
+   200→        }
+   201→
+   202→        /**
+   203→         * Sets up the WebGL2 rendering pipeline for Minecraft's renderer.
+   204→         *
+   205→         * <p>Configures the initial GL state that MC's GameRenderer expects:</p>
+   206→         * <ul>
+   207→         *   <li>Set viewport to canvas size</li>
+   208→         *   <li>Enable depth testing</li>
+   209→         *   <li>Enable back-face culling</li>
+   210→         *   <li>Set up the clear color</li>
+   211→         *   <li>Configure blending for transparency</li>
+   212→         * </ul>
+   213→         */
+   214→        private static void setupRenderingPipeline() {
+   215→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   216→                        ClientMain.log("[EaglerCraft] Setting up rendering pipeline...");
+   217→                }
+   218→
+   219→                // Set initial viewport
+   220→                int width = PlatformRuntime.getCanvasDrawableWidth();
+   221→                int height = PlatformRuntime.getCanvasDrawableHeight();
+   222→                PlatformOpenGL._wglViewport(0, 0, width, height);
+   223→
+   224→                // Enable depth testing (MC requires this)
+   225→                PlatformOpenGL._wglEnable(WebGL2RenderingContext.DEPTH_TEST);
+   226→                PlatformOpenGL._wglDepthFunc(WebGL2RenderingContext.LEQUAL);
+   227→
+   228→                // Enable back-face culling (MC uses this for block faces)
+   229→                PlatformOpenGL._wglEnable(WebGL2RenderingContext.CULL_FACE);
+   230→                PlatformOpenGL._wglCullFace(WebGL2RenderingContext.BACK);
+   231→                PlatformOpenGL._wglFrontFace(WebGL2RenderingContext.CCW);
+   232→
+   233→                // Set default clear color (sky blue-ish, matches MC default)
+   234→                PlatformOpenGL._wglClearColor(0.627f, 0.808f, 1.0f, 1.0f);
+   235→
+   236→                // Configure blending for transparency (used heavily by MC)
+   237→                PlatformOpenGL._wglEnable(WebGL2RenderingContext.BLEND);
+   238→                PlatformOpenGL._wglBlendFunc(WebGL2RenderingContext.SRC_ALPHA,
+   239→                                WebGL2RenderingContext.ONE_MINUS_SRC_ALPHA);
+   240→
+   241→                // Disable stencil test by default (MC uses it for some effects)
+   242→                PlatformOpenGL._wglDisable(WebGL2RenderingContext.STENCIL_TEST);
+   243→
+   244→                // Enable scissor test (used by MC for viewport clipping)
+   245→                PlatformOpenGL._wglDisable(WebGL2RenderingContext.SCISSOR_TEST);
+   246→
+   247→                // Reset shader stats
+   248→                EaglerShaderImpl.resetStats();
+   249→
+   250→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   251→                        ClientMain.log("[EaglerCraft] Rendering pipeline configured "
+   252→                                        + "(viewport: " + width + "x" + height + ")");
+   253→                        ClientMain.log("[EaglerCraft] WebGL2 Version: " + PlatformOpenGL.getGLVersion());
+   254→                        ClientMain.log("[EaglerCraft] GL Vendor: " + PlatformOpenGL.getGLVendor());
+   255→                        ClientMain.log("[EaglerCraft] GL Renderer: " + PlatformOpenGL.getGLRenderer());
+   256→                }
+   257→        }
+   258→
+   259→        /**
+   260→         * Applies audio settings from the player profile to the audio subsystem.
+   261→         */
+   262→        private static void applyAudioSettings() {
+   263→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   264→                        ClientMain.log("[EaglerCraft] Applying audio settings: "
+   265→                                        + "master=" + EaglerProfile.getMasterVolume()
+   266→                                        + ", music=" + EaglerProfile.getMusicVolume()
+   267→                                        + ", sfx=" + EaglerProfile.getSFXVolume());
+   268→                }
+   269→
+   270→                // Apply volume settings to PlatformAudio
+   271→                PlatformAudio.setMasterVolume(EaglerProfile.getMasterVolume());
+   272→                PlatformAudio.setMusicVolume(EaglerProfile.getMusicVolume());
+   273→                PlatformAudio.setSFXVolume(EaglerProfile.getSFXVolume());
+   274→        }
+   275→
+   276→        /**
+   277→         * Creates the Minecraft 26.1.2 game instance.
+   278→         *
+   279→         * <p>In vanilla MC 26.1.2, the Minecraft class is the central singleton
+   280→         * that manages the entire game lifecycle. In EaglerCraft, we create this
+   281→         * instance with browser-appropriate parameters:</p>
+   282→         * <ul>
+   283→         *   <li>Display width/height from the canvas</li>
+   284→         *   <li>Settings from EaglerProfile</li>
+   285→         *   <li>Asset root from the EPK loader</li>
+   286→         * </ul>
+   287→         *
+   288→         * <p>TODO: Update to actual MC 26.1.2 API after decompilation.
+   289→         * The exact constructor signature and initialization sequence will
+   290→         * depend on the MC 26.1.2 codebase. Expected pattern:</p>
+   291→         * <pre>
+   292→         *   // Expected after decompilation:
+   293→         *   Minecraft mc = new Minecraft(
+   294→         *       runtimeDirectory,    // replaced with IndexedDB/EPK
+   295→         *       assetsDirectory,     // replaced with EPK
+   296→         *       gameConfig           // replaced with EaglerCraftConfig
+   297→         *   );
+   298→         *   mc.setDisplayWidth(PlatformRuntime.getCanvasWidth());
+   299→         *   mc.setDisplayHeight(PlatformRuntime.getCanvasHeight());
+   300→         * </pre>
+   301→         */
+   302→        private static void createMinecraftInstance() {
+   303→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   304→                        ClientMain.log("[EaglerCraft] Creating Minecraft instance...");
+   305→                }
+   306→
+   307→                try {
+   308→                        // Directly reference MC's Minecraft class so TeaVM includes it.
+   309→                        // TeaVM only compiles classes that are statically reachable
+   310→                        // from the mainClass - reflection won't work.
+   311→                        //
+   312→                        // MC 26.1.2's Minecraft class is net.minecraft.client.Minecraft
+   313→                        // It's a singleton accessible via Minecraft.getInstance()
+   314→                        //
+   315→                        // However, Minecraft's constructor requires many services
+   316→                        // (game directory, assets, GLFW window, etc.) that don't
+   317→                        // exist in the browser. We'll try a minimal bootstrap.
+   318→
+   319→                        try {
+   320→                                // Force TeaVM to include the Minecraft class by referencing it
+   321→                                // The class itself will fail to initialize fully because it
+   322→                                // depends on GLFW/LWJGL, but our shims provide no-op stubs
+   323→                                net.minecraft.client.Minecraft mc = null;
+   324→                                try {
+   325→                                        mc = net.minecraft.client.Minecraft.getInstance();
+   326→                                } catch (Throwable t) {
+   327→                                        ClientMain.log("[EaglerCraft] Minecraft.getInstance() failed: " + t.getMessage());
+   328→                                        ClientMain.log("[EaglerCraft] (This is expected - MC needs full LWJGL setup)");
+   329→                                }
+   330→
+   331→                                if (mc != null) {
+   332→                                        minecraftInstance = mc;
+   333→                                        ClientMain.log("[EaglerCraft] Minecraft instance created successfully!");
+   334→                                } else {
+   335→                                        ClientMain.log("[EaglerCraft] Could not create MC instance (missing native services)");
+   336→                                        ClientMain.log("[EaglerCraft] Running in adapter-only mode with title screen");
+   337→                                }
+   338→                        } catch (NoClassDefFoundError e) {
+   339→                                ClientMain.log("[EaglerCraft] Minecraft class not available: " + e.getMessage());
+   340→                                ClientMain.log("[EaglerCraft] Running in adapter-only mode");
+   341→                        } catch (Throwable t) {
+   342→                                ClientMain.warn("[EaglerCraft] Error creating Minecraft: " + t.getMessage());
+   343→                        }
+   344→                } catch (Throwable t) {
+   345→                        ClientMain.warn("[EaglerCraft] Error during MC instance creation: " + t.getMessage());
+   346→                }
+   347→
+   348→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   349→                        ClientMain.log("[EaglerCraft] Display: " + PlatformRuntime.getCanvasWidth()
+   350→                                        + "x" + PlatformRuntime.getCanvasHeight()
+   351→                                        + " @" + PlatformRuntime.getDevicePixelRatio() + "x DPR");
+   352→                        ClientMain.log("[EaglerCraft] Username: " + EaglerProfile.getUsername());
+   353→                        ClientMain.log("[EaglerCraft] Render Distance: " + EaglerProfile.getRenderDistance()
+   354→                                        + " chunks");
+   355→                }
+   356→        }
+   357→
+   358→        // ========== Game Loop ==========
+   359→
+   360→        /**
+   361→         * Called once per frame by the ClientMain game loop.
+   362→         *
+   363→         * <p>This method handles the frame-by-frame update cycle:</p>
+   364→         * <ol>
+   365→         *   <li>Check if the page is visible (auto-pause when hidden)</li>
+   366→         *   <li>Process input events from PlatformInput</li>
+   367→         *   <li>Run game logic ticks at 20 TPS (fixed timestep)</li>
+   368→         *   <li>Render the frame</li>
+   369→         *   <li>Update FPS counter and timing</li>
+   370→         * </ol>
+   371→         *
+   372→         * <p>The tick rate is decoupled from the frame rate: the game logic
+   373→         * runs at a fixed 20 TPS, while rendering happens at the display's
+   374→         * refresh rate (typically 60Hz via requestAnimationFrame). This
+   375→         * prevents simulation instability from variable frame timing.</p>
+   376→         *
+   377→         * <p>TODO: Once MC 26.1.2 is decompiled, this method should be
+   378→         * patched to call the actual MC tick/render methods. Expected:</p>
+   379→         * <pre>
+   380→         *   Minecraft mc = Minecraft.getInstance();
+   381→         *   mc.runTick(isPaused);
+   382→         * </pre>
+   383→         */
+   384→        public static void tick() {
+   385→                if (gameState != STATE_RUNNING) return;
+   386→
+   387→                long currentTime = PlatformRuntime.getCurrentTimeMillis();
+   388→                long deltaTime = currentTime - lastTickTime;
+   389→
+   390→                // Clamp delta time to prevent spiral of death
+   391→                if (deltaTime > EaglerCraftConfig.MAX_FRAME_DELTA_MS) {
+   392→                        deltaTime = EaglerCraftConfig.MAX_FRAME_DELTA_MS;
+   393→                }
+   394→
+   395→                // Auto-pause when page is not visible
+   396→                if (!PlatformRuntime.isPageVisible()) {
+   397→                        if (!paused) {
+   398→                                paused = true;
+   399→                                gameState = STATE_PAUSED;
+   400→                        }
+   401→                        return;
+   402→                } else if (paused) {
+   403→                        paused = false;
+   404→                        gameState = STATE_RUNNING;
+   405→                        lastTickTime = currentTime;
+   406→                        tickAccumulator = 0;
+   407→                        return;
+   408→                }
+   409→
+   410→                // Process input
+   411→                processInput();
+   412→
+   413→                // Run game logic ticks at fixed TPS
+   414→                if (EaglerCraftConfig.USE_FIXED_TIMESTEP) {
+   415→                        tickAccumulator += deltaTime;
+   416→                        while (tickAccumulator >= EaglerCraftConfig.MS_PER_TICK) {
+   417→                                gameLogicTick();
+   418→                                tickAccumulator -= EaglerCraftConfig.MS_PER_TICK;
+   419→                        }
+   420→                } else {
+   421→                        // Variable timestep: run one tick per frame
+   422→                        // MC internally handles the tick rate, so we just call it
+   423→                        gameLogicTick();
+   424→                }
+   425→
+   426→                // Render frame
+   427→                renderFrame();
+   428→
+   429→                // Update timing
+   430→                lastTickTime = currentTime;
+   431→                totalFrames++;
+   432→        }
+   433→
+   434→        /**
+   435→         * Processes input events from PlatformInput.
+   436→         *
+   437→         * <p>Polls the keyboard and mouse state from PlatformInput and
+   438→         * dispatches events to the MC input system.</p>
+   439→         *
+   440→         * <p>TODO: Once MC 26.1.2 is decompiled, this should feed events
+   441→         * into MC's KeyboardHandler and MouseHandler. Expected:</p>
+   442→         * <pre>
+   443→         *   Minecraft mc = Minecraft.getInstance();
+   444→         *   KeyboardHandler kb = mc.keyboardHandler;
+   445→         *   MouseHandler mh = mc.mouseHandler;
+   446→         *   // Feed polled events to handlers
+   447→         * </pre>
+   448→         */
+   449→        private static void processInput() {
+   450→                // Input polling is handled by PlatformInput, which updates
+   451→                // its internal state arrays on each DOM event. MC code reads
+   452→                // the state through PlatformWebService convenience methods.
+   453→                //
+   454→                // In the full implementation, we would also:
+   455→                // - Check for new key press events and queue them for MC's KeyboardListener
+   456→                // - Check for mouse button click events and queue them for MC's MouseListener
+   457→                // - Handle pointer lock state changes
+   458→                // - Process IME composition events for CJK input
+   459→                // - Handle gamepad input mapping
+   460→        }
+   461→
+   462→        /**
+   463→         * Runs one game logic tick.
+   464→         *
+   465→         * <p>MC's game logic runs at 20 TPS (ticks per second). Each tick
+   466→         * updates entity positions, processes block changes, runs redstone,
+   467→         * handles network packets, etc.</p>
+   468→         *
+   469→         * <p>TODO: Once MC 26.1.2 is decompiled, this should call:</p>
+   470→         * <pre>
+   471→         *   Minecraft mc = Minecraft.getInstance();
+   472→         *   mc.tick();
+   473→         *   // or: mc.runTick(false);
+   474→         * </pre>
+   475→         */
+   476→        private static void gameLogicTick() {
+   477→                // TODO: Call MC 26.1.2 game tick
+   478→                // Expected: Minecraft.getInstance().tick()
+   479→                totalTicks++;
+   480→        }
+   481→
+   482→        /**
+   483→         * Renders one frame.
+   484→         *
+   485→         * <p>MC's rendering pipeline is driven by GameRenderer, which
+   486→         * handles world rendering, GUI overlay, and screen rendering.</p>
+   487→         *
+   488→         * <p>Currently renders a Minecraft-style sky background with a
+   489→         * title screen until the full MC renderer is integrated.</p>
+   490→         */
+   491→        private static void renderFrame() {
+   492→                // Check for viewport changes
+   493→                int width = PlatformRuntime.getCanvasDrawableWidth();
+   494→                int height = PlatformRuntime.getCanvasDrawableHeight();
+   495→                if (width <= 0 || height <= 0) return;
+   496→
+   497→                // Clear the framebuffer with MC sky blue
+   498→                PlatformOpenGL._wglClear(
+   499→                        WebGL2RenderingContext.COLOR_BUFFER_BIT
+   500→                        | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+   501→
+   502→                // Render the title screen using WebGL2
+   503→                renderTitleScreen(width, height);
+   504→
+   505→                firstFrameRendered = true;
+   506→        }
+   507→
+   508→        /**
+   509→         * Renders the EaglerCraft title screen directly via WebGL2.
+   510→         *
+   511→         * <p>This is a placeholder title screen rendered before the full
+   512→         * MC GUI system is integrated. It draws:</p>
+   513→         * <ul>
+   514→         *   <li>A gradient sky background (MC-style)</li>
+   515→         *   <li>The EaglerCraftX title text</li>
+   516→         *   <li>Version info and status</li>
+   517→         * </ul>
+   518→         */
+   519→        private static void renderTitleScreen(int width, int height) {
+   520→                WebGL2RenderingContext gl = ClientMain.getWebGL2();
+   521→                if (gl == null) return;
+   522→
+   523→                // Use a simple fullscreen quad with a gradient shader
+   524→                // to render the title screen background
+   525→                EaglerShaderImpl.renderTitleScreen(gl, width, height,
+   526→                        EaglerCraftConfig.CLIENT_IDENTIFIER,
+   527→                        "Protocol " + EaglerCraftConfig.PROTOCOL_VERSION,
+   528→                        EaglerProfile.getUsername(),
+   529→                        (int)(totalTicks / 20),
+   530→                        (int)totalFrames);
+   531→        }
+   532→
+   533→        // ========== State Queries ==========
+   534→
+   535→        /**
+   536→         * Checks if the game has been fully initialized.
+   537→         */
+   538→        public static boolean isInitialized() {
+   539→                return initialized;
+   540→        }
+   541→
+   542→        /**
+   543→         * Checks if the game is currently running.
+   544→         */
+   545→        public static boolean isRunning() {
+   546→                return gameState == STATE_RUNNING;
+   547→        }
+   548→
+   549→        /**
+   550→         * Checks if the game is currently paused.
+   551→         */
+   552→        public static boolean isPaused() {
+   553→                return paused;
+   554→        }
+   555→
+   556→        /**
+   557→         * Gets the current game state.
+   558→         *
+   559→         * @return one of STATE_UNINITIALIZED, STATE_INITIALIZING, STATE_RUNNING,
+   560→         *         STATE_PAUSED, STATE_SHUTDOWN, STATE_CRASHED
+   561→         */
+   562→        public static int getGameState() {
+   563→                return gameState;
+   564→        }
+   565→
+   566→        /**
+   567→         * Gets the total number of frames rendered since initialization.
+   568→         */
+   569→        public static long getTotalFrames() {
+   570→                return totalFrames;
+   571→        }
+   572→
+   573→        /**
+   574→         * Gets the total number of game ticks processed since initialization.
+   575→         */
+   576→        public static long getTotalTicks() {
+   577→                return totalTicks;
+   578→        }
+   579→
+   580→        /**
+   581→         * Checks if the first frame has been rendered.
+   582→         * Useful for the loading screen to know when to transition.
+   583→         */
+   584→        public static boolean isFirstFrameRendered() {
+   585→                return firstFrameRendered;
+   586→        }
+   587→
+   588→        /**
+   589→         * Gets the MC game instance.
+   590→         *
+   591→         * <p>TODO: Update return type to actual MC 26.1.2 class after decompilation.
+   592→         * Expected: net.minecraft.client.Minecraft</p>
+   593→         *
+   594→         * @return the Minecraft instance, or null if not yet created
+   595→         */
+   596→        public static Object getMinecraftInstance() {
+   597→                return minecraftInstance;
+   598→        }
+   599→
+   600→        // ========== Shutdown / Crash ==========
+   601→
+   602→        /**
+   603→         * Shuts down the game gracefully.
+   604→         *
+   605→         * <p>Stops the game loop, saves the player profile, disconnects
+   606→         * from any server, and releases resources.</p>
+   607→         */
+   608→        public static void shutdown() {
+   609→                if (gameState == STATE_SHUTDOWN) return;
+   610→
+   611→                ClientMain.log("[EaglerCraft] Shutting down...");
+   612→                gameState = STATE_SHUTDOWN;
+   613→
+   614→                // Save the player profile
+   615→                EaglerProfile.save();
+   616→
+   617→                // Disconnect from any multiplayer server
+   618→                net.lax1dude.eaglercraft.v2_6.internal.PlatformNetworking.disconnect();
+   619→
+   620→                // Stop the game loop
+   621→                ClientMain.stopGameLoop();
+   622→
+   623→                ClientMain.log("[EaglerCraft] Shutdown complete");
+   624→        }
+   625→
+   626→        /**
+   627→         * Handles a crash by showing the crash screen.
+   628→         *
+   629→         * <p>This is called when an unrecoverable error occurs during
+   630→         * the game loop (e.g., GL context loss, unhandled exception).</p>
+   631→         *
+   632→         * @param message the crash message to display
+   633→         */
+   634→        public static void crash(String message) {
+   635→                if (gameState == STATE_CRASHED) return;
+   636→
+   637→                gameState = STATE_CRASHED;
+   638→                ClientMain.error("[EaglerCraft] CRASH: " + message);
+   639→                ClientMain.showCrashScreen("EaglerCraft crashed!\n\n" + message);
+   640→        }
+   641→
+   642→        // ========== Display Configuration ==========
+   643→
+   644→        /**
+   645→         * Called when the canvas is resized.
+   646→         * Updates the viewport and signals MC to adjust its rendering.
+   647→         *
+   648→         * <p>TODO: Once MC 26.1.2 is decompiled, this should call:</p>
+   649→         * <pre>
+   650→         *   Minecraft mc = Minecraft.getInstance();
+   651→         *   mc.resizeDisplay(); // or mc.getMainWindow().setWindowSize(width, height)
+   652→         * </pre>
+   653→         */
+   654→        public static void onResize(int width, int height) {
+   655→                if (!initialized) return;
+   656→
+   657→                PlatformOpenGL._wglViewport(0, 0, width, height);
+   658→
+   659→                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
+   660→                        ClientMain.log("[EaglerCraft] Viewport resized: " + width + "x" + height);
+   661→                }
+   662→        }
+   663→
+   664→        // ========== F3 Debug Info ==========
+   665→
+   666→        /**
+   667→         * Gets debug information for the F3 debug screen.
+   668→         *
+   669→         * @return formatted string with debug information
+   670→         */
+   671→        public static String getDebugInfo() {
+   672→                StringBuilder sb = new StringBuilder();
+   673→                sb.append("EaglerCraft ").append(EaglerCraftConfig.CLIENT_IDENTIFIER).append("\n");
+   674→                sb.append("FPS: ").append(String.format("%.1f", PlatformRuntime.getFPS())).append("\n");
+   675→                sb.append("Ticks: ").append(totalTicks).append("\n");
+   676→                sb.append("Frames: ").append(totalFrames).append("\n");
+   677→                sb.append("Canvas: ").append(PlatformRuntime.getCanvasWidth())
+   678→                                .append("x").append(PlatformRuntime.getCanvasHeight())
+   679→                                .append(" @").append(PlatformRuntime.getDevicePixelRatio()).append("x\n");
+   680→                sb.append("GL: ").append(PlatformOpenGL.getGLVersion()).append("\n");
+   681→                sb.append("Renderer: ").append(PlatformOpenGL.getGLRenderer()).append("\n");
+   682→                sb.append(EaglerShaderImpl.getShaderStats()).append("\n");
+   683→
+   684→                if (PlatformRuntime.isMobileBrowser()) {
+   685→                        sb.append("Device: Mobile\n");
+   686→                }
+   687→
+   688→                return sb.toString();
+   689→        }
+   690→}
+   691→
