@@ -36,6 +36,7 @@ public class Window {
 
 	/** The window title (unused in browser - document.title could be set). */
 	private String title;
+	private DisplayData displayData;
 
 	/** Whether the window should close. */
 	private boolean shouldClose;
