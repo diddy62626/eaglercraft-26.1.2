@@ -51,8 +51,8 @@ public final class DataResult<T> {
     public <S> DataResult<S> flatMap(Function<T, DataResult<S>> fn) {
         return errorMessage != null ? error(errorMessage) : fn.apply(value);
     }
-    public <S> DataResult<S> mapOrElse(Function<T, S> onSuccess, Function<String, S> onError) {
-        return errorMessage != null ? success(onError.apply(errorMessage)) : success(onSuccess.apply(value));
+    public <S> S mapOrElse(Function<T, S> onSuccess, Function<String, S> onError) {
+        return errorMessage != null ? onError.apply(errorMessage) : onSuccess.apply(value);
     }
     public DataResult<T> ifError(Consumer<String> onError) {
         if (errorMessage != null) onError.accept(errorMessage);
@@ -83,9 +83,6 @@ public final class DataResult<T> {
     public interface BiFunction<T, U, R> { R apply(T t, U u); }
     public interface TriFunction<T, U, V, R> { R apply(T t, U u, V v); }
 
-    public java.lang.Object mapOrElse(java.util.function.Function<T, ?> onSuccess, java.util.function.Function<String, ?> onError) {
-        return errorMessage != null ? onError.apply(errorMessage) : onSuccess.apply(value);
-    }
     public DataResult<T> setLifecycle(Lifecycle lifecycle) { return this; }
     public T getPartialOrThrow(java.util.function.Function<String, ? extends RuntimeException> exceptionFactory) {
         if (errorMessage != null) throw exceptionFactory.apply(errorMessage);
