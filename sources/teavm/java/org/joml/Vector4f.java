@@ -1,6 +1,6 @@
 package org.joml;
 
-public class Vector4f {
+public class Vector4f implements Vector4fc {
     public float x, y, z, w;
 
     public Vector4f() {}

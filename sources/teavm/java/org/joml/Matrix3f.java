@@ -254,21 +254,8 @@ public class Matrix3f implements Matrix3fc {
     public Matrix3f rotateX(float angle) { return this; }
     public Matrix3f rotateY(float angle) { return this; }
     public Matrix3f rotateZ(float angle) { return this; }
-    public Matrix3f rotation(float angle, float ax, float ay, float az) { return this; }
-    public Matrix3f rotation(float angle, Vector3fc axis) { return this; }
     public Matrix3f rotationXYZ(float x, float y, float z) { return this; }
     public Matrix3f rotationZYX(float z, float y, float x) { return this; }
     public Matrix3f rotationYXZ(float y, float x, float z) { return this; }
-    public Matrix3f transpose() { return this; }
-    public Matrix3f invert() { return this; }
-    public Matrix3f mul(Matrix3fc right) { return this; }
-    public Matrix3f mul(Matrix3fc right, Matrix3f dest) { return dest; }
     public Vector3f transform(Vector3fc v, Vector3f dest) { return dest; }
-    public float determinant() { return 1.0f; }
-    public Matrix3f set(float[] m) {
-        m00 = m[0]; m01 = m[1]; m02 = m[2];
-        m10 = m[3]; m11 = m[4]; m12 = m[5];
-        m20 = m[6]; m21 = m[7]; m22 = m[8];
-        return this;
-    }
 }
