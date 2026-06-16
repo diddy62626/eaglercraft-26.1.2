@@ -27,7 +27,6 @@ public final class Dynamic<T> {
     public DataResult<Number> asNumber() { return DataResult.success(0); }
     public DataResult<String> asString() { return DataResult.success(""); }
     public String asString(String defaultValue) { return defaultValue; }
-    public DataResult<java.util.List<Dynamic<T>>> asStream() { return DataResult.success(new java.util.ArrayList<>()); }
     public DataResult<java.util.Optional<Dynamic<T>>> getElement(String key) { return DataResult.success(java.util.Optional.empty()); }
     public Dynamic<T> emptyList() { return new Dynamic<>(ops, ops.emptyList()); }
     public Dynamic<T> emptyMap() { return new Dynamic<>(ops, ops.emptyMap()); }
@@ -61,7 +60,7 @@ public final class Dynamic<T> {
 
     public float asFloat(float defaultValue) { return defaultValue; }
     public <U> java.util.List<U> asList(java.util.function.Function<Dynamic<T>, U> decoder) { return new java.util.ArrayList<>(); }
-    public DataResult<java.util.MapLike<Dynamic<T>>> asMapOpt() { return DataResult.success(null); }
+    public DataResult<MapLike<Dynamic<T>>> asMapOpt() { return DataResult.success(null); }
     public java.util.stream.Stream<Dynamic<T>> asStream() { return java.util.stream.Stream.empty(); }
     public Dynamic<T> createLongList(java.util.stream.LongStream stream) { return this; }
 }

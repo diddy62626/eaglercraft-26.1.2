@@ -30,7 +30,6 @@ public final class OptionalDynamic<T> {
     public float asFloat(float defaultValue) { return defaultValue; }
     public double asDouble(double defaultValue) { return defaultValue; }
     public boolean asBoolean(boolean defaultValue) { return defaultValue; }
-    public DataResult<Stream<Dynamic<T>>> asStream() { return DataResult.success(Stream.empty()); }
     public DataResult<Stream<Dynamic<T>>> asStreamOpt() { return DataResult.success(Stream.empty()); }
     public DataResult<java.util.stream.IntStream> asIntStreamOpt() { return DataResult.success(java.util.stream.IntStream.empty()); }
     public <U> DataResult<List<U>> asList(Function<Dynamic<T>, U> decoder) { return DataResult.success(new java.util.ArrayList<>()); }
