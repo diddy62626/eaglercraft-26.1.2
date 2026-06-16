@@ -356,8 +356,10 @@ public class EaglerCraft {
                                 java.util.Optional.empty()
                         );
 
+                        // Real MC 26.1.2 signature: UserData(User, java.net.Proxy)
+                        // Browsers don't use SOCKS/HTTP proxies directly, so NO_PROXY.
                         net.minecraft.client.main.GameConfig.UserData userData =
-                                new net.minecraft.client.main.GameConfig.UserData(user, new com.mojang.authlib.properties.PropertyMap());
+                                new net.minecraft.client.main.GameConfig.UserData(user, java.net.Proxy.NO_PROXY);
 
                         net.minecraft.client.main.GameConfig.GameData gameData =
                                 new net.minecraft.client.main.GameConfig.GameData(
