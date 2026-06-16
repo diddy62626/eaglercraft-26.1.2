@@ -75,6 +75,5 @@ sources/libs/minecraft-26.1.2.jar
 # EPK assets (binary, built by CI)
 output/assets.epk
 
-# Generated JS (built by CI)
-public/classes.js
+# Generated JS source map (built by CI)
 public/classes.js.map
