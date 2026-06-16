@@ -27,7 +27,7 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         // Runtime
         add("java.lang.Runtime", "maxMemory", ValueType.LONG, new ValueType[0], 512L * 1024 * 1024, false);
         add("java.lang.Runtime", "addShutdownHook", ValueType.VOID, new ValueType[] { ValueType.object("java.lang.Thread") }, null, false);
-        add("java.lang.Runtime", "removeShutdownHook", ValueType.INTEGER, new ValueType[] { ValueType.object("java.lang.Thread") }, 0, false);
+        add("java.lang.Runtime", "removeShutdownHook", ValueType.BOOLEAN, new ValueType[] { ValueType.object("java.lang.Thread") }, 0, false);
 
         // System (static)
         add("java.lang.System", "getenv", ValueType.object("java.util.Map"), new ValueType[0], null, true);
@@ -40,12 +40,15 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("java.lang.Class", "getGenericSuperclass", ValueType.object("java.lang.reflect.Type"), new ValueType[0], null, false);
         add("java.lang.Class", "getResource", ValueType.object("java.net.URL"), new ValueType[] { ValueType.object("java.lang.String") }, null, false);
         add("java.lang.Class", "getSigners", ValueType.arrayOf(ValueType.object("java.lang.Object")), new ValueType[0], null, false);
-        add("java.lang.Class", "isAnonymousClass", ValueType.INTEGER, new ValueType[0], 0, false);
+        add("java.lang.Class", "isAnonymousClass", ValueType.BOOLEAN, new ValueType[0], 0, false);
 
         // ClassLoader
         add("java.lang.ClassLoader", "getResource", ValueType.object("java.net.URL"), new ValueType[] { ValueType.object("java.lang.String") }, null, false);
         add("java.lang.ClassLoader", "getResources", ValueType.object("java.util.Enumeration"), new ValueType[] { ValueType.object("java.lang.String") }, null, false);
         add("java.lang.ClassLoader", "loadClass", ValueType.object("java.lang.Class"), new ValueType[] { ValueType.object("java.lang.String") }, null, false);
+        add("java.lang.ClassLoader", "getSystemResource", ValueType.object("java.net.URL"), new ValueType[] { ValueType.object("java.lang.String") }, null, true);
+        add("java.lang.ClassLoader", "getSystemResources", ValueType.object("java.util.Enumeration"), new ValueType[] { ValueType.object("java.lang.String") }, null, true);
+        add("java.lang.ClassLoader", "getSystemResourceAsStream", ValueType.object("java.io.InputStream"), new ValueType[] { ValueType.object("java.lang.String") }, null, true);
 
         // Integer (static)
         add("java.lang.Integer", "parseUnsignedInt", ValueType.INTEGER, new ValueType[] { ValueType.object("java.lang.String"), ValueType.INTEGER }, 0, true);
@@ -58,6 +61,12 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
 
         // UUID
         add("java.util.UUID", "getMostSignificantBits", ValueType.LONG, new ValueType[0], 0L, false);
+        add("java.util.UUID", "getLeastSignificantBits", ValueType.LONG, new ValueType[0], 0L, false);
+        add("java.util.UUID", "version", ValueType.INTEGER, new ValueType[0], 0, false);
+        add("java.util.UUID", "variant", ValueType.INTEGER, new ValueType[0], 0, false);
+        add("java.util.UUID", "timestamp", ValueType.LONG, new ValueType[0], 0L, false);
+        add("java.util.UUID", "clockSequence", ValueType.INTEGER, new ValueType[0], 0, false);
+        add("java.util.UUID", "node", ValueType.LONG, new ValueType[0], 0L, false);
         add("java.util.UUID", "nameUUIDFromBytes", ValueType.object("java.util.UUID"), new ValueType[] { ValueType.arrayOf(ValueType.BYTE) }, null, true);
 
         // Date
@@ -68,13 +77,13 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("java.nio.file.Files", "getFileStore", ValueType.object("java.nio.file.FileStore"), new ValueType[] { ValueType.object("java.nio.file.Path") }, null, true);
 
         // ConcurrentHashMap (static)
-        add("java.util.concurrent.ConcurrentHashMap", "newKeySet", ValueType.object("java.util.Set"), new ValueType[0], null, true);
+        add("java.util.concurrent.ConcurrentHashMap", "newKeySet", ValueType.object("java.util.concurrent.ConcurrentHashMap$KeySetView"), new ValueType[0], null, true);
 
         // StreamSupport (static)
         add("java.util.stream.StreamSupport", "intStream", ValueType.object("java.util.stream.IntStream"),
-            new ValueType[] { ValueType.object("java.util.Spliterator$OfInt"), ValueType.INTEGER }, null, true);
+            new ValueType[] { ValueType.object("java.util.Spliterator$OfInt"), ValueType.BOOLEAN }, null, true);
         add("java.util.stream.StreamSupport", "longStream", ValueType.object("java.util.stream.LongStream"),
-            new ValueType[] { ValueType.object("java.util.Spliterator$OfLong"), ValueType.INTEGER }, null, true);
+            new ValueType[] { ValueType.object("java.util.Spliterator$OfLong"), ValueType.BOOLEAN }, null, true);
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {
