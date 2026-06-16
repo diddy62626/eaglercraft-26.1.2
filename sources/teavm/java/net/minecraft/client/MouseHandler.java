@@ -28,8 +28,8 @@ public class MouseHandler {
                 this.ypos = ypos;
 
                 // Route to current screen
-                if (minecraft.getScreen() != null) {
-                        minecraft.getScreen().mouseDragged(xpos, ypos, 0, xpos, ypos);
+                if (minecraft.screen != null) {
+                        minecraft.screen.mouseDragged(xpos, ypos, 0, xpos, ypos);
                 }
         }
 
@@ -42,13 +42,13 @@ public class MouseHandler {
 
                 if (action == 1) {
                         // Button pressed
-                        if (minecraft.getScreen() != null) {
-                                minecraft.getScreen().mouseClicked(mx, my, button);
+                        if (minecraft.screen != null) {
+                                minecraft.screen.mouseClicked(mx, my, button);
                         }
                 } else if (action == 0) {
                         // Button released
-                        if (minecraft.getScreen() != null) {
-                                minecraft.getScreen().mouseReleased(mx, my, button);
+                        if (minecraft.screen != null) {
+                                minecraft.screen.mouseReleased(mx, my, button);
                         }
                 }
         }
@@ -57,8 +57,8 @@ public class MouseHandler {
          * Called when the mouse is scrolled.
          */
         public void onScroll(long window, double xOffset, double yOffset) {
-                if (minecraft.getScreen() != null) {
-                        minecraft.getScreen().mouseScrolled(this.xpos, this.ypos, yOffset);
+                if (minecraft.screen != null) {
+                        minecraft.screen.mouseScrolled(this.xpos, this.ypos, yOffset);
                 }
         }
 

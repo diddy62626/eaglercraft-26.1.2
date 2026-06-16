@@ -32,7 +32,7 @@ public class Screen {
 	 */
 	public void init(Minecraft minecraft, int width, int height) {
 		this.minecraft = minecraft;
-		this.font = minecraft != null ? minecraft.getFontManager() : new Font();
+		this.font = minecraft != null ? minecraft.font : new Font();
 		this.width = width;
 		this.height = height;
 	}

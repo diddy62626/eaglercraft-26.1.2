@@ -36,8 +36,8 @@ public class KeyboardHandler {
          */
         public void charTyped(long window, int codePoint, int modifiers) {
                 char c = (char) codePoint;
-                if (minecraft.getScreen() != null) {
-                        minecraft.getScreen().charTyped(c, modifiers);
+                if (minecraft.screen != null) {
+                        minecraft.screen.charTyped(c, modifiers);
                 }
         }
 
@@ -46,8 +46,8 @@ public class KeyboardHandler {
          */
         private void keyDown(int key, int scanCode, int modifiers) {
                 // First, try to route to the current screen
-                if (minecraft.getScreen() != null) {
-                        if (minecraft.getScreen().keyPressed(key, scanCode, modifiers)) {
+                if (minecraft.screen != null) {
+                        if (minecraft.screen.keyPressed(key, scanCode, modifiers)) {
                                 return;
                         }
                 }
@@ -60,8 +60,8 @@ public class KeyboardHandler {
          * Handles a key release event.
          */
         private void keyUp(int key, int scanCode, int modifiers) {
-                if (minecraft.getScreen() != null) {
-                        minecraft.getScreen().keyReleased(key, scanCode, modifiers);
+                if (minecraft.screen != null) {
+                        minecraft.screen.keyReleased(key, scanCode, modifiers);
                 }
         }
 

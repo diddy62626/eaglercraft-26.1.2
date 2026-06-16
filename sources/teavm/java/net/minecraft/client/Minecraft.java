@@ -62,13 +62,13 @@ public class Minecraft implements Window.WindowEventHandler {
         private final LevelRenderer levelRenderer;
         private final KeyboardHandler keyboardHandler;
         private final MouseHandler mouseHandler;
-        private final Font font;
+        public final Font font;
         private final TextureManager textureManager;
         private final SoundManager soundManager;
         private final Gui gui;
 
         // ========== Game State ==========
-        private Screen screen;
+        public Screen screen;
         private Screen overlay;
         private int fps;
         private long currentTime;

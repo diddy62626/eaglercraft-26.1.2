@@ -4782,7 +4782,6 @@ nleva_EaglerShaderImpl__clinit_ = () => {
     nleva_EaglerShaderImpl_titleTimeUniform = null;
     nleva_EaglerShaderImpl_titleInitialized = 0;
 },
-otjc_JSNumber = $rt_classWithoutFields(),
 cmbp_Window$WindowEventHandler = $rt_classWithoutFields(0);
 function nmc_Minecraft() {
     let a = this; jl_Object.call(a);
@@ -5507,6 +5506,7 @@ nmcm_GameConfig__init_ = (var_0, var_1, var_2, var_3, var_4) => {
     nmcm_GameConfig__init_0(var_5, var_0, var_1, var_2, var_3, var_4);
     return var_5;
 },
+otjc_JSNumber = $rt_classWithoutFields(),
 otcit_FloatSynthesizer = $rt_classWithoutFields(),
 otcit_FloatSynthesizer_mantissa10Table = null,
 otcit_FloatSynthesizer_exp10Table = null,
@@ -19943,7 +19943,6 @@ jl_StackTraceElement, 0, jl_Object, [ji_Serializable], 17, 0, 0, 0,
 nleva_PlatformWebService, 0, jl_Object, [], 17, 0, () => nleva_PlatformWebService_$callClinit(), 0,
 nlev_EaglerProfile, 0, jl_Object, [], 1, 0, () => nlev_EaglerProfile_$callClinit(), 0,
 nleva_EaglerShaderImpl, 0, jl_Object, [], 1, 0, () => nleva_EaglerShaderImpl_$callClinit(), 0,
-otjc_JSNumber, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 cmbp_Window$WindowEventHandler, 0, jl_Object, [], 1537, 0, 0, 0,
 nmc_Minecraft, 0, jl_Object, [cmbp_Window$WindowEventHandler], 1, 0, 0, 0,
 nlevi_PlatformNetworking, "PlatformNetworking", 14, jl_Object, [], 1, [0,0,0], 0, 0,
@@ -19966,6 +19965,7 @@ nmcm_GameConfig$QuickPlayData, 0, jl_Object, [], 1, 0, 0, 0,
 jl_Enum, 0, jl_Object, [jl_Comparable, ji_Serializable], 1025, 0, 0, 0,
 nmcm_GameConfig$QuickPlayVariant, 0, jl_Enum, [], 65553, 0, () => nmcm_GameConfig$QuickPlayVariant_$callClinit(), 0,
 nmcm_GameConfig, 0, jl_Object, [], 1, 0, 0, 0,
+otjc_JSNumber, 0, jl_Object, [otj_JSObject], 1025, 0, 0, 0,
 otcit_FloatSynthesizer, 0, jl_Object, [], 17, 0, () => otcit_FloatSynthesizer_$callClinit(), 0,
 jl_Long, "Long", 4, jl_Number, [jl_Comparable], 1, 0, () => jl_Long_$callClinit(), ["$intValue", $rt_wrapFunction0(jl_Long_intValue), "$longValue", $rt_wrapFunction0(jl_Long_longValue), "$doubleValue", $rt_wrapFunction0(jl_Long_doubleValue), "$toString", $rt_wrapFunction0(jl_Long_toString0), "$hashCode", $rt_wrapFunction0(jl_Long_hashCode)],
 ju_UUID, 0, jl_Object, [], 1, 0, 0, 0,

@@ -132,6 +132,12 @@ configurations {
 // to teavmClasspath at task-execution time (deferred so it sees
 // the latest compiled output). The teavm source set output must
 // come BEFORE the MC JAR so our overrides take precedence.
+//
+// We ALSO prepend the java.base patch classes directory so that
+// our overrides for java.util.UUID, java.util.concurrent.*, etc.
+// are seen by TeaVM BEFORE teavm-classlib.jar. TeaVM uses the
+// first class definition it finds on the classpath, so putting
+// our patches first lets us add missing methods to java.base classes.
 afterEvaluate {
     tasks.matching { it.name == 'generateJavaScript' }.configureEach {
         dependsOn 'compileTeavmJava'
@@ -139,11 +145,52 @@ afterEvaluate {
         // Prepend our classes so they're scanned first by TeaVM.
         // ConfigurableFileCollection.from() appends, so we use setFrom()
         // with our classes first, then add the rest.
-        def ourClasses = sourceSets.teavm.output.files + sourceSets.main.output.files
+        def patchClassesDir = file('teavm/patch/classes')
+        def ourClasses = [patchClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
         def existingCp = classpath.files
         classpath.setFrom(ourClasses)
         classpath.from(existingCp)
     }
+}
+
+// Task to compile java.base patches into sources/teavm/patch/classes/
+// before TeaVM runs. These patches override/extend classes from
+// teavm-classlib.jar by being placed FIRST on the TeaVM classpath.
+tasks.register('compileTeavmPatches') {
+    group = 'build'
+    description = 'Compiles java.base patches for TeaVM classlib overrides'
+    def patchSrcDir = file('teavm/patch/java')
+    def patchClassesDir = file('teavm/patch/classes')
+    inputs.dir patchSrcDir
+    outputs.dir patchClassesDir
+    doLast {
+        patchClassesDir.mkdirs()
+        def jdkHome = System.getenv('JAVA_HOME') ?: '/home/z/.jdks/jdk-25.0.3+9'
+        def javac = "${jdkHome}/bin/javac"
+        def srcFiles = []
+        fileTree(patchSrcDir).matching { include '**/*.java' }.each { srcFiles << it.absolutePath }
+        if (!srcFiles.isEmpty()) {
+            // Use Java exec API directly since project.exec() isn't available in doLast
+            def pb = new ProcessBuilder()
+            pb.command(javac, '--source', '25', '--enable-preview',
+                    "--patch-module", "java.base=${patchSrcDir.absolutePath}",
+                    '-d', patchClassesDir.absolutePath)
+            pb.command().addAll(srcFiles)
+            pb.redirectErrorStream(true)
+            def proc = pb.start()
+            def out = proc.inputStream.text
+            def exitCode = proc.waitFor()
+            if (exitCode != 0) {
+                println out
+                throw new GradleException("Patch compilation failed with exit code ${exitCode}")
+            }
+        }
+    }
+}
+
+// Make generateJavaScript depend on patch compilation
+tasks.matching { it.name == 'generateJavaScript' }.configureEach {
+    dependsOn 'compileTeavmPatches'
 }
 
 java {

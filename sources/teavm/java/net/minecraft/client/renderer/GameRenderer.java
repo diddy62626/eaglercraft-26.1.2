@@ -56,7 +56,7 @@ public class GameRenderer {
 			RenderSystem.defaultBlendFunc();
 
 			// Render current screen if present
-			Screen screen = minecraft.getScreen();
+			Screen screen = minecraft.screen;
 			if (screen != null) {
 				PoseStack poseStack = new PoseStack();
 				screen.render(poseStack, 0, 0, partialTick);
