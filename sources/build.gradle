@@ -144,8 +144,9 @@ sourceSets {
         resources {
             srcDirs = ['teavm-plugin/resources']
         }
-        compileClasspath += sourceSets.main.compileClasspath
-        compileClasspath += configurations.teavmImplementation
+        // The plugin needs access to TeaVM's API classes (TeaVMPlugin, ClassHolderTransformer, etc.)
+        // Use teavm source set's compileClasspath which already has teavm-classlib etc.
+        compileClasspath += sourceSets.teavm.compileClasspath
     }
 }
 
