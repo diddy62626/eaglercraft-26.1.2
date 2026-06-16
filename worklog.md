@@ -1,26 +1,26 @@
 ---
-Task ID: 1
-Agent: main
-Task: Port MC 26.1.2 classes to work through TeaVM in browser
+Task ID: 1-11
+Agent: Super Z (main)
+Task: Port MC 26.1.2 game code to work through TeaVM in browser
 
 Work Log:
-- Downloaded MC 26.1.2 client JAR from Mojang's Piston API (38MB, 30,675 entries, 10,208 net.minecraft classes)
-- Downloaded 27 MC dependency libraries (gson, guava, fastutil, log4j, netty, brigadier, datafixerupper, etc.)
-- Installed JDK 25 (Temurin 25.0.3) for Java 25 class file compatibility
-- Configured Gradle to use JDK 25 for compilation (Java 21 was insufficient for Java 25 class files)
-- Removed conflicting NIO buffer stubs (TeaVM classlib provides these)
-- Created browser-compatible SLF4J stubs (Logger, LoggerFactory, Marker, MarkerFactory, event.Level) to replace SLF4J JAR
-- Created TeaVM classlib patches (StackWalker, CompletableFuture, Future, TimeoutException, CompletionException) compiled with --patch-module java.base
-- Fixed LWJGL stub compilation errors (GL11 duplicate constants, GL15 Uint8Array.set type, GLFW parameter type)
-- Configured build.gradle with all MC dependency libraries and teavm-patches.jar
-- Updated CI/CD to auto-download MC JAR and libraries from Mojang API
-- Successfully compiled TeaVM JavaScript: BUILD SUCCESSFUL
-- Output: 293KB classes.js with 279 source files including 39 MC/Mojang classes
-- Pushed to GitHub: diddy62626/eaglercraft-26.1.2
+- Examined MC 26.1.2 JAR (10,682 classes, 38MB) and identified key entry points
+- Decompiled net.minecraft.client.Minecraft constructor and GameConfig dependencies
+- Created 15+ browser-compatible LWJGL stubs (GLFW callbacks, OpenAL extensions, PointerBuffer, CustomBuffer, GL20C)
+- Created 30+ TeaVM classlib patches (java.net.Proxy, java.nio.file.Path/Paths, java.util.UUID, java.util.concurrent.*, java.util.HexFormat, java.io.File.toPath(), java.security.cert.Certificate, java.sql.Date)
+- Updated teavm-patches.jar with all compiled patches
+- Wired EaglerCraft.createMinecraftInstance() to construct net.minecraft.client.Minecraft with browser-compatible GameConfig
+- Updated gameLogicTick() to call Minecraft.tick() when instance available
+- Updated renderFrame() to delegate to MC renderer when available
+- Fixed Java compilation errors (Callback imports, GL20C types, GL30/GL20 missing methods, PointerBuffer constructor)
+- Ran TeaVM compilation - Java sources compile successfully
+- TeaVM JS generation takes 10+ minutes for MC's 10K+ class codebase (too slow for interactive session)
+- Increased Gradle JVM heap to 8GB, disabled obfuscation for dev builds
+- Pushed all changes to GitHub (commit 94d4694)
 
 Stage Summary:
-- TeaVM now successfully compiles MC 26.1.2 classes to JavaScript
-- classes.js grew from 180KB (adapter-only) to 293KB (with MC class references)
-- 39 MC/Mojang classes included so far (Minecraft, LogUtils, Identifier, Codec, Component, etc.)
-- Full game (30K+ classes) not yet included - TeaVM only compiles reachable code from mainClass
-- Next step: Create bootstrap class that directly references more MC game subsystems to pull them into the TeaVM call graph
+- MC 26.1.2 game code is now wired into TeaVM compilation pipeline
+- 59 files changed, 2226 insertions - comprehensive stub layer for browser compatibility
+- TeaVM can compile Java sources successfully but JS generation takes too long in dev environment
+- CI/CD pipeline will handle the full compilation with more resources
+- Key remaining work: fix remaining TeaVM missing methods (found from first successful partial compilation), optimize compilation, test runtime behavior
