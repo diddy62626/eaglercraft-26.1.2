@@ -11,4 +11,6 @@ public final class Kernel32Util {
     public static boolean isWindows10OrLater() { return false; }
     public static boolean isWindowsVistaOrLater() { return false; }
     public static boolean isWindowsXPOrLater() { return false; }
+
+    public static java.util.List<String> getModules(int processId) { return new java.util.ArrayList<>(); }
 }

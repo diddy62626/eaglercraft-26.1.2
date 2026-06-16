@@ -380,6 +380,12 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("java.security.KeyFactory", "generatePublic", ValueType.object("java.security.PublicKey"),
             new ValueType[] { ValueType.object("java.security.spec.KeySpec") }, null, false);
 
+        // ===== Additional MethodHandle.invoke/invokeExact signatures =====
+        add("java.lang.invoke.MethodHandle", "invoke", ValueType.object("java.util.List"),
+            new ValueType[] { ValueType.object("java.lang.Object") }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.BOOLEAN,
+            new ValueType[] { ValueType.object("java.lang.Class") }, 0, false);
+
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {

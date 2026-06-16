@@ -19,4 +19,6 @@ public interface MapCodec<T> extends Codec<T> {
     default MapCodec<T> unit(java.util.function.Supplier<T> defaultValue) { return this; }
     default Codec<T> unitCodec(T defaultValue) { return this; }
     default Codec<T> unitCodec(java.util.function.Supplier<T> defaultValue) { return this; }
+
+    default MapCodec<T> orElseGet(java.util.function.Consumer<String> onError, java.util.function.Supplier<T> supplier) { return this; }
 }

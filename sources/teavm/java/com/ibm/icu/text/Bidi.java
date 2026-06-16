@@ -34,4 +34,9 @@ public final class Bidi {
     public static int countBaseCharacters(java.text.AttributedCharacterIterator paragraph) { return 0; }
     public static Bidi writeReverse(String src, int options) { return new Bidi(); }
     public String writeReordered(int options) { return ""; }
+
+    public void setReorderingMode(int mode) {}
+    public int getReorderingMode() { return 0; }
+    public void setReorderingOptions(int options) {}
+    public int getReorderingOptions() { return 0; }
 }

@@ -42,4 +42,7 @@ public final class Native {
         int OPTION_STRUCTURE_ALIGNMENT = 3;
         int OPTION_TYPE_MAPPER = 4;
     }
+
+    public static void register(Class<?> cls, NativeLibrary lib) {}
+    public static void register(Class<?> cls) {}
 }

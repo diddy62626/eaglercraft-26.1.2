@@ -58,4 +58,10 @@ public final class Dynamic<T> {
     public Dynamic<T> replaceField(String key, String newKey, java.util.Optional<Dynamic<T>> value) { return this; }
     public Dynamic<T> setFieldIfPresent(String key, java.util.Optional<Dynamic<T>> value) { return this; }
     public Dynamic<T> updateMapValues(java.util.function.Function<Dynamic<T>, Dynamic<T>> fn) { return this; }
+
+    public float asFloat(float defaultValue) { return defaultValue; }
+    public <U> java.util.List<U> asList(java.util.function.Function<Dynamic<T>, U> decoder) { return new java.util.ArrayList<>(); }
+    public DataResult<java.util.MapLike<Dynamic<T>>> asMapOpt() { return DataResult.success(null); }
+    public java.util.stream.Stream<Dynamic<T>> asStream() { return java.util.stream.Stream.empty(); }
+    public Dynamic<T> createLongList(java.util.stream.LongStream stream) { return this; }
 }

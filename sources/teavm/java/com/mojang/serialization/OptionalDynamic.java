@@ -39,4 +39,13 @@ public final class OptionalDynamic<T> {
     public <U> DataResult<U> flatMap(Function<Dynamic<T>, DataResult<U>> fn) { return DataResult.success(null); }
     public Optional<Dynamic<T>> result() { return result.result(); }
     public <U> OptionalDynamic<U> cast(DynamicOps<U> ops) { return new OptionalDynamic<>(ops, DataResult.success(null)); }
+
+    public DataResult<java.nio.ByteBuffer> asByteBufferOpt() { return DataResult.success(java.nio.ByteBuffer.allocate(0)); }
+    public java.util.stream.IntStream asIntStream() { return java.util.stream.IntStream.empty(); }
+    public java.util.stream.LongStream asLongStream() { return java.util.stream.LongStream.empty(); }
+    public <K, V> java.util.Map<K, V> asMap(Function<Dynamic<T>, K> keyDecoder, Function<Dynamic<T>, V> valueDecoder) { return new java.util.HashMap<>(); }
+    public java.util.stream.Stream<Dynamic<T>> asStream() { return java.util.stream.Stream.empty(); }
+    public Dynamic<T> createList(java.util.stream.Stream<Dynamic<T>> stream) { return new Dynamic<>(ops, ops.emptyList()); }
+    public Dynamic<T> createString(String value) { return new Dynamic<>(ops, ops.createString(value)); }
+    public <U> DataResult<U> read(Decoder<U> decoder) { return DataResult.success(null); }
 }
