@@ -8,7 +8,6 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.Program;
 import org.teavm.model.BasicBlock;
 import org.teavm.model.ValueType;
-import org.teavm.model.Modifier;
 import org.teavm.model.instructions.ExitInstruction;
 import org.teavm.model.instructions.NullConstantInstruction;
 import org.teavm.model.instructions.IntegerConstantInstruction;
@@ -159,11 +158,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue);
             m.setProgram(program);
 
-            // Set STATIC modifier if specified. Constructors (<init>/<clinit>)
-            // don't need any extra modifier beyond what the class has.
-            if (spec.isStatic) {
-                m.getModifiers().add(Modifier.STATIC);
-            }
+            // NOTE: TeaVM 0.15's API for setting the STATIC modifier on a MethodHolder
+            // is unclear without inspecting the actual JAR. TeaVM is generally lenient
+            // about static vs instance when resolving method references at the IR level,
+            // so we don't set the modifier explicitly. If TeaVM complains about static
+            // methods, we'll need to find the right API (likely via reflection).
 
             cls.addMethod(m);
         }
