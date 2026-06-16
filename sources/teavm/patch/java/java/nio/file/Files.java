@@ -1,5 +1,6 @@
 package java.nio.file;
 import java.nio.file.attribute.*;
+import java.util.function.BiPredicate;
 public final class Files {
     public static InputStream newInputStream(Path path, OpenOption... options) throws java.io.IOException { return new java.io.ByteArrayInputStream(new byte[0]); }
     public static OutputStream newOutputStream(Path path, OpenOption... options) throws java.io.IOException { return new java.io.ByteArrayOutputStream(); }

@@ -1,4 +1,5 @@
 package java.time;
+import java.time.temporal.Temporal;
 public final class Duration {
     public static Duration ofMillis(long millis) { return new Duration(); }
     public static Duration ofSeconds(long seconds) { return new Duration(); }

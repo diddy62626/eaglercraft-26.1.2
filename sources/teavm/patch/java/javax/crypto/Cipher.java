@@ -1,4 +1,5 @@
 package javax.crypto;
+import java.security.Key;
 public class Cipher {
     public static final int ENCRYPT_MODE = 1;
     public static final int DECRYPT_MODE = 2;
