@@ -164,13 +164,9 @@ public interface Codec<T> {
     default <S> Codec<S> map(java.util.function.Function<T, S> fn) { return null; }
     default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return null; }
     default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
-    default <S> Codec<S> dispatchStable(java.util.function.Function<S, Codec<? extends T>> fn) { return null; }
     default MapCodec<T> lenientOptionalFieldOf(String name) { return null; }
-    default MapCodec<T> optionalFieldOf(String name) { return null; }
-    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return null; }
     default Codec<java.util.Map<String, T>> simpleMap(Codec<String> keyCodec, Codec<T> valueCodec, com.mojang.serialization.Keyable keys) { return null; }
     default Codec<T> sizeLimitedString(int maxSize) { return this; }
-    default Codec<java.util.Map<String, T>> unboundedMap(Codec<String> keyCodec, Codec<T> valueCodec) { return null; }
     default Codec<T> xor(Codec<T> alternative) { return this; }
 
     interface ResultFunction<T> {

@@ -31,5 +31,4 @@ public interface CommandEncoder {
             com.mojang.blaze3d.textures.GpuTextureView depthAttachment, java.util.OptionalDouble clearDepth) {
         return new com.mojang.blaze3d.systems.RenderPass() {};
     }
-    default void writeToTexture(com.mojang.blaze3d.textures.GpuTexture texture, com.mojang.blaze3d.platform.NativeImage image, int x, int y, int z, int w, int h, int d, int m) {}
-}
+    }

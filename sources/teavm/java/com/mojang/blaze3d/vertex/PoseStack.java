@@ -28,7 +28,6 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
 
         public org.joml.Matrix3f normal() { return new org.joml.Matrix3f(); }
 
-        public com.mojang.blaze3d.vertex.PoseStack.Pose copy() { return new com.mojang.blaze3d.vertex.PoseStack.Pose(); }
         public void mulPose(org.joml.Matrix4fc mat) {}
         public void scale(float x, float y, float z) {}
         public void set(com.mojang.blaze3d.vertex.PoseStack.Pose other) {}

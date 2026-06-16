@@ -25,44 +25,45 @@ public final class DataResult<T> {
     public static <T> DataResult<T> partial(T partial, String message) { return new DataResult<>(null, partial, message); }
     public static <T> DataResult<T> partial(T partial, Supplier<String> message) { return new DataResult<>(null, partial, message.get()); }
 
-    public java.util.Optional<T> result() { return java.util.Optional.ofNullable(value); }
+    public Optional<T> result() { return Optional.ofNullable(value); }
     public T resultOrNull() { return value; }
-    public java.util.Optional<String> error() { return java.util.Optional.ofNullable(error); }
-    public String errorOrNull() { return error; }
+    public Optional<String> error() { return Optional.ofNullable(errorMessage); }
+    public String errorOrNull() { return errorMessage; }
+
     public T getOrThrow() throws RuntimeException {
-        if (error != null) throw new RuntimeException(error);
+        if (errorMessage != null) throw new RuntimeException(errorMessage);
         return value;
     }
     public T getOrThrow(Function<String, ? extends RuntimeException> exceptionFactory) throws RuntimeException {
-        if (error != null) throw exceptionFactory.apply(error);
+        if (errorMessage != null) throw exceptionFactory.apply(errorMessage);
         return value;
     }
     public Optional<T> resultOrPartial(Consumer<String> onError) {
-        if (error != null) onError.accept(error);
+        if (errorMessage != null) onError.accept(errorMessage);
         return Optional.ofNullable(value != null ? value : partial);
     }
     public boolean isError() { return errorMessage != null; }
     public boolean isSuccess() { return errorMessage == null; }
 
     public <S> DataResult<S> map(Function<T, S> fn) {
-        return error != null ? error(error) : success(fn.apply(value));
+        return errorMessage != null ? error(errorMessage) : success(fn.apply(value));
     }
     public <S> DataResult<S> flatMap(Function<T, DataResult<S>> fn) {
-        return error != null ? error(error) : fn.apply(value);
+        return errorMessage != null ? error(errorMessage) : fn.apply(value);
     }
     public <S> DataResult<S> mapOrElse(Function<T, S> onSuccess, Function<String, S> onError) {
-        return error != null ? success(onError.apply(error)) : success(onSuccess.apply(value));
+        return errorMessage != null ? success(onError.apply(errorMessage)) : success(onSuccess.apply(value));
     }
     public DataResult<T> ifError(Consumer<String> onError) {
-        if (error != null) onError.accept(error);
+        if (errorMessage != null) onError.accept(errorMessage);
         return this;
     }
     public DataResult<T> ifSuccess(Consumer<T> onSuccess) {
-        if (error == null) onSuccess.accept(value);
+        if (errorMessage == null) onSuccess.accept(value);
         return this;
     }
     public DataResult<T> ifErrorOrElse(Consumer<String> onError, Runnable onSuccess) {
-        if (error != null) onError.accept(error);
+        if (errorMessage != null) onError.accept(errorMessage);
         else onSuccess.run();
         return this;
     }
@@ -81,10 +82,4 @@ public final class DataResult<T> {
 
     public interface BiFunction<T, U, R> { R apply(T t, U u); }
     public interface TriFunction<T, U, V, R> { R apply(T t, U u, V v); }
-
-    public <R> R mapOrElse(java.util.function.Function<T, R> onSuccess, java.util.function.Function<String, R> onError) {
-        return error != null ? onError.apply(error) : onSuccess.apply(value);
-    }
-    public DataResult<T> promoteOnlyOnError() { return this; }
-    public DataResult<T> apply2stable(BiFunction<T, T, T> fn, DataResult<T> other) { return this; }
 }
