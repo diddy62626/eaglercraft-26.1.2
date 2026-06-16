@@ -161,7 +161,6 @@ public interface Codec<T> {
     static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return null; }
 
     default DataResult<T> decode(DynamicOps<?> ops, Object input) { return DataResult.success(decode(input)); }
-    default <S> Codec<S> map(java.util.function.Function<T, S> fn) { return null; }
     default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return null; }
     default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
     default MapCodec<T> lenientOptionalFieldOf(String name) { return null; }

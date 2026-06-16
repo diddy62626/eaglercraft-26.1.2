@@ -41,5 +41,4 @@ public interface DynamicOps<T> {
     default T createMap(java.util.Map<T, T> map) { return empty(); }
     default DataResult<T> mergeToMap(T input, MapLike<T> map) { return DataResult.success(input); }
     default DataResult<T> mergeToPrimitive(T input, T value) { return DataResult.success(input); }
-    default DataResult<T> mergeToMap(T input, T key, T value) { return DataResult.success(input); }
 }
