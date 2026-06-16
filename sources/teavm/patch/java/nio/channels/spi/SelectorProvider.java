@@ -1,5 +1,6 @@
 package java.nio.channels.spi;
 
+import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Pipe;
 import java.nio.channels.ServerSocketChannel;
