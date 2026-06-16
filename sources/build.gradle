@@ -112,6 +112,40 @@ sourceSets {
     }
 }
 
+// ============================================================
+// IMPORTANT: Wire teavmClasspath to include the teavm source
+// set output AND all teavmImplementation dependencies.
+// ============================================================
+// The TeaVM plugin's generateJavaScript task reads its classpath
+// ONLY from the 'teavmClasspath' configuration (see TeaVMPlugin
+// bytecode: applyToTask → getClasspath().from(getByName("teavmClasspath"))).
+// By default, teavmClasspath extends only from the 'teavm' config
+// and does NOT include teavmImplementation deps or source set output.
+// Without this wiring, TeaVM cannot find our overrides or the MC JAR.
+configurations {
+    teavmClasspath {
+        extendsFrom configurations.teavmImplementation
+    }
+}
+
+// Also add the teavm source set output and main source set output
+// to teavmClasspath at task-execution time (deferred so it sees
+// the latest compiled output). The teavm source set output must
+// come BEFORE the MC JAR so our overrides take precedence.
+afterEvaluate {
+    tasks.matching { it.name == 'generateJavaScript' }.configureEach {
+        dependsOn 'compileTeavmJava'
+        inputs.files sourceSets.teavm.output
+        // Prepend our classes so they're scanned first by TeaVM.
+        // ConfigurableFileCollection.from() appends, so we use setFrom()
+        // with our classes first, then add the rest.
+        def ourClasses = sourceSets.teavm.output.files + sourceSets.main.output.files
+        def existingCp = classpath.files
+        classpath.setFrom(ourClasses)
+        classpath.from(existingCp)
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25

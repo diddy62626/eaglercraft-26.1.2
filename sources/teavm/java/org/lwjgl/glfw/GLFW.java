@@ -361,7 +361,7 @@ public class GLFW {
         yscale[0] = 1.0f;
     }
 
-    @JSBody(params = "title", script = "document.title = title;")
+    @JSBody(params = {"window", "title"}, script = "document.title = title;")
     public static native void glfwSetWindowTitle(long window, CharSequence title);
 
     public static void glfwShowWindow(long window) {
