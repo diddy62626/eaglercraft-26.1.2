@@ -374,7 +374,7 @@ public class GL11 {
         public static final int GL_OR = 0x1507;
         public static final int GL_NOR = 0x1508;
         public static final int GL_EQUIV = 0x1509;
-        public static final int GL_INVERT = 0x150A;
+        // GL_INVERT already defined above (0x150A)
         public static final int GL_OR_REVERSE = 0x150B;
         public static final int GL_COPY_INVERTED = 0x150C;
         public static final int GL_OR_INVERTED = 0x150D;
@@ -494,7 +494,7 @@ public class GL11 {
         public static final int GL_GREEN_BIAS = 0x0D19;
         public static final int GL_BLUE_SCALE = 0x0D1A;
         public static final int GL_BLUE_BIAS = 0x0D1B;
-        public static final int GL_ALPHA_SCALE = 0x0D1C;
+        // GL_ALPHA_SCALE already defined above (0x8574 / also 0x0D1C in legacy)
         public static final int GL_ALPHA_BIAS = 0x0D1D;
         public static final int GL_DEPTH_SCALE = 0x0D1E;
         public static final int GL_DEPTH_BIAS = 0x0D1F;

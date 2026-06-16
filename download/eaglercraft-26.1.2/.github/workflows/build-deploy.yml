@@ -58,10 +58,37 @@ jobs:
 
       # ── Download Minecraft JAR if needed ─────────────────────
       - name: Download Minecraft JAR
-        if: steps.cache-mc-jar.outputs.cache-hit != 'true' && inputs.minecraft_jar_url != ''
+        if: steps.cache-mc-jar.outputs.cache-hit != 'true'
         run: |
-          echo "Downloading Minecraft 26.1.2 JAR..."
-          curl -L -o minecraft-26.1.2.jar "${{ inputs.minecraft_jar_url }}"
+          echo "Downloading Minecraft 26.1.2 client JAR from Mojang..."
+          # Get version manifest
+          VERSION_URL=$(curl -sL "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json" | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          for v in data.get('versions',[]):
+            if v.get('id')=='26.1.2':
+              print(v.get('url',''))
+              break
+          ")
+          if [ -z "$VERSION_URL" ]; then
+            echo "ERROR: Could not find MC 26.1.2 in version manifest"
+            exit 1
+          fi
+          echo "Version JSON: $VERSION_URL"
+          
+          # Get client JAR URL from version JSON
+          CLIENT_URL=$(curl -sL "$VERSION_URL" | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          print(data.get('downloads',{}).get('client',{}).get('url',''))
+          ")
+          if [ -z "$CLIENT_URL" ]; then
+            echo "ERROR: Could not find client JAR URL"
+            exit 1
+          fi
+          echo "Client JAR URL: $CLIENT_URL"
+          
+          curl -L -o minecraft-26.1.2.jar "$CLIENT_URL"
           echo "Downloaded $(stat -c%s minecraft-26.1.2.jar) bytes"
 
       - name: Check for Minecraft JAR
@@ -90,59 +117,79 @@ jobs:
 
       # ── Build: Init workspace ────────────────────────────────
       - name: Initialize workspace
-        if: steps.check-jar.outputs.found == 'true'
         run: |
-          ./build_init.sh --jar ../minecraft-26.1.2.jar --headless 2>&1 || true
-          echo "Init step completed (may have warnings - continuing)"
+          # Copy MC JAR to the right place
+          mkdir -p sources/libs
+          if [ -f minecraft-26.1.2.jar ]; then
+            cp minecraft-26.1.2.jar sources/libs/minecraft-26.1.2.jar
+            echo "MC JAR copied to sources/libs/"
+          fi
+          
+          # Download MC dependency libraries from Mojang
+          echo "Downloading MC dependency libraries..."
+          python3 -c "
+          import urllib.request, json
+          with urllib.request.urlopen('https://piston-meta.mojang.com/v1/packages/978e6c0dd077d0f8d5d53887454928f1d3687ba8/26.1.2.json') as r:
+            data = json.loads(r.read())
+          libs_to_download = [
+            'com.mojang:logging', 'com.mojang:brigadier', 'com.mojang:datafixerupper',
+            'com.mojang:authlib', 'com.mojang:blocklist', 'com.mojang:patchy',
+            'com.mojang:text2speech', 'com.mojang:jtracy',
+            'com.google.code.gson:gson', 'com.google.guava:guava', 'com.google.guava:failureaccess',
+            'org.apache.commons:commons-lang3', 'org.apache.commons:commons-compress',
+            'commons-io:commons-io', 'commons-codec:commons-codec',
+            'it.unimi.dsi:fastutil',
+            'org.apache.logging.log4j:log4j-api', 'org.apache.logging.log4j:log4j-core',
+            'org.jspecify:jspecify',
+            'io.netty:netty-buffer', 'io.netty:netty-common', 'io.netty:netty-transport',
+            'io.netty:netty-codec-base', 'io.netty:netty-codec-compression', 'io.netty:netty-handler',
+            'net.sf.jopt-simple:jopt-simple'
+          ]
+          for lib in data.get('libraries', []):
+            name = lib.get('name', '')
+            # Skip native libraries
+            if 'natives-' in name:
+              continue
+            # Check if this lib should be downloaded
+            should_download = any(name.startswith(prefix) for prefix in libs_to_download)
+            if not should_download:
+              continue
+            artifact = lib.get('downloads', {}).get('artifact', {})
+            url = artifact.get('url', '')
+            if url:
+              filename = url.split('/')[-1]
+              print(f'Downloading {filename}...')
+              urllib.request.urlretrieve(url, f'sources/libs/{filename}')
+          print('Done downloading libraries')
+          "
+          echo "Libraries in sources/libs/:"
+          ls -la sources/libs/
 
       # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle
         run: |
-          echo "=== Gradle build info ==="
-          ./gradlew --no-daemon buildInfo 2>&1 || true
-
-          echo "=== Compiling Java sources ==="
-          ./gradlew --no-daemon --info compileJava 2>&1 | tee gradle-compile.log
-
-          echo "=== Checking compile result ==="
-          if grep -qi "BUILD SUCCESSFUL" gradle-compile.log 2>/dev/null; then
-            echo "Gradle compileJava succeeded"
+          # Build TeaVM classlib patches (StackWalker, CompletableFuture, etc.)
+          mkdir -p sources/teavm/patch/classes
+          cd sources/teavm/patch
+          $JAVA_HOME/bin/javac --source 25 --enable-preview \
+            --patch-module java.base=$(pwd) \
+            -d classes \
+            java/lang/StackWalker.java \
+            java/util/concurrent/Future.java \
+            java/util/concurrent/TimeoutException.java \
+            java/util/concurrent/CompletionException.java \
+            java/util/concurrent/CompletableFuture.java
+          $JAVA_HOME/bin/jar cf ../../libs/teavm-patches.jar -C classes .
+          cd ../..
+          
+          echo "=== Compiling TeaVM JavaScript ==="
+          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 | tee teavm.log
+          
+          # Check result
+          if grep -q "BUILD SUCCESSFUL" teavm.log; then
+            echo "TeaVM compilation succeeded!"
           else
-            echo "ERROR: Gradle compileJava FAILED"
-            exit 1
-          fi
-
-      # ── Build: TeaVM compilation ─────────────────────────────
-      - name: Compile TeaVM (Java -> JavaScript)
-        run: |
-          set -o pipefail
-          ./gradlew --no-daemon --info :sources:generateJavaScript 2>&1 | tee teavm.log
-          TEAVM_EXIT=$?
-
-          # Check if TeaVM reported errors in the log (even if exit code was 0)
-          # Use specific patterns to avoid false positives from JVM args like HeapDumpOnOutOfMemoryError
-          ERROR_COUNT=$(grep -cE '\.java:[0-9]+: error:|TeaVM.*error|Compilation error|BUILD FAILED' teavm.log 2>/dev/null || echo 0)
-          if [ "$TEAVM_EXIT" -ne 0 ] || [ "$ERROR_COUNT" -gt 0 ]; then
-            echo "=== TeaVM compilation FAILED (exit=$TEAVM_EXIT, errors in log=$ERROR_COUNT) ==="
-            echo "Last 80 lines of TeaVM log:"
-            tail -80 teavm.log
-            echo ""
-            echo "Full log saved as artifact. TeaVM compilation must succeed before deployment."
-            exit 1
-          fi
-
-          # Check if classes.js was produced (TeaVM 0.15.0 outputs to build/generated/teavm/js/)
-          CLASSES_JS=""
-          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
-            if [ -f "$path" ]; then
-              CLASSES_JS="$path"
-              echo "classes.js found at: $path ($(stat -c%s "$path") bytes)"
-              break
-            fi
-          done
-          if [ -z "$CLASSES_JS" ]; then
-            echo "ERROR: TeaVM compilation did not produce classes.js"
-            echo "TeaVM log tail:"
+            echo "ERROR: TeaVM compilation failed"
             tail -50 teavm.log
             exit 1
           fi

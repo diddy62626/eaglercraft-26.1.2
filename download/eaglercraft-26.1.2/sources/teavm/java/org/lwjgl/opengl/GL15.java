@@ -155,7 +155,7 @@ public class GL15 {
         public static void glBufferData(int target, byte[] data, int usage) {
                 Uint8Array arr = Uint8Array.create(data.length);
                 for (int i = 0; i < data.length; i++) {
-                        arr.set(i, data[i] & 0xFF);
+                        arr.set(i, (short)(data[i] & 0xFF));
                 }
                 PlatformOpenGL._wglBufferData(target, arr, usage);
         }
@@ -197,7 +197,7 @@ public class GL15 {
         public static void glBufferSubData(int target, int offset, byte[] data) {
                 Uint8Array arr = Uint8Array.create(data.length);
                 for (int i = 0; i < data.length; i++) {
-                        arr.set(i, data[i] & 0xFF);
+                        arr.set(i, (short)(data[i] & 0xFF));
                 }
                 PlatformOpenGL._wglBufferSubData(target, offset, arr);
         }

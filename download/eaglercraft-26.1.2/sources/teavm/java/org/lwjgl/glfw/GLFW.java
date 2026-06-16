@@ -337,7 +337,7 @@ public class GLFW {
     @JSBody(script = "var c = document.querySelector('canvas'); if (c) { return c.height || 0; } return 0;")
     private static native int getCanvasHeight();
 
-    public static void glfwGetWindowSize(long window, int[] width, int height) {
+    public static void glfwGetWindowSize(long window, int[] width, int[] height) {
         width[0] = getCanvasWidth();
         height[0] = getCanvasHeight();
     }
