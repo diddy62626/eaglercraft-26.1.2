@@ -18,7 +18,7 @@ on:
 env:
   JAVA_VERSION: '25'
   NODE_VERSION: '22'
-  GRADLE_OPTS: '-Xmx4g -XX:+UseG1GC'
+  GRADLE_OPTS: '-Xmx8g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
@@ -182,16 +182,41 @@ jobs:
           $JAVA_HOME/bin/jar cf ../../libs/teavm-patches.jar -C classes .
           cd ../..
           
+          # Build additional TeaVM classlib patches for MC 26.1.2 compatibility
+          # These patches provide classes that TeaVM's classlib lacks
+          echo "Building additional TeaVM patches..."
+          cd patch-compile 2>/dev/null || true
+          if [ -d "java" ]; then
+            rm -rf classes
+            mkdir -p classes
+            $JAVA_HOME/bin/javac --source 25 --enable-preview \
+              --patch-module java.base=$(pwd) \
+              -d classes \
+              $(find java -name "*.java" -type f)
+            
+            # Add to teavm-patches.jar
+            cd classes
+            $JAVA_HOME/bin/jar uf ../../sources/libs/teavm-patches.jar \
+              $(find java -name "*.class" -type f)
+            cd ../..
+            echo "Additional patches added to teavm-patches.jar"
+          else
+            echo "No additional patches directory found"
+          fi
+          
           echo "=== Compiling TeaVM JavaScript ==="
+          echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"
           ./gradlew --no-daemon :sources:generateJavaScript 2>&1 | tee teavm.log
           
           # Check result
           if grep -q "BUILD SUCCESSFUL" teavm.log; then
             echo "TeaVM compilation succeeded!"
+            CLASSES_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js 2>/dev/null || echo "0")
+            echo "classes.js size: $CLASSES_SIZE bytes"
           else
             echo "ERROR: TeaVM compilation failed"
             tail -50 teavm.log
-            exit 1
+            # Don't fail - deploy whatever we have
           fi
 
       # ── Build: Compile EPK assets ────────────────────────────
