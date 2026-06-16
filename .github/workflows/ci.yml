@@ -197,18 +197,32 @@ jobs:
       - name: Assemble public/ directory
         run: |
           echo "Assembling public/ directory..."
+          # Only copy classes.js from TeaVM output if the build SUCCEEDED
+          # and the output is non-trivial (>= 50KB). TeaVM sometimes writes
+          # a tiny stub file (just the source map comment) before failing,
+          # which would clobber the working committed classes.js.
           CLASSES_JS=""
-          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
-            if [ -f "$path" ]; then
-              CLASSES_JS="$path"
-              break
-            fi
-          done
+          if grep -q "BUILD SUCCESSFUL" teavm.log 2>/dev/null; then
+            for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+              if [ -f "$path" ]; then
+                SIZE=$(stat -c%s "$path" 2>/dev/null || echo 0)
+                if [ "$SIZE" -ge 50000 ]; then
+                  CLASSES_JS="$path"
+                  echo "Using TeaVM output: $path ($SIZE bytes)"
+                  break
+                else
+                  echo "WARNING: $path is only $SIZE bytes — too small, skipping"
+                fi
+              fi
+            done
+          else
+            echo "TeaVM build did not succeed — keeping committed classes.js"
+          fi
           if [ -n "$CLASSES_JS" ]; then
             cp "$CLASSES_JS" public/classes.js
             echo "classes.js copied from $CLASSES_JS ($(stat -c%s public/classes.js) bytes)"
           else
-            echo "WARNING: No TeaVM output found, using repository stub"
+            echo "Keeping committed public/classes.js ($(stat -c%s public/classes.js 2>/dev/null || echo 0) bytes)"
           fi
 
           for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
