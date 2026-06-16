@@ -19,6 +19,7 @@ public interface Codec<T> {
     Codec<java.util.stream.LongStream> LONG_STREAM = new Codec<java.util.stream.LongStream>() { public java.util.stream.LongStream decode(Object i) { return java.util.stream.LongStream.empty(); } public Object encode(java.util.stream.LongStream v) { return null; } };
     Codec<java.util.stream.DoubleStream> DOUBLE_STREAM = new Codec<java.util.stream.DoubleStream>() { public java.util.stream.DoubleStream decode(Object i) { return java.util.stream.DoubleStream.empty(); } public Object encode(java.util.stream.DoubleStream v) { return null; } };
     Codec<java.nio.ByteBuffer> BYTE_BUFFER = new Codec<java.nio.ByteBuffer>() { public java.nio.ByteBuffer decode(Object i) { return java.nio.ByteBuffer.allocate(0); } public Object encode(java.nio.ByteBuffer v) { return null; } };
+    Codec<java.util.Optional<Object>> EMPTY = new Codec<java.util.Optional<Object>>() { public java.util.Optional<Object> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<Object> v) { return null; } };
 
     T decode(Object input);
     Object encode(T value);
@@ -158,4 +159,22 @@ public interface Codec<T> {
     static <T> MapCodec<T> optionalFieldOf(String name, T defaultValue, Codec<T> codec) { return null; }
     static <T> Codec<java.util.Optional<T>> optionalFieldOf(String name, Codec<T> codec) { return null; }
     static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return null; }
+
+    default DataResult<T> decode(DynamicOps<?> ops, Object input) { return DataResult.success(decode(input)); }
+    default <S> Codec<S> map(java.util.function.Function<T, S> fn) { return null; }
+    default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return null; }
+    default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
+    default <S> Codec<S> dispatchStable(java.util.function.Function<S, Codec<? extends T>> fn) { return null; }
+    default MapCodec<T> lenientOptionalFieldOf(String name) { return null; }
+    default MapCodec<T> optionalFieldOf(String name) { return null; }
+    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return null; }
+    default Codec<java.util.Map<String, T>> simpleMap(Codec<String> keyCodec, Codec<T> valueCodec, com.mojang.serialization.Keyable keys) { return null; }
+    default Codec<T> sizeLimitedString(int maxSize) { return this; }
+    default Codec<java.util.Map<String, T>> unboundedMap(Codec<String> keyCodec, Codec<T> valueCodec) { return null; }
+    default Codec<T> xor(Codec<T> alternative) { return this; }
+
+    interface ResultFunction<T> {
+        DataResult<T> coApply(DynamicOps<?> ops, Object input, DataResult<T> result);
+        DataResult<T> coApplyInverse(DynamicOps<?> ops, T input, DataResult<Object> result);
+    }
 }

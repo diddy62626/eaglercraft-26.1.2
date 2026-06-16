@@ -432,4 +432,6 @@ public void selectCursor(com.mojang.blaze3d.platform.cursor.CursorType cursorTyp
     public float getAppropriateLineWidth() {
         return getWidth() / 8.0f;
     }
+
+    public boolean isMinimized() { return false; }
 }

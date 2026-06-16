@@ -8,4 +8,6 @@ public class Page {
 
     public int eos() { return 0; }
     public long granulepos() { return 0L; }
+
+    public int serialno() { return 0; }
 }

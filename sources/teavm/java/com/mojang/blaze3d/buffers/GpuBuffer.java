@@ -12,4 +12,6 @@ public abstract class GpuBuffer {
         void unmap();
         default void close() { unmap(); }
     }
+
+    public int usage() { return 0; }
 }

@@ -1,12 +1,14 @@
 package com.mojang.blaze3d.pipeline;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.shaders.UniformType;
 
 public class RenderPipeline {
     public static Builder builder(Snippet... snippets) { return new Builder(); }
 
     public int getSortKey() { return 0; }
     public VertexFormat getVertexFormat() { return null; }
+    public VertexFormat.Mode getVertexFormatMode() { return VertexFormat.Mode.TRIANGLES; }
     public boolean isCull() { return false; }
     public void updateSortKeySeed() {}
 
@@ -18,7 +20,8 @@ public class RenderPipeline {
         public Builder withCull(boolean cull) { return this; }
         public Builder withDepthTest(String depthTest) { return this; }
         public Builder withSampler(String sampler) { return this; }
-        public Builder withUniform(String uniform) { return this; }
+        public Builder withUniform(String name) { return this; }
+        public Builder withUniform(String name, UniformType type) { return this; }
         public RenderPipeline build() { return new RenderPipeline(); }
     }
 

@@ -327,4 +327,9 @@ public class RenderTarget {
     public com.mojang.blaze3d.textures.GpuTextureView getColorTextureView() {
         return new com.mojang.blaze3d.textures.GpuTextureView(new com.mojang.blaze3d.textures.GpuTexture() {});
     }
+
+    public void blitAndBlendToTexture(com.mojang.blaze3d.textures.GpuTextureView view) {}
+    public com.mojang.blaze3d.textures.GpuTextureView getDepthTextureView() {
+        return new com.mojang.blaze3d.textures.GpuTextureView(new com.mojang.blaze3d.textures.GpuTexture() {});
+    }
 }

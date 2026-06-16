@@ -7,13 +7,13 @@ import java.util.function.Supplier;
 
 public final class DataResult<T> {
     private final T value;
-    private final String error;
+    private final String errorMessage;
     private final T partial;
 
     private DataResult(T value, T partial, String error) {
         this.value = value;
         this.partial = partial;
-        this.error = error;
+        this.errorMessage = error;
     }
 
     public static <T> DataResult<T> success(T value) { return new DataResult<>(value, null, null); }
@@ -25,8 +25,10 @@ public final class DataResult<T> {
     public static <T> DataResult<T> partial(T partial, String message) { return new DataResult<>(null, partial, message); }
     public static <T> DataResult<T> partial(T partial, Supplier<String> message) { return new DataResult<>(null, partial, message.get()); }
 
-    public T result() { return value; }
-    public String error() { return error; }
+    public java.util.Optional<T> result() { return java.util.Optional.ofNullable(value); }
+    public T resultOrNull() { return value; }
+    public java.util.Optional<String> error() { return java.util.Optional.ofNullable(error); }
+    public String errorOrNull() { return error; }
     public T getOrThrow() throws RuntimeException {
         if (error != null) throw new RuntimeException(error);
         return value;
@@ -39,8 +41,8 @@ public final class DataResult<T> {
         if (error != null) onError.accept(error);
         return Optional.ofNullable(value != null ? value : partial);
     }
-    public boolean isError() { return error != null; }
-    public boolean isSuccess() { return error == null; }
+    public boolean isError() { return errorMessage != null; }
+    public boolean isSuccess() { return errorMessage == null; }
 
     public <S> DataResult<S> map(Function<T, S> fn) {
         return error != null ? error(error) : success(fn.apply(value));
@@ -67,7 +69,7 @@ public final class DataResult<T> {
     public DataResult<T> promote() { return this; }
     public DataResult<T> promoteOnlyOnError() { return this; }
     public DataResult<T> setPartial(T partial) {
-        return new DataResult<>(value, partial, error);
+        return new DataResult<>(value, partial, errorMessage);
     }
     public DataResult<T> withLifecycle(Lifecycle lifecycle) { return this; }
     public Lifecycle lifecycle() { return Lifecycle.STABLE; }
@@ -79,4 +81,10 @@ public final class DataResult<T> {
 
     public interface BiFunction<T, U, R> { R apply(T t, U u); }
     public interface TriFunction<T, U, V, R> { R apply(T t, U u, V v); }
+
+    public <R> R mapOrElse(java.util.function.Function<T, R> onSuccess, java.util.function.Function<String, R> onError) {
+        return error != null ? onError.apply(error) : onSuccess.apply(value);
+    }
+    public DataResult<T> promoteOnlyOnError() { return this; }
+    public DataResult<T> apply2stable(BiFunction<T, T, T> fn, DataResult<T> other) { return this; }
 }

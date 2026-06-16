@@ -613,10 +613,17 @@ public class RenderSystem {
         public boolean has(int vertexCount) { return false; }
         public int indexBufferObject() { return 0; }
         public com.mojang.blaze3d.buffers.GpuBuffer getBuffer(int vertexCount) { return new com.mojang.blaze3d.buffers.GpuBuffer() {}; }
+        public com.mojang.blaze3d.vertex.VertexFormat.IndexType type() { return com.mojang.blaze3d.vertex.VertexFormat.IndexType.SHORT; }
     }
 
     public static void bindDefaultUniforms(com.mojang.blaze3d.systems.RenderPass pass) {}
     public static void setGlobalSettingsUniform(com.mojang.blaze3d.buffers.GpuBuffer buffer) {}
     public static void setProjectionMatrix(com.mojang.blaze3d.buffers.GpuBufferSlice slice, com.mojang.blaze3d.ProjectionType type) {}
     public static void setShaderLights(com.mojang.blaze3d.buffers.GpuBufferSlice slice) {}
+
+    public static com.mojang.blaze3d.textures.GpuTexture outputColorTextureOverride = null;
+    public static com.mojang.blaze3d.textures.GpuTexture outputDepthTextureOverride = null;
+
+    public static org.joml.Matrix4fStack getModelViewStack() { return new org.joml.Matrix4fStack(); }
+    public static com.mojang.blaze3d.ProjectionType getProjectionType() { return com.mojang.blaze3d.ProjectionType.PERSPECTIVE; }
 }

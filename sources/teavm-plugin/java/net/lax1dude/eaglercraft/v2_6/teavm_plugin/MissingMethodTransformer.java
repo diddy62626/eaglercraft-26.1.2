@@ -360,6 +360,26 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("sun.misc.Unsafe", "getInt", ValueType.INTEGER,
             new ValueType[] { ValueType.LONG }, null, false);
 
+        // ===== java.lang.invoke.MethodHandle.invoke() returns Object =====
+        add("java.lang.invoke.MethodHandle", "invoke", ValueType.object("java.lang.Object"),
+            new ValueType[0], null, false);
+        // invokeExact(Thread) returns boolean
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.BOOLEAN,
+            new ValueType[] { ValueType.object("java.lang.Thread") }, 0, false);
+        // invokeExact(Class, ByteOrder) returns VarHandle
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.lang.invoke.VarHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.nio.ByteOrder") }, null, false);
+
+        // ===== java.lang.invoke.MethodHandles.filterArguments (static) =====
+        add("java.lang.invoke.MethodHandles", "filterArguments", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.invoke.MethodHandle"), ValueType.INTEGER, ValueType.arrayOf(ValueType.object("java.lang.invoke.MethodHandle")) }, null, true);
+
+        // ===== java.security.KeyFactory.generatePrivate / generatePublic =====
+        add("java.security.KeyFactory", "generatePrivate", ValueType.object("java.security.PrivateKey"),
+            new ValueType[] { ValueType.object("java.security.spec.KeySpec") }, null, false);
+        add("java.security.KeyFactory", "generatePublic", ValueType.object("java.security.PublicKey"),
+            new ValueType[] { ValueType.object("java.security.spec.KeySpec") }, null, false);
+
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {

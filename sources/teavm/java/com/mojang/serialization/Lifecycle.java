@@ -7,4 +7,6 @@ public interface Lifecycle {
     static Lifecycle experimental() { return EXPERIMENTAL; }
     static Lifecycle stable() { return STABLE; }
     static Lifecycle deprecated() { return DEPRECATED; }
+
+    default Lifecycle add(Lifecycle other) { return this; }
 }
