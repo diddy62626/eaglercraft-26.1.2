@@ -151,18 +151,19 @@ teavm {
 
         // BALANCED optimization is recommended for JS target (AGGRESSIVE doesn't
         // give significant performance growth but produces more code)
+        // Using BALANCED optimization for JS target
         optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
 
         // Additional TeaVM properties
         properties = [
-            'teavm.minHeapSize' : '256MB',
-            'teavm.maxHeapSize' : '1024MB'
+            'teavm.minHeapSize' : '512MB',
+            'teavm.maxHeapSize' : '4096MB'
         ]
     }
 
     js {
-        // Obfuscation (recommended for production - produces less code)
-        obfuscated = true
+        // Obfuscation disabled for development - faster compilation
+        obfuscated = false
 
         // Source maps for debugging
         sourceMap = true

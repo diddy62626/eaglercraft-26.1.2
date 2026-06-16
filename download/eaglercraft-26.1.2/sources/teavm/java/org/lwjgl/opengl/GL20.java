@@ -467,6 +467,17 @@ public class GL20 {
                 // bindAttribLocation not exposed in PlatformOpenGL; use layout qualifiers in shaders instead
         }
 
+        // --- Draw buffers ---
+
+        public static void glDrawBuffers(java.nio.IntBuffer buffers) {
+                int count = buffers.remaining();
+                Int32Array arr = Int32Array.create(count);
+                for (int i = 0; i < count; i++) {
+                        arr.set(i, buffers.get());
+                }
+                PlatformOpenGL._wglDrawBuffers(arr);
+        }
+
         // --- Get active uniform/attrib ---
 
         public static String glGetActiveUniform(int program, int index, int bufSize, int[] length, int[] size, int[] type, byte[] name) {

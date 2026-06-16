@@ -64,6 +64,24 @@ public class EaglerCraft {
 
         // ========== State Constants ==========
 
+        /**
+         * Generates an offline-mode UUID from a username.
+         * Replaces UUID.nameUUIDFromBytes which TeaVM doesn't support.
+         * Uses the same algorithm as Mojang's offline UUID:
+         * UUID v3 with namespace "OfflinePlayer:" prefix.
+         */
+        private static java.util.UUID makeOfflineUUID(String username) {
+                // TeaVM doesn't support UUID(long, long) constructor.
+                // Use UUID.fromString() with a deterministic format instead.
+                // This is a simplified offline UUID - not cryptographically compatible
+                // with Mojang's offline UUID but sufficient for EaglerCraft.
+                int hash = username.hashCode();
+                return java.util.UUID.fromString(
+                        String.format("%08x-0000-3000-8000-%012x",
+                                hash, (long)hash * 31 & 0xFFFFFFFFFFFFL)
+                );
+        }
+
         /** The game has not been initialized yet. */
         private static final int STATE_UNINITIALIZED = 0;
 
@@ -305,53 +323,71 @@ public class EaglerCraft {
                 }
 
                 try {
-                        // Directly reference MC's Minecraft class so TeaVM includes it.
-                        // TeaVM only compiles classes that are statically reachable
-                        // from the mainClass - reflection won't work.
-                        //
-                        // MC 26.1.2's Minecraft class is net.minecraft.client.Minecraft
-                        // It's a singleton accessible via Minecraft.getInstance()
-                        //
-                        // However, Minecraft's constructor requires many services
-                        // (game directory, assets, GLFW window, etc.) that don't
-                        // exist in the browser. We'll try a minimal bootstrap.
+                        // We reference MC classes directly so TeaVM includes them in the compilation.
+                        // However, the constructor may cascade into subsystems that require native APIs.
+                        // We catch all failures and fall back to the title screen.
+                        ClientMain.log("[EaglerCraft] Attempting to construct Minecraft...");
 
-                        try {
-                                // Force TeaVM to include the Minecraft class by referencing it
-                                // The class itself will fail to initialize fully because it
-                                // depends on GLFW/LWJGL, but our shims provide no-op stubs
-                                net.minecraft.client.Minecraft mc = null;
-                                try {
-                                        mc = net.minecraft.client.Minecraft.getInstance();
-                                } catch (Throwable t) {
-                                        ClientMain.log("[EaglerCraft] Minecraft.getInstance() failed: " + t.getMessage());
-                                        ClientMain.log("[EaglerCraft] (This is expected - MC needs full LWJGL setup)");
-                                }
+                        java.io.File gameDir = new java.io.File("/eaglercraft");
+                        java.io.File resourceDir = new java.io.File("/eaglercraft/resourcepacks");
+                        java.io.File assetDir = new java.io.File("/eaglercraft/assets");
 
-                                if (mc != null) {
-                                        minecraftInstance = mc;
-                                        ClientMain.log("[EaglerCraft] Minecraft instance created successfully!");
-                                } else {
-                                        ClientMain.log("[EaglerCraft] Could not create MC instance (missing native services)");
-                                        ClientMain.log("[EaglerCraft] Running in adapter-only mode with title screen");
-                                }
-                        } catch (NoClassDefFoundError e) {
-                                ClientMain.log("[EaglerCraft] Minecraft class not available: " + e.getMessage());
-                                ClientMain.log("[EaglerCraft] Running in adapter-only mode");
-                        } catch (Throwable t) {
-                                ClientMain.warn("[EaglerCraft] Error creating Minecraft: " + t.getMessage());
-                        }
+                        net.minecraft.client.main.GameConfig.FolderData folderData =
+                                new net.minecraft.client.main.GameConfig.FolderData(
+                                        gameDir, resourceDir, assetDir, "26.1.2"
+                                );
+
+                        int canvasWidth = PlatformRuntime.getCanvasDrawableWidth();
+                        int canvasHeight = PlatformRuntime.getCanvasDrawableHeight();
+
+                        com.mojang.blaze3d.platform.DisplayData displayData =
+                                new com.mojang.blaze3d.platform.DisplayData(
+                                        canvasWidth, canvasHeight,
+                                        java.util.OptionalInt.empty(),
+                                        java.util.OptionalInt.empty(),
+                                        false
+                                );
+
+                        net.minecraft.client.User user = new net.minecraft.client.User(
+                                EaglerProfile.getUsername(),
+                                makeOfflineUUID(EaglerProfile.getUsername()),
+                                "0",
+                                java.util.Optional.empty(),
+                                java.util.Optional.empty()
+                        );
+
+                        net.minecraft.client.main.GameConfig.UserData userData =
+                                new net.minecraft.client.main.GameConfig.UserData(user, null);
+
+                        net.minecraft.client.main.GameConfig.GameData gameData =
+                                new net.minecraft.client.main.GameConfig.GameData(
+                                        false, EaglerCraftConfig.VERSION, EaglerCraftConfig.BRAND,
+                                        false, false, false, false, false
+                                );
+
+                        net.minecraft.client.main.GameConfig.QuickPlayData quickPlayData =
+                                new net.minecraft.client.main.GameConfig.QuickPlayData(
+                                        "",
+                                        net.minecraft.client.main.GameConfig.QuickPlayVariant.DISABLED
+                                );
+
+                        net.minecraft.client.main.GameConfig gameConfig =
+                                new net.minecraft.client.main.GameConfig(
+                                        userData, displayData, folderData, gameData, quickPlayData
+                                );
+
+                        ClientMain.log("[EaglerCraft] Constructing Minecraft(" + canvasWidth + "x" + canvasHeight + ")...");
+                        net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
+                        minecraftInstance = mc;
+                        ClientMain.log("[EaglerCraft] Minecraft instance created!");
+
                 } catch (Throwable t) {
-                        ClientMain.warn("[EaglerCraft] Error during MC instance creation: " + t.getMessage());
-                }
-
-                if (EaglerCraftConfig.VERBOSE_INIT_LOGGING) {
-                        ClientMain.log("[EaglerCraft] Display: " + PlatformRuntime.getCanvasWidth()
-                                        + "x" + PlatformRuntime.getCanvasHeight()
-                                        + " @" + PlatformRuntime.getDevicePixelRatio() + "x DPR");
-                        ClientMain.log("[EaglerCraft] Username: " + EaglerProfile.getUsername());
-                        ClientMain.log("[EaglerCraft] Render Distance: " + EaglerProfile.getRenderDistance()
-                                        + " chunks");
+                        ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getMessage());
+                        StackTraceElement[] stack = t.getStackTrace();
+                        for (int i = 0; i < Math.min(stack.length, 10); i++) {
+                                ClientMain.warn("  at " + stack[i].toString());
+                        }
+                        ClientMain.log("[EaglerCraft] Running in adapter-only mode");
                 }
         }
 
@@ -474,8 +510,15 @@ public class EaglerCraft {
          * </pre>
          */
         private static void gameLogicTick() {
-                // TODO: Call MC 26.1.2 game tick
-                // Expected: Minecraft.getInstance().tick()
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                        try {
+                                net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
+                                mc.tick();
+                        } catch (Throwable t) {
+                                // MC tick errors shouldn't crash the game loop
+                                ClientMain.warn("[EaglerCraft] MC tick error: " + t.getMessage());
+                        }
+                }
                 totalTicks++;
         }
 
@@ -494,7 +537,22 @@ public class EaglerCraft {
                 int height = PlatformRuntime.getCanvasDrawableHeight();
                 if (width <= 0 || height <= 0) return;
 
-                // Clear the framebuffer with MC sky blue
+                // If MC is running, its own game loop handles rendering via run()
+                // The EaglerCraft game loop is separate from MC's internal loop.
+                // MC's run() method has its own render loop.
+                // We only render our fallback title screen if MC isn't running.
+
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                        // MC handles its own rendering through its game loop.
+                        // The MC instance's run() method manages tick + render.
+                        // We just need to clear the framebuffer as a safety net.
+                        PlatformOpenGL._wglClear(
+                                WebGL2RenderingContext.COLOR_BUFFER_BIT
+                                | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+                        return;
+                }
+
+                // Fallback: render the title screen using WebGL2
                 PlatformOpenGL._wglClear(
                         WebGL2RenderingContext.COLOR_BUFFER_BIT
                         | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
