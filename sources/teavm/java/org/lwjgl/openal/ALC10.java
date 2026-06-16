@@ -84,7 +84,7 @@ public class ALC10 {
     }
 
     public static long alcCreateContext(long device) {
-        return alcCreateContext(device, null);
+        return alcCreateContext(device, (int[]) null);
     }
 
     public static void alcGetIntegerv(long device, int param, int size, int[] values) {
