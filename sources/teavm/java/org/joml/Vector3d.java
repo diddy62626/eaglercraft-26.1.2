@@ -19,7 +19,7 @@ public class Vector3d implements Vector3dc {
     public Vector3d add(org.joml.Vector3d v) { x += v.x; y += v.y; z += v.z; return this; }
     public Vector3d add(org.joml.Vector3dc v) { x += v.x(); y += v.y(); z += v.z(); return this; }
     public Vector3d sub(org.joml.Vector3d v) { x -= v.x; y -= v.y; z -= v.z; return this; }
-    public Vector3d sub(org.joml.Vector3dc v) { x -= v.x(); y -= v.y; z -= v.z(); return this; }
+    public Vector3d sub(org.joml.Vector3dc v) { x -= v.x(); y -= v.y(); z -= v.z(); return this; }
     public Vector3d mul(double s) { x *= s; y *= s; z *= s; return this; }
     public Vector3d mul(org.joml.Vector3dc v) { x *= v.x(); y *= v.y(); z *= v.z(); return this; }
     public Vector3d div(double s) { x /= s; y /= s; z /= s; return this; }

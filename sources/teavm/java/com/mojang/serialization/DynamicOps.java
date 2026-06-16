@@ -26,7 +26,7 @@ public interface DynamicOps<T> {
     default DataResult<java.util.stream.Stream<java.util.Map.Entry<T, T>>> getMapValues(T input) {
         return DataResult.success(java.util.stream.Stream.empty());
     }
-    default DataResult<java.util.MapLike<T>> getMap(T input) { return DataResult.success(null); }
+    default DataResult<MapLike<T>> getMap(T input) { return DataResult.success(null); }
     default T mergeToMap(T input, T key, T value) { return input; }
     default T mergeToList(T input, T value) { return input; }
     default T remove(T input, String key) { return input; }

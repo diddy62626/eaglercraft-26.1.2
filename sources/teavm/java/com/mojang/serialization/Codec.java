@@ -103,8 +103,6 @@ public interface Codec<T> {
     default Codec<T> optionalFieldOf(String name, T defaultValue) { return this; }
     default Codec<java.util.Optional<T>> optionalFieldOf(String name) { return null; }
     default Codec<java.util.Optional<T>> optionalFieldOf(String name, java.util.Optional<T> defaultValue) { return null; }
-    default MapCodec<T> optionalFieldOf(String name) { return null; }
-    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return null; }
     default MapCodec<T> lenientOptionalFieldOf(String name, T defaultValue) { return null; }
     default Codec<java.util.Optional<T>> optionalFieldOfOptional(String name) { return null; }
     default Codec<T> fieldOfOptional(String name) { return this; }
@@ -160,5 +158,4 @@ public interface Codec<T> {
     static <T> MapCodec<T> optionalFieldOf(String name, T defaultValue, Codec<T> codec) { return null; }
     static <T> Codec<java.util.Optional<T>> optionalFieldOf(String name, Codec<T> codec) { return null; }
     static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return null; }
-    static <T> Codec<T> dispatchedMap(Codec<T> codec, Function<T, T> fn) { return null; }
 }

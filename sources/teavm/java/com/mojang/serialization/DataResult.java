@@ -35,8 +35,6 @@ public final class DataResult<T> {
         if (error != null) throw exceptionFactory.apply(error);
         return value;
     }
-    public Optional<T> result() { return Optional.ofNullable(value); }
-    public Optional<String> error() { return Optional.ofNullable(error); }
     public Optional<T> resultOrPartial(Consumer<String> onError) {
         if (error != null) onError.accept(error);
         return Optional.ofNullable(value != null ? value : partial);

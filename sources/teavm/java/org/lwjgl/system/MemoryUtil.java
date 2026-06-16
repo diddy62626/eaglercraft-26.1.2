@@ -259,4 +259,13 @@ public final class MemoryUtil {
     public static float memGetFloat(long address) { return 0.0f; }
     public static long memGetLong(long address) { return 0L; }
     public static double memGetDouble(long address) { return 0.0; }
+
+    interface MemoryAllocator {
+        long malloc(long size);
+        long calloc(long num, long size);
+        long realloc(long ptr, long size);
+        void free(long ptr);
+        long aligned_alloc(long alignment, long size);
+        void aligned_free(long ptr);
+    }
 }
