@@ -1,0 +1,2 @@
+package javax.swing;
+public class SwingUtilities { public static void invokeLater(Runnable doRun) { doRun.run(); } public static void invokeAndWait(Runnable doRun) { doRun.run(); } public static boolean isEventDispatchThread() { return true; } }

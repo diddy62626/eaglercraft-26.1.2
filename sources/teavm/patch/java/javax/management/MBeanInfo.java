@@ -1,0 +1,2 @@
+package javax.management;
+public class MBeanInfo { public MBeanInfo(String className, String description, MBeanAttributeInfo[] attributes, MBeanConstructorInfo[] constructors, MBeanOperationInfo[] operations, MBeanNotificationInfo[] notifications) {} }

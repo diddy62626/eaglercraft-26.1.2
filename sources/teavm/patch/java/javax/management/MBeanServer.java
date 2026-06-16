@@ -1,0 +1,2 @@
+package javax.management;
+public interface MBeanServer { ObjectInstance registerMBean(Object object, ObjectName name) throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException; }

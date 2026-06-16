@@ -1,0 +1,2 @@
+package javax.swing;
+public class JTextArea extends JComponent { public JTextArea() {} public JTextArea(String text) {} public JTextArea(int rows, int columns) {} public void setText(String t) {} public String getText() { return ""; } public void setEditable(boolean b) {} public void append(String str) {} }

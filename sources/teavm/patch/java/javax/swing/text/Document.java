@@ -1,0 +1,2 @@
+package javax.swing.text;
+public interface Document { void insertString(int offset, String str, javax.swing.text.AttributeSet a) throws BadLocationException; void remove(int offset, int len) throws BadLocationException; String getText(int offset, int length) throws BadLocationException; int getLength(); }

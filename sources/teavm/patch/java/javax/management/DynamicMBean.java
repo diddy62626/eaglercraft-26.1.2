@@ -1,0 +1,2 @@
+package javax.management;
+public interface DynamicMBean { Object getAttribute(String attribute); void setAttribute(Attribute attribute); AttributeList getAttributes(String[] attributes); AttributeList setAttributes(AttributeList attributes); Object invoke(String actionName, Object[] params, String[] signature); MBeanInfo getMBeanInfo(); }

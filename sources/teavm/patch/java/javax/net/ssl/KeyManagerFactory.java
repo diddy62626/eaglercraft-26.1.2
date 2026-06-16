@@ -1,0 +1,2 @@
+package javax.net.ssl;
+public class KeyManagerFactory { public static KeyManagerFactory getInstance(String algorithm) { return new KeyManagerFactory(); } public void init(java.security.KeyStore ks, char[] password) {} }

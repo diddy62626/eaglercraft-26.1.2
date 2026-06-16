@@ -1,0 +1,2 @@
+package javax.net.ssl;
+public class TrustManagerFactory { public static TrustManagerFactory getInstance(String algorithm) { return new TrustManagerFactory(); } public void init(java.security.KeyStore ks) {} }

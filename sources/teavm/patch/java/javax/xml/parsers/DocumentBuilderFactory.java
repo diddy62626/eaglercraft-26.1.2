@@ -1,0 +1,2 @@
+package javax.xml.parsers;
+public class DocumentBuilderFactory { public static DocumentBuilderFactory newInstance() { return new DocumentBuilderFactory(); } public DocumentBuilder newDocumentBuilder() { return null; } }

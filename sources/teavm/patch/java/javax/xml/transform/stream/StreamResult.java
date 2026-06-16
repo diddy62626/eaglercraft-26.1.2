@@ -1,0 +1,2 @@
+package javax.xml.transform.stream;
+public class StreamResult implements javax.xml.transform.Result { public StreamResult(java.io.OutputStream outputStream) {} public StreamResult(java.io.Writer writer) {} }

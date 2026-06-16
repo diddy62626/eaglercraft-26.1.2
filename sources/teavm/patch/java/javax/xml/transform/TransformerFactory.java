@@ -1,0 +1,2 @@
+package javax.xml.transform;
+public class TransformerFactory { public static TransformerFactory newInstance() { return new TransformerFactory(); } public Transformer newTransformer() { return null; } }
