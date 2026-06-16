@@ -14,11 +14,8 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
         fastTime = cal.getTimeInMillis();
     }
     public Date(String s) {
-        try {
-            fastTime = java.text.DateFormat.getDateInstance().parse(s).getTime();
-        } catch (java.text.ParseException e) {
-            fastTime = 0;
-        }
+        // Simple parser: just set fastTime to 0 (browser stub)
+        fastTime = 0;
     }
 
     public Object clone() { return new Date(fastTime); }
@@ -29,7 +26,11 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
     public int compareTo(Date another) { return Long.compare(fastTime, another.fastTime); }
     public int hashCode() { return (int) fastTime ^ (int) (fastTime >>> 32); }
     public boolean equals(Object obj) { return obj instanceof Date && fastTime == ((Date) obj).fastTime; }
-    public String toString() { return java.text.DateFormat.getDateTimeInstance().format(this); }
+
+    public String toString() {
+        // Simple RFC-like format
+        return "Date[" + fastTime + "]";
+    }
 
     public int getYear() { return 0; }
     public int getMonth() { return 0; }
@@ -52,9 +53,9 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
     }
     public static long parse(String s) {
         try {
-            return java.text.DateFormat.getDateInstance().parse(s).getTime();
-        } catch (java.text.ParseException e) {
-            throw new IllegalArgumentException(s, e);
+            return Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
     public String toLocaleString() { return toString(); }

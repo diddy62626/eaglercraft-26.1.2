@@ -2,7 +2,6 @@ package java.lang;
 
 /**
  * TeaVM stub for java.lang.Integer.
- * Provides parseInt, parseUnsignedInt, valueOf, toString, and constants.
  */
 public final class Integer extends Number implements Comparable<Integer> {
     public static final int MIN_VALUE = 0x80000000;
@@ -81,38 +80,42 @@ public final class Integer extends Number implements Comparable<Integer> {
     public float floatValue() { return (float) value; }
     public double doubleValue() { return (double) value; }
 
+    // Helper: convert non-negative long to string in given radix
+    private static String longToString(long l, int radix) {
+        if (l == 0) return "0";
+        char[] buf = new char[65];
+        int pos = buf.length;
+        while (l > 0) {
+            buf[--pos] = Character.forDigit((int)(l % radix), radix);
+            l /= radix;
+        }
+        return new String(buf, pos, buf.length - pos);
+    }
+
     public static String toString(int i, int radix) {
         if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) radix = 10;
         if (i == 0) return "0";
         boolean negative = i < 0;
         if (negative) {
-            // Handle MIN_VALUE specially
             if (i == Integer.MIN_VALUE) {
-                return "-" + toString((-(long)Integer.MIN_VALUE), radix);
+                // 2147483648 in unsigned
+                long unsignedPart = -(long)Integer.MIN_VALUE;
+                return "-" + longToString(unsignedPart, radix);
             }
             i = -i;
         }
-        char[] buf = new char[33];
-        int pos = buf.length;
-        while (i > 0) {
-            buf[--pos] = Character.forDigit(i % radix, radix);
-            i /= radix;
-        }
-        if (negative) buf[--pos] = '-';
-        return new String(buf, pos, buf.length - pos);
+        return (negative ? "-" : "") + longToString((long)i, radix);
     }
 
     public static String toString(int i) { return toString(i, 10); }
 
     public static String toUnsignedString(int i, int radix) {
-        return toString(i & 0xFFFFFFFFL, radix);
+        // Treat as unsigned: convert to long with high 32 bits zero
+        long unsigned = i & 0xFFFFFFFFL;
+        return longToString(unsigned, radix);
     }
 
     public static String toUnsignedString(int i) { return toUnsignedString(i, 10); }
-
-    public static String toUnsignedString0(int i, int radix) {
-        return toUnsignedString(i, radix);
-    }
 
     public static String toBinaryString(int i) {
         return toUnsignedString(i, 2);

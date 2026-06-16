@@ -1,8 +1,9 @@
 package java.nio.file.attribute;
+
 public interface BasicFileAttributes {
-    FileTime lastModifiedTime();
-    FileTime lastAccessTime();
-    FileTime creationTime();
+    java.nio.file.attribute.FileTime lastModifiedTime();
+    java.nio.file.attribute.FileTime creationTime();
+    java.nio.file.attribute.FileTime lastAccessTime();
     boolean isRegularFile();
     boolean isDirectory();
     boolean isSymbolicLink();
