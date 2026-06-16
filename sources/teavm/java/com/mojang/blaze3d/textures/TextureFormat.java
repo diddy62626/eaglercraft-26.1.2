@@ -8,4 +8,4 @@ public enum TextureFormat {
 
     public int pixelSize() { return 4; }
     public boolean isCompressed() { return false; }
-
+}
