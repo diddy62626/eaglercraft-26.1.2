@@ -22,4 +22,6 @@ public final class JsonOps implements DynamicOps<com.google.gson.JsonElement> {
 
     public com.google.gson.JsonElement convertList(DynamicOps<com.google.gson.JsonElement> outOps, com.google.gson.JsonElement input) { return input; }
     public com.google.gson.JsonElement convertMap(DynamicOps<com.google.gson.JsonElement> outOps, com.google.gson.JsonElement input) { return input; }
+
+    public com.google.gson.JsonElement convertTo(DynamicOps<com.google.gson.JsonElement> outOps, com.google.gson.JsonElement input) { return input; }
 }

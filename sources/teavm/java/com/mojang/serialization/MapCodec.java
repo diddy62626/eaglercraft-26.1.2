@@ -15,4 +15,8 @@ public interface MapCodec<T> extends Codec<T> {
     default MapCodec<java.util.Optional<T>> optionalFieldOf(String name) { return null; }
 
     default MapCodec<T> unit(T defaultValue) { return this; }
+
+    default MapCodec<T> unit(java.util.function.Supplier<T> defaultValue) { return this; }
+    default Codec<T> unitCodec(T defaultValue) { return this; }
+    default Codec<T> unitCodec(java.util.function.Supplier<T> defaultValue) { return this; }
 }

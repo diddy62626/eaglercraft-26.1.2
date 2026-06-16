@@ -21,6 +21,7 @@ public class RenderPipeline {
         public Builder withVertexFormat(VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode) { return this; }
         public Builder withCull(boolean cull) { return this; }
         public Builder withDepthTest(String depthTest) { return this; }
+        public Builder withDepthStencilState(DepthStencilState state) { return this; }
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
         public Builder withUniform(String name, UniformType type) { return this; }

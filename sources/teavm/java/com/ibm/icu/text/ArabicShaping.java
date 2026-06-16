@@ -28,4 +28,6 @@ public final class ArabicShaping {
     public int getOptions() { return 0; }
     public boolean isLamAlefSpecial(int codepoint) { return false; }
     public String toString() { return "ArabicShaping"; }
+
+    public String shape(String source) { return source; }
 }
