@@ -12,6 +12,8 @@ public class RenderPipeline {
     public boolean isCull() { return false; }
     public void updateSortKeySeed() {}
 
+    public interface Snippet {}
+
     public static class Builder {
         public Builder withLocation(String location) { return this; }
         public Builder withVertexShader(String shader) { return this; }
@@ -22,11 +24,7 @@ public class RenderPipeline {
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
         public Builder withUniform(String name, UniformType type) { return this; }
-        public RenderPipeline build() { return new RenderPipeline(); }
-    }
-
-    public interface Snippet {}
-
         public Snippet buildSnippet() { return new Snippet() {}; }
+        public RenderPipeline build() { return new RenderPipeline(); }
     }
 }

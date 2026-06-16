@@ -18,6 +18,8 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
     public void translate(float x, float y, float z) {}
     public void pushPose() { super.pushPose(); }
     public void popPose() { super.popPose(); }
+    public boolean isEmpty() { return false; }
+    public void rotateAround(org.joml.Quaternionfc q, float x, float y, float z) {}
 
     public static class Pose extends com.mojang.blaze3d.systems.PoseStack.Pose {
         public Pose() { super(); }
@@ -33,13 +35,8 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
         public void set(com.mojang.blaze3d.vertex.PoseStack.Pose other) {}
         public void setIdentity() {}
         public org.joml.Vector3f transformNormal(org.joml.Vector3fc v, org.joml.Vector3f dest) { return dest; }
+        public org.joml.Vector3f transformNormal(float x, float y, float z, org.joml.Vector3f dest) { return dest; }
         public org.joml.Matrix4f translate(float x, float y, float z) { return new org.joml.Matrix4f(); }
         public void rotate(org.joml.Quaternionfc q) {}
-    }
-
-    public boolean isEmpty() { return false; }
-    public void rotateAround(org.joml.Quaternionfc q, float x, float y, float z) {}
-
-        public org.joml.Vector3f transformNormal(float x, float y, float z, org.joml.Vector3f dest) { return dest; }
     }
 }
