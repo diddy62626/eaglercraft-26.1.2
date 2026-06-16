@@ -90,4 +90,25 @@ public class ALC10 {
     public static void alcGetIntegerv(long device, int param, int size, int[] values) {
         alcGetIntegerv(device, param, size, values, 0);
     }
+
+    /**
+     * MC 26.1.2: Creates an ALC context with optional attributes.
+     */
+    public static long alcCreateContext(long device, java.nio.IntBuffer attrlist) {
+        return alcCreateContext(device);
+    }
+
+    /**
+     * MC 26.1.2: Returns whether an ALC extension is present.
+     */
+    public static boolean alcIsExtensionPresent(long device, CharSequence extname) {
+        return false;
+    }
+
+    /**
+     * MC 26.1.2: Opens an ALC device by name.
+     */
+    public static long alcOpenDevice(CharSequence devicename) {
+        return 1L;
+    }
 }

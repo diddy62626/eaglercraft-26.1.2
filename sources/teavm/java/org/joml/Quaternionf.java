@@ -54,4 +54,18 @@ public class Quaternionf implements Quaternionfc {
     @Override public float y() { return y; }
     @Override public float z() { return z; }
     @Override public float w() { return w; }
+
+    /**
+     * MC 26.1.2: Sets this quaternion to a rotation around the Y axis.
+     */
+    public Quaternionf rotationY(float angle) {
+        float halfAngle = angle * 0.5f;
+        float sin = (float) Math.sin(halfAngle);
+        float cos = (float) Math.cos(halfAngle);
+        this.x = 0;
+        this.y = sin;
+        this.z = 0;
+        this.w = cos;
+        return this;
+    }
 }

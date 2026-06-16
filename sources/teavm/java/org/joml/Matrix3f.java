@@ -21,6 +21,15 @@ public class Matrix3f implements Matrix3fc {
         set(mat);
     }
 
+    /**
+     * MC 26.1.2: Constructs a Matrix3f from the upper-left 3x3 of a Matrix4fc.
+     */
+    public Matrix3f(Matrix4fc mat) {
+        m00 = mat.m00(); m01 = mat.m01(); m02 = mat.m02();
+        m10 = mat.m10(); m11 = mat.m11(); m12 = mat.m12();
+        m20 = mat.m20(); m21 = mat.m21(); m22 = mat.m22();
+    }
+
     public Matrix3f identity() {
         m00 = 1; m01 = 0; m02 = 0;
         m10 = 0; m11 = 1; m12 = 0;

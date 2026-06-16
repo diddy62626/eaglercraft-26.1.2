@@ -38,4 +38,13 @@ public interface Logger {
     void error(String msg, Throwable t);
 
     void error(Marker marker, String format, Object arg1, Object arg2);
+
+    // ========== MC 26.1.2 Marker overloads ==========
+
+    default void debug(Marker marker, String format, Object arg) {}
+    default void debug(Marker marker, String format, Object arg1, Object arg2) {}
+    default void error(Marker marker, String msg) {}
+    default void error(Marker marker, String msg, Throwable t) {}
+    default void info(Marker marker, String msg) {}
+    default void warn(Marker marker, String format, Object arg) {}
 }

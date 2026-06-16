@@ -2,6 +2,10 @@ package com.mojang.blaze3d.systems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.textures.TextureFormat;
 
 /**
  * EaglerCraft stub for GpuDevice.
@@ -14,6 +18,42 @@ public interface GpuDevice extends GpuBackend {
      */
     default List<String> getEnabledExtensions() {
         return new ArrayList<>();
+    }
+
+    /**
+     * MC 26.1.2: Returns the max supported texture size.
+     */
+    default int getMaxTextureSize() {
+        return 16384;
+    }
+
+    /**
+     * MC 26.1.2: Returns the renderer string.
+     */
+    default String getRenderer() {
+        return "WebGL2";
+    }
+
+    /**
+     * MC 26.1.2: Returns whether GPU debugging is enabled.
+     */
+    default boolean isDebuggingEnabled() {
+        return false;
+    }
+
+    /**
+     * MC 26.1.2: Creates a command encoder for recording GPU commands.
+     */
+    default CommandEncoder createCommandEncoder() {
+        return new CommandEncoder() {};
+    }
+
+    /**
+     * MC 26.1.2: Creates a new GPU texture.
+     */
+    default GpuTexture createTexture(Supplier<String> labelSupplier, int usage,
+                                     TextureFormat format, int width, int height, int depth, int mipLevels) {
+        return new GpuTexture() {};
     }
 
     default List<String> getLastDebugMessages() {

@@ -1,6 +1,7 @@
 package com.mojang.authlib.minecraft;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.yggdrasil.ProfileResult;
 
 /**
@@ -28,4 +29,20 @@ public interface MinecraftSessionService {
 	 * Returns null in EaglerCraft (no real session service in browser).
 	 */
 	ProfileResult fetchProfile(java.util.UUID uuid, boolean secure);
+
+	/**
+	 * MC 26.1.2: Returns the packed textures Property for the given profile.
+	 * Browser: returns null (no real session service).
+	 */
+	default Property getPackedTextures(GameProfile profile) {
+		return null;
+	}
+
+	/**
+	 * MC 26.1.2: Unpacks the textures Property into a MinecraftProfileTextures object.
+	 * Browser: returns an empty MinecraftProfileTextures.
+	 */
+	default MinecraftProfileTextures unpackTextures(Property property) {
+		return new MinecraftProfileTextures(property);
+	}
 }

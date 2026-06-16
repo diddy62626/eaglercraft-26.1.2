@@ -385,4 +385,49 @@ public class Window {
         return getHeight();
     }
 
+    // ========== MC 26.1.2 additional methods ==========
+
+    /**
+     * MC 26.1.2: Returns the raw window handle. Browser: returns 0.
+     */
+    public long handle() {
+        return 0L;
+    }
+
+    /**
+     * MC 26.1.2: Returns whether the window has focus.
+     */
+    public boolean isFocused() {
+        return true;
+    }
+
+    /**
+     * MC 26.1.2: Enables/disables cursor appearance changes. Browser: no-op.
+     */
+    public void setAllowCursorChanges(boolean allow) {
+        // no-op in browser
+    }
+
+    /**
+     * MC 26.1.2: Sets the error section name (used for error reporting).
+     */
+    public void setErrorSection(String section) {
+        // no-op in browser
+    }
+
+    /**
+     * MC 26.1.2: Sets the GUI scale to a fixed integer value.
+     */
+    public void setGuiScale(int scale) {
+        this.guiScale = scale;
+    }
+
+    /**
+     * MC 26.1.2: Updates fullscreen state if it has changed.
+     * Browser: no-op (fullscreen handled by browser API).
+     */
+    public void updateFullscreenIfChanged() {
+        // no-op in browser
+    }
+
 }

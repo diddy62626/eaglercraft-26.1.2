@@ -68,7 +68,16 @@ public class InputConstants {
                 public String toString() {
                         return "Key[" + type.name() + ":" + value + ",'" + name + "']";
                 }
-        }
+        
+	/**
+	 * MC 26.1.2: Returns the display name Component for this key.
+	 * Browser: returns null (Component is a Minecraft class not reachable in TeaVM yet).
+	 */
+	public net.minecraft.network.chat.Component getDisplayName() {
+		return null;
+	}
+}
+
 
         // ========== Key Registry ==========
 
@@ -373,4 +382,37 @@ public class InputConstants {
     public static boolean isKeyDown(Window window, int key) {
         return net.lax1dude.eaglercraft.v2_6.internal.PlatformInput.isKeyDown(key);
     }
+
+	// ========== MC 26.1.2 input callback setup ==========
+
+	/**
+	 * MC 26.1.2: Grabs or releases the mouse cursor (Pointer Lock API in browser).
+	 */
+	public static void grabOrReleaseMouse(Window window, int action, double xpos, double ypos) {
+		// Browser: Pointer Lock API is handled by PlatformInput
+	}
+
+	/**
+	 * MC 26.1.2: Sets up keyboard callbacks (key, char, preedit, IME status).
+	 * Browser: PlatformInput handles all keyboard events via DOM, no-op here.
+	 */
+	public static void setupKeyboardCallbacks(Window window,
+			org.lwjgl.glfw.GLFWKeyCallbackI keyCallback,
+			org.lwjgl.glfw.GLFWCharCallbackI charCallback,
+			org.lwjgl.glfw.GLFWPreeditCallbackI preeditCallback,
+			org.lwjgl.glfw.GLFWIMEStatusCallbackI imeStatusCallback) {
+		// no-op in browser - PlatformInput handles keyboard
+	}
+
+	/**
+	 * MC 26.1.2: Sets up mouse callbacks (cursor pos, mouse button, scroll, drop).
+	 * Browser: PlatformInput handles all mouse events via DOM, no-op here.
+	 */
+	public static void setupMouseCallbacks(Window window,
+			org.lwjgl.glfw.GLFWCursorPosCallbackI cursorPosCallback,
+			org.lwjgl.glfw.GLFWMouseButtonCallbackI mouseButtonCallback,
+			org.lwjgl.glfw.GLFWScrollCallbackI scrollCallback,
+			org.lwjgl.glfw.GLFWDropCallbackI dropCallback) {
+		// no-op in browser - PlatformInput handles mouse
+	}
 }

@@ -122,4 +122,11 @@ public class MemoryStack {
     public void close() {
         // no-op
     }
+
+    /**
+     * MC 26.1.2: Allocates a PointerBuffer of the given size on this stack.
+     */
+    public org.lwjgl.PointerBuffer mallocPointer(int size) {
+        return new org.lwjgl.PointerBuffer(size);
+    }
 }

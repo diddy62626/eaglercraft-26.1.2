@@ -30,4 +30,12 @@ public class AL {
     public static boolean isCreated() {
         return true;
     }
+
+    /**
+     * MC 26.1.2: Creates ALCapabilities from an ALCCapabilities (device).
+     */
+    public static ALCapabilities createCapabilities(ALCCapabilities caps) {
+        if (caps == null) return new ALCapabilities();
+        return new ALCapabilities(caps.device);
+    }
 }

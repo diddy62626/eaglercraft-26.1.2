@@ -239,4 +239,110 @@ public class NativeImage implements AutoCloseable {
                 }
                 return buffer;
         }
+
+        // ========== MC 26.1.2 Format enum + constructors + methods ==========
+
+        /**
+         * MC 26.1.2 NativeImage.Format enum.
+         * Browser: same as InternalGlFormat but with the public API name.
+         */
+        public enum Format {
+                RGBA(4, true, true, false, false),
+                RGB(3, true, true, false, false),
+                LUMINANCE_ALPHA(2, true, true, false, false),
+                LUMINANCE(1, true, false, false, false);
+
+                public final int components;
+                public final boolean hasAlpha;
+                public final boolean hasLuminance;
+                public final boolean hasTransparent;
+                public final boolean supportedByWebGL;
+
+                Format(int components, boolean hasAlpha, boolean hasLuminance, boolean hasTransparent, boolean supportedByWebGL) {
+                        this.components = components;
+                        this.hasAlpha = hasAlpha;
+                        this.hasLuminance = hasLuminance;
+                        this.hasTransparent = hasTransparent;
+                        this.supportedByWebGL = supportedByWebGL;
+                }
+
+                public int components() { return components; }
+                public boolean hasAlpha() { return hasAlpha; }
+                public boolean hasLuminance() { return hasLuminance; }
+                public boolean hasTransparent() { return hasTransparent; }
+                public boolean supportedByWebGL() { return supportedByWebGL; }
+
+                public static Format fromBytes(byte[] bytes) {
+                        if (bytes == null || bytes.length < 1) return RGBA;
+                        switch (bytes[0]) {
+                                case 3: return RGB;
+                                case 2: return LUMINANCE_ALPHA;
+                                case 1: return LUMINANCE;
+                                default: return RGBA;
+                        }
+                }
+        }
+
+        /**
+         * MC 26.1.2: Constructor (width, height, useStb).
+         */
+        public NativeImage(int width, int height, boolean useStb) {
+                this(width, height);
+        }
+
+        /**
+         * MC 26.1.2: Constructor (Format, width, height, useStb).
+         */
+        public NativeImage(Format format, int width, int height, boolean useStb) {
+                this(width, height, useStb);
+        }
+
+        /**
+         * MC 26.1.2: Reads a NativeImage from stream with the given format.
+         */
+        public static NativeImage read(Format format, InputStream stream) throws java.io.IOException {
+                return read(stream);
+        }
+
+        /**
+         * MC 26.1.2: Reads pixel at (x, y). Returns ARGB int.
+         */
+        public int getPixel(int x, int y) {
+                return getPixelRGBA(x, y);
+        }
+
+        /**
+         * MC 26.1.2: Sets pixel at (x, y) to ARGB value.
+         */
+        public void setPixel(int x, int y, int argb) {
+                setPixelRGBA(x, y, argb);
+        }
+
+        /**
+         * MC 26.1.2: Returns the entire image as an ARGB int[] array.
+         */
+        public int[] makePixelArray() {
+                int[] pixels = new int[getWidth() * getHeight()];
+                for (int y = 0; y < getHeight(); y++) {
+                        for (int x = 0; x < getWidth(); x++) {
+                                pixels[y * getWidth() + x] = getPixelRGBA(x, y);
+                        }
+                }
+                return pixels;
+        }
+
+        /**
+         * MC 26.1.2: Computes the transparency type of this image.
+         */
+        public Transparency computeTransparency() {
+                return Transparency.OPAQUE; // Browser: assume opaque
+        }
+
+        /**
+         * MC 26.1.2: Untracks this image from any native resource tracking.
+         * Browser: no-op (no native resources to track).
+         */
+        public void untrack() {
+                // no-op in browser
+        }
 }

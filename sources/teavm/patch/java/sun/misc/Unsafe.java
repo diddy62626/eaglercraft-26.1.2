@@ -86,4 +86,10 @@ public class Unsafe {
         return old;
     }
 
+
+    // ========== MC 26.1.2 additions ==========
+
+    public native Object getObjectVolatile(Object obj, long offset);
+    public native void putOrderedLong(Object obj, long offset, long value);
+    public native void putOrderedObject(Object obj, long offset, Object value);
 }

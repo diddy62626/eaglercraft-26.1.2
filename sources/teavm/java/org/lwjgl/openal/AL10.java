@@ -288,4 +288,11 @@ public class AL10 {
     public static int alGetInteger(int param) {
         return 0;
     }
+
+    /**
+     * MC 26.1.2: Deletes a list of buffer IDs.
+     */
+    public static void alDeleteBuffers(int[] buffers) {
+        alDeleteBuffers(buffers, 0);
+    }
 }

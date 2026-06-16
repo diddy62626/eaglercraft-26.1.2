@@ -166,4 +166,38 @@ public class TextureUtil {
 	public static int getTextureCount() {
 		return textureMap.size();
 	}
+
+	// ========== MC 26.1.2 additional methods ==========
+
+	/**
+	 * MC 26.1.2: Reads an InputStream into a direct ByteBuffer.
+	 */
+	public static java.nio.ByteBuffer readResource(java.io.InputStream stream) throws java.io.IOException {
+		java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+		byte[] buf = new byte[8192];
+		int n;
+		while ((n = stream.read(buf)) > 0) {
+			baos.write(buf, 0, n);
+		}
+		byte[] data = baos.toByteArray();
+		java.nio.ByteBuffer buffer = java.nio.ByteBuffer.allocateDirect(data.length);
+		buffer.put(data);
+		buffer.flip();
+		return buffer;
+	}
+
+	/**
+	 * MC 26.1.2: Fills empty (fully transparent) areas of a NativeImage with dark color.
+	 */
+	public static void fillEmptyAreasWithDarkColor(com.mojang.blaze3d.platform.NativeImage image) {
+		// Browser: WebGL2 textures handle alpha natively, no-op
+	}
+
+	/**
+	 * MC 26.1.2: Makes a NativeImage fully opaque by replacing transparent pixels
+	 * with the average of nearby opaque pixels (or black).
+	 */
+	public static void solidify(com.mojang.blaze3d.platform.NativeImage image) {
+		// Browser: no-op
+	}
 }

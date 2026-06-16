@@ -587,4 +587,20 @@ public class RenderSystem {
     public static void flipFrame(com.mojang.blaze3d.TracyFrameCapture capture) {
         // Browser: frame is presented by browser
     }
+
+	// ========== MC 26.1.2 additional members ==========
+
+	/**
+	 * MC 26.1.2: Size of the projection matrix UBO (uniform buffer object).
+	 * 16 floats * 4 bytes = 64 bytes per matrix.
+	 */
+	public static final int PROJECTION_MATRIX_UBO_SIZE = 64;
+
+	/**
+	 * MC 26.1.2: Executes any pending render-thread tasks.
+	 * Browser: no-op (single-threaded, no task queue needed).
+	 */
+	public static void executePendingTasks() {
+		// no-op in browser
+	}
 }

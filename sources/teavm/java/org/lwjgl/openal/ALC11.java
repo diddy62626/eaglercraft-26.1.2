@@ -13,4 +13,11 @@ public class ALC11 {
     public static long alcGetThreadContext() {
         return 1L; // Return a non-zero context handle
     }
+
+    /**
+     * MC 26.1.2: Returns an ALC integer value for the given device and parameter.
+     */
+    public static int alcGetInteger(long device, int param) {
+        return 0;
+    }
 }

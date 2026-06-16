@@ -133,6 +133,103 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         // ===== java.util.concurrent.Executors (static) =====
         add("java.util.concurrent.Executors", "newScheduledThreadPool", ValueType.object("java.util.concurrent.ScheduledExecutorService"),
             new ValueType[] { ValueType.INTEGER, ValueType.object("java.util.concurrent.ThreadFactory") }, null, true);
+        // callable(Runnable, T) returns Callable<T>
+        add("java.util.concurrent.Executors", "callable", ValueType.object("java.util.concurrent.Callable"),
+            new ValueType[] { ValueType.object("java.lang.Runnable"), ValueType.object("java.lang.Object") }, null, true);
+
+        // ===== java.util.concurrent.ScheduledThreadPoolExecutor =====
+        add("java.util.concurrent.ScheduledThreadPoolExecutor", "setContinueExistingPeriodicTasksAfterShutdownPolicy", ValueType.VOID,
+            new ValueType[] { ValueType.BOOLEAN }, null, false);
+
+        // ===== java.util.concurrent.CompletableFuture (instance methods return this) =====
+        add("java.util.concurrent.CompletableFuture", "applyToEither", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.concurrent.CompletionStage"), ValueType.object("java.util.function.Function") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "exceptionallyComposeAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.function.Function"), ValueType.object("java.util.concurrent.Executor") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "thenAcceptAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.function.Consumer"), ValueType.object("java.util.concurrent.Executor") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "thenApplyAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.function.Function"), ValueType.object("java.util.concurrent.Executor") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "thenCombine", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.concurrent.CompletionStage"), ValueType.object("java.util.function.BiFunction") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "thenComposeAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.function.Function"), ValueType.object("java.util.concurrent.Executor") }, null, false);
+        add("java.util.concurrent.CompletableFuture", "thenRunAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.lang.Runnable"), ValueType.object("java.util.concurrent.Executor") }, null, false);
+
+        // ===== java.util.concurrent.atomic.AtomicReferenceArray =====
+        add("java.util.concurrent.atomic.AtomicReferenceArray", "lazySet", ValueType.VOID,
+            new ValueType[] { ValueType.INTEGER, ValueType.object("java.lang.Object") }, null, false);
+
+        // ===== java.util.regex.Pattern =====
+        add("java.util.regex.Pattern", "asPredicate", ValueType.object("java.util.function.Predicate"),
+            new ValueType[0], null, false);
+
+        // ===== java.net.InetAddress =====
+        add("java.net.InetAddress", "isAnyLocalAddress", ValueType.BOOLEAN, new ValueType[0], 0, false);
+        add("java.net.InetAddress", "isLinkLocalAddress", ValueType.BOOLEAN, new ValueType[0], 0, false);
+        add("java.net.InetAddress", "isMulticastAddress", ValueType.BOOLEAN, new ValueType[0], 0, false);
+        add("java.net.InetAddress", "isSiteLocalAddress", ValueType.BOOLEAN, new ValueType[0], 0, false);
+        // static getByAddress(String, byte[])
+        add("java.net.InetAddress", "getByAddress", ValueType.object("java.net.InetAddress"),
+            new ValueType[] { ValueType.object("java.lang.String"), ValueType.arrayOf(ValueType.BYTE) }, null, true);
+
+        // ===== java.net.HttpURLConnection =====
+        add("java.net.HttpURLConnection", "getContentLengthLong", ValueType.LONG, new ValueType[0], -1L, false);
+
+        // ===== java.nio.channels.Channels (static) =====
+        add("java.nio.channels.Channels", "newWriter", ValueType.object("java.io.Writer"),
+            new ValueType[] { ValueType.object("java.nio.channels.WritableByteChannel"), ValueType.object("java.nio.charset.Charset") }, null, true);
+
+        // ===== java.nio.file.FileSystem =====
+        add("java.nio.file.FileSystem", "getPathMatcher", ValueType.object("java.nio.file.PathMatcher"),
+            new ValueType[] { ValueType.object("java.lang.String") }, null, false);
+
+        // ===== java.nio.file.Files (static) =====
+        add("java.nio.file.Files", "createLink", ValueType.object("java.nio.file.Path"),
+            new ValueType[] { ValueType.object("java.nio.file.Path"), ValueType.object("java.nio.file.Path") }, null, true);
+        add("java.nio.file.Files", "setLastModifiedTime", ValueType.object("java.nio.file.Path"),
+            new ValueType[] { ValueType.object("java.nio.file.Path"), ValueType.object("java.nio.file.attribute.FileTime") }, null, true);
+
+        // ===== java.security.AccessController (static) =====
+        add("java.security.AccessController", "checkPermission", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.security.Permission") }, null, true);
+
+        // ===== java.io.BufferedReader =====
+        add("java.io.BufferedReader", "transferTo", ValueType.LONG,
+            new ValueType[] { ValueType.object("java.io.Writer") }, 0L, false);
+
+        // ===== java.lang.ScopedValue$Carrier =====
+        add("java.lang.ScopedValue$Carrier", "run", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.lang.Runnable") }, null, false);
+
+        // ===== java.lang.Thread (constructor) =====
+        add("java.lang.Thread", "<init>", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.lang.ThreadGroup"), ValueType.object("java.lang.Runnable"), ValueType.object("java.lang.String") }, null, false);
+
+        // ===== java.lang.invoke.MethodHandle =====
+        add("java.lang.invoke.MethodHandle", "bindTo", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Object") }, null, false);
+        // invokeExact has polymorphic signature - we add a few common signatures.
+        // TeaVM reports each unique invokeExact signature as a separate missing method,
+        // so we add the most common ones. If more are needed, they'll show up in the
+        // next CI run.
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.LONG,
+            new ValueType[] { ValueType.LONG }, 0L, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.VOID,
+            new ValueType[] { ValueType.LONG }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.nio.ByteBuffer") }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.nio.ByteBuffer"),
+            new ValueType[] { ValueType.LONG, ValueType.INTEGER }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.nio.ByteBuffer"),
+            new ValueType[] { ValueType.LONG, ValueType.LONG }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("io.netty.util.internal.CleanerJava25$CleanableDirectBufferImpl"),
+            new ValueType[] { ValueType.INTEGER }, null, false);
+
+        // ===== java.lang.invoke.MethodHandles (static) =====
+        add("java.lang.invoke.MethodHandles", "lookup", ValueType.object("java.lang.invoke.MethodHandles$Lookup"), new ValueType[0], null, true);
+        add("java.lang.invoke.MethodHandles", "publicLookup", ValueType.object("java.lang.invoke.MethodHandles$Lookup"), new ValueType[0], null, true);
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {

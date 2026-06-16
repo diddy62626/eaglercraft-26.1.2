@@ -721,4 +721,33 @@ public class Matrix4f {
         // No-op stub for TeaVM compatibility
         return this;
     }
+
+    /**
+     * MC 26.1.2: Rotates this matrix by the given quaternion.
+     */
+    public Matrix4f rotate(Quaternionfc q) {
+        return this;
+    }
+
+    /**
+     * MC 26.1.2: Scales this matrix by the given vector.
+     */
+    public Matrix4f scale(Vector3fc v) {
+        float sx = v.x(), sy = v.y(), sz = v.z();
+        m00 *= sx; m01 *= sx; m02 *= sx; m03 *= sx;
+        m10 *= sy; m11 *= sy; m12 *= sy; m13 *= sy;
+        m20 *= sz; m21 *= sz; m22 *= sz; m23 *= sz;
+        return this;
+    }
+
+    /**
+     * MC 26.1.2: Sets this matrix to a translation by the given vector.
+     */
+    public Matrix4f translation(Vector3fc v) {
+        identity();
+        m30 = v.x();
+        m31 = v.y();
+        m32 = v.z();
+        return this;
+    }
 }

@@ -1,0 +1,9 @@
+package io.netty.resolver;
+
+import java.net.SocketAddress;
+
+public interface AddressResolver<T extends SocketAddress> {
+    boolean isResolved(SocketAddress address);
+    T resolve(SocketAddress address) throws Exception;
+    T resolve(String inetHost, int inetPort) throws Exception;
+}

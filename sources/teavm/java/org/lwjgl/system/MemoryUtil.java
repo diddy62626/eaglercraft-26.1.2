@@ -225,4 +225,11 @@ public final class MemoryUtil {
     public static int memLengthUTF8(String text) {
         return utf8Length(text);
     }
+
+    /**
+     * MC 26.1.2: Allocates a direct IntBuffer of the given capacity.
+     */
+    public static java.nio.IntBuffer memAllocInt(int capacity) {
+        return java.nio.ByteBuffer.allocateDirect(capacity * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+    }
 }
