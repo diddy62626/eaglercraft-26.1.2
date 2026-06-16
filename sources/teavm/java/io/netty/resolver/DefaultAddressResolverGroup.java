@@ -11,7 +11,9 @@ public final class DefaultAddressResolverGroup extends AddressResolverGroup<java
             @Override
             public boolean isResolved(java.net.SocketAddress address) { return true; }
             @Override
-            public java.net.InetSocketAddress resolve(java.net.SocketAddress address) { return (java.net.InetSocketAddress) address; }
+            public io.netty.util.concurrent.Future<java.net.InetSocketAddress> resolve(java.net.SocketAddress address) {
+                return null;
+            }
             @Override
             public java.net.InetSocketAddress resolve(String inetHost, int inetPort) {
                 return new java.net.InetSocketAddress(inetHost, inetPort);
