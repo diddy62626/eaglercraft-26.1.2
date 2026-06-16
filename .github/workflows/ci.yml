@@ -158,10 +158,12 @@ jobs:
             $(find java -name "*.java" -type f)
           $JAVA_HOME/bin/jar cf ../../libs/teavm-patches.jar -C classes .
           echo "teavm-patches.jar built ($(stat -c%s ../../libs/teavm-patches.jar) bytes)"
-          cd ../..
+          cd $GITHUB_WORKSPACE
 
           echo "=== Compiling TeaVM JavaScript ==="
           echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"
+          echo "Working directory: $(pwd)"
+          ls -la gradlew
           ./gradlew --no-daemon :sources:generateJavaScript 2>&1 | tee teavm.log
 
           if grep -q "BUILD SUCCESSFUL" teavm.log; then
