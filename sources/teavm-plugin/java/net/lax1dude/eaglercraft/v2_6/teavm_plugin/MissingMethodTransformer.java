@@ -230,6 +230,67 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         // ===== java.lang.invoke.MethodHandles (static) =====
         add("java.lang.invoke.MethodHandles", "lookup", ValueType.object("java.lang.invoke.MethodHandles$Lookup"), new ValueType[0], null, true);
         add("java.lang.invoke.MethodHandles", "publicLookup", ValueType.object("java.lang.invoke.MethodHandles$Lookup"), new ValueType[0], null, true);
+
+        // ===== java.lang.invoke.MethodHandles$Lookup =====
+        add("java.lang.invoke.MethodHandles$Lookup", "findVarHandle",
+            ValueType.object("java.lang.invoke.VarHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.Class") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "unreflectConstructor",
+            ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.reflect.Constructor") }, null, false);
+
+        // ===== java.lang.invoke.MethodType (static factories) =====
+        add("java.lang.invoke.MethodType", "methodType", ValueType.object("java.lang.invoke.MethodType"),
+            new ValueType[] { ValueType.object("java.lang.Class") }, null, true);
+        add("java.lang.invoke.MethodType", "methodType", ValueType.object("java.lang.invoke.MethodType"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.Class") }, null, true);
+        add("java.lang.invoke.MethodType", "methodType", ValueType.object("java.lang.invoke.MethodType"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.Class"), ValueType.arrayOf(ValueType.object("java.lang.Class")) }, null, true);
+
+        // ===== java.lang.Thread (static) =====
+        add("java.lang.Thread", "onSpinWait", ValueType.VOID, new ValueType[0], null, true);
+
+        // ===== java.util.concurrent.CompletableFuture =====
+        add("java.util.concurrent.CompletableFuture", "thenApplyAsync", ValueType.object("java.util.concurrent.CompletableFuture"),
+            new ValueType[] { ValueType.object("java.util.function.Function") }, null, false);
+
+        // ===== java.util.concurrent.ScheduledThreadPoolExecutor =====
+        add("java.util.concurrent.ScheduledThreadPoolExecutor", "setExecuteExistingDelayedTasksAfterShutdownPolicy", ValueType.VOID,
+            new ValueType[] { ValueType.BOOLEAN }, null, false);
+
+        // ===== java.util.concurrent.TimeUnit =====
+        add("java.util.concurrent.TimeUnit", "convert", ValueType.LONG,
+            new ValueType[] { ValueType.object("java.time.Duration") }, 0L, false);
+
+        // ===== java.nio.ByteBuffer =====
+        add("java.nio.ByteBuffer", "slice", ValueType.object("java.nio.ByteBuffer"),
+            new ValueType[] { ValueType.INTEGER, ValueType.INTEGER }, null, false);
+
+        // ===== java.nio.file.Files (static) =====
+        add("java.nio.file.Files", "getPosixFilePermissions", ValueType.object("java.util.Set"),
+            new ValueType[] { ValueType.object("java.nio.file.Path"), ValueType.arrayOf(ValueType.object("java.nio.file.LinkOption")) }, null, true);
+        add("java.nio.file.Files", "setPosixFilePermissions", ValueType.object("java.nio.file.Path"),
+            new ValueType[] { ValueType.object("java.nio.file.Path"), ValueType.object("java.util.Set") }, null, true);
+
+        // ===== Additional MethodHandle.invokeExact signatures =====
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.lang.Object"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.INTEGER }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.lang.invoke.MethodHandles$Lookup"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.invoke.MethodHandles$Lookup") }, null, false);
+        add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.object("java.lang.invoke.VarHandle"),
+            new ValueType[] { ValueType.object("java.lang.invoke.MethodHandles$Lookup"), ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.Class") }, null, false);
+
+        // ===== VarHandle methods (called by Guava AbstractFutureState) =====
+        // We provide Object-taking overloads in our VarHandle stub class.
+        // However, TeaVM also needs explicit (3-arg) overloads matching call-site arity.
+        // The plugin can add these to VarHandle since it's our stub class.
+        add("java.lang.invoke.VarHandle", "compareAndSet", ValueType.BOOLEAN,
+            new ValueType[] { ValueType.object("java.lang.Object"), ValueType.object("java.lang.Object"), ValueType.object("java.lang.Object") }, 0, false);
+        add("java.lang.invoke.VarHandle", "getAndSet", ValueType.object("java.lang.Object"),
+            new ValueType[] { ValueType.object("java.lang.Object"), ValueType.object("java.lang.Object") }, null, false);
+        add("java.lang.invoke.VarHandle", "setRelease", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.lang.Object"), ValueType.object("java.lang.Object") }, null, false);
+        add("java.lang.invoke.VarHandle", "storeStoreFence", ValueType.VOID, new ValueType[0], null, true);
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {

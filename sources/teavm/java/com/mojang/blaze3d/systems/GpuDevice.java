@@ -62,4 +62,13 @@ public interface GpuDevice extends GpuBackend {
     default void addDebugMessage(String message) {}
     default void resetDebugMessages() {}
 
+
+    default com.mojang.blaze3d.buffers.GpuBuffer createBuffer(java.util.function.Supplier<String> label, int usage, long size) { return new com.mojang.blaze3d.buffers.GpuBuffer() {}; }
+    default com.mojang.blaze3d.buffers.GpuBuffer createBuffer(java.util.function.Supplier<String> label, int usage, java.nio.ByteBuffer data) { return new com.mojang.blaze3d.buffers.GpuBuffer() {}; }
+    default com.mojang.blaze3d.textures.GpuTexture createTexture(String label, int usage, com.mojang.blaze3d.textures.TextureFormat format, int w, int h, int d, int levels) { return new com.mojang.blaze3d.textures.GpuTexture() {}; }
+    default com.mojang.blaze3d.textures.GpuTextureView createTextureView(com.mojang.blaze3d.textures.GpuTexture texture) { return new com.mojang.blaze3d.textures.GpuTextureView(texture); }
+    default String getBackendName() { return "WebGL2"; }
+    default int getMaxSupportedAnisotropy() { return 0; }
+    default int getUniformOffsetAlignment() { return 256; }
+    default boolean isZZeroToOne() { return false; }
 }

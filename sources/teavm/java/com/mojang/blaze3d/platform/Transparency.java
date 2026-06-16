@@ -12,4 +12,6 @@ public final class Transparency {
     private final String name;
     public Transparency(String name) { this.name = name; }
     public String name() { return name; }
+
+    public boolean hasTransparent() { return "transparent".equals(name); }
 }

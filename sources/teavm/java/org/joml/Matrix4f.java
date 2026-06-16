@@ -750,4 +750,12 @@ public class Matrix4f {
         m32 = v.z();
         return this;
     }
+
+    public Matrix4f(org.joml.Matrix4fc mat) {
+        m00 = mat.m00(); m01 = mat.m01(); m02 = mat.m02(); m03 = mat.m03();
+        m10 = mat.m10(); m11 = mat.m11(); m12 = mat.m12(); m13 = mat.m13();
+        m20 = mat.m20(); m21 = mat.m21(); m22 = mat.m22(); m23 = mat.m23();
+        m30 = mat.m30(); m31 = mat.m31(); m32 = mat.m32(); m33 = mat.m33();
+    }
+    public Matrix4f mul(org.joml.Matrix4fc right, Matrix4f dest) { return dest; }
 }

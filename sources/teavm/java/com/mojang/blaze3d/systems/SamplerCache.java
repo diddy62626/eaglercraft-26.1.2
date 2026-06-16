@@ -22,4 +22,11 @@ public class SamplerCache {
                                  boolean mipmaps) {
         return STUB_SAMPLER;
     }
+
+    public com.mojang.blaze3d.textures.GpuSampler getClampToEdge(com.mojang.blaze3d.textures.FilterMode filter) {
+        return new com.mojang.blaze3d.textures.GpuSampler();
+    }
+    public com.mojang.blaze3d.textures.GpuSampler getRepeat(com.mojang.blaze3d.textures.FilterMode filter) {
+        return new com.mojang.blaze3d.textures.GpuSampler();
+    }
 }

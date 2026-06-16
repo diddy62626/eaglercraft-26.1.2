@@ -214,4 +214,6 @@ public class GLX {
         public static String _getCpuInfo() {
                 return "Browser";
         }
+
+    public static int glfwBool(boolean value) { return value ? 1 : 0; }
 }

@@ -430,4 +430,14 @@ public class Window {
         // no-op in browser
     }
 
+
+    public int getGuiScale() {
+        return (int) this.guiScale;
+    }
+    public void selectCursor(com.mojang.blaze3d.platform.cursor.CursorType cursorType) {
+        // Browser: cursor handled by CSS
+    }
+    public static void setDefaultErrorCallback() {
+        // Browser: no GLFW error callback
+    }
 }

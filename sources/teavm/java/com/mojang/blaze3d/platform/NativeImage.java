@@ -345,4 +345,14 @@ public class NativeImage implements AutoCloseable {
         public void untrack() {
                 // no-op in browser
         }
+
+    public Format format() {
+        return Format.RGBA;
+    }
+    public byte getLuminanceOrAlpha(int x, int y) {
+        return (byte) getAlpha(x, y);
+    }
+    public static NativeImage read(java.nio.ByteBuffer buffer) throws java.io.IOException {
+        return new NativeImage(16, 16);
+    }
 }

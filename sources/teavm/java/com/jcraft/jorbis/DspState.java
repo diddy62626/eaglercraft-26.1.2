@@ -7,4 +7,7 @@ public class DspState {
     public int synthesis_init() { return 0; }
     public int synthesis_blockin(com.jcraft.jorbis.Block block) { return 0; }
     public int synthesis_pcmout(float[][][] floats, int[] indices) { return 0; }
+
+    public int synthesis_init(com.jcraft.jorbis.Info info) { this.vi = info; return 0; }
+    public int synthesis_read(int samples) { return 0; }
 }

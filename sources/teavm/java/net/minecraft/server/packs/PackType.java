@@ -6,4 +6,12 @@ package net.minecraft.server.packs;
 public enum PackType {
     CLIENT_RESOURCES,
     SERVER_DATA;
+
+    public String getDirectory() {
+        switch (this) {
+            case CLIENT_RESOURCES: return "assets";
+            case SERVER_DATA: return "data";
+            default: return "assets";
+        }
+    }
 }

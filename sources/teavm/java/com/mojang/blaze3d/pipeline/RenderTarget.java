@@ -316,4 +316,7 @@ public class RenderTarget {
         public void blitToScreen() {
                 // no-op in browser - WebGL2 swap buffers handled by browser
         }
+
+    public com.mojang.blaze3d.textures.GpuTexture getColorTexture() { return new com.mojang.blaze3d.textures.GpuTexture() {}; }
+    public com.mojang.blaze3d.textures.GpuTexture getDepthTexture() { return new com.mojang.blaze3d.textures.GpuTexture() {}; }
 }

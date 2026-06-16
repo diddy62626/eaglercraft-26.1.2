@@ -14,4 +14,6 @@ public interface TracyFrameCapture {
     static void upload() {
         // no-op in browser
     }
+
+    static void capture(com.mojang.blaze3d.pipeline.RenderTarget target) {}
 }

@@ -69,4 +69,8 @@ public class Source {
         if (location == null) return other.location == null;
         return location.equals(other.location);
     }
+
+    public java.io.File getFile() {
+        return uri == null ? null : new java.io.File(uri);
+    }
 }

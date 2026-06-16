@@ -603,4 +603,14 @@ public class RenderSystem {
 	public static void executePendingTasks() {
 		// no-op in browser
 	}
+
+    public static net.minecraft.client.renderer.DynamicUniforms getDynamicUniforms() { return new net.minecraft.client.renderer.DynamicUniforms(); }
+    public static AutoStorageIndexBuffer getSequentialBuffer(com.mojang.blaze3d.vertex.VertexFormat.Mode mode) { return new AutoStorageIndexBuffer(); }
+    public void setShaderFog(com.mojang.blaze3d.buffers.GpuBufferSlice slice) {}
+
+    public static class AutoStorageIndexBuffer {
+        public void upload(int vertexCount) {}
+        public boolean has(int vertexCount) { return false; }
+        public int indexBufferObject() { return 0; }
+    }
 }

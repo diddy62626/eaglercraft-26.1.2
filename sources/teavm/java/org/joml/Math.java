@@ -141,4 +141,8 @@ public final class Math {
     private Math() {
         // prevent instantiation
     }
+
+    public static float cosFromSin(float sin, float angle) {
+        return (float) Math.cos(angle);
+    }
 }

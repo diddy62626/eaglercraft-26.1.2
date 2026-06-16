@@ -9,4 +9,8 @@ public interface TimeSource {
         @Override
         long getAsLong();
     }
+
+    default long get(java.util.concurrent.TimeUnit unit) {
+        return unit.convert(System.currentTimeMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+    }
 }

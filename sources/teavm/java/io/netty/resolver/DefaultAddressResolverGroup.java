@@ -1,16 +1,12 @@
 package io.netty.resolver;
 
-/**
- * EaglerCraft stub for io.netty.resolver.DefaultAddressResolverGroup.
- *
- * Returns a basic AddressResolver that wraps the address without doing
- * any DNS lookup (browser handles DNS).
- */
+import io.netty.util.concurrent.EventExecutor;
+
 public final class DefaultAddressResolverGroup extends AddressResolverGroup<java.net.InetSocketAddress> {
     public static final DefaultAddressResolverGroup INSTANCE = new DefaultAddressResolverGroup();
 
     @Override
-    public AddressResolver<java.net.InetSocketAddress> getResolver(Object executor) {
+    public AddressResolver<java.net.InetSocketAddress> getResolver(EventExecutor executor) {
         return new AddressResolver<java.net.InetSocketAddress>() {
             @Override
             public boolean isResolved(java.net.SocketAddress address) { return true; }

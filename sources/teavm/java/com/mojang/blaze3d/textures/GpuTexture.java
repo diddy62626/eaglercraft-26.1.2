@@ -6,4 +6,6 @@ public abstract class GpuTexture {
     public int getDepth() { return 0; }
     public TextureFormat getFormat() { return TextureFormat.RGBA8; }
     public void close() {}
+
+    public String getLabel() { return ""; }
 }

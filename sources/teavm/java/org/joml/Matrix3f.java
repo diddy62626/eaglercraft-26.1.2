@@ -235,4 +235,11 @@ public class Matrix3f implements Matrix3fc {
     @Override public float m20() { return m20; }
     @Override public float m21() { return m21; }
     @Override public float m22() { return m22; }
+
+    public Matrix3f scale(float s) {
+        m00 *= s; m01 *= s; m02 *= s;
+        m10 *= s; m11 *= s; m12 *= s;
+        m20 *= s; m21 *= s; m22 *= s;
+        return this;
+    }
 }

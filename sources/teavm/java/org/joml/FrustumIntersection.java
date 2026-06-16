@@ -37,4 +37,8 @@ public class FrustumIntersection {
     public boolean intersectsPoint(Vector3f point) {
         return true;
     }
+
+    public int intersectAab(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) { return 1; }
+    public FrustumIntersection set(org.joml.Matrix4fc m) { return this; }
+    public boolean testPoint(float x, float y, float z) { return true; }
 }

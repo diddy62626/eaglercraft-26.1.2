@@ -30,4 +30,14 @@ public interface PackResources {
      * MC 26.1.2: Returns a metadata section by type.
      */
     <T> T getMetadataSection(net.minecraft.server.packs.metadata.MetadataSectionType<T> type);
+
+    default java.util.function.Function<net.minecraft.server.packs.resources.IoSupplier<java.io.InputStream>, java.io.InputStream> createResourceOpener() { return null; }
+    default net.minecraft.server.packs.resources.IoSupplier<java.io.InputStream> getResource(net.minecraft.server.packs.PackType packType, net.minecraft.resources.Identifier location) { return null; }
+    default net.minecraft.server.packs.resources.IoSupplier<java.io.InputStream> getRootResource(String... path) { return null; }
+    default void listResources(net.minecraft.server.packs.PackType packType, String namespace, String pathPrefix, ResourceOutput output) {}
+
+    @FunctionalInterface
+    interface ResourceOutput {
+        void accept(net.minecraft.resources.Identifier location, net.minecraft.server.packs.resources.IoSupplier<java.io.InputStream> supplier);
+    }
 }
