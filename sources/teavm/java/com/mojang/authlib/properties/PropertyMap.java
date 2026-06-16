@@ -10,50 +10,52 @@ import java.util.Collections;
  */
 public class PropertyMap {
 
-	public PropertyMap() {
-	}
+        public static final PropertyMap EMPTY = new PropertyMap();
 
-	public Collection<Property> get(String key) {
-		return Collections.emptyList();
-	}
+        public PropertyMap() {
+        }
 
-	public void put(String key, Property property) {
-		// no-op
-	}
+        public Collection<Property> get(String key) {
+                return Collections.emptyList();
+        }
 
-	public boolean containsKey(String key) {
-		return false;
-	}
+        public void put(String key, Property property) {
+                // no-op
+        }
 
-	public boolean isEmpty() {
-		return true;
-	}
+        public boolean containsKey(String key) {
+                return false;
+        }
 
-	public int size() {
-		return 0;
-	}
+        public boolean isEmpty() {
+                return true;
+        }
 
-	/**
-	 * Property stub.
-	 */
-	public static class Property {
-		private final String name;
-		private final String value;
-		private final String signature;
+        public int size() {
+                return 0;
+        }
 
-		public Property(String name, String value) {
-			this(name, value, null);
-		}
+        /**
+         * Property stub.
+         */
+        public static class Property {
+                private final String name;
+                private final String value;
+                private final String signature;
 
-		public Property(String name, String value, String signature) {
-			this.name = name;
-			this.value = value;
-			this.signature = signature;
-		}
+                public Property(String name, String value) {
+                        this(name, value, null);
+                }
 
-		public String getName() { return name; }
-		public String getValue() { return value; }
-		public String getSignature() { return signature; }
-		public boolean hasSignature() { return signature != null; }
-	}
+                public Property(String name, String value, String signature) {
+                        this.name = name;
+                        this.value = value;
+                        this.signature = signature;
+                }
+
+                public String getName() { return name; }
+                public String getValue() { return value; }
+                public String getSignature() { return signature; }
+                public boolean hasSignature() { return signature != null; }
+        }
 }

@@ -3945,7 +3945,7 @@ nlev_EaglerCraft_createMinecraftInstance = () => {
             $canvasWidth = nlevi_PlatformRuntime_getCanvasDrawableWidth();
             $canvasHeight = nlevi_PlatformRuntime_getCanvasDrawableHeight();
             $displayData = cmbp_DisplayData__init_0($canvasWidth, $canvasHeight, ju_OptionalInt_empty(), ju_OptionalInt_empty(), 0);
-            $userData = nmcm_GameConfig$UserData__init_(nmc_User__init_0(nlev_EaglerProfile_getUsername(), nlev_EaglerCraft_makeOfflineUUID(nlev_EaglerProfile_getUsername()), $rt_s(16), ju_Optional_empty(), ju_Optional_empty()), cmap_PropertyMap__init_0());
+            $userData = nmcm_GameConfig$UserData__init_(nmc_User__init_0(nlev_EaglerProfile_getUsername(), nlev_EaglerCraft_makeOfflineUUID(nlev_EaglerProfile_getUsername()), $rt_s(16), ju_Optional_empty(), ju_Optional_empty()), cmap_PropertyMap__init_());
             $gameData = nmcm_GameConfig$GameData__init_(0, $rt_s(64), $rt_s(65), 0, 0, 0, 0, 0);
             $quickPlayData = new nmcm_GameConfig$QuickPlayData;
             nmcm_GameConfig$QuickPlayVariant_$callClinit();
@@ -5395,13 +5395,21 @@ nmcm_GameConfig$UserData__init_ = (var_0, var_1) => {
     return var_2;
 },
 cmap_PropertyMap = $rt_classWithoutFields(),
-cmap_PropertyMap__init_ = $this => {
-    return;
+cmap_PropertyMap_EMPTY = null,
+cmap_PropertyMap_$callClinit = () => {
+    cmap_PropertyMap_$callClinit = $rt_eraseClinit(cmap_PropertyMap);
+    cmap_PropertyMap__clinit_();
 },
-cmap_PropertyMap__init_0 = () => {
+cmap_PropertyMap__init_0 = $this => {
+    cmap_PropertyMap_$callClinit();
+},
+cmap_PropertyMap__init_ = () => {
     let var_0 = new cmap_PropertyMap();
-    cmap_PropertyMap__init_(var_0);
+    cmap_PropertyMap__init_0(var_0);
     return var_0;
+},
+cmap_PropertyMap__clinit_ = () => {
+    cmap_PropertyMap_EMPTY = cmap_PropertyMap__init_();
 };
 function nmcm_GameConfig$GameData() {
     let a = this; jl_Object.call(a);
@@ -19959,7 +19967,7 @@ ju_OptionalInt, 0, jl_Object, [], 1, 0, 0, 0,
 nmc_User, 0, jl_Object, [], 1, 0, 0, 0,
 ju_Optional, 0, jl_Object, [], 17, 0, 0, 0,
 nmcm_GameConfig$UserData, 0, jl_Object, [], 1, 0, 0, 0,
-cmap_PropertyMap, 0, jl_Object, [], 1, 0, 0, 0,
+cmap_PropertyMap, 0, jl_Object, [], 1, 0, () => cmap_PropertyMap_$callClinit(), 0,
 nmcm_GameConfig$GameData, 0, jl_Object, [], 1, 0, 0, 0,
 nmcm_GameConfig$QuickPlayData, 0, jl_Object, [], 1, 0, 0, 0,
 jl_Enum, 0, jl_Object, [jl_Comparable, ji_Serializable], 1025, 0, 0, 0,
