@@ -27,6 +27,16 @@ public class InputConstants {
                         }
                         return KEYSYM;
                 }
+
+                /**
+                 * Returns the Key for the given integer value within this Type,
+                 * creating a new Key if one hasn't been registered yet.
+                 * Matches MC 26.1.2's getOrCreate(int) signature.
+                 */
+                public Key getOrCreate(int value) {
+                        Key key = InputConstants.getKey(this, value);
+                        return key;
+                }
         }
 
         // ========== Key Class ==========
@@ -67,6 +77,9 @@ public class InputConstants {
 
         /** Standard GLFW key constants - matching browser keyCode/which values. */
         public static final int KEY_UNKNOWN = -1;
+
+        /** MC 26.1.2 UNKNOWN Key singleton (static field). */
+        public static final Key UNKNOWN = new Key(KEY_UNKNOWN, "unknown", Type.KEYSYM);
         public static final int KEY_ESCAPE = 256;
         public static final int KEY_0 = 48;
         public static final int KEY_1 = 49;
