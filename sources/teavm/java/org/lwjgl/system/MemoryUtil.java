@@ -232,4 +232,31 @@ public final class MemoryUtil {
     public static java.nio.IntBuffer memAllocInt(int capacity) {
         return java.nio.ByteBuffer.allocateDirect(capacity * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
     }
+
+    public static org.lwjgl.system.MemoryUtil.MemoryAllocator getAllocator(boolean tracked) {
+        return new org.lwjgl.system.MemoryUtil.MemoryAllocator() {
+            public long malloc(long size) { return 0L; }
+            public long calloc(long num, long size) { return 0L; }
+            public long realloc(long ptr, long size) { return 0L; }
+            public void free(long ptr) {}
+            public long aligned_alloc(long alignment, long size) { return 0L; }
+            public void aligned_free(long ptr) {}
+        };
+    }
+
+    public static java.nio.ByteBuffer memByteBuffer(long address, int capacity) {
+        return java.nio.ByteBuffer.allocateDirect(capacity);
+    }
+    public static void memPutByte(long address, byte value) {}
+    public static void memPutShort(long address, short value) {}
+    public static void memPutInt(long address, int value) {}
+    public static void memPutFloat(long address, float value) {}
+    public static void memPutLong(long address, long value) {}
+    public static void memPutDouble(long address, double value) {}
+    public static byte memGetByte(long address) { return 0; }
+    public static short memGetShort(long address) { return 0; }
+    public static int memGetInt(long address) { return 0; }
+    public static float memGetFloat(long address) { return 0.0f; }
+    public static long memGetLong(long address) { return 0L; }
+    public static double memGetDouble(long address) { return 0.0; }
 }

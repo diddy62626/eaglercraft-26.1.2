@@ -1,0 +1,6 @@
+package com.mojang.serialization;
+
+public interface Decoder<T> {
+    default DataResult<T> parse(DynamicOps<?> ops, Object input) { return DataResult.success(null); }
+    default <U> T parse(Dynamic<U> input) { return null; }
+}

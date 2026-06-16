@@ -129,4 +129,8 @@ public class MemoryStack {
     public org.lwjgl.PointerBuffer mallocPointer(int size) {
         return new org.lwjgl.PointerBuffer(java.nio.ByteBuffer.allocateDirect(size * 8));
     }
+
+    public java.nio.IntBuffer callocInt(int size) {
+        return java.nio.ByteBuffer.allocateDirect(size * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+    }
 }

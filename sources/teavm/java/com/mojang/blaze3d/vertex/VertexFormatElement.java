@@ -1,5 +1,7 @@
 package com.mojang.blaze3d.vertex;
 
+import java.util.stream.Stream;
+
 public class VertexFormatElement {
     public enum Usage {
         POSITION, NORMAL, COLOR, UV, MATRIX, JOINT, PADDING;
@@ -23,4 +25,8 @@ public class VertexFormatElement {
     public DataType getType() { return type; }
     public int getCount() { return count; }
     public int getSize() { return count * 4; }
+
+    public static Stream<VertexFormatElement> elementsFromMask(int mask) {
+        return Stream.empty();
+    }
 }

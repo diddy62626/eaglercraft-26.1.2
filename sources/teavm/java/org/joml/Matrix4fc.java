@@ -1,45 +1,24 @@
 package org.joml;
 
-/**
- * EaglerCraft stub for org.joml.Matrix4fc interface.
- */
-public interface Matrix4fc {
-    float m00();
-    float m01();
-    float m02();
-    float m03();
-    float m10();
-    float m11();
-    float m12();
-    float m13();
-    float m20();
-    float m21();
-    float m22();
-    float m23();
-    float m30();
-    float m31();
-    float m32();
-    float m33();
+import java.nio.ByteBuffer;
 
-    default float getRowColumn(int row, int column) {
-        switch (row * 4 + column) {
-            case 0: return m00();
-            case 1: return m01();
-            case 2: return m02();
-            case 3: return m03();
-            case 4: return m10();
-            case 5: return m11();
-            case 6: return m12();
-            case 7: return m13();
-            case 8: return m20();
-            case 9: return m21();
-            case 10: return m22();
-            case 11: return m23();
-            case 12: return m30();
-            case 13: return m31();
-            case 14: return m32();
-            case 15: return m33();
-            default: throw new IndexOutOfBoundsException();
-        }
-    }
+public interface Matrix4fc {
+    float m00(); float m01(); float m02(); float m03();
+    float m10(); float m11(); float m12(); float m13();
+    float m20(); float m21(); float m22(); float m23();
+    float m30(); float m31(); float m32(); float m33();
+
+    default int properties() { return 0; }
+    default ByteBuffer get(ByteBuffer buf) { return buf; }
+    default ByteBuffer get(int offset, ByteBuffer buf) { return buf; }
+    default float[] get(float[] arr) { return arr; }
+    default Matrix4f get(Matrix4f dest) { return dest; }
+    default Matrix4f mul(Matrix4fc right, Matrix4f dest) { return dest; }
+    default Matrix4f invert(Matrix4f dest) { return dest; }
+    default float determinant() { return 1.0f; }
+    default Matrix4f transpose(Matrix4f dest) { return dest; }
+    default Vector4f transform(Vector4f v) { return v; }
+    default Vector3f transformDirection(Vector3fc v, Vector3f dest) { return dest; }
+    default Vector3f transformPosition(Vector3fc v, Vector3f dest) { return dest; }
+    default Vector4f transformTranspose(Vector4f v) { return v; }
 }

@@ -612,5 +612,11 @@ public class RenderSystem {
         public void upload(int vertexCount) {}
         public boolean has(int vertexCount) { return false; }
         public int indexBufferObject() { return 0; }
+        public com.mojang.blaze3d.buffers.GpuBuffer getBuffer(int vertexCount) { return new com.mojang.blaze3d.buffers.GpuBuffer() {}; }
     }
+
+    public static void bindDefaultUniforms(com.mojang.blaze3d.systems.RenderPass pass) {}
+    public static void setGlobalSettingsUniform(com.mojang.blaze3d.buffers.GpuBuffer buffer) {}
+    public static void setProjectionMatrix(com.mojang.blaze3d.buffers.GpuBufferSlice slice, com.mojang.blaze3d.ProjectionType type) {}
+    public static void setShaderLights(com.mojang.blaze3d.buffers.GpuBufferSlice slice) {}
 }

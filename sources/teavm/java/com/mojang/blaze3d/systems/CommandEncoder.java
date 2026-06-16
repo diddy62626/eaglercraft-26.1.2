@@ -19,4 +19,10 @@ public interface CommandEncoder {
     default void clearColorAndDepthTextures(com.mojang.blaze3d.textures.GpuTexture color, int colorValue, com.mojang.blaze3d.textures.GpuTexture depth, double depthValue) {}
     default void clearColorTexture(com.mojang.blaze3d.textures.GpuTexture texture, int value) {}
     default void clearDepthTexture(com.mojang.blaze3d.textures.GpuTexture texture, double value) {}
+
+    default com.mojang.blaze3d.systems.RenderPass createRenderPass(java.util.function.Supplier<String> labelSupplier, com.mojang.blaze3d.textures.GpuTextureView colorAttachment, java.util.OptionalInt clearColor) {
+        return new com.mojang.blaze3d.systems.RenderPass() {};
+    }
+    default void copyTextureToBuffer(com.mojang.blaze3d.textures.GpuTexture src, com.mojang.blaze3d.buffers.GpuBuffer dst, long offset, java.lang.Runnable callback, int flags) {}
+    default com.mojang.blaze3d.buffers.GpuBuffer.MappedView mapBuffer(com.mojang.blaze3d.buffers.GpuBufferSlice slice, boolean read, boolean write) { return null; }
 }

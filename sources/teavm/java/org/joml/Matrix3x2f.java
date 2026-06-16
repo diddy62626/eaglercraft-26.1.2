@@ -35,4 +35,14 @@ public class Matrix3x2f implements Matrix3x2fc {
     public Matrix3x2f rotate(float angle) { return this; }
     public Matrix3x2f scale(float x, float y) { return this; }
     public Matrix3x2f scaleLocal(float x, float y) { return this; }
+
+    public Matrix3x2f(Matrix3x2fc mat) {
+        m00 = mat.m00(); m01 = mat.m01();
+        m10 = mat.m10(); m11 = mat.m11();
+        m20 = mat.m20(); m21 = mat.m21();
+    }
+
+    public Matrix3x2f invert(Matrix3x2f dest) { return dest; }
+    public Matrix3x2f invert() { return this; }
+    public float determinant() { return m00 * m11 - m01 * m10; }
 }

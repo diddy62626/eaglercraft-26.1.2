@@ -8,4 +8,9 @@ public class Matrix3x2fStack extends Matrix3x2f {
     public int depth() { return 0; }
     public int getMaxDepth() { return 32; }
     public void clear() { identity(); }
+
+    @Override
+    public Matrix3x2fStack invert(Matrix3x2f dest) { return this; }
+    @Override
+    public Matrix3x2fStack invert() { return this; }
 }

@@ -19,11 +19,20 @@ public class VertexFormat {
         }
     }
 
+    public enum IndexType {
+        SHORT(2), INT(4);
+
+        public final int bytes;
+        IndexType(int bytes) { this.bytes = bytes; }
+    }
+
     public static Builder builder() { return new Builder(); }
 
     public int getVertexSize() { return 32; }
     public boolean contains(VertexFormatElement element) { return false; }
     public String getElementName(VertexFormatElement element) { return ""; }
+    public int getElementsMask() { return 0; }
+    public java.util.stream.Stream<VertexFormatElement> elements() { return java.util.stream.Stream.empty(); }
 
     public static class Builder {
         public Builder add(String name, VertexFormatElement element) { return this; }

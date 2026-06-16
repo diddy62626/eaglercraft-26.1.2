@@ -24,7 +24,7 @@ public abstract class SelectorProvider {
     public abstract Pipe openPipe();
     public abstract ServerSocketChannel openServerSocketChannel();
     public abstract SocketChannel openSocketChannel();
-    public abstract Selector openSelector();
+    public java.nio.channels.spi.AbstractSelector openSelector() { return null; }
     public Channel inheritedChannel() { return null; }
     public DatagramChannel openDatagramChannel(java.net.ProtocolFamily family) { return null; }
     public ServerSocketChannel openServerSocketChannel(java.net.ProtocolFamily family) { return null; }

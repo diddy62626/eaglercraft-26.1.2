@@ -291,6 +291,75 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("java.lang.invoke.VarHandle", "setRelease", ValueType.VOID,
             new ValueType[] { ValueType.object("java.lang.Object"), ValueType.object("java.lang.Object") }, null, false);
         add("java.lang.invoke.VarHandle", "storeStoreFence", ValueType.VOID, new ValueType[0], null, true);
+
+        // ===== java.lang.System (static) =====
+        add("java.lang.System", "exit", ValueType.VOID, new ValueType[] { ValueType.INTEGER }, null, true);
+
+        // ===== java.lang.invoke.MethodHandle =====
+        add("java.lang.invoke.MethodHandle", "asType", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.invoke.MethodType") }, null, false);
+
+        // ===== java.lang.invoke.MethodHandles$Lookup =====
+        add("java.lang.invoke.MethodHandles$Lookup", "findStatic", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.invoke.MethodType") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "findVirtual", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.invoke.MethodType") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "findSpecial", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.invoke.MethodType"), ValueType.object("java.lang.Class") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "findGetter", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.Class") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "findSetter", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.String"), ValueType.object("java.lang.Class") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "findConstructor", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.invoke.MethodType") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "unreflect", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.reflect.Method") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "unreflectGetter", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.reflect.Field") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "unreflectSetter", ValueType.object("java.lang.invoke.MethodHandle"),
+            new ValueType[] { ValueType.object("java.lang.reflect.Field") }, null, false);
+        add("java.lang.invoke.MethodHandles$Lookup", "privateLookupIn", ValueType.object("java.lang.invoke.MethodHandles$Lookup"),
+            new ValueType[] { ValueType.object("java.lang.Class"), ValueType.object("java.lang.invoke.MethodHandles$Lookup") }, null, true);
+
+        // ===== java.nio.channels.spi.SelectorProvider.openSelector returns AbstractSelector =====
+        // (Note: this is an abstract method; we need to provide a default impl via plugin)
+        // Actually it's already in the SelectorProvider patch as abstract. Plugin transformer can't easily fix this.
+        // Let me instead make SelectorProvider.openSelector concrete in the patch.
+
+        // ===== java.nio.file.Files (static) =====
+        add("java.nio.file.Files", "getFileAttributeView", ValueType.object("java.nio.file.attribute.FileAttributeView"),
+            new ValueType[] { ValueType.object("java.nio.file.Path"), ValueType.object("java.lang.Class"), ValueType.arrayOf(ValueType.object("java.nio.file.LinkOption")) }, null, true);
+
+        // ===== java.util.Base64 (static) =====
+        add("java.util.Base64", "getMimeDecoder", ValueType.object("java.util.Base64$Decoder"), new ValueType[0], null, true);
+        add("java.util.Base64", "getMimeEncoder", ValueType.object("java.util.Base64$Encoder"),
+            new ValueType[] { ValueType.INTEGER, ValueType.arrayOf(ValueType.BYTE) }, null, true);
+        add("java.util.Base64", "getDecoder", ValueType.object("java.util.Base64$Decoder"), new ValueType[0], null, true);
+        add("java.util.Base64", "getEncoder", ValueType.object("java.util.Base64$Encoder"), new ValueType[0], null, true);
+        add("java.util.Base64", "getMimeEncoder", ValueType.object("java.util.Base64$Encoder"), new ValueType[0], null, true);
+        add("java.util.Base64", "getMimeEncoder", ValueType.object("java.util.Base64$Encoder"),
+            new ValueType[] { ValueType.INTEGER }, null, true);
+
+        // ===== sun.misc.Unsafe.putLong(long, long) - static-offset variant =====
+        add("sun.misc.Unsafe", "putLong", ValueType.VOID,
+            new ValueType[] { ValueType.LONG, ValueType.LONG }, null, false);
+        add("sun.misc.Unsafe", "putLong", ValueType.VOID,
+            new ValueType[] { ValueType.LONG, ValueType.INTEGER }, null, false);
+        add("sun.misc.Unsafe", "putLong", ValueType.VOID,
+            new ValueType[] { ValueType.object("java.lang.Object"), ValueType.LONG, ValueType.LONG }, null, false);
+        add("sun.misc.Unsafe", "getLong", ValueType.LONG,
+            new ValueType[] { ValueType.LONG }, null, false);
+        add("sun.misc.Unsafe", "getLong", ValueType.LONG,
+            new ValueType[] { ValueType.object("java.lang.Object"), ValueType.LONG }, null, false);
+        add("sun.misc.Unsafe", "putObject", ValueType.VOID,
+            new ValueType[] { ValueType.LONG, ValueType.object("java.lang.Object") }, null, false);
+        add("sun.misc.Unsafe", "getObject", ValueType.object("java.lang.Object"),
+            new ValueType[] { ValueType.LONG }, null, false);
+        add("sun.misc.Unsafe", "putInt", ValueType.VOID,
+            new ValueType[] { ValueType.LONG, ValueType.INTEGER }, null, false);
+        add("sun.misc.Unsafe", "getInt", ValueType.INTEGER,
+            new ValueType[] { ValueType.LONG }, null, false);
+
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {

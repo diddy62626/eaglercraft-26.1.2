@@ -124,4 +124,14 @@ public class Vector2i {
         return Math.sqrt(distanceSquared(x2, y2));
     }
 
+
+    public Vector2i add(int x, int y) { this.x += x; this.y += y; return this; }
+    public Vector2i add(Vector2ic v) { this.x += v.x(); this.y += v.y(); return this; }
+    public Vector2i sub(int x, int y) { this.x -= x; this.y -= y; return this; }
+    public Vector2i sub(Vector2ic v) { this.x -= v.x(); this.y -= v.y(); return this; }
+    public int distanceSquared(Vector2ic v) {
+        int dx = x - v.x(), dy = y - v.y();
+        return dx*dx + dy*dy;
+    }
+    public int distance(Vector2ic v) { return (int) java.lang.Math.sqrt(distanceSquared(v)); }
 }

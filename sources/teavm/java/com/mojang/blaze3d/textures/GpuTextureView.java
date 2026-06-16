@@ -11,4 +11,6 @@ public class GpuTextureView {
     public void close() {}
 
     public int getWidth(int level) { return texture.getWidth() >> level; }
+
+    public int getHeight(int level) { return texture.getHeight() >> level; }
 }

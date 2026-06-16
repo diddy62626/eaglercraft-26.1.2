@@ -299,4 +299,10 @@ public class AL10 {
             }
         }
     }
+
+    public static void alGenSources(int[] sources) {
+        if (sources != null) {
+            for (int i = 0; i < sources.length; i++) sources[i] = alGenSources();
+        }
+    }
 }

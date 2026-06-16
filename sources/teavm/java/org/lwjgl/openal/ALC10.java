@@ -112,4 +112,9 @@ public class ALC10 {
     public static long alcOpenDevice(CharSequence devicename) {
         return 1L;
     }
+
+    public static int alcGetInteger(long device, int param) { return 0; }
+    public static void alcGetIntegerv(long device, int param, java.nio.IntBuffer values) {
+        if (values != null && values.remaining() > 0) values.put(0, 0);
+    }
 }

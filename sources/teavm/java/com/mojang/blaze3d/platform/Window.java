@@ -428,4 +428,8 @@ public void selectCursor(com.mojang.blaze3d.platform.cursor.CursorType cursorTyp
     public static void setDefaultErrorCallback() {
         // Browser: no GLFW error callback
     }
+
+    public float getAppropriateLineWidth() {
+        return getWidth() / 8.0f;
+    }
 }

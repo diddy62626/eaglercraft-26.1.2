@@ -609,4 +609,7 @@ public class GLFW {
     public static void glfwSetGammaRamp(long monitor, Object ramp) {
         // no-op
     }
+
+    public static int glfwGetInputMode(long window, int mode) { return 0; }
+    public static void glfwSetPreeditCursorRectangle(long window, int x, int y, int w, int h) {}
 }

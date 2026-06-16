@@ -319,4 +319,12 @@ public class RenderTarget {
 
     public com.mojang.blaze3d.textures.GpuTexture getColorTexture() { return new com.mojang.blaze3d.textures.GpuTexture() {}; }
     public com.mojang.blaze3d.textures.GpuTexture getDepthTexture() { return new com.mojang.blaze3d.textures.GpuTexture() {}; }
+
+    public RenderTarget(String name, boolean useDepth) {
+        // Browser stub
+    }
+
+    public com.mojang.blaze3d.textures.GpuTextureView getColorTextureView() {
+        return new com.mojang.blaze3d.textures.GpuTextureView(new com.mojang.blaze3d.textures.GpuTexture() {});
+    }
 }
