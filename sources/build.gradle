@@ -126,6 +126,64 @@ configurations {
     teavmClasspath {
         extendsFrom configurations.teavmImplementation
     }
+    teavmPlugin
+}
+
+// ============================================================
+// TeaVM Plugin source set
+// ============================================================
+// This source set compiles our TeaVM plugin (ClassHolderTransformer)
+// into a separate JAR that's added to the TeaVM classpath. The plugin
+// adds missing methods to existing java.base classes that TeaVM's
+// classlib doesn't provide.
+sourceSets {
+    teavmplugin {
+        java {
+            srcDirs = ['teavm-plugin/java']
+        }
+        resources {
+            srcDirs = ['teavm-plugin/resources']
+        }
+        compileClasspath += sourceSets.main.compileClasspath
+        compileClasspath += configurations.teavmImplementation
+    }
+}
+
+// Compile the TeaVM plugin
+tasks.register('compileTeavmPlugin', JavaCompile) {
+    group = 'build'
+    description = 'Compiles the TeaVM plugin that adds missing java.base methods'
+    source = sourceSets.teavmplugin.java
+    classpath = sourceSets.teavmplugin.compileClasspath
+    destinationDirectory = file('teavm-plugin/classes')
+    options.encoding = 'UTF-8'
+    options.fork = true
+}
+
+// Package the TeaVM plugin as a JAR
+tasks.register('teavmPluginJar', Jar) {
+    group = 'build'
+    description = 'Packages the TeaVM plugin as a JAR'
+    dependsOn 'compileTeavmPlugin'
+    archiveBaseName = 'eaglercraft-teavm-plugin'
+    archiveVersion = ''
+    archiveClassifier = ''
+    from('teavm-plugin/classes')
+    from('teavm-plugin/resources')
+    destinationDirectory = file('libs')
+}
+
+// Make the teavm-plugin JAR available as a dependency
+dependencies {
+    teavmPlugin files('libs/eaglercraft-teavm-plugin.jar')
+}
+
+afterEvaluate {
+    tasks.matching { it.name == 'generateJavaScript' }.configureEach {
+        dependsOn 'teavmPluginJar'
+        // Add the plugin JAR to the classpath so TeaVM discovers it via ServiceLoader
+        classpath.from(files('libs/eaglercraft-teavm-plugin.jar'))
+    }
 }
 
 // Also add the teavm source set output and main source set output

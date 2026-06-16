@@ -79,3 +79,5 @@ output/assets.epk
 public/classes.js.map
 # Local MC JAR inspection (not for distribution)
 mc-jar/
+teavm-plugin/classes/
+sources/libs/eaglercraft-teavm-plugin.jar
