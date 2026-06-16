@@ -48,7 +48,8 @@ public final class Dynamic<T> {
     public Dynamic<T> update(String key, java.util.function.Function<Dynamic<T>, Dynamic<T>> fn) { return this; }
     public Dynamic<T> remove(String key) { return this; }
     public Dynamic<T> renameAndFixField(String oldName, String newName, java.util.function.UnaryOperator<Dynamic<T>> fixer) { return this; }
-    public DataResult<java.util.stream.Stream<? extends java.util.Map.Entry<Dynamic<T>, Dynamic<T>>> getMapValues() { return DataResult.success(java.util.stream.Stream.empty()); }
+    @SuppressWarnings("rawtypes")
+    public DataResult<java.util.stream.Stream> getMapValues() { return DataResult.success(java.util.stream.Stream.empty()); }
 
     public interface Function<T, R> { R apply(T t); }
 }
