@@ -33,4 +33,13 @@ public interface DynamicOps<T> {
     default boolean compressMaps() { return false; }
     default com.mojang.serialization.ListBuilder<T> listBuilder() { return null; }
     default com.mojang.serialization.RecordBuilder<T> mapBuilder() { return null; }
+
+    default T createByteList(java.nio.ByteBuffer buf) { return empty(); }
+    default T createIntList(java.util.stream.IntStream stream) { return empty(); }
+    default T createLongList(java.util.stream.LongStream stream) { return empty(); }
+    default T createList(java.util.stream.Stream<T> stream) { return empty(); }
+    default T createMap(java.util.Map<T, T> map) { return empty(); }
+    default DataResult<T> mergeToMap(T input, MapLike<T> map) { return DataResult.success(input); }
+    default DataResult<T> mergeToPrimitive(T input, T value) { return DataResult.success(input); }
+    default DataResult<T> mergeToMap(T input, T key, T value) { return DataResult.success(input); }
 }

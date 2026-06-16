@@ -52,4 +52,10 @@ public final class Dynamic<T> {
     public DataResult<java.util.stream.Stream> getMapValues() { return DataResult.success(java.util.stream.Stream.empty()); }
 
     public interface Function<T, R> { R apply(T t); }
+
+    public static <T> Dynamic<T> copyField(Dynamic<T> src, String srcKey, Dynamic<T> dst, String dstKey) { return dst; }
+    public Dynamic<T> renameField(String oldKey, String newKey) { return this; }
+    public Dynamic<T> replaceField(String key, String newKey, java.util.Optional<Dynamic<T>> value) { return this; }
+    public Dynamic<T> setFieldIfPresent(String key, java.util.Optional<Dynamic<T>> value) { return this; }
+    public Dynamic<T> updateMapValues(java.util.function.Function<Dynamic<T>, Dynamic<T>> fn) { return this; }
 }

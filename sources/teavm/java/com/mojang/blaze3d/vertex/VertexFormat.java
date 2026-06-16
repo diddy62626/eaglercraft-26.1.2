@@ -64,4 +64,6 @@ public class VertexFormat {
         public Builder padding(int bytes) { return this; }
         public VertexFormat build() { return new VertexFormat(); }
     }
+
+    public int[] getOffsetsByElement() { return new int[0]; }
 }

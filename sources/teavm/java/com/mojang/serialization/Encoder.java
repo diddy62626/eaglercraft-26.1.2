@@ -7,4 +7,6 @@ public interface Encoder<T> {
     static <T> Encoder<T> error(String message) {
         return new Encoder<T>() {};
     }
+
+    default DataResult<Object> encodeStart(DynamicOps<?> ops, T value) { return DataResult.success(encode(value, ops, ops.empty())); }
 }

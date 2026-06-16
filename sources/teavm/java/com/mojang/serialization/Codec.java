@@ -177,4 +177,6 @@ public interface Codec<T> {
     default <S> Codec<S> dispatchStable(java.util.function.Function<S, ?> name, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
     default Codec<T> xor(Codec<T> other, Codec<T> alternative) { return this; }
     default com.mojang.serialization.codecs.UnboundedMapCodec<String, T> unboundedMap(Codec<T> valueCodec) { return null; }
+
+    default Decoder<T> map(java.util.function.Function<T, T> fn) { return null; }
 }

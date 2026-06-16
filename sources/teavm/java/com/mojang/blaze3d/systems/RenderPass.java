@@ -24,4 +24,6 @@ public interface RenderPass {
     default void drawMultipleIndexed(java.util.Collection<?> draws, com.mojang.blaze3d.buffers.GpuBuffer indexBuffer,
             com.mojang.blaze3d.vertex.VertexFormat.IndexType indexType, java.util.Collection<?> params, Object multiDrawData) {}
     default void setUniform(String name, com.mojang.blaze3d.buffers.GpuBuffer buffer) {}
+
+    default void draw(int vertexCount, int instanceCount) {}
 }

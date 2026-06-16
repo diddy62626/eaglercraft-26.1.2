@@ -26,4 +26,7 @@ public class RenderPipeline {
     }
 
     public interface Snippet {}
+
+        public Snippet buildSnippet() { return new Snippet() {}; }
+    }
 }

@@ -39,4 +39,7 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
 
     public boolean isEmpty() { return false; }
     public void rotateAround(org.joml.Quaternionfc q, float x, float y, float z) {}
+
+        public org.joml.Vector3f transformNormal(float x, float y, float z, org.joml.Vector3f dest) { return dest; }
+    }
 }
