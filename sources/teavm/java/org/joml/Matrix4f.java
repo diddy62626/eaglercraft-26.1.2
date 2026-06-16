@@ -209,4 +209,9 @@ public class Matrix4f implements Matrix4fc {
     public boolean equals(Object o) { return o == this; }
     public int hashCode() { return 0; }
     public String toString() { return "Matrix4f"; }
+
+    public Matrix4f rotationY(float angle) { return this; }
+    public Matrix4f setTranslation(float x, float y, float z) { m30 = x; m31 = y; m32 = z; return this; }
+    public Matrix4f rotation(Quaternionfc q) { return this; }
+    public Matrix4f assume(int properties) { return this; }
 }

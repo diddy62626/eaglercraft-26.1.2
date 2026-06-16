@@ -21,4 +21,7 @@ public interface Matrix4fc {
     default Vector3f transformDirection(Vector3fc v, Vector3f dest) { return dest; }
     default Vector3f transformPosition(Vector3fc v, Vector3f dest) { return dest; }
     default Vector4f transformTranspose(Vector4f v) { return v; }
+
+    default Vector3f transformDirection(Vector3f v) { return v; }
+    default Vector3f transformPosition(float x, float y, float z, Vector3f dest) { return dest; }
 }

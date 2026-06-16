@@ -27,4 +27,8 @@ public class Vector4f implements Vector4fc {
     public float dot(Vector4f v) { return x*v.x + y*v.y + z*v.z + w*v.w; }
     public Vector4f normalize() { float l = length(); if (l > 0) mul(1/l); return this; }
     public Vector4f zero() { x = y = z = w = 0; return this; }
+
+    public Vector4f set(double x, double y, double z, double w) { this.x = (float)x; this.y = (float)y; this.z = (float)z; this.w = (float)w; return this; }
+    public Vector4f set(Vector4fc v) { this.x = v.x(); this.y = v.y(); this.z = v.z(); this.w = v.w(); return this; }
+    public Vector4f lerp(Vector4fc v, float t, Vector4f dest) { return dest; }
 }

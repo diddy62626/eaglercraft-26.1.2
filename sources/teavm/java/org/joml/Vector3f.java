@@ -107,4 +107,11 @@ public class Vector3f implements Vector3fc {
         return x == v.x && y == v.y && z == v.z;
     }
     @Override public int hashCode() { return java.lang.Float.hashCode(x) + java.lang.Float.hashCode(y) + java.lang.Float.hashCode(z); }
+
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public float getZ() { return z; }
+
+    public Vector3f rotate(Quaternionfc q, Vector3f dest) { return dest; }
+    public Vector3f mulPosition(Matrix4fc mat) { return this; }
 }

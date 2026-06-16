@@ -625,4 +625,7 @@ public class RenderSystem {
     public static com.mojang.blaze3d.textures.GpuTexture outputDepthTextureOverride = null;
 
     public static com.mojang.blaze3d.ProjectionType getProjectionType() { return com.mojang.blaze3d.ProjectionType.PERSPECTIVE; }
+
+    public static com.mojang.blaze3d.buffers.GpuBufferSlice getProjectionMatrixBuffer() { return new com.mojang.blaze3d.buffers.GpuBufferSlice(new com.mojang.blaze3d.buffers.GpuBuffer() {}, 0, 64); }
+    public static com.mojang.blaze3d.systems.ScissorState getScissorStateForRenderTypeDraws() { return new com.mojang.blaze3d.systems.ScissorState(); }
 }

@@ -30,4 +30,7 @@ public class Vector2f implements Vector2fc {
         float dx = x - v.x, dy = y - v.y;
         return (float) java.lang.Math.sqrt(dx*dx + dy*dy);
     }
+
+    public float getX() { return x; }
+    public float getY() { return y; }
 }

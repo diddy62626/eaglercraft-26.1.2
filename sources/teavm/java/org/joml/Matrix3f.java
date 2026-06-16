@@ -258,4 +258,6 @@ public class Matrix3f implements Matrix3fc {
     public Matrix3f rotationZYX(float z, float y, float x) { return this; }
     public Matrix3f rotationYXZ(float y, float x, float z) { return this; }
     public Vector3f transform(Vector3fc v, Vector3f dest) { return dest; }
+
+    public Vector3f transform(float x, float y, float z, Vector3f dest) { return dest; }
 }

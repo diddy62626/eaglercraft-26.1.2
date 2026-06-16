@@ -73,4 +73,9 @@ public interface GpuDevice extends GpuBackend {
     default boolean isZZeroToOne() { return false; }
 
     default com.mojang.blaze3d.pipeline.CompiledRenderPipeline precompilePipeline(com.mojang.blaze3d.pipeline.RenderPipeline pipeline, com.mojang.blaze3d.shaders.ShaderSource source) { return null; }
+
+    default com.mojang.blaze3d.textures.GpuSampler createSampler(com.mojang.blaze3d.textures.AddressMode u, com.mojang.blaze3d.textures.AddressMode v,
+            com.mojang.blaze3d.textures.FilterMode min, com.mojang.blaze3d.textures.FilterMode mag, int maxAnisotropy, java.util.OptionalDouble maxLod) {
+        return new com.mojang.blaze3d.textures.GpuSampler();
+    }
 }

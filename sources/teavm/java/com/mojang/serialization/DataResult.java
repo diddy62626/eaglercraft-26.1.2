@@ -82,4 +82,13 @@ public final class DataResult<T> {
 
     public interface BiFunction<T, U, R> { R apply(T t, U u); }
     public interface TriFunction<T, U, V, R> { R apply(T t, U u, V v); }
+
+    public java.lang.Object mapOrElse(java.util.function.Function<T, ?> onSuccess, java.util.function.Function<String, ?> onError) {
+        return errorMessage != null ? onError.apply(errorMessage) : onSuccess.apply(value);
+    }
+    public DataResult<T> setLifecycle(Lifecycle lifecycle) { return this; }
+    public T getPartialOrThrow(java.util.function.Function<String, ? extends RuntimeException> exceptionFactory) {
+        if (errorMessage != null) throw exceptionFactory.apply(errorMessage);
+        return partial != null ? partial : value;
+    }
 }

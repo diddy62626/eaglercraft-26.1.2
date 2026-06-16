@@ -45,4 +45,7 @@ public class Matrix3x2f implements Matrix3x2fc {
     public Matrix3x2f invert(Matrix3x2f dest) { return dest; }
     public Matrix3x2f invert() { return this; }
     public float determinant() { return m00 * m11 - m01 * m10; }
+
+    public Matrix3x2f scale(float s) { return scale(s, s); }
+    public org.joml.Vector2f transformPosition(org.joml.Vector2f v) { return v; }
 }

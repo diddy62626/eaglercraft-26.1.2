@@ -19,4 +19,9 @@ public interface RenderPass {
     default void setUniform(String uniformName, java.nio.ByteBuffer data) {}
     default void enableScissor(int x, int y, int width, int height) {}
     default void disableScissor() {}
+
+    default void drawIndexed(int baseVertex, int indexCount, int startIndex, int instanceCount) {}
+    default void drawMultipleIndexed(java.util.Collection<?> draws, com.mojang.blaze3d.buffers.GpuBuffer indexBuffer,
+            com.mojang.blaze3d.vertex.VertexFormat.IndexType indexType, java.util.Collection<?> params, Object multiDrawData) {}
+    default void setUniform(String name, com.mojang.blaze3d.buffers.GpuBuffer buffer) {}
 }

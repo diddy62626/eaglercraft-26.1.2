@@ -32,6 +32,22 @@ public class VertexFormatElement {
     public DataType getType() { return type; }
     public int getCount() { return count; }
     public int getSize() { return count * 4; }
+    public int id() { return ordinal(); }
+    public int mask() { return 1 << ordinal(); }
+    public int offset() { return 0; }
+
+    private int ordinal() {
+        switch (usage) {
+            case POSITION: return 0;
+            case NORMAL: return 1;
+            case COLOR: return 2;
+            case UV: return 3;
+            case MATRIX: return 4;
+            case JOINT: return 5;
+            case PADDING: return 6;
+            default: return 0;
+        }
+    }
 
     public static Stream<VertexFormatElement> elementsFromMask(int mask) {
         return Stream.empty();

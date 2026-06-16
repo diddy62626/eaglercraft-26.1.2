@@ -53,6 +53,7 @@ public class VertexFormat {
     public boolean contains(VertexFormatElement element) { return false; }
     public String getElementName(VertexFormatElement element) { return ""; }
     public int getElementsMask() { return 0; }
+    public int getOffset(VertexFormatElement element) { return 0; }
     public Stream<VertexFormatElement> elements() { return Stream.empty(); }
 
     public com.mojang.blaze3d.buffers.GpuBuffer uploadImmediateVertexBuffer(ByteBuffer data) { return new com.mojang.blaze3d.buffers.GpuBuffer() {}; }
@@ -60,6 +61,7 @@ public class VertexFormat {
 
     public static class Builder {
         public Builder add(String name, VertexFormatElement element) { return this; }
+        public Builder padding(int bytes) { return this; }
         public VertexFormat build() { return new VertexFormat(); }
     }
 }

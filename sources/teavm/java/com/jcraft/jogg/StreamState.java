@@ -19,4 +19,6 @@ public class StreamState {
     public void writePage(Page page) {}
 
     public int pagein(com.jcraft.jogg.Page page) { return 0; }
+
+    public void init(int state) {}
 }

@@ -6,4 +6,6 @@ public interface Decoder<T> {
 
     default MapDecoder<T> unit(T defaultValue) { return null; }
     default DataResult<T> unit() { return DataResult.success(null); }
+
+    static <T> Decoder<T> error(String message) { return new Decoder<T>() {}; }
 }

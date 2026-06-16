@@ -434,4 +434,6 @@ public void selectCursor(com.mojang.blaze3d.platform.cursor.CursorType cursorTyp
     }
 
     public boolean isMinimized() { return false; }
+
+    public boolean isResized() { return false; }
 }

@@ -332,4 +332,6 @@ public class RenderTarget {
     public com.mojang.blaze3d.textures.GpuTextureView getDepthTextureView() {
         return new com.mojang.blaze3d.textures.GpuTextureView(new com.mojang.blaze3d.textures.GpuTexture() {});
     }
+
+    public void copyDepthFrom(com.mojang.blaze3d.pipeline.RenderTarget source) {}
 }
