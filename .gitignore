@@ -77,3 +77,5 @@ output/assets.epk
 
 # Generated JS source map (built by CI)
 public/classes.js.map
+# Local MC JAR inspection (not for distribution)
+mc-jar/
