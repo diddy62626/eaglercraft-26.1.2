@@ -221,7 +221,7 @@ public class RenderSystem {
         }
 
         public static void applyModelViewMatrix() {
-                setModelViewMatrix(modelViewStack.last().pose());
+                setModelViewMatrix(modelViewStack);
         }
 
         // ========== Viewport ==========
@@ -624,6 +624,5 @@ public class RenderSystem {
     public static com.mojang.blaze3d.textures.GpuTexture outputColorTextureOverride = null;
     public static com.mojang.blaze3d.textures.GpuTexture outputDepthTextureOverride = null;
 
-    public static org.joml.Matrix4fStack getModelViewStack() { return new org.joml.Matrix4fStack(); }
     public static com.mojang.blaze3d.ProjectionType getProjectionType() { return com.mojang.blaze3d.ProjectionType.PERSPECTIVE; }
 }

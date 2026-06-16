@@ -9,7 +9,6 @@ public interface MapCodec<T> extends Codec<T> {
     default <S> MapCodec<S> xmap(java.util.function.Function<T, S> to, java.util.function.Function<S, T> from) { return null; }
     default MapCodec<T> orElse(T defaultValue) { return this; }
     default MapCodec<T> orElseGet(java.util.function.Supplier<T> supplier) { return this; }
-    default MapCodec<T> recursive(String name, java.util.function.Function<MapCodec<T>, MapCodec<T>> function) { return this; }
     default MapCodec<T> withLifecycle(Lifecycle lifecycle) { return this; }
     default MapCodec<T> stable() { return this; }
     default MapCodec<T> deprecated(int since) { return this; }
