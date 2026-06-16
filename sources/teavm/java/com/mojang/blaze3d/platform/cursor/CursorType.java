@@ -15,7 +15,7 @@ public enum CursorType {
     MOVE,
     NOT_ALLOWED,
     WAIT,
-    PROGRESS
+    PROGRESS;
 
     public static CursorType createStandardCursor(int shape, String name, CursorType fallback) {
         return fallback != null ? fallback : DEFAULT;
