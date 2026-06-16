@@ -73,24 +73,20 @@ public final class UUID implements java.io.Serializable, Comparable<UUID> {
         return cmp != 0 ? cmp : Long.compare(leastSigBits, val.leastSigBits);
     }
 
-    public static UUID nameUUIDFromBytes(byte[] bytes) {
+        public static UUID nameUUIDFromBytes(byte[] bytes) {
         if (bytes == null) throw new IllegalArgumentException("bytes is null");
         // Use MD5-style UUID v3 generation
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(bytes);
-            digest[6] &= 0x0f;  /* clear version */
-            digest[6] |= 0x30;  /* set to version 3 */
-            digest[8] &= 0x3f;  /* clear variant */
-            digest[8] |= 0x80;  /* set to IETF variant */
-            long msb = 0;
-            long lsb = 0;
-            for (int i = 0; i < 8; i++) msb = (msb << 8) | (digest[i] & 0xff);
-            for (int i = 8; i < 16; i++) lsb = (lsb << 8) | (digest[i] & 0xff);
-            return new UUID(msb, lsb);
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 not available", e);
-        }
+        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(bytes);
+        digest[6] &= 0x0f;  /* clear version */
+        digest[6] |= 0x30;  /* set to version 3 */
+        digest[8] &= 0x3f;  /* clear variant */
+        digest[8] |= 0x80;  /* set to IETF variant */
+        long msb = 0;
+        long lsb = 0;
+        for (int i = 0; i < 8; i++) msb = (msb << 8) | (digest[i] & 0xff);
+        for (int i = 8; i < 16; i++) lsb = (lsb << 8) | (digest[i] & 0xff);
+        return new UUID(msb, lsb);
     }
 
 }
