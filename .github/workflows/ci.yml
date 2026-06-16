@@ -171,9 +171,19 @@ jobs:
             CLASSES_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js 2>/dev/null || echo "0")
             echo "classes.js size: $CLASSES_SIZE bytes"
           else
-            echo "ERROR: TeaVM compilation failed"
-            tail -50 teavm.log
+            echo "ERROR: TeaVM compilation failed - showing last 200 lines"
+            tail -200 teavm.log
           fi
+
+      # ── Upload TeaVM log (always, even on failure) ──────────
+      - name: Upload TeaVM log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teavm-log
+          path: teavm.log
+          retention-days: 30
+          if-no-files-found: warn
 
       # ── Build: Compile EPK assets ────────────────────────────
       - name: Compile EPK assets
