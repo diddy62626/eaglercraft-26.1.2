@@ -45,7 +45,7 @@ public class Window {
         private int framerateLimit = 260;
 
         /** The GUI scale factor. */
-        private double guiScale = 1.0;
+        private int guiScale = 1;
 
         /** The framebuffer width (same as canvas drawing buffer width). */
         private int framebufferWidth;
@@ -290,11 +290,11 @@ public class Window {
 
         // ========== GUI Scale ==========
 
-        public double getGuiScale() {
+        public int getGuiScale() {
                 return guiScale;
         }
 
-        public void setGuiScale(double scale) {
+        public void setGuiScale(int scale) {
                 this.guiScale = scale;
         }
 

@@ -5,6 +5,8 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 public final class MinecraftProfileTextures {
+    public static final MinecraftProfileTextures EMPTY = new MinecraftProfileTextures(null, null, null, SignatureState.UNSIGNED);
+
     private final MinecraftProfileTexture skin;
     private final MinecraftProfileTexture cape;
     private final MinecraftProfileTexture elytra;

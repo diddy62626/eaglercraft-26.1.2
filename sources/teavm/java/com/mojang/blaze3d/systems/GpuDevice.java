@@ -71,4 +71,6 @@ public interface GpuDevice extends GpuBackend {
     default int getMaxSupportedAnisotropy() { return 0; }
     default int getUniformOffsetAlignment() { return 256; }
     default boolean isZZeroToOne() { return false; }
+
+    default com.mojang.blaze3d.pipeline.CompiledRenderPipeline precompilePipeline(com.mojang.blaze3d.pipeline.RenderPipeline pipeline, com.mojang.blaze3d.shaders.ShaderSource source) { return null; }
 }

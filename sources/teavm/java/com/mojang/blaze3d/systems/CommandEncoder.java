@@ -15,4 +15,8 @@ public interface CommandEncoder {
     default void writeToBuffer(com.mojang.blaze3d.buffers.GpuBufferSlice dst, java.nio.ByteBuffer src) {}
     default void writeToTexture(com.mojang.blaze3d.textures.GpuTexture texture, com.mojang.blaze3d.platform.NativeImage image) {}
     default void writeToTexture(com.mojang.blaze3d.textures.GpuTexture texture, com.mojang.blaze3d.platform.NativeImage image, int x, int y, int z, int w, int h, int d, int m) {}
+
+    default void clearColorAndDepthTextures(com.mojang.blaze3d.textures.GpuTexture color, int colorValue, com.mojang.blaze3d.textures.GpuTexture depth, double depthValue) {}
+    default void clearColorTexture(com.mojang.blaze3d.textures.GpuTexture texture, int value) {}
+    default void clearDepthTexture(com.mojang.blaze3d.textures.GpuTexture texture, double value) {}
 }

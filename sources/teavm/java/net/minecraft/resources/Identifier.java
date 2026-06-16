@@ -4,6 +4,13 @@ public final class Identifier {
     private final String namespace;
     private final String path;
 
+    public static final com.mojang.serialization.Codec<Identifier> CODEC = new com.mojang.serialization.Codec<Identifier>() {
+        @Override public Identifier decode(Object input) { return new Identifier(String.valueOf(input)); }
+        @Override public Object encode(Identifier value) { return value.toString(); }
+    };
+
+    public static final Object STREAM_CODEC = null; // stub
+
     public Identifier(String namespace, String path) {
         this.namespace = namespace;
         this.path = path;

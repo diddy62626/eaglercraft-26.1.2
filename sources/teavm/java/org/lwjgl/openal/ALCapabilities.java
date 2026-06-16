@@ -11,4 +11,6 @@ public class ALCapabilities {
     public ALCapabilities() {
         this.context = 0L;
     }
+
+    public boolean AL_EXT_source_distance_model = false;
 }

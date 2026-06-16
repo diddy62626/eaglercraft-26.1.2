@@ -2,16 +2,30 @@ package com.mojang.blaze3d.vertex;
 
 /**
  * EaglerCraft 26.1.2 browser override for com.mojang.blaze3d.vertex.PoseStack.
- * Re-exports PoseStack from the systems package, which is where our actual
- * implementation lives. MC code imports PoseStack from the vertex package.
- *
- * NOTE: last() and mulPose() are inherited from systems.PoseStack — do not
- * redeclare them here (would cause return-type conflict with the parent's
- * Pose inner class).
+ * Extends systems.PoseStack and overrides last() with covariant return type.
  */
 public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
 
-	public PoseStack() {
-		super();
-	}
+    public PoseStack() {
+        super();
+    }
+
+    @Override
+    public Pose last() {
+        return new Pose();
+    }
+
+    @Override
+    public void mulPose(org.joml.Quaternionfc q) {}
+
+    public static class Pose extends com.mojang.blaze3d.systems.PoseStack.Pose {
+        public Pose() { super(); }
+        public Pose(com.mojang.blaze3d.systems.PoseStack.Pose parent) { super(parent); }
+
+        @Override
+        public org.joml.Matrix4f pose() { return new org.joml.Matrix4f(); }
+
+        @Override
+        public org.joml.Matrix3f normal() { return new org.joml.Matrix3f(); }
+    }
 }

@@ -17,4 +17,6 @@ public class StreamState {
     public int packetout(Packet packet) { return 0; }
     public void reset() {}
     public void writePage(Page page) {}
+
+    public int pagein(com.jcraft.jogg.Page page) { return 0; }
 }

@@ -8,4 +8,8 @@ public abstract class GpuBuffer {
         java.nio.ByteBuffer data();
         void unmap();
     }
+
+    public com.mojang.blaze3d.buffers.GpuBufferSlice slice(long offset, long size) {
+        return new com.mojang.blaze3d.buffers.GpuBufferSlice(this, offset, size);
+    }
 }
