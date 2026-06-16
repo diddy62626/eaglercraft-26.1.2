@@ -104,6 +104,40 @@ public class Matrix4f {
         return rotate(angle, x, y, z, this);
     }
 
+    /**
+     * Applies a rotation described by a Quaternionf to this matrix.
+     */
+    public Matrix4f rotate(Quaternionf q) {
+        float w2 = q.w * q.w, x2 = q.x * q.x, y2 = q.y * q.y, z2 = q.z * q.z;
+        float wx = q.w * q.x, wy = q.w * q.y, wz = q.w * q.z;
+        float xy = q.x * q.y, xz = q.x * q.z, yz = q.y * q.z;
+        float r00 = w2 + x2 - y2 - z2;
+        float r01 = 2 * (xy + wz);
+        float r02 = 2 * (xz - wy);
+        float r10 = 2 * (xy - wz);
+        float r11 = w2 - x2 + y2 - z2;
+        float r12 = 2 * (yz + wx);
+        float r20 = 2 * (xz + wy);
+        float r21 = 2 * (yz - wx);
+        float r22 = w2 - x2 - y2 + z2;
+        float nm00 = m00 * r00 + m10 * r01 + m20 * r02;
+        float nm01 = m01 * r00 + m11 * r01 + m21 * r02;
+        float nm02 = m02 * r00 + m12 * r01 + m22 * r02;
+        float nm03 = m03 * r00 + m13 * r01 + m23 * r02;
+        float nm10 = m00 * r10 + m10 * r11 + m20 * r12;
+        float nm11 = m01 * r10 + m11 * r11 + m21 * r12;
+        float nm12 = m02 * r10 + m12 * r11 + m22 * r12;
+        float nm13 = m03 * r10 + m13 * r11 + m23 * r12;
+        float nm20 = m00 * r20 + m10 * r21 + m20 * r22;
+        float nm21 = m01 * r20 + m11 * r21 + m21 * r22;
+        float nm22 = m02 * r20 + m12 * r21 + m22 * r22;
+        float nm23 = m03 * r20 + m13 * r21 + m23 * r22;
+        m00 = nm00; m01 = nm01; m02 = nm02; m03 = nm03;
+        m10 = nm10; m11 = nm11; m12 = nm12; m13 = nm13;
+        m20 = nm20; m21 = nm21; m22 = nm22; m23 = nm23;
+        return this;
+    }
+
     public Matrix4f rotate(float angle, float x, float y, float z, Matrix4f dest) {
         float s = (float) Math.sin(angle);
         float c = (float) Math.cos(angle);

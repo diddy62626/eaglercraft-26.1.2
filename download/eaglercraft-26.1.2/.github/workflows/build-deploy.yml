@@ -168,41 +168,19 @@ jobs:
       # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle
         run: |
-          # Build TeaVM classlib patches (StackWalker, CompletableFuture, etc.)
+          # Build ALL TeaVM classlib patches using --patch-module java.base
+          # This includes: StackWalker, CompletableFuture, Thread, Runtime, System,
+          # NIO buffers, concurrent collections, IO stubs, etc.
+          echo "Building TeaVM classlib patches..."
           mkdir -p sources/teavm/patch/classes
           cd sources/teavm/patch
           $JAVA_HOME/bin/javac --source 25 --enable-preview \
             --patch-module java.base=$(pwd) \
             -d classes \
-            java/lang/StackWalker.java \
-            java/util/concurrent/Future.java \
-            java/util/concurrent/TimeoutException.java \
-            java/util/concurrent/CompletionException.java \
-            java/util/concurrent/CompletableFuture.java
+            $(find java -name "*.java" -type f)
           $JAVA_HOME/bin/jar cf ../../libs/teavm-patches.jar -C classes .
+          echo "teavm-patches.jar built ($(stat -c%s ../../libs/teavm-patches.jar) bytes)"
           cd ../..
-          
-          # Build additional TeaVM classlib patches for MC 26.1.2 compatibility
-          # These patches provide classes that TeaVM's classlib lacks
-          echo "Building additional TeaVM patches..."
-          cd patch-compile 2>/dev/null || true
-          if [ -d "java" ]; then
-            rm -rf classes
-            mkdir -p classes
-            $JAVA_HOME/bin/javac --source 25 --enable-preview \
-              --patch-module java.base=$(pwd) \
-              -d classes \
-              $(find java -name "*.java" -type f)
-            
-            # Add to teavm-patches.jar
-            cd classes
-            $JAVA_HOME/bin/jar uf ../../sources/libs/teavm-patches.jar \
-              $(find java -name "*.class" -type f)
-            cd ../..
-            echo "Additional patches added to teavm-patches.jar"
-          else
-            echo "No additional patches directory found"
-          fi
           
           echo "=== Compiling TeaVM JavaScript ==="
           echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"

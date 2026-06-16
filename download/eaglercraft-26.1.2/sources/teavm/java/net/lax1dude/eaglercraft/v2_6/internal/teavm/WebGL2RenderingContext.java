@@ -247,6 +247,8 @@ public abstract class WebGL2RenderingContext implements JSObject {
         public static final int RGBA_INTEGER = 0x8D99;
         public static final int DEPTH_COMPONENT = 0x1902;
         public static final int DEPTH_STENCIL = 0x84F9;
+        public static final int LUMINANCE = 0x1909;
+        public static final int LUMINANCE_ALPHA = 0x190A;
 
         public static final int UNSIGNED_BYTE = 0x1401;
         public static final int BYTE = 0x1400;
