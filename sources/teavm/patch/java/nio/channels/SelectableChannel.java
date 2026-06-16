@@ -1,6 +1,7 @@
 package java.nio.channels;
 
 import java.io.IOException;
+import java.nio.channels.spi.SelectorProvider;
 
 public abstract class SelectableChannel extends java.nio.channels.spi.AbstractInterruptibleChannel {
     protected SelectableChannel() {}

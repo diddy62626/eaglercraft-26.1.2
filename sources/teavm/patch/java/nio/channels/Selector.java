@@ -2,6 +2,7 @@ package java.nio.channels;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Set;
 
 public abstract class Selector implements Closeable {
