@@ -101,4 +101,27 @@ public class Vector2i {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    public long distanceSquared(int x2, int y2, int x3, int y3) {
+        long dx = x3 - x2;
+        long dy = y3 - y2;
+        return dx * dx + dy * dy;
+    }
+
+    public long distanceSquared(Vector2i v) {
+        long dx = v.x - x;
+        long dy = v.y - y;
+        return dx * dx + dy * dy;
+    }
+
+    public long distanceSquared(int x2, int y2) {
+        long dx = x2 - x;
+        long dy = y2 - y;
+        return dx * dx + dy * dy;
+    }
+
+    public double distance(int x2, int y2) {
+        return Math.sqrt(distanceSquared(x2, y2));
+    }
+
 }

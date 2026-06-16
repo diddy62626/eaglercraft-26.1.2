@@ -29,7 +29,7 @@ public class CentralProcessor {
         public boolean isCpu64bit() { return true; }
         public long getProcessorId() { return 0L; }
         public String getVendor() { return "EaglerCraft"; }
-        public String getVendorFreq() { return "0"; }
+        public long getVendorFreq() { return 0L; }
         public int getLogicalProcessorCount() { return 1; }
         public int getPhysicalProcessorCount() { return 1; }
         public int getPhysicalPackageCount() { return 1; }

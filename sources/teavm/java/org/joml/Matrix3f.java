@@ -106,6 +106,116 @@ public class Matrix3f implements Matrix3fc {
         return mul((Matrix3fc) right, dest);
     }
 
+
+    public Matrix3f scaling(float x, float y, float z) {
+        m00 = x; m01 = 0; m02 = 0;
+        m10 = 0; m11 = y; m12 = 0;
+        m20 = 0; m21 = 0; m22 = z;
+        return this;
+    }
+
+    public Matrix3f scaling(Vector3fc scale) {
+        return scaling(scale.x(), scale.y(), scale.z());
+    }
+
+    public Matrix3f zero() {
+        m00 = 0; m01 = 0; m02 = 0;
+        m10 = 0; m11 = 0; m12 = 0;
+        m20 = 0; m21 = 0; m22 = 0;
+        return this;
+    }
+
+    public Matrix3f scaling(float factor) {
+        return scaling(factor, factor, factor);
+    }
+
+    public Matrix3f rotation(float angle, float x, float y, float z) {
+        float c = (float) Math.cos(angle);
+        float s = (float) Math.sin(angle);
+        float omc = 1.0f - c;
+        m00 = c + x * x * omc;
+        m11 = c + y * y * omc;
+        m22 = c + z * z * omc;
+        float tmp1 = x * y * omc;
+        float tmp2 = z * s;
+        m01 = tmp1 - tmp2;
+        m10 = tmp1 + tmp2;
+        tmp1 = x * z * omc;
+        tmp2 = y * s;
+        m02 = tmp1 + tmp2;
+        m20 = tmp1 - tmp2;
+        tmp1 = y * z * omc;
+        tmp2 = x * s;
+        m12 = tmp1 - tmp2;
+        m21 = tmp1 + tmp2;
+        return this;
+    }
+
+    public Matrix3f rotationX(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        m00 = 1; m01 = 0; m02 = 0;
+        m10 = 0; m11 = cos; m12 = -sin;
+        m20 = 0; m21 = sin; m22 = cos;
+        return this;
+    }
+
+    public Matrix3f rotationY(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        m00 = cos; m01 = 0; m02 = sin;
+        m10 = 0; m11 = 1; m12 = 0;
+        m20 = -sin; m21 = 0; m22 = cos;
+        return this;
+    }
+
+    public Matrix3f rotationZ(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        m00 = cos; m01 = -sin; m02 = 0;
+        m10 = sin; m11 = cos; m12 = 0;
+        m20 = 0; m21 = 0; m22 = 1;
+        return this;
+    }
+
+    public float determinant() {
+        return m00 * (m11 * m22 - m12 * m21)
+             - m01 * (m10 * m22 - m12 * m20)
+             + m02 * (m10 * m21 - m11 * m20);
+    }
+
+    public Matrix3f invert() {
+        float s = 1.0f / determinant();
+        float nm00 = (m11 * m22 - m12 * m21) * s;
+        float nm01 = (m02 * m21 - m01 * m22) * s;
+        float nm02 = (m01 * m12 - m02 * m11) * s;
+        float nm10 = (m12 * m20 - m10 * m22) * s;
+        float nm11 = (m00 * m22 - m02 * m20) * s;
+        float nm12 = (m02 * m10 - m00 * m12) * s;
+        float nm20 = (m10 * m21 - m11 * m20) * s;
+        float nm21 = (m01 * m20 - m00 * m21) * s;
+        float nm22 = (m00 * m11 - m01 * m10) * s;
+        m00 = nm00; m01 = nm01; m02 = nm02;
+        m10 = nm10; m11 = nm11; m12 = nm12;
+        m20 = nm20; m21 = nm21; m22 = nm22;
+        return this;
+    }
+
+    public Matrix3f transpose() {
+        float tmp = m01; m01 = m10; m10 = tmp;
+        tmp = m02; m02 = m20; m20 = tmp;
+        tmp = m12; m12 = m21; m21 = tmp;
+        return this;
+    }
+
+    public Vector3f getTranslation(Vector3f dest) {
+        return dest.set(0, 0, 0);
+    }
+
+    public Matrix3f get(Matrix3f dest) {
+        return dest.set(this);
+    }
+
     // Matrix3fc interface methods
     @Override public float m00() { return m00; }
     @Override public float m01() { return m01; }

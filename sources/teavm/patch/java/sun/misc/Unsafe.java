@@ -59,4 +59,31 @@ public class Unsafe {
     public void setMemory(long address, long bytes, byte value) {}
     public void copyMemory(long srcAddress, long destAddress, long bytes) {}
     public void copyMemory(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes) {}
+
+    public Object getAndSetObject(Object o, long offset, Object newValue) {
+        Object old = getObject(o, offset);
+        putObject(o, offset, newValue);
+        return old;
+    }
+    public int getAndSetInt(Object o, long offset, int newValue) {
+        int old = getInt(o, offset);
+        putInt(o, offset, newValue);
+        return old;
+    }
+    public long getAndSetLong(Object o, long offset, long newValue) {
+        long old = getLong(o, offset);
+        putLong(o, offset, newValue);
+        return old;
+    }
+    public int getAndAddInt(Object o, long offset, int delta) {
+        int old = getInt(o, offset);
+        putInt(o, offset, old + delta);
+        return old;
+    }
+    public long getAndAddLong(Object o, long offset, long delta) {
+        long old = getLong(o, offset);
+        putLong(o, offset, old + delta);
+        return old;
+    }
+
 }
