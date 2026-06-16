@@ -54,3 +54,4 @@ public class VertexFormatElement {
         return Stream.empty();
     }
 
+}

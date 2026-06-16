@@ -18,6 +18,8 @@ public class RenderPipeline {
         public Builder withLocation(String location) { return this; }
         public Builder withVertexShader(String shader) { return this; }
         public Builder withFragmentShader(String shader) { return this; }
+        public Builder withVertexShader(net.minecraft.resources.Identifier shader) { return this; }
+        public Builder withFragmentShader(net.minecraft.resources.Identifier shader) { return this; }
         public Builder withVertexFormat(VertexFormat format, com.mojang.blaze3d.vertex.VertexFormat.Mode mode) { return this; }
         public Builder withCull(boolean cull) { return this; }
         public Builder withDepthTest(String depthTest) { return this; }
@@ -27,9 +29,5 @@ public class RenderPipeline {
         public Builder withUniform(String name, UniformType type) { return this; }
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
-    }
-
-        public Builder withFragmentShader(net.minecraft.resources.Identifier shader) { return this; }
-        public Builder withVertexShader(net.minecraft.resources.Identifier shader) { return this; }
     }
 }
