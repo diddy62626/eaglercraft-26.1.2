@@ -23,7 +23,6 @@ public final class ArabicShaping {
 
     public ArabicShaping(int options) {}
     public int shape(String source, StringBuffer dest, int start, int count) { return 0; }
-    public StringBuffer shape(String source) { return new StringBuffer(source); }
     public String shape(String source, int options) { return source; }
     public int getOptions() { return 0; }
     public boolean isLamAlefSpecial(int codepoint) { return false; }
