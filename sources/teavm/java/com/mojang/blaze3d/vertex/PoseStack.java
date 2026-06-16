@@ -23,24 +23,18 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
 
     // Pose is a standalone class (NOT extending systems.PoseStack.Pose) to allow
     // covariant return type for copy() and avoid Java's single-inheritance limitation.
-    public static class Pose {
+    public static class Pose extends com.mojang.blaze3d.systems.PoseStack.Pose {
         private final org.joml.Matrix4f pose;
         private final org.joml.Matrix3f normal;
 
-        public Pose() {
-            this.pose = new org.joml.Matrix4f();
-            this.normal = new org.joml.Matrix3f();
-        }
+        public Pose() { super(); this.pose = new org.joml.Matrix4f(); this.normal = new org.joml.Matrix3f(); }
 
-        public Pose(org.joml.Matrix4f pose, org.joml.Matrix3f normal) {
-            this.pose = pose;
-            this.normal = normal;
-        }
+        public Pose(org.joml.Matrix4f pose, org.joml.Matrix3f normal) { super(); this.pose = pose; this.normal = normal; }
 
+        @Override
         public org.joml.Matrix4f pose() { return pose; }
         public org.joml.Matrix3f normal() { return normal; }
 
-        public Pose copy() { return new Pose(new org.joml.Matrix4f(pose), new org.joml.Matrix3f(normal)); }
         public void mulPose(org.joml.Matrix4fc mat) {}
         public void scale(float x, float y, float z) {}
         public void set(Pose other) {}
