@@ -1,0 +1,67 @@
+name: Build PR Preview
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  JAVA_VERSION: '25'
+  NODE_VERSION: '22'
+  GRADLE_OPTS: '-Xmx4g -XX:+UseG1GC'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make scripts executable
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          chmod +x run_chmod.sh 2>/dev/null && ./run_chmod.sh 2>/dev/null || true
+
+      - name: Compile Java sources
+        run: |
+          ./gradlew --no-daemon compileJava 2>&1 || true
+
+      - name: Compile TeaVM
+        run: |
+          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 || true
+          for path in sources/build/generated/teavm/js/classes.js sources/javascript/classes.js; do
+            if [ -f "$path" ]; then
+              cp "$path" public/classes.js
+              echo "classes.js copied from $path"
+              break
+            fi
+          done
+          for smap in sources/build/generated/teavm/js/classes.js.map sources/javascript/classes.js.map; do
+            if [ -f "$smap" ]; then
+              cp "$smap" public/classes.js.map
+              break
+            fi
+          done
+
+      - name: Upload PR preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-preview-${{ github.event.pull_request.number }}
+          path: public/
+          retention-days: 7
