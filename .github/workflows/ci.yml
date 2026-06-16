@@ -169,6 +169,14 @@ jobs:
           $JAVA_HOME/bin/javap -p -classpath ../../libs/teavm-patches.jar java.util.HexFormat 2>&1 | grep -i "withUpperCase\|fromHexDigits" || echo "  NOT FOUND"
           cd $GITHUB_WORKSPACE
 
+          echo "=== TeaVM JARs on classpath (for plugin API debugging) ==="
+          find ~/.gradle/caches -name "teavm-*.jar" 2>/dev/null | head -10
+          TEAVM_CORE_JAR=$(find ~/.gradle/caches -name "teavm-core-*.jar" 2>/dev/null | head -1)
+          if [ -n "$TEAVM_CORE_JAR" ]; then
+            echo "=== teavm-core contents (BooleanConstant/ElementModifier) ==="
+            $JAVA_HOME/bin/jar tf "$TEAVM_CORE_JAR" 2>&1 | grep -iE "BooleanConstant|ElementModifier|ConstInstruction" | head -20
+          fi
+
           echo "=== Compiling TeaVM JavaScript ==="
           echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"
           echo "Working directory: $(pwd)"
