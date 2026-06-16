@@ -214,9 +214,9 @@ public class RenderSystem {
 
         // ========== ModelViewStack ==========
 
-        private static final PoseStack modelViewStack = new PoseStack();
+        private static final org.joml.Matrix4fStack modelViewStack = new org.joml.Matrix4fStack();
 
-        public static PoseStack getModelViewStack() {
+        public static org.joml.Matrix4fStack getModelViewStack() {
                 return modelViewStack;
         }
 
@@ -588,21 +588,21 @@ public class RenderSystem {
         // Browser: frame is presented by browser
     }
 
-	// ========== MC 26.1.2 additional members ==========
+        // ========== MC 26.1.2 additional members ==========
 
-	/**
-	 * MC 26.1.2: Size of the projection matrix UBO (uniform buffer object).
-	 * 16 floats * 4 bytes = 64 bytes per matrix.
-	 */
-	public static final int PROJECTION_MATRIX_UBO_SIZE = 64;
+        /**
+         * MC 26.1.2: Size of the projection matrix UBO (uniform buffer object).
+         * 16 floats * 4 bytes = 64 bytes per matrix.
+         */
+        public static final int PROJECTION_MATRIX_UBO_SIZE = 64;
 
-	/**
-	 * MC 26.1.2: Executes any pending render-thread tasks.
-	 * Browser: no-op (single-threaded, no task queue needed).
-	 */
-	public static void executePendingTasks() {
-		// no-op in browser
-	}
+        /**
+         * MC 26.1.2: Executes any pending render-thread tasks.
+         * Browser: no-op (single-threaded, no task queue needed).
+         */
+        public static void executePendingTasks() {
+                // no-op in browser
+        }
 
     public static net.minecraft.client.renderer.DynamicUniforms getDynamicUniforms() { return new net.minecraft.client.renderer.DynamicUniforms(); }
     public static AutoStorageIndexBuffer getSequentialBuffer(com.mojang.blaze3d.vertex.VertexFormat.Mode mode) { return new AutoStorageIndexBuffer(); }
