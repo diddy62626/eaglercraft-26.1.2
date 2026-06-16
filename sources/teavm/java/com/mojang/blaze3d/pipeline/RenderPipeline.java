@@ -16,6 +16,7 @@ public class RenderPipeline {
 
     public static class Builder {
         public Builder withLocation(String location) { return this; }
+        public Builder withLocation(net.minecraft.resources.Identifier location) { return this; }
         public Builder withVertexShader(String shader) { return this; }
         public Builder withFragmentShader(String shader) { return this; }
         public Builder withVertexShader(net.minecraft.resources.Identifier shader) { return this; }
@@ -27,6 +28,7 @@ public class RenderPipeline {
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
         public Builder withUniform(String name, UniformType type) { return this; }
+        public Builder withShaderDefine(String define) { return this; }
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
     }
