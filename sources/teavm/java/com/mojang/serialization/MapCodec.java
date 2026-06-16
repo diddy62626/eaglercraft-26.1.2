@@ -14,6 +14,5 @@ public interface MapCodec<T> extends Codec<T> {
     default MapCodec<T> deprecated(int since) { return this; }
     default MapCodec<java.util.Optional<T>> optionalFieldOf(String name) { return null; }
 
-    default MapCodec<T> recursive(String name, java.util.function.Function<MapCodec<T>, MapCodec<T>> function) { return this; }
     default MapCodec<T> unit(T defaultValue) { return this; }
 }
