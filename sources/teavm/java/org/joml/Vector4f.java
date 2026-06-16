@@ -31,4 +31,6 @@ public class Vector4f implements Vector4fc {
     public Vector4f set(double x, double y, double z, double w) { this.x = (float)x; this.y = (float)y; this.z = (float)z; this.w = (float)w; return this; }
     public Vector4f set(Vector4fc v) { this.x = v.x(); this.y = v.y(); this.z = v.z(); this.w = v.w(); return this; }
     public Vector4f lerp(Vector4fc v, float t, Vector4f dest) { return dest; }
+
+    public Vector4f mul(Matrix4fc mat, Vector4f dest) { return dest; }
 }

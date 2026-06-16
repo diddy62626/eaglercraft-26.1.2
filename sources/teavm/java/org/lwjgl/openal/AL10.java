@@ -305,4 +305,10 @@ public class AL10 {
             for (int i = 0; i < sources.length; i++) sources[i] = alGenSources();
         }
     }
+
+    public static void alBufferData(int buffer, int format, java.nio.ByteBuffer data, int frequency) {}
+    public static void alDeleteSources(int[] sources) { if (sources != null) for (int s : sources) alDeleteSources(s); }
+    public static void alGenBuffers(int[] buffers) { if (buffers != null) for (int i = 0; i < buffers.length; i++) buffers[i] = alGenBuffers(); }
+    public static void alSourceQueueBuffers(int source, int[] buffers) {}
+    public static void alSourceUnqueueBuffers(int source, int[] buffers) {}
 }

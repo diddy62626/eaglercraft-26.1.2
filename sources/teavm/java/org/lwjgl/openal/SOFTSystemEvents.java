@@ -6,4 +6,6 @@ public final class SOFTSystemEvents {
 
     public static boolean alcEventControlSOFT(int[] events, boolean enable) { return false; }
     public static int alcEventIsSupportedSOFT(int eventType, int eventCategory) { return 0; }
+
+    public static void alcEventCallbackSOFT(SOFTSystemEventProcI callback, long device) {}
 }

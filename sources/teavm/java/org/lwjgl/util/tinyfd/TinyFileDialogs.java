@@ -9,4 +9,6 @@ public final class TinyFileDialogs {
     public static String tinyfd_colorChooser(String title, String defaultHexRGB, byte[] defaultRGB, byte[] resultRGB) { return "#000000"; }
     public static void openFolderDialog(String title) {}
     public static String getDefaultPath() { return ""; }
+
+    public static int tinyfd_messageBox(java.lang.CharSequence title, java.lang.CharSequence message, java.lang.CharSequence type, java.lang.CharSequence icon, int defaultButton) { return 1; }
 }

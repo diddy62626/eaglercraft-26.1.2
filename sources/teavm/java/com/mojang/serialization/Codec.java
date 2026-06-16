@@ -178,4 +178,6 @@ public interface Codec<T> {
     default com.mojang.serialization.codecs.UnboundedMapCodec<String, T> unboundedMap(Codec<T> valueCodec) { return null; }
 
     default Decoder<T> map(java.util.function.Function<T, T> fn) { return null; }
+
+    default MapCodec<T> mapPair(MapCodec<T> left, MapCodec<T> right) { return null; }
 }

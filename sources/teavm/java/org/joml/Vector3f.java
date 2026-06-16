@@ -114,4 +114,6 @@ public class Vector3f implements Vector3fc {
 
     public Vector3f rotate(Quaternionfc q, Vector3f dest) { return dest; }
     public Vector3f mulPosition(Matrix4fc mat) { return this; }
+
+    public Vector3f rotateY(float angle) { return this; }
 }

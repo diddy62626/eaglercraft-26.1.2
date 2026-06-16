@@ -21,4 +21,6 @@ public interface MapCodec<T> extends Codec<T> {
     default Codec<T> unitCodec(java.util.function.Supplier<T> defaultValue) { return this; }
 
     default MapCodec<T> orElseGet(java.util.function.Consumer<String> onError, java.util.function.Supplier<T> supplier) { return this; }
+
+    default MapCodec<T> validate(java.util.function.Function<T, DataResult<T>> validator) { return this; }
 }

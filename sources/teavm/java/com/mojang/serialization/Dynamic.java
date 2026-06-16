@@ -63,4 +63,7 @@ public final class Dynamic<T> {
     public DataResult<MapLike<Dynamic<T>>> asMapOpt() { return DataResult.success(null); }
     public java.util.stream.Stream<Dynamic<T>> asStream() { return java.util.stream.Stream.empty(); }
     public Dynamic<T> createLongList(java.util.stream.LongStream stream) { return this; }
+
+    public DataResult<Boolean> asBoolean() { return DataResult.success(false); }
+    public java.util.stream.LongStream asLongStream() { return java.util.stream.LongStream.empty(); }
 }

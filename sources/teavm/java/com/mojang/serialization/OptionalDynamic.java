@@ -47,4 +47,9 @@ public final class OptionalDynamic<T> {
     public Dynamic<T> createList(java.util.stream.Stream<Dynamic<T>> stream) { return new Dynamic<>(ops, ops.emptyList()); }
     public Dynamic<T> createString(String value) { return new Dynamic<>(ops, ops.createString(value)); }
     public <U> DataResult<U> read(Decoder<U> decoder) { return DataResult.success(null); }
+
+    public <U> java.util.List<U> asList(java.util.function.Function<Dynamic<T>, U> decoder) { return new java.util.ArrayList<>(); }
+    public Dynamic<T> createInt(int value) { return new Dynamic<>(ops, ops.createInt(value)); }
+    public Dynamic<T> createMap(java.util.Map<Dynamic<T>, Dynamic<T>> map) { return new Dynamic<>(ops, ops.emptyMap()); }
+    public Dynamic<T> emptyMap() { return new Dynamic<>(ops, ops.emptyMap()); }
 }
