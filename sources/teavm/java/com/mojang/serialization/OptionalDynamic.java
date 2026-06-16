@@ -32,7 +32,6 @@ public final class OptionalDynamic<T> {
     public boolean asBoolean(boolean defaultValue) { return defaultValue; }
     public DataResult<Stream<Dynamic<T>>> asStreamOpt() { return DataResult.success(Stream.empty()); }
     public DataResult<java.util.stream.IntStream> asIntStreamOpt() { return DataResult.success(java.util.stream.IntStream.empty()); }
-    public <U> DataResult<List<U>> asList(Function<Dynamic<T>, U> decoder) { return DataResult.success(new java.util.ArrayList<>()); }
     public OptionalDynamic<T> get(String key) { return new OptionalDynamic<>(ops, DataResult.success(null)); }
     public <U> DataResult<U> map(Function<Dynamic<T>, U> fn) { return DataResult.success(null); }
     public <U> DataResult<U> flatMap(Function<Dynamic<T>, DataResult<U>> fn) { return DataResult.success(null); }
