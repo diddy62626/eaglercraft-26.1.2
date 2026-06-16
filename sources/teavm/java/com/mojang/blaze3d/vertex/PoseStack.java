@@ -34,7 +34,6 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
         public void setIdentity() {}
         public org.joml.Vector3f transformNormal(org.joml.Vector3fc v, org.joml.Vector3f dest) { return dest; }
         public org.joml.Matrix4f translate(float x, float y, float z) { return new org.joml.Matrix4f(); }
-        public com.mojang.blaze3d.vertex.PoseStack.Pose copy() { return new com.mojang.blaze3d.vertex.PoseStack.Pose(); }
         public void rotate(org.joml.Quaternionfc q) {}
     }
 

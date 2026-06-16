@@ -147,5 +147,4 @@ public final class Math {
     }
 
     public static float invsqrt(float value) { return 1.0f / (float) java.lang.Math.sqrt(value); }
-    public static float fma(float a, float b, float c) { return a * b + c; }
 }
