@@ -357,7 +357,7 @@ public class EaglerCraft {
                         );
 
                         net.minecraft.client.main.GameConfig.UserData userData =
-                                new net.minecraft.client.main.GameConfig.UserData(user, null);
+                                new net.minecraft.client.main.GameConfig.UserData(user, new com.mojang.authlib.properties.PropertyMap());
 
                         net.minecraft.client.main.GameConfig.GameData gameData =
                                 new net.minecraft.client.main.GameConfig.GameData(
