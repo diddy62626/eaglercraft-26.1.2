@@ -346,9 +346,6 @@ public class NativeImage implements AutoCloseable {
                 // no-op in browser
         }
 
-    public Format format() {
-        return Format.RGBA;
-    }
     public byte getLuminanceOrAlpha(int x, int y) {
         return (byte) getAlpha(x, y);
     }

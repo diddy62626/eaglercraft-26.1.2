@@ -6,7 +6,9 @@ public interface CommandEncoder {
     default void submit() {}
 
     default void copyToBuffer(com.mojang.blaze3d.buffers.GpuBufferSlice src, com.mojang.blaze3d.buffers.GpuBufferSlice dst) {}
-    default com.mojang.blaze3d.buffers.GpuFence createFence() { return () -> false; }
+    default com.mojang.blaze3d.buffers.GpuFence createFence() {
+        return new com.mojang.blaze3d.buffers.GpuFence() {};
+    }
     default com.mojang.blaze3d.buffers.GpuBuffer.MappedView mapBuffer(com.mojang.blaze3d.buffers.GpuBuffer buffer, boolean read, boolean write) { return null; }
     default com.mojang.blaze3d.systems.GpuQuery timerQueryBegin() { return null; }
     default void timerQueryEnd(com.mojang.blaze3d.systems.GpuQuery query) {}

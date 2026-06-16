@@ -1,5 +1,9 @@
 package org.joml;
 
+/**
+ * EaglerCraft stub for org.joml.Vector3d.
+ * Uses java.lang.Math explicitly to avoid resolution to org.joml.Math.
+ */
 public class Vector3d {
     public double x, y, z;
 
@@ -16,7 +20,7 @@ public class Vector3d {
     public Vector3d add(org.joml.Vector3d v) { x += v.x; y += v.y; z += v.z; return this; }
     public Vector3d sub(org.joml.Vector3d v) { x -= v.x; y -= v.y; z -= v.z; return this; }
     public Vector3d mul(double s) { x *= s; y *= s; z *= s; return this; }
-    public double length() { return Math.sqrt(x*x + y*y + z*z); }
+    public double length() { return java.lang.Math.sqrt(x*x + y*y + z*z); }
     public double lengthSquared() { return x*x + y*y + z*z; }
     public Vector3d normalize() { double len = length(); if (len > 0) mul(1.0/len); return this; }
     public double dot(org.joml.Vector3d v) { return x*v.x + y*v.y + z*v.z; }
@@ -29,6 +33,6 @@ public class Vector3d {
     }
     public double distance(org.joml.Vector3d v) {
         double dx = x - v.x, dy = y - v.y, dz = z - v.z;
-        return Math.sqrt(dx*dx + dy*dy + dz*dz);
+        return java.lang.Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
 }
