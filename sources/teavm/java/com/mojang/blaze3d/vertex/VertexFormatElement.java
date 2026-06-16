@@ -17,6 +17,7 @@ public class VertexFormatElement {
     public static final VertexFormatElement UV0 = new VertexFormatElement(Usage.UV, DataType.FLOAT, 2);
     public static final VertexFormatElement UV1 = new VertexFormatElement(Usage.UV, DataType.FLOAT, 2);
     public static final VertexFormatElement UV2 = new VertexFormatElement(Usage.UV, DataType.FLOAT, 2);
+    public static final VertexFormatElement LINE_WIDTH = new VertexFormatElement(Usage.PADDING, DataType.FLOAT, 1);
 
     private final Usage usage;
     private final DataType type;
@@ -52,4 +53,4 @@ public class VertexFormatElement {
     public static Stream<VertexFormatElement> elementsFromMask(int mask) {
         return Stream.empty();
     }
-}
+

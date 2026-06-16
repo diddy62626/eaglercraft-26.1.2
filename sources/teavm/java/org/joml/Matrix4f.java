@@ -214,4 +214,6 @@ public class Matrix4f implements Matrix4fc {
     public Matrix4f setTranslation(float x, float y, float z) { m30 = x; m31 = y; m32 = z; return this; }
     public Matrix4f rotation(Quaternionfc q) { return this; }
     public Matrix4f assume(int properties) { return this; }
+
+    public Matrix4f mul(Matrix3x2fc right) { return this; }
 }

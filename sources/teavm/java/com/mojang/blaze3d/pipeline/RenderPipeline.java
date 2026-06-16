@@ -28,4 +28,8 @@ public class RenderPipeline {
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
     }
+
+        public Builder withFragmentShader(net.minecraft.resources.Identifier shader) { return this; }
+        public Builder withVertexShader(net.minecraft.resources.Identifier shader) { return this; }
+    }
 }

@@ -352,4 +352,6 @@ public class NativeImage implements AutoCloseable {
     public static NativeImage read(java.nio.ByteBuffer buffer) throws java.io.IOException {
         return new NativeImage(16, 16);
     }
+
+    public void copyRect(NativeImage source, int srcX, int srcY, int destX, int destY, int width, int height, boolean flipX, boolean flipY) {}
 }

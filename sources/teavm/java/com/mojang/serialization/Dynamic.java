@@ -66,4 +66,7 @@ public final class Dynamic<T> {
 
     public DataResult<Boolean> asBoolean() { return DataResult.success(false); }
     public java.util.stream.LongStream asLongStream() { return java.util.stream.LongStream.empty(); }
+
+    public short asShort(short defaultValue) { return defaultValue; }
+    public byte asByte(byte defaultValue) { return defaultValue; }
 }

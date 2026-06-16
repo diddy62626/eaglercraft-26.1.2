@@ -39,5 +39,6 @@ public interface PackResources {
     @FunctionalInterface
     interface ResourceOutput {
         void accept(net.minecraft.resources.Identifier location, net.minecraft.server.packs.resources.IoSupplier<java.io.InputStream> supplier);
+        default void accept(Object location, Object supplier) {}
     }
 }

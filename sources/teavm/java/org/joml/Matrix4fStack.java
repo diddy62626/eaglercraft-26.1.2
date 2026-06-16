@@ -8,4 +8,6 @@ public class Matrix4fStack extends Matrix4f {
     public int depth() { return 0; }
     public int getMaxDepth() { return 32; }
     public void clear() { identity(); }
+
+    public Matrix4f rotationX(float angle) { return this; }
 }

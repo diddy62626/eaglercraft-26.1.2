@@ -630,4 +630,7 @@ public class RenderSystem {
     public static com.mojang.blaze3d.systems.ScissorState getScissorStateForRenderTypeDraws() { return new com.mojang.blaze3d.systems.ScissorState(); }
 
     public static com.mojang.blaze3d.buffers.GpuBufferSlice getShaderFog() { return new com.mojang.blaze3d.buffers.GpuBufferSlice(new com.mojang.blaze3d.buffers.GpuBuffer() {}, 0, 64); }
+
+    public static void enableScissorForRenderTypeDraws(int x, int y, int width, int height) {}
+    public static void disableScissorForRenderTypeDraws() {}
 }

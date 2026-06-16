@@ -72,4 +72,6 @@ public final class Identifier {
         if (!(o instanceof Identifier)) return false;
         return toString().equals(o.toString());
     }
+
+    public String toShortString() { return path; }
 }

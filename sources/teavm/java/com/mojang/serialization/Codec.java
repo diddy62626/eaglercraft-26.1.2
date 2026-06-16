@@ -101,7 +101,7 @@ public interface Codec<T> {
 
     // Field / optional methods
     default MapCodec<T> fieldOf(String name) { return null; }
-    default Codec<T> optionalFieldOf(String name, T defaultValue) { return this; }
+    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return null; }
     default Codec<java.util.Optional<T>> optionalFieldOf(String name) { return null; }
     default Codec<java.util.Optional<T>> optionalFieldOf(String name, java.util.Optional<T> defaultValue) { return null; }
     default MapCodec<T> lenientOptionalFieldOf(String name, T defaultValue) { return null; }
