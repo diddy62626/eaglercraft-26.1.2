@@ -10,6 +10,10 @@ public final class URL {
     public String toString() { return url; }
     public java.io.InputStream openStream() throws java.io.IOException { return new java.io.ByteArrayInputStream(new byte[0]); }
 
+    public java.net.URLConnection openConnection() throws java.io.IOException {
+        return new java.net.URLConnection() {};
+    }
+
     public java.net.URLConnection openConnection(java.net.Proxy proxy) throws java.io.IOException {
         return openConnection();
     }
