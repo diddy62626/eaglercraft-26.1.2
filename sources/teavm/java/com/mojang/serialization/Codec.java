@@ -1,8 +1,7 @@
 package com.mojang.serialization;
 
-import java.util.function.Function;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 public interface Codec<T> {
     // Common primitive codecs (static)
@@ -62,12 +61,12 @@ public interface Codec<T> {
     T decode(Object input);
     Object encode(T value);
 
+    // Core methods (one signature per name to avoid erasure clashes)
     default DataResult<T> decode(DynamicOps<?> ops, Object input) { return DataResult.success(decode(input)); }
     default DataResult<Object> encode(T value, DynamicOps<?> ops, Object prefix) { return DataResult.success(encode(value)); }
     default <S> Codec<S> comap(Function<S, T> fn) { return null; }
-    default <S> Codec<S> comapFlatMap(Function<S, DataResult<T>> fn, Function<T, S> inverse) { return null; }
     default <S> Codec<S> flatComap(Function<T, DataResult<S>> fn) { return null; }
-    default <S> Codec<S> flatComapMap(Function<S, DataResult<T>> decoder, Function<T, S> encoder) { return null; }
+    default <S> Codec<S> comapFlatMap(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return null; }
     default <S> Codec<S> dispatch(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return null; }
     default <S> Codec<S> dispatch(Function<T, Codec<? extends T>> codec) { return null; }
     default <S> Codec<S> dispatchStable(Function<T, Codec<? extends T>> codec) { return null; }
@@ -83,12 +82,11 @@ public interface Codec<T> {
     default Codec<T> orElse(T defaultValue) { return this; }
     default Codec<T> validate(Function<T, DataResult<T>> validator) { return this; }
     default <S> Codec<S> xmap(Function<T, S> to, Function<S, T> from) { return null; }
-    default <S> Codec<S> comapFlatMap(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return null; }
     default Codec<T> promoteOrder(Function<T, DataResult<T>> function) { return this; }
     default Codec<T> withLifecycle(com.mojang.serialization.Lifecycle lifecycle) { return this; }
     default Codec<T> dispatched(Function<T, Codec<? extends T>> function) { return null; }
-    default Codec<T> terminateOn(final Codec<T> other) { return this; }
-    default Codec<T> wrap(final Codec<T> other) { return this; }
+    default Codec<T> terminateOn(Codec<T> other) { return this; }
+    default Codec<T> wrap(Codec<T> other) { return this; }
     default Codec<java.util.Optional<T>> optionalFieldOf(String name, java.util.Optional<T> defaultValue) { return null; }
     default Codec<java.util.stream.Stream<T>> streamOf() { return null; }
     default Codec<T> start() { return this; }
@@ -114,28 +112,15 @@ public interface Codec<T> {
     default <S> Codec<S> flatMap(Function<T, Codec<S>> fn) { return null; }
     default <S> Codec<S> ofType() { return null; }
     default Codec<T> captureException() { return this; }
-    default Codec<T> withDefault(Function<java.util.function.Supplier<T>, Codec<T>> function) { return this; }
-    default Codec<java.util.Optional<T>> withDefault(T defaultValue) { return null; }
-    default Codec<java.util.Map<String, T>> asMap() { return null; }
-    default Codec<java.util.Map<String, T>> asMapSorted() { return null; }
-    default <K> Codec<java.util.Map<K, T>> asMap(Codec<K> keyCodec) { return null; }
-    default Codec<java.util.Optional<T>> withDefaultOptional(T defaultValue) { return null; }
-    default Codec<T> withDefaultFunction(java.util.function.Supplier<T> supplier) { return this; }
-    default Codec<T> checkResult(Function<DataResult<T>, DataResult<T>> checker) { return this; }
     default <S> Codec<S> adapt(Function<T, S> to, Function<S, T> from) { return null; }
     default Codec<T> validateAll(Function<T, DataResult<T>> validator) { return this; }
     default Codec<T> validateRaw(Function<DataResult<T>, DataResult<T>> validator) { return this; }
     default Codec<java.util.Optional<T>> opt() { return null; }
-    default Codec<T> withEncoder(Function<T, java.util.function.Supplier<DataResult<T>>> encoder) { return this; }
-    default Codec<T> withDecoder(Function<DataResult<T>, DataResult<T>> decoder) { return this; }
-    default <U> Codec<java.util.Map.Entry<U, T>> asEntry(Codec<U> keyCodec) { return null; }
-    default Codec<java.util.Map.Entry<String, T>> asEntry() { return null; }
     default Codec<T> toStringable() { return this; }
     default Codec<T> fromString(String s) { return this; }
     default Codec<T> toStringCodec() { return this; }
-    default Codec<java.util.Map<String, T>> sortedMapOf() { return null; }
-    default Codec<java.util.Map<String, T>> sortedMapOf(int minSize) { return null; }
-    default <S> Codec<S> dispatchByName(Function<String, Codec<? extends T>> byName, Function<T, String> name) { return null; }
+    default Codec<java.util.Map<String, T>> asMap() { return null; }
+    default <K> Codec<java.util.Map<K, T>> asMap(Codec<K> keyCodec) { return null; }
     default Codec<T> setType() { return this; }
     default Codec<java.util.Optional<T>> optionalFieldOfOptional(String name) { return null; }
     default Codec<T> fieldOfOptional(String name) { return this; }
@@ -144,12 +129,9 @@ public interface Codec<T> {
     default Codec<T> scale(float scale, float offset) { return this; }
     default Codec<T> withRange(T min, T max) { return this; }
     default Codec<T> validateAndGet(Function<T, T> validator) { return this; }
-    default Codec<T> withContext(java.util.function.Supplier<T> supplier) { return this; }
     default Codec<T> ofOptional() { return this; }
     default <S> Codec<S> map(Function<T, S> fn) { return null; }
     default Codec<T> dispatchedByKey(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return this; }
-    default Codec<T> withCompresion(boolean compress) { return this; }
-    default Codec<T> dispatchByCodec(Function<T, Codec<? extends T>> codec) { return this; }
     default Codec<T> validateEncoder(Function<T, DataResult<T>> validator) { return this; }
     default Codec<T> validateDecoder(Function<T, DataResult<T>> validator) { return this; }
     default <S> Codec<S> ofFlatMap(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return null; }
@@ -164,7 +146,6 @@ public interface Codec<T> {
     default Codec<T> optionalFieldOf(String name, java.util.function.Supplier<T> defaultValue) { return this; }
     default Codec<T> toStringOrThrow() { return this; }
     default Codec<java.util.Optional<T>> withFallback() { return null; }
-    default Codec<java.util.Optional<T>> withFallback(T defaultValue) { return null; }
     default Codec<T> dropField(String name) { return this; }
     default Codec<T> dropLifecycle() { return this; }
     default <U> Codec<U> dispatchUnsafe(Function<T, Codec<? extends U>> function) { return null; }
@@ -175,7 +156,6 @@ public interface Codec<T> {
     default Codec<T> fieldOfUnsafe(String name) { return this; }
     default Codec<T> addLifecycle(com.mojang.serialization.Lifecycle lifecycle) { return this; }
     default Codec<T> terminated() { return this; }
-    default Codec<T> terminatedOn(Codec<T> other) { return this; }
     default Codec<T> withDecoderRaw(Function<T, DataResult<T>> decoder) { return this; }
     default Codec<T> withEncoderRaw(Function<T, DataResult<T>> encoder) { return this; }
     default Codec<T> deprecatedPart(int since) { return this; }
@@ -193,18 +173,12 @@ public interface Codec<T> {
     default Codec<T> withStringable(java.util.function.Function<T, String> toString) { return this; }
     default Codec<T> withToString() { return this; }
     default Codec<T> toStringOf() { return this; }
-    default Codec<T> withStringable(java.util.function.Function<T, String> toString, java.util.function.Function<String, T> fromString) { return this; }
-    default Codec<T> withStringable(java.util.function.Function<T, String> toString, java.util.function.Function<String, DataResult<T>> fromString) { return this; }
-    default Codec<T> withStringableOf(java.util.function.Function<T, String> toString, java.util.function.Function<String, T> fromString) { return this; }
-    default Codec<T> withStringableOf(java.util.function.Function<T, String> toString, java.util.function.Function<String, DataResult<T>> fromString) { return this; }
     default Codec<T> withDefaultedField(String name, T defaultValue) { return this; }
     default Codec<T> withAlternativeEncoding(Codec<T> alternative) { return this; }
     default <S> Codec<S> dispatch2(Function<T, String> name1, Function<String, Codec<? extends T>> codec1) { return null; }
     default <S> Codec<S> mapEach(Function<T, S> fn) { return null; }
     default Codec<T> validateDecoderOf(Function<T, DataResult<T>> validator) { return this; }
     default Codec<T> validateEncoderOf(Function<T, DataResult<T>> validator) { return this; }
-    default <S> Codec<S> dispatchByKey(Function<T, String> name, Function<String, Codec<? extends S>> codec) { return null; }
-    default <S> Codec<S> dispatchByKey(Function<String, Codec<? extends S>> codec, Function<T, String> name) { return null; }
     default Codec<T> deprecated2(int since) { return this; }
     default Codec<T> typeOnly() { return this; }
     default Codec<T> withLifecycleOf(com.mojang.serialization.Lifecycle lifecycle) { return this; }
@@ -224,50 +198,23 @@ public interface Codec<T> {
     default <S> Codec<S> flatMapResult2(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return null; }
     default <S> Codec<S> withReturnType() { return null; }
     default <S> Codec<S> withGenericReturn() { return null; }
-    default Codec<T> withStringable2(java.util.function.Function<T, String> toString, java.util.function.Function<String, T> fromString) { return this; }
-    default Codec<T> withToString2() { return this; }
-    default Codec<T> withStringable3(java.util.function.Function<T, String> toString) { return this; }
     default Codec<T> withAlternativeOf(Codec<T> alternative) { return this; }
     default Codec<T> withAlternativeOrDefault(T defaultValue) { return this; }
     default Codec<T> withDefaultOrThrow() { return this; }
     default <S> Codec<S> flatMapOf(Function<T, Codec<S>> fn) { return null; }
     default Codec<T> fieldOfStrict(String name) { return this; }
     default Codec<T> withNestedAlternative(Codec<T> alternative) { return this; }
-    default Codec<T> withStringable4(java.util.function.Function<T, String> toString) { return this; }
     default Codec<T> withAlternativeOrDefaultSupplier(java.util.function.Supplier<T> supplier) { return this; }
     default <S> Codec<S> flatMapOf2(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return null; }
-    default Codec<T> withStringable5(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable6(java.util.function.Function<T, String> toString) { return this; }
     default Codec<T> withDefaultOrGet() { return this; }
     default Codec<T> withDefaultOrGet(java.util.function.Supplier<T> supplier) { return this; }
-    default Codec<T> withStringable7(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withDefaultOrGet2(java.util.function.Supplier<T> supplier) { return this; }
     default Codec<T> withAlternativeOrGet(java.util.function.Supplier<T> supplier) { return this; }
     default Codec<T> withDefaultOrThrow2() { return this; }
     default Codec<T> withDefaultedFieldOf(String name, T defaultValue) { return this; }
-    default Codec<T> withStringable8(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable9(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable10(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable11(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable12(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable13(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable14(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable15(java.util.function.Function<T, String> toString) { return this; }
     default Codec<T> withDefaultOrGet3(java.util.function.Supplier<T> supplier) { return this; }
     default Codec<T> withDefaultOrGet4(java.util.function.Supplier<T> supplier) { return this; }
-    default Codec<T> withStringable16(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable17(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable18(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable19(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable20(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable21(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable22(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable23(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable24(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable25(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable26(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable27(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable28(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable29(java.util.function.Function<T, String> toString) { return this; }
-    default Codec<T> withStringable30(java.util.function.Function<T, String> toString) { return this; }
+
+    // Codec methods used by MC's data fixers
+    default Codec<T> withDefault(T defaultValue, java.util.function.Supplier<T> supplier) { return this; }
+    default <N> Codec<N> dispatchByKey(Function<String, Codec<? extends N>> codec, Function<T, String> name) { return null; }
 }

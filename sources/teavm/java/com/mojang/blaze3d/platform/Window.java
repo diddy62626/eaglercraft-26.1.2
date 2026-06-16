@@ -416,13 +416,6 @@ public class Window {
     }
 
     /**
-     * MC 26.1.2: Sets the GUI scale to a fixed integer value.
-     */
-    public void setGuiScale(int scale) {
-        this.guiScale = scale;
-    }
-
-    /**
      * MC 26.1.2: Updates fullscreen state if it has changed.
      * Browser: no-op (fullscreen handled by browser API).
      */
