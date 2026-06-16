@@ -95,7 +95,8 @@ public class ALC10 {
      * MC 26.1.2: Creates an ALC context with optional attributes.
      */
     public static long alcCreateContext(long device, java.nio.IntBuffer attrlist) {
-        return alcCreateContext(device);
+        // Browser: Web Audio API doesn't use ALC contexts; return a non-zero handle.
+        return 1L;
     }
 
     /**

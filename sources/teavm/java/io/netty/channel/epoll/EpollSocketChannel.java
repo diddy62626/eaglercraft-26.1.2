@@ -1,9 +1,12 @@
 package io.netty.channel.epoll;
 
-import io.netty.channel.socket.SocketChannel;
-
-public class EpollSocketChannel implements SocketChannel {
-    // Stub - native transport not available in browser
+/**
+ * EaglerCraft stub for EpollSocketChannel.
+ * Browser: native epoll transport not available - this is just a marker class.
+ * Not implementing SocketChannel since we'd need to override too many abstract methods.
+ */
+public class EpollSocketChannel {
     public EpollSocketChannel() {}
-    @Override public boolean isOpen() { return false; }
+    public boolean isOpen() { return false; }
+    public void close() {}
 }

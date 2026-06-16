@@ -127,6 +127,6 @@ public class MemoryStack {
      * MC 26.1.2: Allocates a PointerBuffer of the given size on this stack.
      */
     public org.lwjgl.PointerBuffer mallocPointer(int size) {
-        return new org.lwjgl.PointerBuffer(size);
+        return new org.lwjgl.PointerBuffer(java.nio.ByteBuffer.allocateDirect(size * 8));
     }
 }

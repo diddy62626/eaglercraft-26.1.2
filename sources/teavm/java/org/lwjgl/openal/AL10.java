@@ -293,6 +293,10 @@ public class AL10 {
      * MC 26.1.2: Deletes a list of buffer IDs.
      */
     public static void alDeleteBuffers(int[] buffers) {
-        alDeleteBuffers(buffers, 0);
+        if (buffers != null) {
+            for (int buf : buffers) {
+                alDeleteBuffers(buf);
+            }
+        }
     }
 }
