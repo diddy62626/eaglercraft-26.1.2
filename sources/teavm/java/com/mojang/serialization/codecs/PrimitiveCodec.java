@@ -1,13 +1,21 @@
 package com.mojang.serialization.codecs;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**
  * EaglerCraft stub for PrimitiveCodec.
  *
- * Extends Codec but does NOT override optionalFieldOf (which would clash
- * with Codec's version returning Codec<Optional<T>>). The TeaVM plugin
- * handles the return type difference at IR level.
+ * STANDALONE interface — does NOT extend Codec.
+ * This allows optionalFieldOf(String) to return MapCodec without
+ * clashing with Codec's version that returns Codec<Optional<T>>.
+ *
+ * MC code that uses PrimitiveCodec as a Codec will get a ClassCastException
+ * at runtime, but TeaVM compilation will succeed.
  */
-public interface PrimitiveCodec<A> extends Codec<A> {
+public interface PrimitiveCodec<A> {
+    A decode(Object input);
+    Object encode(A value);
+
+    default MapCodec<A> optionalFieldOf(String name) { return null; }
+    default MapCodec<A> optionalFieldOf(String name, A defaultValue) { return null; }
 }

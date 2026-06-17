@@ -360,13 +360,6 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("sun.misc.Unsafe", "getInt", ValueType.INTEGER,
             new ValueType[] { ValueType.LONG }, null, false);
 
-        // ===== PrimitiveCodec.optionalFieldOf(String) returning MapCodec =====
-        // Java won't allow this override (return type clash with Codec), but TeaVM's
-        // class model allows it. No program = native method returning default value.
-        add("com.mojang.serialization.codecs.PrimitiveCodec", "optionalFieldOf",
-            ValueType.object("com.mojang.serialization.MapCodec"),
-            new ValueType[] { ValueType.object("java.lang.String") }, null, false);
-
         // ===== java.lang.invoke.MethodHandle.invoke() returns Object =====
         add("java.lang.invoke.MethodHandle", "invoke", ValueType.object("java.lang.Object"),
             new ValueType[0], null, false);
