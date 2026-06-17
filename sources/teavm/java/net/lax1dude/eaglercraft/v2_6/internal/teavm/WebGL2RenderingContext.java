@@ -531,12 +531,8 @@ public abstract class WebGL2RenderingContext implements JSObject {
         @JSMethod
         public abstract JSObject getParameter(int pname);
 
-        @org.teavm.jso.JSBody(params = { "pname" }, script = "var r = this.getParameter(pname); return r ? '' + r : '';")
-        String getString(int pname);
-
         @JSMethod
-
-        @JSMethod
+        public abstract String getString(int pname);
         public abstract void hint(int target, int mode);
 
         // ----- Blending -----
