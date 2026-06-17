@@ -226,6 +226,7 @@
         var script = document.createElement("script");
         script.src = "classes.js";
         script.onload = function() {
+            console.log("[EaglerCraft] classes.js loaded, starting TeaVM runtime...");
             setProgress(50, "Parsing game code (this takes a minute on slower devices)...");
         };
         script.onerror = function() {
