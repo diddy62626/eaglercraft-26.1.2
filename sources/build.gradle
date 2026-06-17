@@ -333,10 +333,11 @@ teavm {
         // Common configuration (applies to all targets)
         mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-        // BALANCED optimization is recommended for JS target (AGGRESSIVE doesn't
-        // give significant performance growth but produces more code)
-        // Using BALANCED optimization for JS target
-        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+        // Use SIMPLE optimization to skip SSA-based optimizer passes that crash
+        // on plugin-injected methods without programs.
+        // SIMPLE still generates correct JavaScript but skips dead code elimination
+        // and other SSA-dependent optimizations.
+        optimization = org.teavm.gradle.api.OptimizationLevel.SIMPLE
 
         // Additional TeaVM properties
         properties = [
