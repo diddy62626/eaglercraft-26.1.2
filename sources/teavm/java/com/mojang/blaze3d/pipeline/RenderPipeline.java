@@ -37,6 +37,8 @@ public class RenderPipeline {
         public Builder withUniform(String name, UniformType type, com.mojang.blaze3d.textures.TextureFormat format) { return this; }
         public Builder withShaderDefine(String define) { return this; }
         public Builder withShaderDefine(String define, float value) { return this; }
+        public Builder withShaderDefine(String define, int value) { return this; }
+        public Builder withShaderDefine(String define, boolean value) { return this; }
         public Builder withPolygonMode(com.mojang.blaze3d.platform.PolygonMode mode) { return this; }
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
