@@ -130,7 +130,7 @@ jobs:
           fi
           echo "Downloading MC dependency libraries..."
           python3 -c "
-          import urllib.request, json
+          import urllib.request, json, os
           with urllib.request.urlopen('https://piston-meta.mojang.com/v1/packages/978e6c0dd077d0f8d5d53887454928f1d3687ba8/26.1.2.json') as r:
             data = json.loads(r.read())
           libs_to_download = [
@@ -158,8 +158,20 @@ jobs:
             url = artifact.get('url', '')
             if url:
               filename = url.split('/')[-1]
+              if os.path.exists(f'sources/libs/{filename}'):
+                print(f'Skip {filename} (already exists)')
+                continue
               print(f'Downloading {filename}...')
-              urllib.request.urlretrieve(url, f'sources/libs/{filename}')
+              for attempt in range(5):
+                try:
+                  urllib.request.urlretrieve(url, f'sources/libs/{filename}')
+                  break
+                except Exception as e:
+                  print(f'  Attempt {attempt+1} failed: {e}')
+                  if attempt < 4:
+                    import time; time.sleep(5)
+                  else:
+                    raise
           print('Done downloading libraries')
           "
           echo "Libraries in sources/libs/:"
