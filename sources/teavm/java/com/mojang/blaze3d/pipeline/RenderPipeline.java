@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.shaders.UniformType;
 
 public class RenderPipeline {
+    private net.minecraft.resources.Identifier location;
+
     public static Builder builder(Snippet... snippets) { return new Builder(); }
 
     public int getSortKey() { return 0; }
@@ -11,6 +13,7 @@ public class RenderPipeline {
     public VertexFormat.Mode getVertexFormatMode() { return VertexFormat.Mode.TRIANGLES; }
     public boolean isCull() { return false; }
     public void updateSortKeySeed() {}
+    public net.minecraft.resources.Identifier getLocation() { return location; }
 
     public interface Snippet {}
 
@@ -25,6 +28,7 @@ public class RenderPipeline {
         public Builder withCull(boolean cull) { return this; }
         public Builder withDepthTest(String depthTest) { return this; }
         public Builder withDepthStencilState(DepthStencilState state) { return this; }
+        public Builder withColorTargetState(ColorTargetState state) { return this; }
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
         public Builder withUniform(String name, UniformType type) { return this; }

@@ -1,5 +1,16 @@
 package com.mojang.blaze3d.vertex;
 
+/**
+ * EaglerCraft 26.1.2 browser override for com.mojang.blaze3d.vertex.PoseStack.
+ *
+ * Extends systems.PoseStack but overrides last() to return a standalone Pose
+ * class (not extending systems.PoseStack.Pose) to allow covariant return type
+ * for copy() and avoid Java's single-inheritance limitation.
+ *
+ * Note: We can't extend both systems.PoseStack (for the stack methods) AND
+ * have Pose extend systems.PoseStack.Pose (for the pose methods) while also
+ * overriding copy() with a different return type. So Pose is standalone.
+ */
 public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
 
     public PoseStack() {
@@ -11,6 +22,7 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
         return new Pose();
     }
 
+    // Overload (not override) - parent has mulPose(Quaternionf), MC 26.1.2 calls mulPose(Quaternionfc)
     public void mulPose(org.joml.Quaternionfc q) {}
     public void mulPose(org.joml.Matrix4fc mat) {}
     public void setIdentity() {}
@@ -21,20 +33,29 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
     public boolean isEmpty() { return false; }
     public void rotateAround(org.joml.Quaternionfc q, float x, float y, float z) {}
 
-    // Pose is a standalone class (NOT extending systems.PoseStack.Pose) to allow
-    // covariant return type for copy() and avoid Java's single-inheritance limitation.
-    public static class Pose extends com.mojang.blaze3d.systems.PoseStack.Pose {
+    /**
+     * Standalone Pose class — does NOT extend systems.PoseStack.Pose.
+     * This allows us to have copy() return vertex.PoseStack.Pose (covariant)
+     * without clashing with the parent's copy() returning Matrix4f.
+     */
+    public static class Pose {
         private final org.joml.Matrix4f pose;
         private final org.joml.Matrix3f normal;
 
-        public Pose() { super(); this.pose = new org.joml.Matrix4f(); this.normal = new org.joml.Matrix3f(); }
+        public Pose() {
+            this.pose = new org.joml.Matrix4f();
+            this.normal = new org.joml.Matrix3f();
+        }
 
-        public Pose(org.joml.Matrix4f pose, org.joml.Matrix3f normal) { super(); this.pose = pose; this.normal = normal; }
+        public Pose(org.joml.Matrix4f pose, org.joml.Matrix3f normal) {
+            this.pose = pose;
+            this.normal = normal;
+        }
 
-        @Override
         public org.joml.Matrix4f pose() { return pose; }
         public org.joml.Matrix3f normal() { return normal; }
 
+        public Pose copy() { return new Pose(new org.joml.Matrix4f(pose), new org.joml.Matrix3f(normal)); }
         public void mulPose(org.joml.Matrix4fc mat) {}
         public void scale(float x, float y, float z) {}
         public void set(Pose other) {}

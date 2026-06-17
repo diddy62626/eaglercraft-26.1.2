@@ -205,7 +205,8 @@ afterEvaluate {
         // ConfigurableFileCollection.from() appends, so we use setFrom()
         // with our classes first, then add the rest.
         def patchClassesDir = file('teavm/patch/classes')
-        def ourClasses = [patchClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
+        def jdkPatchClassesDir = file('teavm/patch/jdk-classes')
+        def ourClasses = [patchClassesDir, jdkPatchClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
         def existingCp = classpath.files
         classpath.setFrom(ourClasses)
         classpath.from(existingCp)
@@ -247,9 +248,51 @@ tasks.register('compileTeavmPatches') {
     }
 }
 
+// ============================================================
+// Task to compile jdk.jfr patches separately.
+// jdk.jfr is a system module, so we need --patch-module jdk.jfr=...
+// to compile stubs for FlightRecorder, Event, Recording.
+// The compiled classes go into teavm/patch/jdk-classes/ and are
+// added to the TeaVM classpath.
+// ============================================================
+tasks.register('compileJdkJfrPatches') {
+    group = 'build'
+    description = 'Compiles jdk.jfr patches (FlightRecorder, Event, Recording)'
+    def jfrSrcDir = file('teavm/patch/jdk/jfr')
+    def jfrClassesDir = file('teavm/patch/jdk-classes')
+    inputs.dir jfrSrcDir
+    outputs.dir jfrClassesDir
+    doLast {
+        jfrClassesDir.mkdirs()
+        def jdkHome = System.getenv('JAVA_HOME') ?: '/home/z/.jdks/jdk-25.0.3+9'
+        def javac = "${jdkHome}/bin/javac"
+        def srcFiles = []
+        fileTree(jfrSrcDir).matching { include '**/*.java' }.each { srcFiles << it.absolutePath }
+        if (!srcFiles.isEmpty()) {
+            def pb = new ProcessBuilder()
+            pb.command(javac, '--source', '25', '--enable-preview',
+                    "--patch-module", "jdk.jfr=${jfrSrcDir.absolutePath}",
+                    '-d', jfrClassesDir.absolutePath)
+            pb.command().addAll(srcFiles)
+            pb.redirectErrorStream(true)
+            def proc = pb.start()
+            def out = proc.inputStream.text
+            def exitCode = proc.waitFor()
+            if (exitCode != 0) {
+                println out
+                // Don't fail the build — jdk.jfr is optional
+                println "WARNING: jdk.jfr patch compilation failed (non-fatal)"
+            } else {
+                println "jdk.jfr patches compiled successfully"
+            }
+        }
+    }
+}
+
 // Make generateJavaScript depend on patch compilation
 tasks.matching { it.name == 'generateJavaScript' }.configureEach {
     dependsOn 'compileTeavmPatches'
+    dependsOn 'compileJdkJfrPatches'
 }
 
 java {

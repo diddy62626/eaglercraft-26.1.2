@@ -148,7 +148,7 @@ public interface Codec<T> {
     static <T> Codec<T> either(Codec<T> left, Codec<T> right) { return null; }
     static <T> Codec<T> withAlternative(Codec<T> first, Codec<T> second) { return first; }
     static <T> Codec<T> withAlternative(Codec<T> first, Codec<T> second, Function<T, T> encoder) { return first; }
-    static <K, V> Codec<java.util.Map<K, V>> unboundedMap(Codec<K> keyCodec, Codec<V> valueCodec) { return null; }
+    static <K, V> com.mojang.serialization.codecs.UnboundedMapCodec<K, V> unboundedMap(Codec<K> keyCodec, Codec<V> valueCodec) { return null; }
     static <F, S> Codec<java.util.Map.Entry<F, S>> compoundList(Codec<F> keyCodec, Codec<S> valueCodec) { return null; }
     static Codec<String> string(int min, int max) { return STRING; }
     static <T> Codec<T> stringResolver(Function<T, String> toString, Function<String, T> fromString) { return null; }

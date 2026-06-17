@@ -633,4 +633,7 @@ public class RenderSystem {
 
     public static void enableScissorForRenderTypeDraws(int x, int y, int width, int height) {}
     public static void disableScissorForRenderTypeDraws() {}
+
+    public static void backupProjectionMatrix() {}
+    public static void restoreProjectionMatrix() {}
 }
