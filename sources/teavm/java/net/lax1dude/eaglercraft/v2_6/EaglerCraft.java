@@ -177,18 +177,23 @@ public class EaglerCraft {
                         }
 
                         // Step 1: Initialize platform service locator
+                        ClientMain.log("[EaglerCraft] Step 1: PlatformWebService.init()...");
                         PlatformWebService.init();
 
                         // Step 2: Load the player profile from localStorage
+                        ClientMain.log("[EaglerCraft] Step 2: EaglerProfile.load()...");
                         EaglerProfile.load();
 
                         // Step 3: Configure the WebGL2 rendering pipeline
+                        ClientMain.log("[EaglerCraft] Step 3: setupRenderingPipeline()...");
                         setupRenderingPipeline();
 
                         // Step 4: Apply audio settings from profile
+                        ClientMain.log("[EaglerCraft] Step 4: applyAudioSettings()...");
                         applyAudioSettings();
 
                         // Step 5: Create the Minecraft game instance
+                        ClientMain.log("[EaglerCraft] Step 5: createMinecraftInstance()...");
                         createMinecraftInstance();
 
                         // Step 6: Signal readiness
@@ -379,6 +384,8 @@ public class EaglerCraft {
                                 );
 
                         ClientMain.log("[EaglerCraft] Constructing Minecraft(" + canvasWidth + "x" + canvasHeight + ")...");
+                        ClientMain.log("[EaglerCraft] This will initialize DataFixers, resource packs, rendering, etc.");
+                        ClientMain.log("[EaglerCraft] May take several minutes on slow devices...");
                         net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
                         minecraftInstance = mc;
                         ClientMain.log("[EaglerCraft] Minecraft instance created!");

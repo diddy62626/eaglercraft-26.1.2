@@ -229,8 +229,10 @@ public class ClientMain {
 
                         // Initialize the EaglerCraft adapter layer on the first frame
                         if (!eaglercraftInitialized) {
-                                EaglerCraft.initialize();
+                                log("[ClientMain] First frame — calling EaglerCraft.initialize()...");
                                 eaglercraftInitialized = true;
+                                EaglerCraft.initialize();
+                                log("[ClientMain] EaglerCraft.initialize() returned!");
                         }
 
                         // Tick the game
