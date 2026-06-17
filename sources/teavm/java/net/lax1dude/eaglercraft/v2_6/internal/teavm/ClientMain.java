@@ -110,16 +110,17 @@ public class ClientMain {
                 }
 
                 try {
-                        // Load client configuration from the bootstrap page
+                        log("[ClientMain] _main() started — loading config...");
                         config = loadConfig();
+                        log("[ClientMain] Config loaded. Detecting browser features...");
 
-                        // Detect browser capabilities
                         detectBrowserFeatures();
+                        log("[ClientMain] Features detected. Creating canvas...");
 
-                        // Validate minimum requirements (WebGL2 is mandatory)
                         if (webgl == null) {
                                 createCanvasAndContext();
                         }
+                        log("[ClientMain] Canvas created. WebGL2: " + (webgl != null));
 
                         if (webgl == null) {
                                 showCrashScreen("WebGL2 is not supported by your browser!\n\n"
@@ -128,19 +129,25 @@ public class ClientMain {
                                 return;
                         }
 
-                        // Initialize platform subsystems
+                        log("[ClientMain] Initializing platform subsystems...");
                         PlatformOpenGL._init();
+                        log("[ClientMain] PlatformOpenGL done");
                         PlatformInput._init();
+                        log("[ClientMain] PlatformInput done");
                         PlatformRuntime._init();
+                        log("[ClientMain] PlatformRuntime done");
                         PlatformAudio._init();
+                        log("[ClientMain] PlatformAudio done");
                         PlatformApplication._init();
+                        log("[ClientMain] PlatformApplication done");
 
                         initialized = true;
+                        log("[ClientMain] Starting game loop...");
 
-                        // Start the game loop
                         startGameLoop();
 
                 } catch (Throwable t) {
+                        log("[ClientMain] CRASH: " + t.getClass().getName() + ": " + t.getMessage());
                         showCrashScreen("Failed to initialize EaglerCraft 26.1.2!\n\n" + t.getMessage());
                 }
         }
