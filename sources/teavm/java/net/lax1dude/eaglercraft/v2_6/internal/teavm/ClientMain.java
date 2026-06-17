@@ -209,12 +209,9 @@ public class ClientMain {
          * optimized for EaglerCraft 26.1.2.
          */
         private static WebGL2RenderingContext createWebGL2Context(HTMLCanvasElement canvasElement) {
-                JSObject attrs = null;
-                if (config != null && config.getGLContextAttributes() != null) {
-                        attrs = createContextAttributes(config.getGLContextAttributes());
-                } else {
-                        attrs = createDefaultContextAttributes();
-                }
+                // Always use default attributes — the config's getGLContextAttributes()
+                // returns a TeaVM JSO wrapper that doesn't have .alpha property
+                JSObject attrs = createDefaultContextAttributes();
                 return tryCreateWebGL2(canvasElement, attrs);
         }
 
