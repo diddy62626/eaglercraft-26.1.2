@@ -14,6 +14,7 @@ public class RenderPipeline {
     public boolean isCull() { return false; }
     public void updateSortKeySeed() {}
     public net.minecraft.resources.Identifier getLocation() { return location; }
+    public ColorTargetState getColorTargetState() { return new ColorTargetState(); }
 
     public interface Snippet {}
 
@@ -35,12 +36,8 @@ public class RenderPipeline {
         public Builder withUniform(String name, UniformType type) { return this; }
         public Builder withUniform(String name, UniformType type, com.mojang.blaze3d.textures.TextureFormat format) { return this; }
         public Builder withShaderDefine(String define) { return this; }
+        public Builder withPolygonMode(com.mojang.blaze3d.platform.PolygonMode mode) { return this; }
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
-    }
-
-    public ColorTargetState getColorTargetState() { return new ColorTargetState(); }
-
-        public Builder withPolygonMode(com.mojang.blaze3d.platform.PolygonMode mode) { return this; }
     }
 }
