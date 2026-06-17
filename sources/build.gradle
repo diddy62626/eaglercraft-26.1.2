@@ -333,11 +333,7 @@ teavm {
         // Common configuration (applies to all targets)
         mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-        // Use SIMPLE optimization to skip SSA-based optimizer passes that crash
-        // on plugin-injected methods without programs.
-        // SIMPLE still generates correct JavaScript but skips dead code elimination
-        // and other SSA-dependent optimizations.
-        optimization = org.teavm.gradle.api.OptimizationLevel.NONE
+        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
 
         // Additional TeaVM properties
         properties = [
