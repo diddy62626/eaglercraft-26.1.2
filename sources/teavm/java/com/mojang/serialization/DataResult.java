@@ -88,4 +88,6 @@ public final class DataResult<T> {
         if (errorMessage != null) throw exceptionFactory.apply(errorMessage);
         return partial != null ? partial : value;
     }
+
+    public DataResult<T> apply2stable(java.util.function.BiFunction<T, T, T> fn, DataResult<T> other) { return this; }
 }
