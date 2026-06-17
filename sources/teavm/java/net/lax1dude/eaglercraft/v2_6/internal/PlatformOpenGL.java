@@ -80,13 +80,25 @@ public class PlatformOpenGL {
                         ClientMain.warn("OES_texture_float_linear not available - float texture filtering may not work");
                 }
 
-                // Cache GL strings
-                glVersion = gl.getString(WebGL2RenderingContext.VERSION);
-                glVendor = gl.getString(WebGL2RenderingContext.VENDOR);
-                glRenderer = gl.getString(WebGL2RenderingContext.RENDERER);
+                // Cache GL strings — WebGL2 uses getParameter() not getString()
+                // (getString is OpenGL ES API, not WebGL)
+                glVersion = getParameterString(WebGL2RenderingContext.VERSION);
+                glVendor = getParameterString(WebGL2RenderingContext.VENDOR);
+                glRenderer = getParameterString(WebGL2RenderingContext.RENDERER);
 
                 ClientMain.log("[PlatformOpenGL] WebGL2 initialized: " + glVersion);
                 ClientMain.log("[PlatformOpenGL] Vendor: " + glVendor + ", Renderer: " + glRenderer);
+        }
+
+        /**
+         * Gets a string parameter from WebGL2 using getParameter() (not getString()
+         * which doesn't exist in the WebGL API).
+         */
+        @JSBody(params = { "gl", "pname" }, script = "var r = gl.getParameter(pname); return r ? '' + r : '';")
+        private static native String getParameterString(WebGL2RenderingContext gl, int pname);
+
+        private static String getParameterString(int pname) {
+                return getParameterString(gl, pname);
         }
 
         // ========== Context State ==========
@@ -906,7 +918,7 @@ public class PlatformOpenGL {
         }
 
         public static String _wglGetString(int pname) {
-                return gl.getString(pname);
+                return getParameterString(gl, pname);
         }
 
         public static JSObject _wglGetParameter(int pname) {
