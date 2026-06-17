@@ -386,13 +386,6 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         add("java.lang.invoke.MethodHandle", "invokeExact", ValueType.BOOLEAN,
             new ValueType[] { ValueType.object("java.lang.Class") }, 0, false);
 
-        // ===== PrimitiveCodec.optionalFieldOf(String) returning MapCodec =====
-        // Java won't allow this override (return type clash with Codec), but TeaVM's
-        // IR doesn't have this restriction. The plugin adds it at IR level.
-        add("com.mojang.serialization.codecs.PrimitiveCodec", "optionalFieldOf",
-            ValueType.object("com.mojang.serialization.MapCodec"),
-            new ValueType[] { ValueType.object("java.lang.String") }, null, false);
-
     }
 
     private static void add(String className, String methodName, ValueType returnType, ValueType[] paramTypes, Object defaultValue, boolean isStatic) {
