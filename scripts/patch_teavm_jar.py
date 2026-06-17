@@ -76,7 +76,7 @@ for i in range(len(patched_data) - 4):
         # by checking if this is in the method body (after the constant pool)
         if i > string_idx or i > 1000:  # Skip constant pool entries
             print(f"  Patching athrow at offset {i+3} (after invokespecial at {i})")
-            patched_data[i+3] = 0x57  # pop instead of athrow
+            patched_data[i+3] = 0xB1  # return instead of athrow (exit method immediately)
             patched_count += 1
 
 print(f"Patched {patched_count} athrow instructions")
