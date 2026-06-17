@@ -8,6 +8,7 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.Program;
 import org.teavm.model.BasicBlock;
 import org.teavm.model.ValueType;
+import org.teavm.model.Modifier;
 import org.teavm.model.instructions.ExitInstruction;
 import org.teavm.model.instructions.NullConstantInstruction;
 import org.teavm.model.instructions.IntegerConstantInstruction;
@@ -408,9 +409,12 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Don't set a program — let TeaVM treat it as a native/abstract method
-            // that returns default values. Setting an incorrect program causes
-            // TeaVM optimizer crashes (NPE, AssertionError, IllegalArgumentException).
+            // Set NATIVE modifier so TeaVM doesn't generate a default program
+            // (which causes assertion errors). NATIVE methods return default values.
+            m.getModifiers().add(Modifier.NATIVE);
+            if (spec.isStatic) {
+                m.getModifiers().add(Modifier.STATIC);
+            }
             cls.addMethod(m);
         }
     }
