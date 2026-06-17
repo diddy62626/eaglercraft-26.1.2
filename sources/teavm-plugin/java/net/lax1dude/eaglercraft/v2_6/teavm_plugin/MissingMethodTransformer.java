@@ -431,15 +431,12 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
     private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
         Program program = new Program();
 
-        // Variable layout:
-        //   Instance methods: 0=this, 1..paramCount=params, paramCount+1=return
-        //   Static methods:   0..paramCount-1=params, paramCount=return
-        int slotCount = isStatic ? paramCount : (1 + paramCount); // this + params
-        int retValVar = returnType == ValueType.VOID ? -1 : slotCount;
-        int totalVars = returnType == ValueType.VOID ? slotCount : (slotCount + 1);
-
-        // Ensure at least 1 variable (TeaVM requires variable 0 to exist)
-        if (totalVars < 1) totalVars = 1;
+        // Always create: this(if instance) + params + return(if non-void) + 1 extra
+        // TeaVM's internal processing expects all these slots to exist.
+        int thisOffset = isStatic ? 0 : 1;
+        int retValVar = thisOffset + paramCount;
+        // Always create one extra variable to avoid ArrayIndexOutOfBounds
+        int totalVars = thisOffset + paramCount + 1;
 
         for (int i = 0; i < totalVars; i++) {
             program.createVariable();
