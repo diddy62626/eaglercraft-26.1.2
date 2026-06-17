@@ -424,57 +424,20 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
     private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
         Program program = new Program();
 
-        // Always create: this(if instance) + params + return(if non-void) + 1 extra
-        // TeaVM's internal processing expects all these slots to exist.
+        // Create minimal variables: this(if instance) + params + 1 extra
         int thisOffset = isStatic ? 0 : 1;
-        int retValVar = thisOffset + paramCount;
-        // Always create one extra variable to avoid ArrayIndexOutOfBounds
         int totalVars = thisOffset + paramCount + 1;
-
         for (int i = 0; i < totalVars; i++) {
             program.createVariable();
         }
 
         BasicBlock block = program.createBasicBlock();
 
-        if (returnType == ValueType.VOID) {
-            // For void methods, return variable 0 (this/first param) — TeaVM ignores it
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(0));
-            block.add(exit);
-        } else {
-            if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
-                returnType == ValueType.BYTE || returnType == ValueType.SHORT ||
-                returnType == ValueType.CHARACTER) {
-                IntegerConstantInstruction insn = new IntegerConstantInstruction();
-                insn.setConstant(valueToInt(defaultValue));
-                insn.setReceiver(program.variableAt(retValVar));
-                block.add(insn);
-            } else if (returnType == ValueType.LONG) {
-                LongConstantInstruction insn = new LongConstantInstruction();
-                insn.setConstant(valueToLong(defaultValue));
-                insn.setReceiver(program.variableAt(retValVar));
-                block.add(insn);
-            } else if (returnType == ValueType.FLOAT) {
-                FloatConstantInstruction insn = new FloatConstantInstruction();
-                insn.setConstant((float) valueToDouble(defaultValue));
-                insn.setReceiver(program.variableAt(retValVar));
-                block.add(insn);
-            } else if (returnType == ValueType.DOUBLE) {
-                DoubleConstantInstruction insn = new DoubleConstantInstruction();
-                insn.setConstant(valueToDouble(defaultValue));
-                insn.setReceiver(program.variableAt(retValVar));
-                block.add(insn);
-            } else {
-                NullConstantInstruction insn = new NullConstantInstruction();
-                insn.setReceiver(program.variableAt(retValVar));
-                block.add(insn);
-            }
-
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        }
+        // For ALL methods (void and non-void), just add a bare ExitInstruction
+        // without any return value. TeaVM will use default values (0/null/false).
+        // This avoids all IR validation issues with constant instructions.
+        ExitInstruction exit = new ExitInstruction();
+        block.add(exit);
 
         return program;
     }
