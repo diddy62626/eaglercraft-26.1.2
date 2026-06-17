@@ -316,9 +316,9 @@ public class WorkerMain {
 
         @JSBody(params = {}, script = ""
                         + "if (self.performance && self.performance.now) {"
-                        + "  return Math.floor(self.performance.now());"
+                        + "  return BigInt(Math.floor(self.performance.now()));"
                         + "} else {"
-                        + "  return Date.now();"
+                        + "  return BigInt(Date.now());"
                         + "}")
         private static native long getCurrentTimeMillis0();
 

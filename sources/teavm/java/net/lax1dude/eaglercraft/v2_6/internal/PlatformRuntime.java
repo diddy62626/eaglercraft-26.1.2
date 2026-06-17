@@ -50,10 +50,10 @@ public class PlatformRuntime {
         private static float devicePixelRatio = 1.0f;
 
         /** Frame delta time in milliseconds. */
-        private static long deltaTimeMs = 0;
+        private static long deltaTimeMs = 0L;
 
         /** Total elapsed time in milliseconds. */
-        private static long totalTimeMs = 0;
+        private static long totalTimeMs = 0L;
 
         /** Performance timing origin (navigation start). */
         private static long timeOrigin = 0;
@@ -486,17 +486,17 @@ public class PlatformRuntime {
 
         @JSBody(params = {}, script = ""
                         + "if (window.performance && window.performance.now) {"
-                        + "  return Math.floor(window.performance.now());"
+                        + "  return BigInt(Math.floor(window.performance.now()));"
                         + "} else {"
-                        + "  return Date.now();"
+                        + "  return BigInt(Date.now());"
                         + "}")
         private static native long getCurrentTimeMillis0();
 
         @JSBody(params = {}, script = ""
                         + "if (window.performance && window.performance.timeOrigin) {"
-                        + "  return Math.floor(window.performance.timeOrigin);"
+                        + "  return BigInt(Math.floor(window.performance.timeOrigin));"
                         + "} else {"
-                        + "  return 0;"
+                        + "  return 0n;"
                         + "}")
         private static native long getTimeOrigin0();
 
