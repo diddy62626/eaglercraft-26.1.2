@@ -201,9 +201,37 @@ afterEvaluate {
     tasks.matching { it.name == 'generateJavaScript' }.configureEach {
         dependsOn 'compileTeavmJava'
         inputs.files sourceSets.teavm.output
+
+        // ── Patch teavm-core JAR to suppress PhiUpdater assertion ──
+        // The assertion "Variable used before definition" in PhiUpdater
+        // fires for plugin-injected NATIVE methods. We patch the JAR
+        // to replace `athrow` with `pop` for the AssertionError throw.
+        doFirst {
+            def teavmCoreJar = classpath.files.find { it.name.startsWith('teavm-core-') && it.name.endsWith('.jar') }
+            if (teavmCoreJar != null) {
+                logger.lifecycle("Patching teavm-core JAR: ${teavmCoreJar}")
+                def patchScript = rootProject.file('scripts/patch_teavm_jar.py')
+                if (patchScript.exists()) {
+                    def pb = new ProcessBuilder('python3', patchScript.absolutePath,
+                            teavmCoreJar.absolutePath, teavmCoreJar.absolutePath + '.tmp')
+                    pb.redirectErrorStream(true)
+                    def proc = pb.start()
+                    def out = proc.inputStream.text
+                    def exitCode = proc.waitFor()
+                    if (exitCode == 0) {
+                        teavmCoreJar.delete()
+                        new File(teavmCoreJar.absolutePath + '.tmp').renameTo(teavmCoreJar)
+                        logger.lifecycle("Successfully patched teavm-core JAR")
+                    } else {
+                        logger.warn("Failed to patch teavm-core JAR: ${out}")
+                    }
+                }
+            } else {
+                logger.warn("teavm-core JAR not found on classpath — skipping patch")
+            }
+        }
+
         // Prepend our classes so they're scanned first by TeaVM.
-        // ConfigurableFileCollection.from() appends, so we use setFrom()
-        // with our classes first, then add the rest.
         def patchClassesDir = file('teavm/patch/classes')
         def jdkPatchClassesDir = file('teavm/patch/jdk-classes')
         def ourClasses = [patchClassesDir, jdkPatchClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
