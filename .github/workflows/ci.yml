@@ -94,6 +94,25 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
+      # ── Download TeaVM deps and patch JAR BEFORE Gradle loads classes ──
+      - name: Download and patch TeaVM dependencies
+        run: |
+          echo "Downloading TeaVM dependencies..."
+          cd /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
+          ./gradlew :sources:dependencies --configuration teavmClasspath --no-daemon 2>/dev/null || true
+          echo "Finding teavm-core JARs..."
+          TEAVM_JARS=$(find ~/.gradle/caches -name "teavm-core-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null || true)
+          if [ -z "$TEAVM_JARS" ]; then
+            echo "WARNING: teavm-core JAR not found — will try again after build"
+          else
+            for JAR in $TEAVM_JARS; do
+              echo "Patching $JAR"
+              python3 scripts/patch_teavm_jar.py "$JAR" "$JAR.tmp"
+              mv "$JAR.tmp" "$JAR"
+              echo "Done patching: $JAR"
+            done
+          fi
+
       # ── Make scripts executable ──────────────────────────────
       - name: Make scripts executable
         run: |
