@@ -276,7 +276,7 @@ public class ClientMain {
         /**
          * Loads the client configuration from window.__eaglercraftXClientConfig.
          */
-        @JSBody(params = {}, script = "return window.__eaglercraftXClientConfig || null;")
+        @JSBody(params = {}, script = "return window.eaglercraftXOpts || window.__eaglercraftXClientConfig || null;")
         private static native IClientConfig loadConfig();
 
         /**
