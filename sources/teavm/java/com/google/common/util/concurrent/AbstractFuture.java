@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
  *
  * This class is placed on the classpath BEFORE the real Guava JAR.
  */
-abstract class AbstractFuture<V> extends AbstractFutureState {
+abstract class AbstractFuture<V> extends AbstractFutureState implements ListenableFuture<V> {
 
     /** The result of the future, or null if not yet complete. */
     private volatile Object result;
