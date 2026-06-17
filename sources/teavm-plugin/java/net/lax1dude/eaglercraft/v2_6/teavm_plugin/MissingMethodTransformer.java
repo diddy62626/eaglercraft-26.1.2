@@ -408,15 +408,9 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue, spec.isStatic);
-            m.setProgram(program);
-
-            // NOTE: TeaVM 0.15's API for setting the STATIC modifier on a MethodHolder
-            // is unclear without inspecting the actual JAR. TeaVM is generally lenient
-            // about static vs instance when resolving method references at the IR level,
-            // so we don't set the modifier explicitly. If TeaVM complains about static
-            // methods, we'll need to find the right API (likely via reflection).
-
+            // Don't set a program — let TeaVM treat it as a native/abstract method
+            // that returns default values. Setting an incorrect program causes
+            // TeaVM optimizer crashes (NPE, AssertionError, IllegalArgumentException).
             cls.addMethod(m);
         }
     }
