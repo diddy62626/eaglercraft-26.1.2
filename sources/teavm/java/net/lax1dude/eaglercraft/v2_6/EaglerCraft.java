@@ -391,10 +391,17 @@ public class EaglerCraft {
                         ClientMain.log("[EaglerCraft] Minecraft instance created!");
 
                 } catch (Throwable t) {
-                        ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getMessage());
+                        ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getClass().getName() + ": " + t.getMessage());
                         StackTraceElement[] stack = t.getStackTrace();
-                        for (int i = 0; i < Math.min(stack.length, 10); i++) {
+                        for (int i = 0; i < Math.min(stack.length, 20); i++) {
                                 ClientMain.warn("  at " + stack[i].toString());
+                        }
+                        if (t.getCause() != null) {
+                                ClientMain.warn("[EaglerCraft] Caused by: " + t.getCause().getClass().getName() + ": " + t.getCause().getMessage());
+                                StackTraceElement[] causeStack = t.getCause().getStackTrace();
+                                for (int i = 0; i < Math.min(causeStack.length, 20); i++) {
+                                        ClientMain.warn("  at " + causeStack[i].toString());
+                                }
                         }
                         ClientMain.log("[EaglerCraft] Running in adapter-only mode");
                 }
