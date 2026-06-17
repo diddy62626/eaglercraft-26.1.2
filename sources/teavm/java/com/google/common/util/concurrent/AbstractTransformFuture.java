@@ -31,4 +31,15 @@ abstract class AbstractTransformFuture<I, O> extends AbstractFuture<O> {
     }
 
     abstract O transform(I input) throws Exception;
+
+    static <I, O> ListenableFuture<O> create(ListenableFuture<I> inputFuture,
+            com.google.common.base.Function<I, O> function,
+            java.util.concurrent.Executor executor) {
+        return new AbstractTransformFuture<I, O>() {
+            @Override
+            O transform(I input) {
+                return function.apply(input);
+            }
+        };
+    }
 }

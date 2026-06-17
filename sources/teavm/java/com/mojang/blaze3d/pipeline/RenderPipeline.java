@@ -40,4 +40,7 @@ public class RenderPipeline {
     }
 
     public ColorTargetState getColorTargetState() { return new ColorTargetState(); }
+
+        public Builder withPolygonMode(com.mojang.blaze3d.platform.PolygonMode mode) { return this; }
+    }
 }
