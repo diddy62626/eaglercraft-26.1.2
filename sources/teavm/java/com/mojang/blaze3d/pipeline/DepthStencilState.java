@@ -8,6 +8,8 @@ public class DepthStencilState {
     public boolean depthWriteEnabled = true;
     public String depthFunction = "LESS";
     public boolean stencilEnabled = false;
+    public float stencilFrontRef = 0;
+    public float stencilBackRef = 0;
 
     public DepthStencilState() {}
 
@@ -15,5 +17,12 @@ public class DepthStencilState {
         this.depthTestEnabled = depthFunc != null;
         this.depthWriteEnabled = depthWrite;
         this.depthFunction = depthFunc != null ? depthFunc.name() : "LESS";
+    }
+
+    public DepthStencilState(com.mojang.blaze3d.platform.CompareOp depthFunc, boolean depthWrite, float stencilFrontRef, float stencilBackRef) {
+        this(depthFunc, depthWrite);
+        this.stencilFrontRef = stencilFrontRef;
+        this.stencilBackRef = stencilBackRef;
+        this.stencilEnabled = true;
     }
 }
