@@ -1,19 +1,17 @@
 package com.mojang.serialization;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * EaglerCraft stub for MapCodec.
  *
- * In MC 26.1.2, MapCodec extends Codec. But Java's type erasure causes name clashes
- * for methods like recursive(String, Function) and optionalFieldOf(String) when
- * MapCodec tries to override with different (covariant) return types.
+ * STANDALONE interface — does NOT extend Codec.
+ * This avoids name clashes for recursive() and optionalFieldOf().
  *
- * Solution: MapCodec does NOT extend Codec. It's a standalone interface that
- * provides codec() to convert to a Codec when needed. The TeaVM plugin transformer
- * handles type compatibility at the IR level.
+ * SimpleMapCodec extends BOTH MapCodec and Codec, but since MapCodec
+ * no longer defines methods with the same erasure as Codec, there's
+ * no conflict.
  */
 public interface MapCodec<T> {
     default Codec<T> codec() { return new Codec<T>() {
@@ -27,7 +25,7 @@ public interface MapCodec<T> {
     default <S> MapCodec<S> flatXmap(Function<T, DataResult<S>> to, Function<S, DataResult<T>> from) { return null; }
     default <S> MapCodec<S> xmap(Function<T, S> to, Function<S, T> from) { return null; }
     default MapCodec<T> orElse(T defaultValue) { return this; }
-    default MapCodec<T> orElseGet(Supplier<T> supplier) { return this; }
+    // NOTE: orElseGet removed — inherited from Codec via SimpleMapCodec
     default MapCodec<T> recursive(String name, Function<MapCodec<T>, MapCodec<T>> function) { return this; }
     default MapCodec<T> withLifecycle(Lifecycle lifecycle) { return this; }
     default MapCodec<T> stable() { return this; }
@@ -38,5 +36,5 @@ public interface MapCodec<T> {
     default Codec<T> unitCodec(T defaultValue) { return codec(); }
     default Codec<T> unitCodec(Supplier<T> defaultValue) { return codec(); }
     default MapCodec<T> validate(Function<T, DataResult<T>> validator) { return this; }
-    default MapCodec<T> orElseGet(java.util.function.Consumer<String> onError, Supplier<T> supplier) { return this; }
+    // NOTE: orElseGet(Consumer, Supplier) removed — causes clash with Codec.orElseGet
 }

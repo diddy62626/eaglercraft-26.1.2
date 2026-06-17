@@ -3,40 +3,52 @@ package com.mojang.blaze3d.vertex;
 /**
  * EaglerCraft 26.1.2 browser override for com.mojang.blaze3d.vertex.PoseStack.
  *
- * Extends systems.PoseStack but overrides last() to return a standalone Pose
- * class (not extending systems.PoseStack.Pose) to allow covariant return type
- * for copy() and avoid Java's single-inheritance limitation.
+ * STANDALONE class — does NOT extend systems.PoseStack.
+ * This allows Pose to be a standalone class with copy() returning
+ * vertex.PoseStack.Pose (covariant return type, no parent clash).
  *
- * Note: We can't extend both systems.PoseStack (for the stack methods) AND
- * have Pose extend systems.PoseStack.Pose (for the pose methods) while also
- * overriding copy() with a different return type. So Pose is standalone.
+ * All stack methods (pushPose, popPose, etc.) are re-implemented here.
  */
-public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
+public class PoseStack {
+
+    private final java.util.Deque<Pose> poseStack = new java.util.ArrayDeque<>();
 
     public PoseStack() {
-        super();
+        poseStack.push(new Pose());
     }
 
-    @Override
     public Pose last() {
-        return new Pose();
+        return poseStack.peek();
     }
 
-    // Overload (not override) - parent has mulPose(Quaternionf), MC 26.1.2 calls mulPose(Quaternionfc)
+    public void pushPose() {
+        poseStack.push(new Pose(poseStack.peek()));
+    }
+
+    public void popPose() {
+        if (poseStack.size() <= 1) {
+            throw new IllegalStateException("Cannot pop the last pose from the stack");
+        }
+        poseStack.pop();
+    }
+
     public void mulPose(org.joml.Quaternionfc q) {}
     public void mulPose(org.joml.Matrix4fc mat) {}
-    public void setIdentity() {}
+    public void setIdentity() { poseStack.peek().setIdentity(); }
     public void scale(float x, float y, float z) {}
-    public void translate(float x, float y, float z) {}
-    public void pushPose() { super.pushPose(); }
-    public void popPose() { super.popPose(); }
-    public boolean isEmpty() { return false; }
+    public void translate(float x, float y, float z) {
+        poseStack.peek().translate(x, y, z);
+    }
+    public boolean isEmpty() { return poseStack.size() <= 1; }
     public void rotateAround(org.joml.Quaternionfc q, float x, float y, float z) {}
+    public void clear() {
+        poseStack.clear();
+        poseStack.push(new Pose());
+    }
 
     /**
      * Standalone Pose class — does NOT extend systems.PoseStack.Pose.
-     * This allows us to have copy() return vertex.PoseStack.Pose (covariant)
-     * without clashing with the parent's copy() returning Matrix4f.
+     * This allows copy() to return vertex.PoseStack.Pose.
      */
     public static class Pose {
         private final org.joml.Matrix4f pose;
@@ -50,6 +62,11 @@ public class PoseStack extends com.mojang.blaze3d.systems.PoseStack {
         public Pose(org.joml.Matrix4f pose, org.joml.Matrix3f normal) {
             this.pose = pose;
             this.normal = normal;
+        }
+
+        public Pose(Pose parent) {
+            this.pose = new org.joml.Matrix4f(parent.pose);
+            this.normal = new org.joml.Matrix3f(parent.normal);
         }
 
         public org.joml.Matrix4f pose() { return pose; }
