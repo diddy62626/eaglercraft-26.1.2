@@ -409,11 +409,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Mark as ABSTRACT so TeaVM skips program generation entirely.
-            // ABSTRACT methods have no implementation — TeaVM generates
-            // stubs that throw AbstractMethodError at runtime, which is
-            // acceptable for our stub methods.
-            m.getModifiers().add(ElementModifier.ABSTRACT);
+            // Create a program with proper default return values.
+            // The PhiUpdater JAR patch suppresses the assertion that
+            // previously crashed when processing these programs.
+            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue);
+            m.setProgram(program);
             if (spec.isStatic) {
                 m.getModifiers().add(ElementModifier.STATIC);
             }
@@ -421,43 +421,16 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         }
     }
 
-    private Program createSafeProgram(ValueType returnType, int paramCount, boolean isStatic) {
-        Program program = new Program();
-
-        // Variable layout: this(if instance) + params + return
-        int thisOffset = isStatic ? 0 : 1;
-        int retValVar = thisOffset + paramCount;
-        int totalVars = thisOffset + paramCount + 1; // always +1 for return
-
-        for (int i = 0; i < totalVars; i++) {
-            program.createVariable();
-        }
-
-        BasicBlock block = program.createBasicBlock();
-
-        // Explicitly define ALL variables with NullConstantInstruction.
-        // This satisfies TeaVM's assertion that all variables are "defined"
-        // before being "used". Even parameter variables need explicit definition
-        // in plugin-injected methods.
-        for (int i = 0; i < totalVars; i++) {
-            NullConstantInstruction nullInsn = new NullConstantInstruction();
-            nullInsn.setReceiver(program.variableAt(i));
-            block.add(nullInsn);
-        }
-
-        // Exit with the return variable (index retValVar)
-        ExitInstruction exit = new ExitInstruction();
-        exit.setValueToReturn(program.variableAt(retValVar));
-        block.add(exit);
-
-        return program;
-    }
 
     private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
         Program program = new Program();
 
-        // Create minimal variables: this(if instance) + params + 1 extra
+        // Variable layout:
+        //   Instance: 0=this, 1..paramCount=params, paramCount+1=return
+        //   Static:   0..paramCount-1=params, paramCount=return
         int thisOffset = isStatic ? 0 : 1;
+        int retValVar = thisOffset + paramCount;
+        // Always create at least this+params+1 variables
         int totalVars = thisOffset + paramCount + 1;
         for (int i = 0; i < totalVars; i++) {
             program.createVariable();
@@ -465,11 +438,56 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
 
         BasicBlock block = program.createBasicBlock();
 
-        // For ALL methods (void and non-void), just add a bare ExitInstruction
-        // without any return value. TeaVM will use default values (0/null/false).
-        // This avoids all IR validation issues with constant instructions.
-        ExitInstruction exit = new ExitInstruction();
-        block.add(exit);
+        if (returnType == ValueType.VOID) {
+            // Void: just exit
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(null);
+            block.add(exit);
+        } else if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
+                   returnType == ValueType.BYTE || returnType == ValueType.SHORT ||
+                   returnType == ValueType.CHARACTER) {
+            // Int-like: return 0 (or specified default)
+            IntegerConstantInstruction insn = new IntegerConstantInstruction();
+            insn.setConstant(valueToInt(defaultValue));
+            insn.setReceiver(program.variableAt(retValVar));
+            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+        } else if (returnType == ValueType.LONG) {
+            // Long: return 0L (or specified default)
+            LongConstantInstruction insn = new LongConstantInstruction();
+            insn.setConstant(valueToLong(defaultValue));
+            insn.setReceiver(program.variableAt(retValVar));
+            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+        } else if (returnType == ValueType.FLOAT) {
+            FloatConstantInstruction insn = new FloatConstantInstruction();
+            insn.setConstant((float) valueToDouble(defaultValue));
+            insn.setReceiver(program.variableAt(retValVar));
+            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+        } else if (returnType == ValueType.DOUBLE) {
+            DoubleConstantInstruction insn = new DoubleConstantInstruction();
+            insn.setConstant(valueToDouble(defaultValue));
+            insn.setReceiver(program.variableAt(retValVar));
+            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+        } else {
+            // Object/array types: return null
+            NullConstantInstruction insn = new NullConstantInstruction();
+            insn.setReceiver(program.variableAt(retValVar));
+            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+        }
 
         return program;
     }
