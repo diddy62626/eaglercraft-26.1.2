@@ -32,6 +32,7 @@ public class RenderPipeline {
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
         public Builder withUniform(String name, UniformType type) { return this; }
+        public Builder withUniform(String name, UniformType type, com.mojang.blaze3d.textures.TextureFormat format) { return this; }
         public Builder withShaderDefine(String define) { return this; }
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
