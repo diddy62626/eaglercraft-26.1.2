@@ -86,38 +86,40 @@ public class PlatformAudio {
          * AudioContext may not be usable until a user gesture resumes it.
          */
         public static void _init() {
-                if (!ClientMain.audioSupported) {
-                        ClientMain.warn("[PlatformAudio] Web Audio API not available");
-                        return;
+                try {
+                        if (!ClientMain.audioSupported) {
+                                ClientMain.warn("[PlatformAudio] Web Audio API not available");
+                                return;
+                        }
+
+                        // Create AudioContext with default sample rate (skip config to avoid JSO issues)
+                        int configuredRate = 48000;
+
+                        audioContext = createAudioContext(configuredRate);
+                        if (audioContext == null) {
+                                ClientMain.warn("[PlatformAudio] Failed to create AudioContext");
+                                return;
+                        }
+
+                        // Check AudioWorklet availability
+                        audioWorkletAvailable = checkAudioWorklet();
+
+                        // Get actual sample rate
+                        sampleRate = getAudioContextSampleRate(audioContext);
+
+                        // Store in JS global for native method access
+                        setAudioContextGlobal(audioContext);
+
+                        // Create audio processing graph
+                        setupAudioGraph();
+
+                        initialized = true;
+                        ClientMain.log("[PlatformAudio] Audio initialized (sampleRate=" + sampleRate
+                                        + ", worklet=" + audioWorkletAvailable + ")");
+                } catch (Throwable t) {
+                        ClientMain.warn("[PlatformAudio] Audio init failed (non-fatal): " + t.getMessage());
+                        initialized = false;
                 }
-
-                // Create AudioContext with configured sample rate
-                int configuredRate = 48000;
-                if (ClientMain.config != null) {
-                        configuredRate = ClientMain.config.getAudioSampleRate();
-                }
-
-                audioContext = createAudioContext(configuredRate);
-                if (audioContext == null) {
-                        ClientMain.warn("[PlatformAudio] Failed to create AudioContext");
-                        return;
-                }
-
-                // Check AudioWorklet availability
-                audioWorkletAvailable = checkAudioWorklet();
-
-                // Get actual sample rate
-                sampleRate = getAudioContextSampleRate(audioContext);
-
-                // Store in JS global for native method access
-                setAudioContextGlobal(audioContext);
-
-                // Create audio processing graph
-                setupAudioGraph();
-
-                initialized = true;
-                ClientMain.log("[PlatformAudio] Audio initialized (sampleRate=" + sampleRate
-                                + ", worklet=" + audioWorkletAvailable + ")");
         }
 
         /**
