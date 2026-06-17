@@ -8,7 +8,6 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.Program;
 import org.teavm.model.BasicBlock;
 import org.teavm.model.ValueType;
-import org.teavm.model.Modifier;
 import org.teavm.model.instructions.ExitInstruction;
 import org.teavm.model.instructions.NullConstantInstruction;
 import org.teavm.model.instructions.IntegerConstantInstruction;
@@ -409,14 +408,44 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Set NATIVE modifier so TeaVM doesn't generate a default program
-            // (which causes assertion errors). NATIVE methods return default values.
-            m.getModifiers().add(Modifier.NATIVE);
-            if (spec.isStatic) {
-                m.getModifiers().add(Modifier.STATIC);
-            }
+            // Create a minimal program that explicitly defines ALL variables
+            // (including parameters) to satisfy TeaVM's assertion checks.
+            Program program = createSafeProgram(spec.returnType, spec.paramTypes.length, spec.isStatic);
+            m.setProgram(program);
             cls.addMethod(m);
         }
+    }
+
+    private Program createSafeProgram(ValueType returnType, int paramCount, boolean isStatic) {
+        Program program = new Program();
+
+        // Variable layout: this(if instance) + params + return
+        int thisOffset = isStatic ? 0 : 1;
+        int retValVar = thisOffset + paramCount;
+        int totalVars = thisOffset + paramCount + 1; // always +1 for return
+
+        for (int i = 0; i < totalVars; i++) {
+            program.createVariable();
+        }
+
+        BasicBlock block = program.createBasicBlock();
+
+        // Explicitly define ALL variables with NullConstantInstruction.
+        // This satisfies TeaVM's assertion that all variables are "defined"
+        // before being "used". Even parameter variables need explicit definition
+        // in plugin-injected methods.
+        for (int i = 0; i < totalVars; i++) {
+            NullConstantInstruction nullInsn = new NullConstantInstruction();
+            nullInsn.setReceiver(program.variableAt(i));
+            block.add(nullInsn);
+        }
+
+        // Exit with the return variable (index retValVar)
+        ExitInstruction exit = new ExitInstruction();
+        exit.setValueToReturn(program.variableAt(retValVar));
+        block.add(exit);
+
+        return program;
     }
 
     private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
