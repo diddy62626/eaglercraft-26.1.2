@@ -480,8 +480,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             exit.setValueToReturn(program.variableAt(retValVar));
             block.add(exit);
         } else {
-            // Object/array types: return null
-            NullConstantInstruction insn = new NullConstantInstruction();
+            // Object/array types: use IntegerConstantInstruction(0) instead of
+            // NullConstantInstruction (which causes NPE in TeaVM's SSA optimizer).
+            // TeaVM will treat the int 0 as null/falsy at runtime for object types.
+            IntegerConstantInstruction insn = new IntegerConstantInstruction();
+            insn.setConstant(0);
             insn.setReceiver(program.variableAt(retValVar));
             block.add(insn);
             ExitInstruction exit = new ExitInstruction();
