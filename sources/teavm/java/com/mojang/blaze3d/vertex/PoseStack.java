@@ -82,4 +82,6 @@ public class PoseStack {
         public org.joml.Matrix4f translate(float x, float y, float z) { return new org.joml.Matrix4f(); }
         public void rotate(org.joml.Quaternionfc q) {}
     }
+
+    public void translate(double x, double y, double z) { translate((float)x, (float)y, (float)z); }
 }

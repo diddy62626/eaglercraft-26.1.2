@@ -36,4 +36,6 @@ public class RenderPipeline {
         public Snippet buildSnippet() { return new Snippet() {}; }
         public RenderPipeline build() { return new RenderPipeline(); }
     }
+
+    public ColorTargetState getColorTargetState() { return new ColorTargetState(); }
 }

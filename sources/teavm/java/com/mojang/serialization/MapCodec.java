@@ -37,4 +37,7 @@ public interface MapCodec<T> {
     default Codec<T> unitCodec(Supplier<T> defaultValue) { return codec(); }
     default MapCodec<T> validate(Function<T, DataResult<T>> validator) { return this; }
     // NOTE: orElseGet(Consumer, Supplier) removed — causes clash with Codec.orElseGet
+
+    default <S> Codec<S> dispatch(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return null; }
+    default MapCodec<T> orElseGet(java.util.function.Consumer<String> onError, java.util.function.Supplier<T> supplier) { return this; }
 }
