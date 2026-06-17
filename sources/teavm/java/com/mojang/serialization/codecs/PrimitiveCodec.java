@@ -24,6 +24,9 @@ public interface PrimitiveCodec<A> {
     default <S> Codec<S> comapFlatMap(Function<A, DataResult<S>> fn, Function<S, A> inverse) { return null; }
     default <S> Codec<S> flatXmap(Function<A, DataResult<S>> to, Function<S, DataResult<A>> from) { return null; }
     default <S> Codec<S> xmap(Function<A, S> to, Function<S, A> from) { return null; }
+    default <S> Codec<S> flatComapMap(Function<S, DataResult<A>> decoder, Function<A, S> encoder) { return null; }
+    default <S> Codec<S> comap(Function<S, A> fn) { return null; }
+    default <S> Codec<S> flatComap(Function<A, DataResult<S>> fn) { return null; }
     default Codec<A> listOf() { return null; }
     default Codec<A> sizeLimitedListOf(int maxSize) { return null; }
     default Codec<A> validate(Function<A, DataResult<A>> validator) { return null; }
