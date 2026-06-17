@@ -408,10 +408,8 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Create a minimal program that explicitly defines ALL variables
-            // (including parameters) to satisfy TeaVM's assertion checks.
-            Program program = createSafeProgram(spec.returnType, spec.paramTypes.length, spec.isStatic);
-            m.setProgram(program);
+            // No program — method is treated as abstract/native.
+            // TeaVM generates default stubs that return null/0/false.
             cls.addMethod(m);
         }
     }
