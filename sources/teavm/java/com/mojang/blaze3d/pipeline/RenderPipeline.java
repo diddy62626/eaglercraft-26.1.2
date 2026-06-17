@@ -28,6 +28,7 @@ public class RenderPipeline {
         public Builder withCull(boolean cull) { return this; }
         public Builder withDepthTest(String depthTest) { return this; }
         public Builder withDepthStencilState(DepthStencilState state) { return this; }
+        public Builder withDepthStencilState(java.util.Optional<DepthStencilState> state) { return this; }
         public Builder withColorTargetState(ColorTargetState state) { return this; }
         public Builder withSampler(String sampler) { return this; }
         public Builder withUniform(String name) { return this; }
