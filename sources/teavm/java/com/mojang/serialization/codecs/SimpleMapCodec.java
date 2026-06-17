@@ -7,9 +7,12 @@ import com.mojang.serialization.MapCodec;
 /**
  * EaglerCraft stub for SimpleMapCodec.
  *
- * In real MC, SimpleMapCodec extends MapCodec AND Codec. But since we made
- * MapCodec standalone (not extending Codec), SimpleMapCodec can extend both
- * without name clashes.
+ * Extends BOTH MapCodec and Codec. Since MapCodec is now standalone
+ * (not extending Codec), there are name clashes for methods like
+ * optionalFieldOf(String) which both define with different return types.
+ *
+ * Fix: SimpleMapCodec extends ONLY Codec (not MapCodec). It provides
+ * a codec() method that returns itself.
  */
-public interface SimpleMapCodec<K, V> extends MapCodec<java.util.Map<K, V>>, Keyable, Codec<java.util.Map<K, V>> {
+public interface SimpleMapCodec<K, V> extends Keyable, Codec<java.util.Map<K, V>> {
 }
