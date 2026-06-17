@@ -445,8 +445,9 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         BasicBlock block = program.createBasicBlock();
 
         if (returnType == ValueType.VOID) {
+            // For void methods, return variable 0 (this/first param) — TeaVM ignores it
             ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(null);
+            exit.setValueToReturn(program.variableAt(0));
             block.add(exit);
         } else {
             if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
