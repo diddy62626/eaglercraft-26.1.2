@@ -407,9 +407,9 @@ public class ClientMain {
          */
         @JSBody(params = {}, script = ""
                         + "if (window.performance && window.performance.now) {"
-                        + "  return Math.floor(window.performance.now());"
+                        + "  return BigInt(Math.floor(window.performance.now()));"
                         + "} else {"
-                        + "  return Date.now();"
+                        + "  return BigInt(Date.now());"
                         + "}")
         private static native long getCurrentTimeMillis();
 
