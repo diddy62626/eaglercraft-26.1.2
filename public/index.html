@@ -226,8 +226,22 @@
         var script = document.createElement("script");
         script.src = "classes.js";
         script.onload = function() {
-            console.log("[EaglerCraft] classes.js loaded, starting TeaVM runtime...");
-            setProgress(50, "Parsing game code (this takes a minute on slower devices)...");
+            console.log("[EaglerCraft] classes.js loaded, calling main()...");
+            setProgress(50, "Starting game engine...");
+            // TeaVM exports a UMD module with main() — call it
+            setTimeout(function() {
+                try {
+                    if (typeof self.main === 'function') {
+                        console.log("[EaglerCraft] Calling self.main()...");
+                        self.main(null);
+                    } else {
+                        console.error("[EaglerCraft] main() not found in global scope!");
+                    }
+                } catch(e) {
+                    console.error("[EaglerCraft] Error: " + e.message);
+                    console.error(e.stack);
+                }
+            }, 100);
         };
         script.onerror = function() {
             errorOverlay.classList.add("visible");
