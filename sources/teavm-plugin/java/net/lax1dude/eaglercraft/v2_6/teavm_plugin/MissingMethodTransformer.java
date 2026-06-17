@@ -408,8 +408,30 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // No program — method is treated as abstract/native.
-            // TeaVM generates default stubs that return null/0/false.
+            // Create a program using IntegerConstantInstruction for ALL variables.
+            // NullConstantInstruction causes "Node must not be null" in TeaVM's SSA.
+            // IntegerConstantInstruction produces a valid SSA node and the int value 0
+            // will be treated as null/false/0 at runtime depending on the return type.
+            Program program = new Program();
+            int thisOffset = spec.isStatic ? 0 : 1;
+            int retValVar = thisOffset + spec.paramTypes.length;
+            int totalVars = thisOffset + spec.paramTypes.length + 1;
+            for (int i = 0; i < totalVars; i++) {
+                program.createVariable();
+            }
+            BasicBlock block = program.createBasicBlock();
+            // Define ALL variables with IntegerConstantInstruction(0)
+            for (int i = 0; i < totalVars; i++) {
+                IntegerConstantInstruction insn = new IntegerConstantInstruction();
+                insn.setConstant(0);
+                insn.setReceiver(program.variableAt(i));
+                block.add(insn);
+            }
+            // Exit returning the return variable
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
+            m.setProgram(program);
             cls.addMethod(m);
         }
     }
