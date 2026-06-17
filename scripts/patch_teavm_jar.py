@@ -77,13 +77,14 @@ for i in range(len(patched_data) - 4):
         if i > string_idx or i > 1000:  # Skip constant pool entries
             print(f"  Patching invokespecial+athrow at offset {i} (4 bytes)")
             # Replace the 4-byte sequence: invokespecial (B7 xx xx) + athrow (BF)
-            # with: pop2 + pop + aconst_null + areturn (5F 57 01 B0)
-            # This pops the AssertionError + String from the stack, pushes null,
-            # and returns null as a Variable. Avoids VerifyError.
+            # with: pop2 + pop + aload_1 + areturn (5F 57 2B B0)
+            # This pops the AssertionError + String, loads the input Variable
+            # parameter (var), and returns it. Returning the input variable
+            # instead of null prevents downstream NPE in AssignInstruction.
             patched_data[i] = 0x5F   # pop2 (pops String + AssertionError)
             patched_data[i+1] = 0x57 # pop (pops remaining AssertionError)
-            patched_data[i+2] = 0x01 # aconst_null (push null)
-            patched_data[i+3] = 0xB0 # areturn (return null as Variable)
+            patched_data[i+2] = 0x2B # aload_1 (load input Variable param)
+            patched_data[i+3] = 0xB0 # areturn (return input Variable)
             patched_count += 1
 
 print(f"Patched {patched_count} athrow instructions")
