@@ -8,6 +8,7 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.Program;
 import org.teavm.model.BasicBlock;
 import org.teavm.model.ValueType;
+import org.teavm.model.ElementModifier;
 import org.teavm.model.instructions.ExitInstruction;
 import org.teavm.model.instructions.NullConstantInstruction;
 import org.teavm.model.instructions.IntegerConstantInstruction;
@@ -408,9 +409,13 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // No program set — TeaVM will generate a default stub.
-            // The assertion error from default stub generation is handled
-            // by setting optimization to NONE in build.gradle.
+            // Mark as NATIVE so TeaVM doesn't generate a default program
+            // (which causes "Variable used before definition" assertion).
+            // NATIVE methods return default values (0/null/false) at runtime.
+            m.getModifiers().add(ElementModifier.NATIVE);
+            if (spec.isStatic) {
+                m.getModifiers().add(ElementModifier.STATIC);
+            }
             cls.addMethod(m);
         }
     }
