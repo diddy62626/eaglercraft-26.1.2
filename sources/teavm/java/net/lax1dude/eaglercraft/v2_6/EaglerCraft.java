@@ -206,6 +206,19 @@ public class EaglerCraft {
                         // Signal to the browser that the game is ready
                         ClientMain.__eaglercraftReady();
 
+        @org.teavm.jso.JSBody(params = { "gameConfig" }, script = ""
+                        + "try {"
+                        + "  var mc = new net.minecraft.client.Minecraft(gameConfig);"
+                        + "  window.__minecraftInstance = mc;"
+                        + "  return '';"
+                        + "} catch(e) {"
+                        + "  return e.message + '\\n' + (e.stack || '');"
+                        + "}")
+        @org.teavm.jso.JSBody(params = {}, script = "return window.__minecraftInstance || null;")
+	private static native net.minecraft.client.Minecraft getMinecraftInstance();
+
+	@org.teavm.jso.JSBody(params = { "gameConfig" }, script = ""(Object gameConfig);
+
                 } catch (Throwable t) {
                         gameState = STATE_CRASHED;
                         String message = "EaglerCraft initialization failed!\n\n"
