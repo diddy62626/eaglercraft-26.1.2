@@ -146,8 +146,4 @@ abstract class AbstractFuture<V> extends AbstractFutureState {
         }
     }
 
-    @Override
-    boolean isDone() {
-        return done;
-    }
 }
