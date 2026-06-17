@@ -386,11 +386,11 @@ teavm {
     }
 
     js {
-        // Obfuscation disabled for development - faster compilation
-        obfuscated = false
+        // Obfuscation enabled — reduces classes.js from ~59MB to ~15MB
+        obfuscated = true
 
-        // Source maps for debugging
-        sourceMap = true
+        // Source maps disabled — saves 4MB and speeds up browser parsing
+        sourceMap = false
 
         // Output file name
         targetFileName = 'classes.js'
