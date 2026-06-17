@@ -412,7 +412,7 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             // Create a program with proper default return values.
             // The PhiUpdater JAR patch suppresses the assertion that
             // previously crashed when processing these programs.
-            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue);
+            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue, spec.isStatic);
             m.setProgram(program);
             if (spec.isStatic) {
                 m.getModifiers().add(ElementModifier.STATIC);
