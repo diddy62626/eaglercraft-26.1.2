@@ -409,10 +409,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Mark as NATIVE so TeaVM doesn't generate a default program
-            // (which causes "Variable used before definition" assertion).
-            // NATIVE methods return default values (0/null/false) at runtime.
-            m.getModifiers().add(ElementModifier.NATIVE);
+            // Mark as ABSTRACT so TeaVM skips program generation entirely.
+            // ABSTRACT methods have no implementation — TeaVM generates
+            // stubs that throw AbstractMethodError at runtime, which is
+            // acceptable for our stub methods.
+            m.getModifiers().add(ElementModifier.ABSTRACT);
             if (spec.isStatic) {
                 m.getModifiers().add(ElementModifier.STATIC);
             }
