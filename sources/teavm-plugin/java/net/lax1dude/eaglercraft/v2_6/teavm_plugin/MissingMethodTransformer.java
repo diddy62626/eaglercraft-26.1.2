@@ -409,11 +409,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            // Create a program with proper default return values.
-            // The PhiUpdater JAR patch suppresses the assertion that
-            // previously crashed when processing these programs.
-            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue, spec.isStatic);
-            m.setProgram(program);
+            // ABSTRACT methods have no program — TeaVM generates stubs that
+            // return undefined/null at runtime. This avoids ALL SSA optimizer
+            // crashes (NPE, AssertionError, IllegalArgumentException).
+            // MC catches the null returns and runs in adapter-only mode.
+            m.getModifiers().add(ElementModifier.ABSTRACT);
             if (spec.isStatic) {
                 m.getModifiers().add(ElementModifier.STATIC);
             }
