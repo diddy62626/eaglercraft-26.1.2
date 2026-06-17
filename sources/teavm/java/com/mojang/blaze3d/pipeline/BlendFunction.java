@@ -25,6 +25,7 @@ public class BlendFunction {
     public static final BlendFunction RAIN_SNOW = new BlendFunction();
     public static final BlendFunction DESTROY = new BlendFunction();
     public static final BlendFunction BEACON_BEAM = new BlendFunction();
+    public static final BlendFunction INVERT = new BlendFunction();
     public static final BlendFunction SPIDER_EYES = new BlendFunction();
     public static final BlendFunction WATER_MASK = new BlendFunction();
 
