@@ -425,12 +425,8 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
     private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
         Program program = new Program();
 
-        // Variable layout:
-        //   Instance: 0=this, 1..paramCount=params, paramCount+1=return
-        //   Static:   0..paramCount-1=params, paramCount=return
+        // Create variables: this(if instance) + params + 1 extra
         int thisOffset = isStatic ? 0 : 1;
-        int retValVar = thisOffset + paramCount;
-        // Always create at least this+params+1 variables
         int totalVars = thisOffset + paramCount + 1;
         for (int i = 0; i < totalVars; i++) {
             program.createVariable();
@@ -438,59 +434,11 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
 
         BasicBlock block = program.createBasicBlock();
 
-        if (returnType == ValueType.VOID) {
-            // Void: just exit
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(null);
-            block.add(exit);
-        } else if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
-                   returnType == ValueType.BYTE || returnType == ValueType.SHORT ||
-                   returnType == ValueType.CHARACTER) {
-            // Int-like: return 0 (or specified default)
-            IntegerConstantInstruction insn = new IntegerConstantInstruction();
-            insn.setConstant(valueToInt(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        } else if (returnType == ValueType.LONG) {
-            // Long: return 0L (or specified default)
-            LongConstantInstruction insn = new LongConstantInstruction();
-            insn.setConstant(valueToLong(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        } else if (returnType == ValueType.FLOAT) {
-            FloatConstantInstruction insn = new FloatConstantInstruction();
-            insn.setConstant((float) valueToDouble(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        } else if (returnType == ValueType.DOUBLE) {
-            DoubleConstantInstruction insn = new DoubleConstantInstruction();
-            insn.setConstant(valueToDouble(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        } else {
-            // Object/array types: use IntegerConstantInstruction(0) instead of
-            // NullConstantInstruction (which causes NPE in TeaVM's SSA optimizer).
-            // TeaVM will treat the int 0 as null/falsy at runtime for object types.
-            IntegerConstantInstruction insn = new IntegerConstantInstruction();
-            insn.setConstant(0);
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-            ExitInstruction exit = new ExitInstruction();
-            exit.setValueToReturn(program.variableAt(retValVar));
-            block.add(exit);
-        }
+        // Simple approach: just exit without any constant instructions.
+        // TeaVM will return undefined/null/0 for all types.
+        // No constant instructions means no SSA optimizer issues.
+        ExitInstruction exit = new ExitInstruction();
+        block.add(exit);
 
         return program;
     }
