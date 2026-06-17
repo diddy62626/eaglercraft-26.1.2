@@ -415,7 +415,7 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
             if (cls.getMethod(desc) != null) continue;
 
             MethodHolder m = new MethodHolder(desc);
-            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue);
+            Program program = createProgram(spec.returnType, spec.paramTypes.length, spec.defaultValue, spec.isStatic);
             m.setProgram(program);
 
             // NOTE: TeaVM 0.15's API for setting the STATIC modifier on a MethodHolder
@@ -428,49 +428,63 @@ public class MissingMethodTransformer implements ClassHolderTransformer {
         }
     }
 
-    private Program createProgram(ValueType returnType, int paramCount, Object defaultValue) {
+    private Program createProgram(ValueType returnType, int paramCount, Object defaultValue, boolean isStatic) {
         Program program = new Program();
-        int totalVars = 1 + paramCount + 1;
+
+        // Variable layout:
+        //   Instance methods: 0=this, 1..paramCount=params, paramCount+1=return
+        //   Static methods:   0..paramCount-1=params, paramCount=return
+        int slotCount = isStatic ? paramCount : (1 + paramCount); // this + params
+        int retValVar = returnType == ValueType.VOID ? -1 : slotCount;
+        int totalVars = returnType == ValueType.VOID ? slotCount : (slotCount + 1);
+
+        // Ensure at least 1 variable (TeaVM requires variable 0 to exist)
+        if (totalVars < 1) totalVars = 1;
+
         for (int i = 0; i < totalVars; i++) {
             program.createVariable();
         }
+
         BasicBlock block = program.createBasicBlock();
-        int retValVar = 1 + paramCount;
 
         if (returnType == ValueType.VOID) {
-            // No value to set
-        } else if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
-                   returnType == ValueType.BYTE || returnType == ValueType.SHORT ||
-                   returnType == ValueType.CHARACTER) {
-            IntegerConstantInstruction insn = new IntegerConstantInstruction();
-            insn.setConstant(valueToInt(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-        } else if (returnType == ValueType.LONG) {
-            LongConstantInstruction insn = new LongConstantInstruction();
-            insn.setConstant(valueToLong(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-        } else if (returnType == ValueType.FLOAT) {
-            FloatConstantInstruction insn = new FloatConstantInstruction();
-            insn.setConstant((float) valueToDouble(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
-        } else if (returnType == ValueType.DOUBLE) {
-            DoubleConstantInstruction insn = new DoubleConstantInstruction();
-            insn.setConstant(valueToDouble(defaultValue));
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(null);
+            block.add(exit);
         } else {
-            // Object/array types: return null
-            NullConstantInstruction insn = new NullConstantInstruction();
-            insn.setReceiver(program.variableAt(retValVar));
-            block.add(insn);
+            if (returnType == ValueType.INTEGER || returnType == ValueType.BOOLEAN ||
+                returnType == ValueType.BYTE || returnType == ValueType.SHORT ||
+                returnType == ValueType.CHARACTER) {
+                IntegerConstantInstruction insn = new IntegerConstantInstruction();
+                insn.setConstant(valueToInt(defaultValue));
+                insn.setReceiver(program.variableAt(retValVar));
+                block.add(insn);
+            } else if (returnType == ValueType.LONG) {
+                LongConstantInstruction insn = new LongConstantInstruction();
+                insn.setConstant(valueToLong(defaultValue));
+                insn.setReceiver(program.variableAt(retValVar));
+                block.add(insn);
+            } else if (returnType == ValueType.FLOAT) {
+                FloatConstantInstruction insn = new FloatConstantInstruction();
+                insn.setConstant((float) valueToDouble(defaultValue));
+                insn.setReceiver(program.variableAt(retValVar));
+                block.add(insn);
+            } else if (returnType == ValueType.DOUBLE) {
+                DoubleConstantInstruction insn = new DoubleConstantInstruction();
+                insn.setConstant(valueToDouble(defaultValue));
+                insn.setReceiver(program.variableAt(retValVar));
+                block.add(insn);
+            } else {
+                NullConstantInstruction insn = new NullConstantInstruction();
+                insn.setReceiver(program.variableAt(retValVar));
+                block.add(insn);
+            }
+
+            ExitInstruction exit = new ExitInstruction();
+            exit.setValueToReturn(program.variableAt(retValVar));
+            block.add(exit);
         }
 
-        ExitInstruction exit = new ExitInstruction();
-        exit.setValueToReturn(returnType == ValueType.VOID ? null : program.variableAt(retValVar));
-        block.add(exit);
         return program;
     }
 
