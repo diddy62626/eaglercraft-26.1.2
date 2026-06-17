@@ -386,17 +386,18 @@ public class EaglerCraft {
                         ClientMain.log("[EaglerCraft] Constructing Minecraft(" + canvasWidth + "x" + canvasHeight + ")...");
                         ClientMain.log("[EaglerCraft] This will initialize DataFixers, resource packs, rendering, etc.");
                         ClientMain.log("[EaglerCraft] May take several minutes on slow devices...");
-                        // Wrap in JS try/catch to get full JS stack trace
-                        String jsErr = tryConstructMinecraft0(gameConfig);
-                        if (jsErr != null && !jsErr.isEmpty()) {
-                                ClientMain.warn("[EaglerCraft] JS error: " + jsErr);
-                                throw new RuntimeException("MC init JS error: " + jsErr);
-                        }
+                        // Construct Minecraft directly — TeaVM handles the class reference
+                        net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
+                        minecraftInstance = mc;
                         ClientMain.log("[EaglerCraft] Minecraft instance created!");
-                        minecraftInstance = getMinecraftInstance0();
 
                 } catch (Throwable t) {
                         ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getClass().getName() + ": " + t.getMessage());
+                        // Also print the JS error details if available
+                        String jsStack = getJsErrorStack();
+                        if (jsStack != null && !jsStack.isEmpty()) {
+                                ClientMain.warn("[EaglerCraft] JS stack: " + jsStack);
+                        }
                         StackTraceElement[] stack = t.getStackTrace();
                         for (int i = 0; i < Math.min(stack.length, 20); i++) {
                                 ClientMain.warn("  at " + stack[i].toString());
@@ -767,15 +768,11 @@ public class EaglerCraft {
                 return sb.toString();
         }
 
-        @org.teavm.jso.JSBody(params = { "gameConfig" }, script = ""
+        @org.teavm.jso.JSBody(params = {}, script = ""
                         + "try {"
-                        + "  window.__minecraftInstance = new net.minecraft.client.Minecraft(gameConfig);"
-                        + "  return '';"
+                        + "  throw new Error('stack trace');"
                         + "} catch(e) {"
-                        + "  return (e.message || 'unknown') + '\\n' + (e.stack || '');"
+                        + "  return e.stack || '';"
                         + "}")
-        private static native String tryConstructMinecraft0(Object gameConfig);
-
-        @org.teavm.jso.JSBody(params = {}, script = "return window.__minecraftInstance || null;")
-        private static native net.minecraft.client.Minecraft getMinecraftInstance0();
+        private static native String getJsErrorStack();
 }
