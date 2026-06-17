@@ -337,7 +337,7 @@ teavm {
         // on plugin-injected methods without programs.
         // SIMPLE still generates correct JavaScript but skips dead code elimination
         // and other SSA-dependent optimizations.
-        optimization = org.teavm.gradle.api.OptimizationLevel.SIMPLE
+        optimization = org.teavm.gradle.api.OptimizationLevel.NONE
 
         // Additional TeaVM properties
         properties = [
