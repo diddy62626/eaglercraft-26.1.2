@@ -33,4 +33,5 @@ public class BlendFunction {
     public BlendFunction() {}
 
     public BlendFunction(SourceFactor srcColor, DestFactor dstColor, SourceFactor srcAlpha, DestFactor dstAlpha) {}
+    public BlendFunction(SourceFactor srcColor, DestFactor dstColor) {}
 }
