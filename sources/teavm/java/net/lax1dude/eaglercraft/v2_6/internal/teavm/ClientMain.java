@@ -83,7 +83,7 @@ public class ClientMain {
         public static boolean pageVisibilitySupported = false;
 
         /** Frame timing via Performance API. */
-        static long lastFrameTime = 0;
+        static long lastFrameTime = 0L;
 
         /** The animation frame callback ID for cancellation. */
         private static int animationFrameId = 0;
