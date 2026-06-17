@@ -197,39 +197,54 @@ afterEvaluate {
 // are seen by TeaVM BEFORE teavm-classlib.jar. TeaVM uses the
 // first class definition it finds on the classpath, so putting
 // our patches first lets us add missing methods to java.base classes.
+// ============================================================
+// Task to patch teavm-core JAR (suppress PhiUpdater assertion)
+// ============================================================
+tasks.register('patchTeavmCore') {
+    group = 'build'
+    description = 'Patches teavm-core JAR to suppress PhiUpdater assertion'
+    doLast {
+        // Find teavm-core JAR in Gradle cache
+        def gradleCache = new File(System.getProperty('user.home'), '.gradle/caches')
+        def teavmJars = []
+        gradleCache.eachFileRecurse { f ->
+            if (f.name.startsWith('teavm-core-') && f.name.endsWith('.jar')) {
+                teavmJars << f
+            }
+        }
+        if (teavmJars.isEmpty()) {
+            logger.warn("teavm-core JAR not found in Gradle cache — skipping patch")
+            return
+        }
+        def patchScript = rootProject.file('scripts/patch_teavm_jar.py')
+        if (!patchScript.exists()) {
+            logger.warn("Patch script not found: ${patchScript}")
+            return
+        }
+        teavmJars.each { jar ->
+            logger.lifecycle("Patching teavm-core JAR: ${jar}")
+            def pb = new ProcessBuilder('python3', patchScript.absolutePath,
+                    jar.absolutePath, jar.absolutePath + '.tmp')
+            pb.redirectErrorStream(true)
+            def proc = pb.start()
+            def out = proc.inputStream.text
+            def exitCode = proc.waitFor()
+            if (exitCode == 0) {
+                jar.delete()
+                new File(jar.absolutePath + '.tmp').renameTo(jar)
+                logger.lifecycle("Successfully patched: ${jar}")
+            } else {
+                logger.warn("Failed to patch ${jar}: ${out}")
+            }
+        }
+    }
+}
+
 afterEvaluate {
     tasks.matching { it.name == 'generateJavaScript' }.configureEach {
         dependsOn 'compileTeavmJava'
+        dependsOn 'patchTeavmCore'
         inputs.files sourceSets.teavm.output
-
-        // ── Patch teavm-core JAR to suppress PhiUpdater assertion ──
-        // The assertion "Variable used before definition" in PhiUpdater
-        // fires for plugin-injected NATIVE methods. We patch the JAR
-        // to replace `athrow` with `pop` for the AssertionError throw.
-        doFirst {
-            def teavmCoreJar = classpath.files.find { it.name.startsWith('teavm-core-') && it.name.endsWith('.jar') }
-            if (teavmCoreJar != null) {
-                logger.lifecycle("Patching teavm-core JAR: ${teavmCoreJar}")
-                def patchScript = rootProject.file('scripts/patch_teavm_jar.py')
-                if (patchScript.exists()) {
-                    def pb = new ProcessBuilder('python3', patchScript.absolutePath,
-                            teavmCoreJar.absolutePath, teavmCoreJar.absolutePath + '.tmp')
-                    pb.redirectErrorStream(true)
-                    def proc = pb.start()
-                    def out = proc.inputStream.text
-                    def exitCode = proc.waitFor()
-                    if (exitCode == 0) {
-                        teavmCoreJar.delete()
-                        new File(teavmCoreJar.absolutePath + '.tmp').renameTo(teavmCoreJar)
-                        logger.lifecycle("Successfully patched teavm-core JAR")
-                    } else {
-                        logger.warn("Failed to patch teavm-core JAR: ${out}")
-                    }
-                }
-            } else {
-                logger.warn("teavm-core JAR not found on classpath — skipping patch")
-            }
-        }
 
         // Prepend our classes so they're scanned first by TeaVM.
         def patchClassesDir = file('teavm/patch/classes')
