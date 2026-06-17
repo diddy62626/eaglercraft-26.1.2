@@ -66,25 +66,4 @@ public abstract class VarHandle {
         GET_AND_BITWISE_XOR_RELEASE;
     }
 
-    // Guava-specific overloads (TeaVM does exact type matching)
-    public boolean compareAndSet(com.google.common.util.concurrent.AbstractFutureState recv,
-            com.google.common.util.concurrent.AbstractFutureState.Listener oldVal,
-            com.google.common.util.concurrent.AbstractFutureState.Listener newVal) { return false; }
-    public boolean compareAndSet(com.google.common.util.concurrent.AbstractFutureState recv,
-            com.google.common.util.concurrent.AbstractFutureState.Waiter oldVal,
-            com.google.common.util.concurrent.AbstractFutureState.Waiter newVal) { return false; }
-    public boolean compareAndSet(com.google.common.util.concurrent.AbstractFutureState recv,
-            java.lang.Object oldVal, java.lang.Object newVal) { return false; }
-    public com.google.common.util.concurrent.AbstractFutureState.Listener getAndSet(
-            com.google.common.util.concurrent.AbstractFutureState recv,
-            com.google.common.util.concurrent.AbstractFutureState.Listener newVal) { return null; }
-    public com.google.common.util.concurrent.AbstractFutureState.Waiter getAndSet(
-            com.google.common.util.concurrent.AbstractFutureState recv,
-            com.google.common.util.concurrent.AbstractFutureState.Waiter newVal) { return null; }
-    public void setRelease(
-            com.google.common.util.concurrent.AbstractFutureState.Waiter recv,
-            com.google.common.util.concurrent.AbstractFutureState.Waiter newVal) {}
-    public void setRelease(
-            com.google.common.util.concurrent.AbstractFutureState.Waiter recv,
-            java.lang.Thread newVal) {}
 }
