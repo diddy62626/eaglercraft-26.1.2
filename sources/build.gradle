@@ -435,21 +435,16 @@ teavm {
     }
 
     js {
-        // Obfuscation re-enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
-        // The CXq bug from the obfuscated build was actually a missing
-        // MapCodec.codec() static method (visible in unobfuscated build as
-        // 'cms_MapCodec_codec is not defined'). Now that the stub has the
-        // static method, obfuscation should work correctly.
-        obfuscated = true
+        // TEMPORARY: Disable obfuscation to identify the 'qf' method.
+        // The obfuscated build shows 'Ub.qf is not a function' but we need
+        // the real Java method name to fix it. Unobfuscated build will show
+        // 'cms_Codec_<methodName>' in the error.
+        obfuscated = false
 
-        // Source maps disabled — saves space.
         sourceMap = false
 
-        // Output file name
         targetFileName = 'classes.js'
 
-        // Top-level names limit (increased from 80000 to 200000 as a
-        // precaution for MC's large codebase).
         maxTopLevelNames = 200000
     }
 }
