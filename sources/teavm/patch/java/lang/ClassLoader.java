@@ -78,4 +78,4 @@ public abstract class ClassLoader {
     public void setPackageAssertionStatus(String packageName, boolean enabled) {}
     public void setClassAssertionStatus(String className, boolean enabled) {}
     public void clearAssertionStatus() {}
-
+}

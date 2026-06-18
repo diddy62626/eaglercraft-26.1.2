@@ -86,5 +86,4 @@ public class File implements Serializable, Comparable<File> {
     public long getTotalSpace() { return 0; }
     public long getFreeSpace() { return 0; }
     public long getUsableSpace() { return 0; }
-
 }

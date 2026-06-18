@@ -34,5 +34,4 @@ public final class URL {
         return url.equals(((URL) obj).url);
     }
     public int hashCode() { return url == null ? 0 : url.hashCode(); }
-
 }

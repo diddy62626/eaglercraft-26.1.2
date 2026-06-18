@@ -6,7 +6,4 @@ public class AtomicReferenceArray<E> {
     public void set(int i, E newValue) { array[i] = newValue; }
     public boolean compareAndSet(int i, E expect, E update) { if (array[i] == expect) { array[i] = update; return true; } return false; }
     public int length() { return array.length; }
-
-// === Plugin-injected methods ===
-    public void lazySet(int i, Object newValue) {}
 }

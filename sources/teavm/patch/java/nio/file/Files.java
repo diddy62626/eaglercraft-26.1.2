@@ -216,12 +216,4 @@ public final class Files {
     public static Path setPosixFilePermissions(Path path, java.util.Set<java.nio.file.attribute.PosixFilePermission> perms) throws IOException {
         return path;
     }
-
-// === Plugin-injected methods ===
-    public static java.nio.file.Path createLink(java.nio.file.Path link, java.nio.file.Path existing) { return link; }
-    public static java.nio.file.Path setLastModifiedTime(java.nio.file.Path path, java.nio.file.attribute.FileTime time) { return path; }
-    public static java.nio.file.FileStore getFileStore(java.nio.file.Path path) { return null; }
-    public static java.util.Set<java.nio.file.attribute.PosixFilePermission> getPosixFilePermissions(java.nio.file.Path path, java.nio.file.LinkOption... options) { return java.util.Collections.emptySet(); }
-    public static java.nio.file.Path setPosixFilePermissions(java.nio.file.Path path, java.util.Set<java.nio.file.attribute.PosixFilePermission> perms) { return path; }
-    public static <V extends java.nio.file.attribute.FileAttributeView> V getFileAttributeView(java.nio.file.Path path, Class<V> type, java.nio.file.LinkOption... options) { return null; }
 }
