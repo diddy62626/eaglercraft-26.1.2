@@ -93,9 +93,15 @@ public interface Codec<T> {
     default Codec<T> captureExceptionOrDefault() { return this; }
 
     // List / collection methods
-    default Codec<List<T>> listOf() { return null; }
-    default Codec<List<T>> listOf(int minSize) { return null; }
-    default Codec<List<T>> listOf(int minSize, int maxSize) { return null; }
+    default Codec<List<T>> listOf() {
+        final Codec<T> self = this;
+        return new Codec<List<T>>() {
+            @Override public List<T> decode(Object input) { return java.util.Collections.emptyList(); }
+            @Override public Object encode(List<T> value) { return null; }
+        };
+    }
+    default Codec<List<T>> listOf(int minSize) { return listOf(); }
+    default Codec<List<T>> listOf(int minSize, int maxSize) { return listOf(); }
     default Codec<List<T>> sizeLimitedListOf(int maxSize) { return null; }
     default Codec<List<T>> list(Codec<T> codec) { return null; }
 

@@ -435,11 +435,8 @@ teavm {
     }
 
     js {
-        // TEMPORARY: Disable obfuscation to identify the 'qf' method.
-        // The obfuscated build crashes at 'Ub.qf' BEFORE reaching the
-        // $listOf crash that the unobfuscated build showed. Need to find
-        // what method 'qf' corresponds to.
-        obfuscated = false
+        // Obfuscation enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
+        obfuscated = true
 
         sourceMap = false
 

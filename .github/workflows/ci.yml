@@ -218,7 +218,11 @@ jobs:
           echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"
           echo "Working directory: $(pwd)"
           ls -la gradlew
-          ./gradlew --no-daemon :sources:generateJavaScript 2>&1 | tee teavm.log
+          # Use --rerun-tasks to force recompilation of Java sources.
+          # Without this, Gradle uses FROM-CACHE for compileTeavmJava and
+          # our Java source changes (e.g., Codec.java, MapCodec.java) are
+          # NOT recompiled — the old cached .class files are used instead.
+          ./gradlew --no-daemon --rerun-tasks :sources:generateJavaScript 2>&1 | tee teavm.log
 
           if grep -q "BUILD SUCCESSFUL" teavm.log; then
             echo "TeaVM compilation succeeded!"
