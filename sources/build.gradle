@@ -435,11 +435,8 @@ teavm {
     }
 
     js {
-        // TEMPORARY: Disable obfuscation to identify the 'qf' method.
-        // The obfuscated build shows 'Ub.qf is not a function' but we need
-        // the real Java method name to fix it. Unobfuscated build will show
-        // 'cms_Codec_<methodName>' in the error.
-        obfuscated = false
+        // Obfuscation re-enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
+        obfuscated = true
 
         sourceMap = false
 
