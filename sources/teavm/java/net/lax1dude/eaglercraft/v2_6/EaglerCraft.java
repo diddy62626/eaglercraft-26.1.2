@@ -1,5 +1,9 @@
 package net.lax1dude.eaglercraft.v2_6;
 
+import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
+import org.teavm.jso.JSObject;
+
 import net.lax1dude.eaglercraft.v2_6.adapter.EaglerShaderImpl;
 import net.lax1dude.eaglercraft.v2_6.adapter.PlatformWebService;
 import net.lax1dude.eaglercraft.v2_6.internal.PlatformApplication;
@@ -386,9 +390,13 @@ public class EaglerCraft {
                         ClientMain.log("[EaglerCraft] Constructing Minecraft(" + canvasWidth + "x" + canvasHeight + ")...");
                         ClientMain.log("[EaglerCraft] This will initialize DataFixers, resource packs, rendering, etc.");
                         ClientMain.log("[EaglerCraft] May take several minutes on slow devices...");
-                        // Construct Minecraft directly — TeaVM handles the class reference
-                        net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
-                        minecraftInstance = mc;
+                        // Construct Minecraft directly — TeaVM handles the class reference.
+                        // Wrap in a JS-level try/catch to capture the ORIGINAL JS error stack
+                        // (TeaVM's Throwable loses the original JS stack when wrapping).
+                        runWithJsStackCapture(() -> {
+                                net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
+                                minecraftInstance = mc;
+                        });
                         ClientMain.log("[EaglerCraft] Minecraft instance created!");
 
                 } catch (Throwable t) {
@@ -775,4 +783,37 @@ public class EaglerCraft {
                         + "  return e.stack || '';"
                         + "}")
         private static native String getJsErrorStack();
+
+        /** Functor for a no-arg callback that may throw. */
+        @JSFunctor
+        private interface ThrowingRunnable extends JSObject {
+                void run();
+        }
+
+        /**
+         * Wraps a runnable in a JS-level try/catch to capture the ORIGINAL JS error
+         * stack trace. TeaVM's Throwable loses the original JS error's stack when
+         * wrapping it as a Java exception, so we need this to see the real crash
+         * location.
+         *
+         * <p>If the runnable throws, the JS error's stack is logged to the console
+         * BEFORE re-throwing, so the existing Java catch block still works.</p>
+         */
+        @JSBody(params = { "runnable" }, script = ""
+                        + "try {"
+                        + "  runnable();"
+                        + "} catch(e) {"
+                        + "  console.error('[EaglerCraft] === ORIGINAL JS ERROR ===');"
+                        + "  console.error('[EaglerCraft] Error type:', e && e.constructor ? e.constructor.name : typeof e);"
+                        + "  console.error('[EaglerCraft] Message:', e && e.message ? e.message : String(e));"
+                        + "  if (e && e.stack) {"
+                        + "    console.error('[EaglerCraft] ORIGINAL JS STACK TRACE:');"
+                        + "    console.error(e.stack);"
+                        + "  }"
+                        + "  if (typeof window !== 'undefined' && window.__eaglercraftLastError === undefined) {"
+                        + "    window.__eaglercraftLastError = e;"
+                        + "  }"
+                        + "  throw e;"
+                        + "}")
+        private static native void runWithJsStackCapture(ThrowingRunnable runnable);
 }
