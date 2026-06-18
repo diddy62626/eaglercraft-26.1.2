@@ -76,9 +76,11 @@ class ClassFile:
                 i += 1
             elif tag == CONSTANT_Long:
                 self.constant_pool.append(('Long', self.bytes(8)))
+                self.constant_pool.append(None)  # placeholder for 2nd slot
                 i += 2  # Long takes 2 slots
             elif tag == CONSTANT_Double:
                 self.constant_pool.append(('Double', self.bytes(8)))
+                self.constant_pool.append(None)  # placeholder for 2nd slot
                 i += 2  # Double takes 2 slots
             elif tag == CONSTANT_Class:
                 self.constant_pool.append(('Class', self.u2()))
@@ -244,14 +246,8 @@ class ClassFile:
         output += struct.pack('>H', 0)  # minor
         output += struct.pack('>H', 52)  # major (Java 20)
         
-        # Constant pool
-        output += struct.pack('>H', self.constant_pool_count + (len(self.constant_pool) - self.constant_pool_count))
-        # Recalculate count
+        # Constant pool count = len(self.constant_pool) (includes None at index 0 and None placeholders for Long/Double 2nd slots)
         actual_count = len(self.constant_pool)
-        output = bytearray()
-        output += struct.pack('>I', 0xCAFEBABE)
-        output += struct.pack('>H', 0)
-        output += struct.pack('>H', 52)
         output += struct.pack('>H', actual_count)
         
         # Write constant pool entries
