@@ -374,30 +374,30 @@ PUBLIC = 0x0001
 STATIC = 0x0008
 
 METHODS_TO_ADD = {
-    "java/lang/Runtime": [
+    "org/teavm/classlib/java/lang/TRuntime": [
         ("maxMemory", "()J", LONG_RET, 1, 1, PUBLIC),
         ("addShutdownHook", "(Ljava/lang/Thread;)V", VOID_RET, 0, 2, PUBLIC),
         ("removeShutdownHook", "(Ljava/lang/Thread;)Z", INT_RET, 1, 2, PUBLIC),
     ],
-    "java/lang/System": [
+    "org/teavm/classlib/java/lang/TSystem": [
         ("getenv", "()Ljava/util/Map;", OBJ_RET, 1, 0, PUBLIC | STATIC),
         ("exit", "(I)V", VOID_RET, 0, 1, PUBLIC | STATIC),
     ],
-    "java/lang/Thread": [
+    "org/teavm/classlib/java/lang/TThread": [
         ("setContextClassLoader", "(Ljava/lang/ClassLoader;)V", VOID_RET, 0, 2, PUBLIC),
         ("onSpinWait", "()V", VOID_RET, 0, 0, PUBLIC | STATIC),
     ],
-    "java/lang/Class": [
+    "org/teavm/classlib/java/lang/TClass": [
         ("getGenericInterfaces", "()[Ljava/lang/reflect/Type;", OBJ_RET, 1, 1, PUBLIC),
         ("getGenericSuperclass", "()Ljava/lang/reflect/Type;", OBJ_RET, 1, 1, PUBLIC),
         ("getResource", "(Ljava/lang/String;)Ljava/net/URL;", OBJ_RET, 1, 2, PUBLIC),
         ("getSigners", "()[Ljava/lang/Object;", OBJ_RET, 1, 1, PUBLIC),
         ("isAnonymousClass", "()Z", INT_RET, 1, 1, PUBLIC),
     ],
-    "java/lang/ClassLoader": [
+    "org/teavm/classlib/java/lang/TClassLoader": [
         ("loadClass", "(Ljava/lang/String;)Ljava/lang/Class;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/lang/Package": [
+    "org/teavm/classlib/java/lang/TPackage": [
         ("getSpecificationTitle", "()Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC),
         ("getSpecificationVersion", "()Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC),
         ("getSpecificationVendor", "()Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC),
@@ -405,53 +405,53 @@ METHODS_TO_ADD = {
         ("getImplementationVersion", "()Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC),
         ("getImplementationVendor", "()Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC),
     ],
-    "java/lang/Integer": [
+    "org/teavm/classlib/java/lang/TInteger": [
         ("parseUnsignedInt", "(Ljava/lang/String;I)I", INT_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/lang/Long": [
+    "org/teavm/classlib/java/lang/TLong": [
         ("parseUnsignedLong", "(Ljava/lang/String;I)J", LONG_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/lang/Character": [
+    "org/teavm/classlib/java/lang/TCharacter": [
         ("codePointOf", "(Ljava/lang/String;)I", INT_RET, 1, 2, PUBLIC | STATIC),
         ("toString", "(I)Ljava/lang/String;", OBJ_RET, 1, 1, PUBLIC | STATIC),
     ],
-    "java/util/UUID": [
+    "org/teavm/classlib/java/util/TUUID": [
         ("<init>", "(JJ)V", VOID_RET, 0, 3, PUBLIC),
         ("nameUUIDFromBytes", "([B)Ljava/util/UUID;", OBJ_RET, 1, 2, PUBLIC | STATIC),
     ],
-    "java/util/Date": [
+    "org/teavm/classlib/java/util/TDate": [
         ("toInstant", "()Ljava/time/Instant;", OBJ_RET, 1, 1, PUBLIC),
     ],
-    "java/io/File": [
+    "org/teavm/classlib/java/io/TFile": [
         ("toPath", "()Ljava/nio/file/Path;", OBJ_RET, 1, 1, PUBLIC),
     ],
-    "java/io/BufferedReader": [
+    "org/teavm/classlib/java/io/TBufferedReader": [
         ("transferTo", "(Ljava/io/Writer;)J", LONG_RET, 1, 2, PUBLIC),
     ],
-    "java/net/InetAddress": [
+    "org/teavm/classlib/java/net/TInetAddress": [
         ("isAnyLocalAddress", "()Z", INT_RET, 1, 1, PUBLIC),
         ("isLinkLocalAddress", "()Z", INT_RET, 1, 1, PUBLIC),
         ("isMulticastAddress", "()Z", INT_RET, 1, 1, PUBLIC),
         ("isSiteLocalAddress", "()Z", INT_RET, 1, 1, PUBLIC),
         ("getByAddress", "(Ljava/lang/String;[B)Ljava/net/InetAddress;", OBJ_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/net/URL": [
+    "org/teavm/classlib/java/net/TURL": [
         ("openConnection", "(Ljava/net/Proxy;)Ljava/net/URLConnection;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/net/HttpURLConnection": [
+    "org/teavm/classlib/java/net/THttpURLConnection": [
         ("getContentLengthLong", "()J", LONG_RET, 1, 1, PUBLIC),
     ],
-    "java/nio/ByteBuffer": [
+    "org/teavm/classlib/java/nio/TByteBuffer": [
         ("slice", "(II)Ljava/nio/ByteBuffer;", OBJ_RET, 1, 3, PUBLIC),
     ],
-    "java/nio/channels/Channels": [
+    "org/teavm/classlib/java/nio/channels/TChannels": [
         ("newChannel", "(Ljava/io/OutputStream;)Ljava/nio/channels/WritableByteChannel;", OBJ_RET, 1, 2, PUBLIC | STATIC),
         ("newWriter", "(Ljava/nio/channels/WritableByteChannel;Ljava/nio/charset/Charset;)Ljava/io/Writer;", OBJ_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/nio/file/FileSystem": [
+    "org/teavm/classlib/java/nio/file/TFileSystem": [
         ("getPathMatcher", "(Ljava/lang/String;)Ljava/nio/file/PathMatcher;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/nio/file/Files": [
+    "org/teavm/classlib/java/nio/file/TFiles": [
         ("createLink", "(Ljava/nio/file/Path;Ljava/nio/file/Path;)Ljava/nio/file/Path;", OBJ_RET, 1, 3, PUBLIC | STATIC),
         ("setLastModifiedTime", "(Ljava/nio/file/Path;Ljava/nio/file/attribute/FileTime;)Ljava/nio/file/Path;", OBJ_RET, 1, 3, PUBLIC | STATIC),
         ("getFileStore", "(Ljava/nio/file/Path;)Ljava/nio/file/FileStore;", OBJ_RET, 1, 2, PUBLIC | STATIC),
@@ -459,14 +459,14 @@ METHODS_TO_ADD = {
         ("setPosixFilePermissions", "(Ljava/nio/file/Path;Ljava/util/Set;)Ljava/nio/file/Path;", OBJ_RET, 1, 3, PUBLIC | STATIC),
         ("getFileAttributeView", "(Ljava/nio/file/Path;Ljava/lang/Class;[Ljava/nio/file/LinkOption;)Ljava/nio/file/attribute/FileAttributeView;", OBJ_RET, 1, 4, PUBLIC | STATIC),
     ],
-    "java/security/AccessController": [
+    "org/teavm/classlib/java/security/TAccessController": [
         ("checkPermission", "(Ljava/security/Permission;)V", VOID_RET, 0, 2, PUBLIC | STATIC),
     ],
-    "java/security/KeyFactory": [
+    "org/teavm/classlib/java/security/TKeyFactory": [
         ("generatePrivate", "(Ljava/security/spec/KeySpec;)Ljava/security/PrivateKey;", OBJ_RET, 1, 2, PUBLIC),
         ("generatePublic", "(Ljava/security/spec/KeySpec;)Ljava/security/PublicKey;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/util/concurrent/CompletableFuture": [
+    "org/teavm/classlib/java/util/concurrent/TCompletableFuture": [
         ("applyToEither", "(Ljava/util/concurrent/CompletionStage;Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;", OBJ_RET, 1, 3, PUBLIC),
         ("thenApplyAsync", "(Ljava/util/function/Function;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", OBJ_RET, 1, 3, PUBLIC),
         ("thenAcceptAsync", "(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", OBJ_RET, 1, 3, PUBLIC),
@@ -476,72 +476,72 @@ METHODS_TO_ADD = {
         ("exceptionallyComposeAsync", "(Ljava/util/function/Function;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", OBJ_RET, 1, 3, PUBLIC),
         ("thenApplyAsync", "(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/util/concurrent/Executors": [
+    "org/teavm/classlib/java/util/concurrent/TExecutors": [
         ("newScheduledThreadPool", "(ILjava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ScheduledExecutorService;", OBJ_RET, 1, 3, PUBLIC | STATIC),
         ("callable", "(Ljava/lang/Runnable;Ljava/lang/Object;)Ljava/util/concurrent/Callable;", OBJ_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/util/concurrent/ScheduledThreadPoolExecutor": [
+    "org/teavm/classlib/java/util/concurrent/TScheduledThreadPoolExecutor": [
         ("setContinueExistingPeriodicTasksAfterShutdownPolicy", "(Z)V", VOID_RET, 0, 2, PUBLIC),
         ("setExecuteExistingDelayedTasksAfterShutdownPolicy", "(Z)V", VOID_RET, 0, 2, PUBLIC),
     ],
-    "java/util/concurrent/atomic/AtomicReferenceArray": [
+    "org/teavm/classlib/java/util/concurrent/atomic/TAtomicReferenceArray": [
         ("lazySet", "(ILjava/lang/Object;)V", VOID_RET, 0, 3, PUBLIC),
     ],
-    "java/util/concurrent/TimeUnit": [
+    "org/teavm/classlib/java/util/concurrent/TTimeUnit": [
         ("convert", "(Ljava/time/Duration;)J", LONG_RET, 1, 2, PUBLIC),
     ],
-    "java/util/concurrent/ConcurrentHashMap": [
+    "org/teavm/classlib/java/util/concurrent/TConcurrentHashMap": [
         ("newKeySet", "()Ljava/util/concurrent/ConcurrentHashMap$KeySetView;", OBJ_RET, 1, 0, PUBLIC | STATIC),
     ],
-    "java/util/regex/Pattern": [
+    "org/teavm/classlib/java/util/regex/TPattern": [
         ("asPredicate", "()Ljava/util/function/Predicate;", OBJ_RET, 1, 1, PUBLIC),
     ],
-    "java/util/Collections": [
+    "org/teavm/classlib/java/util/TCollections": [
         ("unmodifiableSortedMap", "(Ljava/util/SortedMap;)Ljava/util/SortedMap;", OBJ_RET, 1, 2, PUBLIC | STATIC),
     ],
-    "java/util/Spliterators": [
+    "org/teavm/classlib/java/util/TSpliterators": [
         ("iterator", "(Ljava/util/Spliterator$OfInt;)Ljava/util/PrimitiveIterator$OfInt;", OBJ_RET, 1, 2, PUBLIC | STATIC),
         ("iterator", "(Ljava/util/Spliterator;)Ljava/util/Iterator;", OBJ_RET, 1, 2, PUBLIC | STATIC),
     ],
-    "java/util/stream/StreamSupport": [
+    "org/teavm/classlib/java/util/stream/TStreamSupport": [
         ("intStream", "(Ljava/util/Spliterator$OfInt;Z)Ljava/util/stream/IntStream;", OBJ_RET, 1, 3, PUBLIC | STATIC),
         ("longStream", "(Ljava/util/Spliterator$OfLong;Z)Ljava/util/stream/LongStream;", OBJ_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/lang/invoke/MethodHandle": [
+    "org/teavm/classlib/java/lang/invoke/TMethodHandle": [
         ("bindTo", "(Ljava/lang/Object;)Ljava/lang/invoke/MethodHandle;", OBJ_RET, 1, 2, PUBLIC),
         ("asType", "(Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", OBJ_RET, 1, 2, PUBLIC),
         ("invoke", "([Ljava/lang/Object;)Ljava/lang/Object;", OBJ_RET, 1, 2, PUBLIC),
         ("invokeExact", "([Ljava/lang/Object;)Ljava/lang/Object;", OBJ_RET, 1, 2, PUBLIC),
     ],
-    "java/lang/invoke/MethodHandles": [
+    "org/teavm/classlib/java/lang/invoke/TMethodHandles": [
         ("filterArguments", "(Ljava/lang/invoke/MethodHandle;I[Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/MethodHandle;", OBJ_RET, 1, 4, PUBLIC | STATIC),
     ],
-    "java/lang/invoke/MethodType": [
+    "org/teavm/classlib/java/lang/invoke/TMethodType": [
         ("methodType", "(Ljava/lang/Class;)Ljava/lang/invoke/MethodType;", OBJ_RET, 1, 1, PUBLIC | STATIC),
         ("methodType", "(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/invoke/MethodType;", OBJ_RET, 1, 2, PUBLIC | STATIC),
         ("methodType", "(Ljava/lang/Class;Ljava/lang/Class;[Ljava/lang/Class;)Ljava/lang/invoke/MethodType;", OBJ_RET, 1, 3, PUBLIC | STATIC),
     ],
-    "java/lang/invoke/VarHandle": [
+    "org/teavm/classlib/java/lang/invoke/TVarHandle": [
         ("compareAndSet", "([Ljava/lang/Object;)Z", INT_RET, 1, 1, PUBLIC),
         ("getAndSet", "([Ljava/lang/Object;)Ljava/lang/Object;", OBJ_RET, 1, 1, PUBLIC),
         ("setRelease", "([Ljava/lang/Object;)V", VOID_RET, 0, 1, PUBLIC),
         ("storeStoreFence", "()V", VOID_RET, 0, 0, PUBLIC | STATIC),
     ],
-    "java/lang/StackWalker": [
+    "org/teavm/classlib/java/lang/TStackWalker": [
         ("getInstance", "(Ljava/util/Set;I)Ljava/lang/StackWalker;", OBJ_RET, 1, 2, PUBLIC | STATIC),
     ],
-    "java/lang/ScopedValue$Carrier": [
+    "org/teavm/classlib/java/lang/TScopedValue$Carrier": [
         ("run", "(Ljava/lang/Runnable;)V", VOID_RET, 0, 2, PUBLIC),
     ],
-    "java/util/Base64": [
+    "org/teavm/classlib/java/util/TBase64": [
         ("getMimeDecoder", "()Ljava/util/Base64$Decoder;", OBJ_RET, 1, 0, PUBLIC | STATIC),
         ("getMimeEncoder", "(I[B)Ljava/util/Base64$Encoder;", OBJ_RET, 1, 2, PUBLIC | STATIC),
         ("getMimeEncoder", "()Ljava/util/Base64$Encoder;", OBJ_RET, 1, 0, PUBLIC | STATIC),
     ],
-    "com/mojang/serialization/codecs/PrimitiveCodec": [
+    "org/teavm/classlib/com/mojang/serialization/codecs/TPrimitiveCodec": [
         ("optionalFieldOf", "(Ljava/lang/String;)Lcom/mojang/serialization/MapCodec;", bytes([0x01, 0xB0]), 1, 2, 0x0001),
     ],
-    "sun/misc/Unsafe": [
+    "org/teavm/classlib/sun/misc/TUnsafe": [
         ("putLong", "(JJ)V", VOID_RET, 0, 3, PUBLIC),
         ("putLong", "(Ljava/lang/Object;JJ)V", VOID_RET, 0, 4, PUBLIC),
         ("getLong", "(J)J", LONG_RET, 1, 2, PUBLIC),
