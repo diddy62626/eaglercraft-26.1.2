@@ -419,13 +419,13 @@ teavm {
         // Common configuration (applies to all targets)
         mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-        // Use SIMPLE optimization to avoid TeaVM DCE eliminating method
-        // definitions that are still referenced by static initializers.
-        // BALANCED was causing 'CXq is not defined' errors because TeaVM
-        // inlined some factory methods (returning null) at call sites and
-        // then DCE'd the method definition — but kept the references in
-        // static initializers of classes like com.mojang.serialization.Unit.
-        optimization = org.teavm.gradle.api.OptimizationLevel.SIMPLE
+        // TeaVM optimization level. BALANCED was causing DCE issues where
+        // method definitions were eliminated but references in static
+        // initializers survived ('CXq is not defined').
+        // TeaVM 0.15 OptimizationLevel enum values: NONE, BALANCED, AGGRESSIVE
+        // Using NONE to disable optimization entirely — produces larger
+        // output but keeps all method definitions intact.
+        optimization = org.teavm.gradle.api.OptimizationLevel.NONE
 
         // Additional TeaVM properties
         properties = [
