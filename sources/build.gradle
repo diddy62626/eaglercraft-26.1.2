@@ -450,8 +450,12 @@ teavm {
         targetFileName = 'classes.js'
 
         // Limit top-level names to avoid Chromium stack overflow bug
-        // with large codebases like Minecraft
-        maxTopLevelNames = 80000
+        // with large codebases like Minecraft.
+        // IMPORTANT: Increased from 80000 to 200000 — TeaVM's name allocator
+        // was hitting the limit and silently skipping method definitions
+        // (e.g., 'CXq is not defined' crash at runtime, even though CXq is
+        // referenced in static initializers).
+        maxTopLevelNames = 200000
     }
 }
 
