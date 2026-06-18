@@ -14,6 +14,30 @@ import java.util.function.Supplier;
  * no conflict.
  */
 public interface MapCodec<T> {
+
+    /**
+     * Static factory method that returns a default Codec instance.
+     *
+     * <p>MC code calls {@code MapCodec.codec()} as a no-arg static method
+     * from static initializers like:
+     * <pre>
+     * public static final MapCodec&lt;Unit&gt; CODEC = MapCodec.codec();
+     * </pre>
+     *
+     * <p>This is referenced from many class static initializers but the
+     * real DFU implementation is in the MC JAR. Without this stub,
+     * TeaVM emits references to {@code MapCodec.codec()} but never emits
+     * the method definition (the actual DFU method gets DCE'd or has a
+     * different signature), causing {@code 'MapCodec_codec is not defined'}
+     * runtime crashes.
+     */
+    static <T> Codec<T> codec() {
+        return new Codec<T>() {
+            @Override public T decode(Object input) { return null; }
+            @Override public Object encode(T value) { return null; }
+        };
+    }
+
     default Codec<T> codec() { return new Codec<T>() {
         @Override public T decode(Object input) { return null; }
         @Override public Object encode(T value) { return null; }
