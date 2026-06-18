@@ -12,7 +12,19 @@ public class LoggerFactory {
     }
 
     public static Logger getLogger(Class<?> clazz) {
-        return getLogger(clazz.getName());
+        // In TeaVM, class literals like LogUtils.class can sometimes be null
+        // (especially for classes that aren't directly referenced elsewhere).
+        // Guard against null to prevent Class.getName() from crashing.
+        if (clazz == null) {
+            return getLogger("null");
+        }
+        try {
+            return getLogger(clazz.getName());
+        } catch (Throwable t) {
+            // Defensive: if clazz.getName() crashes for any reason (e.g. the
+            // Class object is a stub), fall back to a safe name.
+            return getLogger(clazz.toString());
+        }
     }
 
     private static class NOPLogger implements Logger {
