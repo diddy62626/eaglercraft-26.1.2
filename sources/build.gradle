@@ -204,16 +204,15 @@ tasks.register('patchTeavmCore') {
     group = 'build'
     description = 'Patches teavm-core JAR to suppress PhiUpdater assertion'
     doLast {
-        // Find teavm-core JAR in Gradle cache
         def gradleCache = new File(System.getProperty('user.home'), '.gradle/caches')
         def teavmJars = []
         gradleCache.eachFileRecurse { f ->
-            if (f.name.startsWith('teavm-core-') && f.name.endsWith('.jar')) {
+            if (f.name.startsWith('teavm-core-') && f.name.endsWith('.jar') && !f.name.contains('sources')) {
                 teavmJars << f
             }
         }
         if (teavmJars.isEmpty()) {
-            logger.warn("teavm-core JAR not found in Gradle cache — skipping patch")
+            logger.warn("teavm-core JAR not found — skipping patch")
             return
         }
         def patchScript = rootProject.file('scripts/patch_teavm_jar.py')
@@ -240,10 +239,54 @@ tasks.register('patchTeavmCore') {
     }
 }
 
+// ============================================================
+// Task to patch teavm-classlib JAR (add missing methods)
+// ============================================================
+tasks.register('patchTeavmClasslib') {
+    group = 'build'
+    description = 'Patches teavm-classlib JAR to add missing methods via bytecode manipulation'
+    doLast {
+        def gradleCache = new File(System.getProperty('user.home'), '.gradle/caches')
+        def classlibJars = []
+        gradleCache.eachFileRecurse { f ->
+            if (f.name.startsWith('teavm-classlib-') && f.name.endsWith('.jar') && !f.name.contains('sources')) {
+                classlibJars << f
+            }
+        }
+        if (classlibJars.isEmpty()) {
+            logger.warn("teavm-classlib JAR not found — skipping patch")
+            return
+        }
+        def patchScript = rootProject.file('scripts/patch_classlib_jar.py')
+        if (!patchScript.exists()) {
+            logger.warn("Classlib patch script not found: ${patchScript}")
+            return
+        }
+        classlibJars.each { jar ->
+            logger.lifecycle("Patching teavm-classlib JAR: ${jar}")
+            def pb = new ProcessBuilder('python3', patchScript.absolutePath,
+                    jar.absolutePath, jar.absolutePath + '.tmp')
+            pb.redirectErrorStream(true)
+            def proc = pb.start()
+            def out = proc.inputStream.text
+            def exitCode = proc.waitFor()
+            if (exitCode == 0) {
+                jar.delete()
+                new File(jar.absolutePath + '.tmp').renameTo(jar)
+                logger.lifecycle("Successfully patched classlib: ${jar}")
+                logger.lifecycle("Patch output: ${out}")
+            } else {
+                logger.warn("Failed to patch classlib ${jar}: ${out}")
+            }
+        }
+    }
+}
+
 afterEvaluate {
     tasks.matching { it.name == 'generateJavaScript' }.configureEach {
         dependsOn 'compileTeavmJava'
         dependsOn 'patchTeavmCore'
+        dependsOn 'patchTeavmClasslib'
         inputs.files sourceSets.teavm.output
 
         // Prepend our classes so they're scanned first by TeaVM.
