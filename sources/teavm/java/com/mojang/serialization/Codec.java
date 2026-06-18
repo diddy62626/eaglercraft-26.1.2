@@ -180,4 +180,60 @@ public interface Codec<T> {
     default Decoder<T> map(java.util.function.Function<T, T> fn) { return null; }
 
     default MapCodec<T> mapPair(MapCodec<T> left, MapCodec<T> right) { return null; }
+
+    // ===== Additional DFU methods that MC 26.1.2 references =====
+    // These are no-arg instance methods that return a Codec or MapCodec.
+    // Without them, TeaVM emits references (e.g., obfuscated 'qf') but
+    // no method definition, causing 'X.qf is not a function' runtime errors.
+
+    /** Returns a Codec for optional values of T. No-arg version. */
+    default Codec<java.util.Optional<T>> optionalFieldOf() { return null; }
+
+    /** Returns this codec with a terminal lifecycle. */
+    default Codec<T> terminal() { return this; }
+
+    /** Returns a sizeable version of this codec (for size-prefixed lists). */
+    default Codec<java.util.List<T>> sizeable() { return null; }
+
+    /** Returns a codec that promotes partial results to full results. */
+    default Codec<T> promotePartial() { return this; }
+
+    /** Returns a codec with a stable lifecycle (alias). */
+    default Codec<T> stableLifecycle() { return this; }
+
+    /** Returns a codec that captures exceptions. No-arg version. */
+    default Codec<T> capture() { return this; }
+
+    /** Returns a MapCodec that wraps this codec for dispatch. */
+    default MapCodec<T> dispatchMap() { return null; }
+
+    /** Returns a codec that validates during decode. */
+    default Codec<T> validated() { return this; }
+
+    /** Returns a codec with no lifecycle. */
+    default Codec<T> noLifecycle() { return this; }
+
+    /** Returns a codec for this type as a map value. */
+    default Codec<java.util.Map<String, T>> asMapOf() { return null; }
+
+    /** Returns a codec that decodes list elements. */
+    default Codec<T> listElement() { return this; }
+
+    /** Returns a codec that decodes map values. */
+    default Codec<T> mapValue() { return this; }
+
+    /** Returns a codec with a check function applied. */
+    default Codec<T> checked() { return this; }
+
+    /** Returns a codec that's lenient on extra fields. */
+    default Codec<T> lenientX() { return this; }
+
+    /** Returns a codec for pairs. */
+    default Codec<T> paired() { return this; }
+
+    /** Returns a codec with alternative fallback. */
+    default Codec<T> withAlt() { return this; }
+
+    /** Returns a codec for either type. */
+    default Codec<T> eitherOf() { return this; }
 }
