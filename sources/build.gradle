@@ -435,8 +435,10 @@ teavm {
     }
 
     js {
-        // Obfuscation enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
-        obfuscated = true
+        // TEMPORARY: Disable obfuscation. The obfuscated build has a
+        // TeaVM obfuscator bug where method 'qf' is referenced but never
+        // emitted. Unobfuscated build doesn't have this bug.
+        obfuscated = false
 
         sourceMap = false
 
