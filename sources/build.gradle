@@ -429,11 +429,14 @@ teavm {
     }
 
     js {
-        // Obfuscation enabled — reduces classes.js from ~59MB to ~15MB
-        obfuscated = true
+        // TEMPORARY: Obfuscation disabled for debugging the MC constructor crash.
+        // Once root cause is found and fixed, re-enable with `obfuscated = true`.
+        // Obfuscated output reduced classes.js from ~59MB to ~15MB.
+        obfuscated = false
 
-        // Source maps disabled — saves 4MB and speeds up browser parsing
-        sourceMap = false
+        // TEMPORARY: Source maps enabled to map JS stack traces back to Java.
+        // Once root cause is found and fixed, re-disable with `sourceMap = false`.
+        sourceMap = true
 
         // Output file name
         targetFileName = 'classes.js'
