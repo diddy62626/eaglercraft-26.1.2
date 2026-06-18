@@ -566,7 +566,8 @@ def patch_jar(input_jar, output_jar):
                 data = zin.read(item.filename)
                 
                 # Check if this class needs methods added
-                class_name = item.filename.replace('/', '.').replace('.class', '')
+                # item.filename is like "java/lang/Runtime.class"
+                class_name = item.filename.replace('.class', '')
                 if class_name in METHODS_TO_ADD:
                     try:
                         cf = ClassFile(data)
