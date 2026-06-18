@@ -38,10 +38,11 @@ public interface MapCodec<T> {
         };
     }
 
-    default Codec<T> codec() { return new Codec<T>() {
-        @Override public T decode(Object input) { return null; }
-        @Override public Object encode(T value) { return null; }
-    }; }
+    // NOTE: The instance (default) codec() method that returned
+    // Codec.of(this) in real DFU has been REMOVED to avoid Java's
+    // name-clash error (static and instance methods cannot share the
+    // same erasure in an interface). The unitCodec() methods below
+    // now call the static codec() method directly.
 
     default Encoder<T> encoder() { return null; }
     default Decoder<T> decoder() { return null; }
