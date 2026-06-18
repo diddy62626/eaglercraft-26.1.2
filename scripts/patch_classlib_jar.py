@@ -565,6 +565,10 @@ def patch_jar(input_jar, output_jar):
             for item in zin.infolist():
                 data = zin.read(item.filename)
                 
+                # Debug: print class files that start with java/lang/Runtime or java/util/UUID
+                if item.filename.endswith('.class') and ('Runtime' in item.filename or 'UUID' in item.filename):
+                    print(f"  Found: {item.filename}")
+                
                 # Check if this class needs methods added
                 # item.filename is like "java/lang/Runtime.class"
                 class_name = item.filename.replace('.class', '')
