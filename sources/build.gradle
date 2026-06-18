@@ -435,15 +435,14 @@ teavm {
     }
 
     js {
-        // Obfuscation enabled — reduces classes.js from ~59MB to ~15MB.
-        // Root cause of MC constructor crash identified (LoggerFactory.getLogger(null)
-        // calling Class.getName(null) — fixed in LoggerFactory.java + LogUtils.java).
-        // Re-enabled obfuscation for production-size output.
-        obfuscated = true
+        // TEMPORARY: Disable obfuscation to bypass TeaVM obfuscator bug
+        // that causes 'CXq is not defined' (referenced but never emitted).
+        // Obfuscation was correctly producing ~16MB but with the CXq bug.
+        // Without obfuscation, file is ~59MB but should not have the CXq bug.
+        // Once root cause is found, re-enable with `obfuscated = true`.
+        obfuscated = false
 
-        // Source maps disabled — saves 4MB and speeds up browser parsing.
-        // If more debugging is needed, temporarily set sourceMap = true and
-        // obfuscated = false to see real Java class names in stack traces.
+        // Source maps disabled — saves space.
         sourceMap = false
 
         // Output file name
