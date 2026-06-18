@@ -5,4 +5,7 @@ public enum TimeUnit {
     public long toSeconds(long duration) { return duration / 1000; }
     public long toMinutes(long duration) { return duration / 60000; }
     public void sleep(long timeout) throws InterruptedException {}
+
+// === Plugin-injected methods ===
+    public long convert(java.time.Duration duration) { return duration.toMillis(); }
 }

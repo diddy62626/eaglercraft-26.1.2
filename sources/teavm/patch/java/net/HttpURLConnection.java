@@ -32,4 +32,7 @@ public class HttpURLConnection extends URLConnection {
     public String getHeaderFieldKey(int n) { return null; }
     public String getHeaderField(int n) { return null; }
     public long getHeaderFieldDate(String name, long Default) { return Default; }
+
+// === Plugin-injected methods ===
+    public long getContentLengthLong() { return -1L; }
 }

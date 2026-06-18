@@ -78,4 +78,16 @@ public abstract class ClassLoader {
     public void setPackageAssertionStatus(String packageName, boolean enabled) {}
     public void setClassAssertionStatus(String className, boolean enabled) {}
     public void clearAssertionStatus() {}
+
+// === Plugin-injected methods ===
+    public java.net.URL getResource(String name) { return null; }
+    public java.util.Enumeration<java.net.URL> getResources(String name) {
+        return java.util.Collections.emptyEnumeration();
+    }
+    public java.io.InputStream getResourceAsStream(String name) { return null; }
+    public static java.net.URL getSystemResource(String name) { return null; }
+    public static java.util.Enumeration<java.net.URL> getSystemResources(String name) {
+        return java.util.Collections.emptyEnumeration();
+    }
+    public static java.io.InputStream getSystemResourceAsStream(String name) { return null; }
 }

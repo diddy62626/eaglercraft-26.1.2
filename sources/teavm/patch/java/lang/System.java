@@ -179,4 +179,9 @@ public final class System {
     public static SecurityManager getSecurityManager() { return null; }
     public static java.nio.channels.Channel inheritedChannel() throws java.io.IOException { return null; }
 
+
+// === Plugin-injected methods ===
+    public static java.util.Map<String,String> getenv() {
+        return new java.util.HashMap<>();
+    }
 }

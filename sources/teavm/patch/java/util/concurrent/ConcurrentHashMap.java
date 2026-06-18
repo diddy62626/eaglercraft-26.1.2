@@ -283,4 +283,7 @@ public class ConcurrentHashMap<K, V> implements ConcurrentMap<K, V>, java.io.Ser
         forEach(action);
     }
 
+
+// === Plugin-injected methods ===
+    public static ConcurrentHashMap.KeySetView newKeySet() { return null; }
 }

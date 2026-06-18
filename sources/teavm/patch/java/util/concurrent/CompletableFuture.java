@@ -190,4 +190,14 @@ class StubScheduledFuture<V> implements ScheduledFuture<V> {
     @Override public boolean isDone() { return true; }
     @Override public V get() { return null; }
     @Override public V get(long timeout, TimeUnit unit) { return null; }
+
+// === Plugin-injected methods ===
+    public <U> CompletableFuture<U> applyToEither(CompletionStage<? extends T> other, java.util.function.Function<? super T,? extends U> fn) { return new CompletableFuture<>(); }
+    public <U> CompletableFuture<U> thenApplyAsync(java.util.function.Function<? super T,? extends U> fn) { return new CompletableFuture<>(); }
+    public <U> CompletableFuture<U> thenApplyAsync(java.util.function.Function<? super T,? extends U> fn, Executor executor) { return new CompletableFuture<>(); }
+    public CompletableFuture<Void> thenAcceptAsync(java.util.function.Consumer<? super T> action, Executor executor) { return new CompletableFuture<>(); }
+    public CompletableFuture<Void> thenRunAsync(Runnable action, Executor executor) { return new CompletableFuture<>(); }
+    public <U,V> CompletableFuture<V> thenCombine(CompletionStage<? extends U> other, java.util.function.BiFunction<? super T,? super U,? extends V> fn) { return new CompletableFuture<>(); }
+    public <U> CompletableFuture<U> thenComposeAsync(java.util.function.Function<? super T,? extends CompletionStage<U>> fn, Executor executor) { return new CompletableFuture<>(); }
+    public CompletableFuture<T> exceptionallyComposeAsync(java.util.function.Function<Throwable,? extends CompletionStage<T>> fn, Executor executor) { return new CompletableFuture<>(); }
 }

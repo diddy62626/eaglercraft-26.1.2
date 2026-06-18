@@ -65,4 +65,7 @@ public class Executors {
             }
         };
     }
+
+// === Plugin-injected methods ===
+    public static <T> Callable<T> callable(Runnable task, T result) { return () -> result; }
 }

@@ -19,4 +19,8 @@ public class ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements S
     public java.util.concurrent.BlockingQueue<Runnable> getQueue() {
         return new java.util.concurrent.LinkedBlockingQueue<Runnable>();
     }
+
+// === Plugin-injected methods ===
+    public void setContinueExistingPeriodicTasksAfterShutdownPolicy(boolean value) {}
+    public void setExecuteExistingDelayedTasksAfterShutdownPolicy(boolean value) {}
 }

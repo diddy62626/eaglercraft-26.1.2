@@ -68,4 +68,7 @@ public class Date implements java.io.Serializable, Cloneable, Comparable<Date> {
     public static Date from(java.time.Instant instant) {
         return new Date(instant.toEpochMilli());
     }
+
+// === Plugin-injected methods ===
+    public java.time.Instant toInstant() { return java.time.Instant.now(); }
 }
