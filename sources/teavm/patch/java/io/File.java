@@ -87,6 +87,4 @@ public class File implements Serializable, Comparable<File> {
     public long getFreeSpace() { return 0; }
     public long getUsableSpace() { return 0; }
 
-// === Plugin-injected methods ===
-    public java.nio.file.Path toPath() { return null; }
 }

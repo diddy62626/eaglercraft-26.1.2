@@ -35,6 +35,4 @@ public final class URL {
     }
     public int hashCode() { return url == null ? 0 : url.hashCode(); }
 
-// === Plugin-injected methods ===
-    public java.net.URLConnection openConnection(java.net.Proxy proxy) { return openConnection(); }
 }
