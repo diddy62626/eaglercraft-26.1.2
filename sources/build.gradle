@@ -435,12 +435,12 @@ teavm {
     }
 
     js {
-        // TEMPORARY: Disable obfuscation to bypass TeaVM obfuscator bug
-        // that causes 'CXq is not defined' (referenced but never emitted).
-        // Obfuscation was correctly producing ~16MB but with the CXq bug.
-        // Without obfuscation, file is ~59MB but should not have the CXq bug.
-        // Once root cause is found, re-enable with `obfuscated = true`.
-        obfuscated = false
+        // Obfuscation re-enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
+        // The CXq bug from the obfuscated build was actually a missing
+        // MapCodec.codec() static method (visible in unobfuscated build as
+        // 'cms_MapCodec_codec is not defined'). Now that the stub has the
+        // static method, obfuscation should work correctly.
+        obfuscated = true
 
         // Source maps disabled — saves space.
         sourceMap = false
@@ -448,12 +448,8 @@ teavm {
         // Output file name
         targetFileName = 'classes.js'
 
-        // Limit top-level names to avoid Chromium stack overflow bug
-        // with large codebases like Minecraft.
-        // IMPORTANT: Increased from 80000 to 200000 — TeaVM's name allocator
-        // was hitting the limit and silently skipping method definitions
-        // (e.g., 'CXq is not defined' crash at runtime, even though CXq is
-        // referenced in static initializers).
+        // Top-level names limit (increased from 80000 to 200000 as a
+        // precaution for MC's large codebase).
         maxTopLevelNames = 200000
     }
 }
