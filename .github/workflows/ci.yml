@@ -94,23 +94,29 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
-      # ── Download TeaVM deps and patch JAR BEFORE Gradle loads classes ──
+      # ── Download TeaVM deps and patch JARs BEFORE Gradle loads classes ──
       - name: Download and patch TeaVM dependencies
         run: |
           echo "Downloading TeaVM dependencies..."
           cd /home/runner/work/eaglercraft-26.1.2/eaglercraft-26.1.2
           ./gradlew :sources:dependencies --configuration teavmClasspath --no-daemon 2>/dev/null || true
-          echo "Finding teavm-core JARs..."
-          TEAVM_JARS=$(find ~/.gradle/caches -name "teavm-core-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null || true)
-          if [ -z "$TEAVM_JARS" ]; then
-            echo "WARNING: teavm-core JAR not found — will try again after build"
+          
+          echo "Patching teavm-core JAR (suppress PhiUpdater assertion)..."
+          TEAVM_CORE=$(find ~/.gradle/caches -name "teavm-core-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          if [ -n "$TEAVM_CORE" ]; then
+            python3 scripts/patch_teavm_jar.py "$TEAVM_CORE" "$TEAVM_CORE.tmp"
+            mv "$TEAVM_CORE.tmp" "$TEAVM_CORE"
+            echo "Patched teavm-core: $TEAVM_CORE"
+          fi
+          
+          echo "Patching teavm-classlib JAR (add missing methods)..."
+          TEAVM_CL=$(find ~/.gradle/caches -name "teavm-classlib-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          if [ -n "$TEAVM_CL" ]; then
+            python3 scripts/patch_classlib_jar.py "$TEAVM_CL" "$TEAVM_CL.tmp"
+            mv "$TEAVM_CL.tmp" "$TEAVM_CL"
+            echo "Patched teavm-classlib: $TEAVM_CL"
           else
-            for JAR in $TEAVM_JARS; do
-              echo "Patching $JAR"
-              python3 scripts/patch_teavm_jar.py "$JAR" "$JAR.tmp"
-              mv "$JAR.tmp" "$JAR"
-              echo "Done patching: $JAR"
-            done
+            echo "WARNING: teavm-classlib JAR not found!"
           fi
 
       # ── Make scripts executable ──────────────────────────────
