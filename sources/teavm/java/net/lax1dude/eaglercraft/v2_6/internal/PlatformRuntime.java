@@ -497,7 +497,7 @@ public class PlatformRuntime {
                         + "if (window.performance && window.performance.timeOrigin) {"
                         + "  return BigInt(Math.floor(window.performance.timeOrigin));"
                         + "} else {"
-                        + "  return 0n;"
+                        + "  return BigInt(0);"
                         + "}")
         private static native long getTimeOrigin0();
 
