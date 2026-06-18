@@ -85,7 +85,10 @@ public class EPKLoader {
                 loadedFiles = 0;
                 totalFiles = 0;
 
-                fetchEPK(url);
+                fetchEPK(url,
+                        data -> __onLoadComplete(data),
+                        (loaded, total) -> __onLoadProgress(loaded, total),
+                        error -> __onLoadError(error));
         }
 
         /**
@@ -119,11 +122,33 @@ public class EPKLoader {
 
         // ========== Native JS Methods ==========
 
+        /** Callback interface for EPK load errors. */
+        @JSFunctor
+        public interface ErrorCallback extends JSObject {
+                void call(String error);
+        }
+
+        /** Internal native callbacks for fetchEPK (used by JSBody). */
+        @JSFunctor
+        private interface LoadCompleteNativeCallback extends JSObject {
+                void call(ArrayBuffer data);
+        }
+
+        @JSFunctor
+        private interface LoadProgressNativeCallback extends JSObject {
+                void call(int loaded, int total);
+        }
+
+        @JSFunctor
+        private interface LoadErrorNativeCallback extends JSObject {
+                void call(String error);
+        }
+
         /**
          * Fetches an EPK file from the given URL using the Fetch API.
          * On completion, invokes the load callback with the raw ArrayBuffer data.
          */
-        @JSBody(params = { "url" }, script = ""
+        @JSBody(params = { "url", "onComplete", "onProgress", "onError" }, script = ""
                         + "fetch(url)"
                         + "  .then(function(response) {"
                         + "    if (!response.ok) throw new Error('HTTP ' + response.status);"
@@ -143,22 +168,23 @@ public class EPKLoader {
                         + "            new Uint8Array(buffer, offset, chunk.length).set(chunk);"
                         + "            offset += chunk.length;"
                         + "          }"
-                        + "          net_lax1dude_eaglercraft_v2_6_internal_teavm_EPKLoader___onLoadComplete(buffer);"
+                        + "          onComplete(buffer);"
                         + "          return;"
                         + "        }"
                         + "        chunks.push(result.value);"
                         + "        loaded += result.value.length;"
                         + "        if (total > 0) {"
-                        + "          net_lax1dude_eaglercraft_v2_6_internal_teavm_EPKLoader___onLoadProgress(loaded, total);"
+                        + "          onProgress(loaded, total);"
                         + "        }"
                         + "        return pump();"
                         + "      });"
                         + "    })();"
                         + "  })"
                         + "  .catch(function(err) {"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_teavm_EPKLoader___onLoadError(err.message || 'Unknown error');"
+                        + "    onError(err.message || 'Unknown error');"
                         + "  });")
-        private static native void fetchEPK(String url);
+        private static native void fetchEPK(String url, LoadCompleteNativeCallback onComplete,
+                        LoadProgressNativeCallback onProgress, LoadErrorNativeCallback onError);
 
         /**
          * Called by JavaScript when the EPK file has been fully loaded.

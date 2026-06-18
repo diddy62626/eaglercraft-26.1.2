@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft.v2_6.internal;
 
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.events.Event;
@@ -272,14 +273,19 @@ public class PlatformInput {
 
         private static void registerWheelListener() {
                 // Use native JS to register with { passive: false } so preventDefault() works
-                registerWheelListener0();
+                registerWheelListener0(normalized -> __onWheel(normalized));
         }
 
         /**
          * Native method to register wheel listener with passive: false option.
          * Required for Chrome which makes wheel events passive by default.
          */
-        @JSBody(params = {}, script = ""
+        @JSFunctor
+        private interface WheelCallback extends JSObject {
+                void call(double normalizedDelta);
+        }
+
+        @JSBody(params = { "callback" }, script = ""
                         + "var c = document.getElementById('EaglerCraftX_26_1_2_Canvas');"
                         + "if (c) {"
                         + "  c.addEventListener('wheel', function(e) {"
@@ -290,10 +296,10 @@ public class PlatformInput {
                         + "    if (mode === 0) normalized = raw;"
                         + "    else if (mode === 1) normalized = raw * 40;"
                         + "    else normalized = raw * 800;"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___onWheel(normalized);"
+                        + "    callback(normalized);"
                         + "  }, { passive: false });"
                         + "}")
-        private static native void registerWheelListener0();
+        private static native void registerWheelListener0(WheelCallback callback);
 
         /** Callback from JavaScript when a wheel event occurs. */
         private static void __onWheel(double normalizedDelta) {
@@ -359,7 +365,9 @@ public class PlatformInput {
          */
         public static void pollGamepad() {
                 if (!gamepadConnected || activeGamepadIndex < 0) return;
-                pollGamepad0(activeGamepadIndex);
+                pollGamepad0(activeGamepadIndex,
+                        (index, value) -> __updateGamepadAxis(index, value),
+                        (index, pressed) -> __updateGamepadButton(index, pressed));
         }
 
         // ========== Pointer Lock ==========
@@ -406,7 +414,7 @@ public class PlatformInput {
          */
         public static String getClipboardText() {
                 if (ClientMain.clipboardSupported) {
-                        getClipboardText0();
+                        getClipboardText0(text -> __onClipboardRead(text));
                 }
                 return clipboardText;
         }
@@ -719,15 +727,20 @@ public class PlatformInput {
         /**
          * Reads clipboard text using the async Clipboard API.
          */
-        @JSBody(params = {}, script = ""
+        @JSFunctor
+        private interface ClipboardReadCallback extends JSObject {
+                void call(String text);
+        }
+
+        @JSBody(params = { "callback" }, script = ""
                         + "if (navigator.clipboard && navigator.clipboard.readText) {"
                         + "  navigator.clipboard.readText().then(function(text) {"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___onClipboardRead(text);"
+                        + "    callback(text);"
                         + "  }).catch(function(e) {"
                         + "    console.warn('Clipboard read failed:', e);"
                         + "  });"
                         + "}")
-        private static native void getClipboardText0();
+        private static native void getClipboardText0(ClipboardReadCallback callback);
 
         /**
          * Callback from JavaScript when clipboard text is read.
@@ -760,24 +773,29 @@ public class PlatformInput {
                         touchActive[i] = false;
                 }
                 touchCount = 0;
-                updateTouchState0(event);
+                updateTouchState0(event, (index, x, y, pressure) -> __updateTouchPoint(index, x, y, pressure));
         }
 
-        @JSBody(params = { "event" }, script = ""
+        @JSFunctor
+        private interface TouchUpdateCallback extends JSObject {
+                void call(int index, float x, float y, float pressure);
+        }
+
+        @JSBody(params = { "event", "callback" }, script = ""
                         + "var touches = event.touches;"
                         + "for (var i = 0; i < Math.min(touches.length, 8); i++) {"
                         + "  var t = touches[i];"
                         + "  var rect = t.target.getBoundingClientRect();"
                         + "  var scaleX = t.target.clientWidth / rect.width;"
                         + "  var scaleY = t.target.clientHeight / rect.height;"
-                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateTouchPoint("
+                        + "  callback("
                         + "    i,"
                         + "    (t.clientX - rect.left) * scaleX,"
                         + "    (t.clientY - rect.top) * scaleY,"
                         + "    t.force || 1.0"
                         + "  );"
                         + "}")
-        private static native void updateTouchState0(TouchEvent event);
+        private static native void updateTouchState0(TouchEvent event, TouchUpdateCallback callback);
 
         private static void __updateTouchPoint(int index, float x, float y, float pressure) {
                 if (index >= 0 && index < MAX_TOUCH_POINTS) {
@@ -802,17 +820,27 @@ public class PlatformInput {
         /**
          * Polls the gamepad state from JavaScript.
          */
-        @JSBody(params = { "index" }, script = ""
+        @JSFunctor
+        private interface GamepadAxisCallback extends JSObject {
+                void call(int index, float value);
+        }
+
+        @JSFunctor
+        private interface GamepadButtonCallback extends JSObject {
+                void call(int index, boolean pressed);
+        }
+
+        @JSBody(params = { "index", "axisCallback", "buttonCallback" }, script = ""
                         + "var gamepads = navigator.getGamepads();"
                         + "if (!gamepads || !gamepads[index]) return;"
                         + "var gp = gamepads[index];"
                         + "for (var i = 0; i < Math.min(gp.axes.length, 8); i++) {"
-                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateGamepadAxis(i, gp.axes[i]);"
+                        + "  axisCallback(i, gp.axes[i]);"
                         + "}"
                         + "for (var i = 0; i < Math.min(gp.buttons.length, 24); i++) {"
-                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformInput___updateGamepadButton(i, gp.buttons[i].pressed);"
+                        + "  buttonCallback(i, gp.buttons[i].pressed);"
                         + "}")
-        private static native void pollGamepad0(int index);
+        private static native void pollGamepad0(int index, GamepadAxisCallback axisCallback, GamepadButtonCallback buttonCallback);
 
         private static void __updateGamepadAxis(int index, float value) {
                 if (index >= 0 && index < gamepadAxes.length) {

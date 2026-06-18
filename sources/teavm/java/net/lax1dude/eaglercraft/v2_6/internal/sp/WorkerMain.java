@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft.v2_6.internal.sp;
 
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Uint8Array;
@@ -103,7 +104,7 @@ public class WorkerMain {
                 }
 
                 // Register message handler for IPC from main thread
-                registerMessageHandler0();
+                registerMessageHandler0(data -> __onIPCMessage(data));
 
                 // Send ready signal
                 sendStatusMessage("WORKER_READY", sharedArrayBufferAvailable ? 1 : 0);
@@ -303,13 +304,18 @@ public class WorkerMain {
         @JSBody(params = { "size" }, script = "return new SharedArrayBuffer(size);")
         private static native JSObject createSharedBuffer0(int size);
 
-        @JSBody(params = {}, script = ""
+        @JSFunctor
+        private interface IPCMessageCallback extends JSObject {
+                void call(ArrayBuffer data);
+        }
+
+        @JSBody(params = { "callback" }, script = ""
                         + "self.onmessage = function(e) {"
                         + "  if (e.data instanceof ArrayBuffer) {"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_sp_WorkerMain___onIPCMessage(e.data);"
+                        + "    callback(e.data);"
                         + "  }"
                         + "};")
-        private static native void registerMessageHandler0();
+        private static native void registerMessageHandler0(IPCMessageCallback callback);
 
         @JSBody(params = { "data" }, script = "self.postMessage(data, [data]);")
         private static native void postMessageToMain0(ArrayBuffer data);

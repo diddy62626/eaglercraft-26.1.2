@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft.v2_6.internal;
 
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
@@ -558,22 +559,42 @@ public class PlatformRuntime {
         private static native void downloadTextFile0(String filename, String text);
 
         // Page visibility
-        @JSBody(params = {}, script = ""
+        /** Callback for visibility change events from the browser. */
+        @JSFunctor
+        private interface VisibilityChangeCallback extends JSObject {
+                void call(boolean visible);
+        }
+
+        @JSBody(params = { "callback" }, script = ""
                         + "document.addEventListener('visibilitychange', function() {"
-                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformRuntime___onVisibilityChange(!document.hidden);"
+                        + "  callback(!document.hidden);"
                         + "});")
-        private static native void registerVisibilityChangeListener();
+        private static native void registerVisibilityChangeListener0(VisibilityChangeCallback callback);
+
+        private static void registerVisibilityChangeListener() {
+                registerVisibilityChangeListener0(visible -> __onVisibilityChange(visible));
+        }
 
         private static void __onVisibilityChange(boolean visible) {
                 setPageVisible(visible);
         }
 
         // Resize listener
-        @JSBody(params = {}, script = ""
+        /** Callback for resize events from the browser. */
+        @JSFunctor
+        private interface SimpleCallback extends JSObject {
+                void call();
+        }
+
+        @JSBody(params = { "callback" }, script = ""
                         + "window.addEventListener('resize', function() {"
-                        + "  net_lax1dude_eaglercraft_v2_6_internal_PlatformRuntime___onResize();"
+                        + "  callback();"
                         + "});")
-        private static native void registerResizeListener();
+        private static native void registerResizeListener0(SimpleCallback callback);
+
+        private static void registerResizeListener() {
+                registerResizeListener0(() -> __onResize());
+        }
 
         private static void __onResize() {
                 updateCanvasSize();
@@ -582,17 +603,21 @@ public class PlatformRuntime {
         }
 
         // Orientation change listener
-        @JSBody(params = {}, script = ""
+        @JSBody(params = { "callback" }, script = ""
                         + "if (screen.orientation) {"
                         + "  screen.orientation.addEventListener('change', function() {"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformRuntime___onOrientationChange();"
+                        + "    callback();"
                         + "  });"
                         + "} else {"
                         + "  window.addEventListener('orientationchange', function() {"
-                        + "    net_lax1dude_eaglercraft_v2_6_internal_PlatformRuntime___onOrientationChange();"
+                        + "    callback();"
                         + "  });"
                         + "}")
-        private static native void registerOrientationChangeListener();
+        private static native void registerOrientationChangeListener0(SimpleCallback callback);
+
+        private static void registerOrientationChangeListener() {
+                registerOrientationChangeListener0(() -> __onOrientationChange());
+        }
 
         private static void __onOrientationChange() {
                 updateScreenInfo();
