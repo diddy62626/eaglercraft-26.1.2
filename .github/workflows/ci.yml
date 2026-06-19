@@ -228,6 +228,15 @@ jobs:
             echo "TeaVM compilation succeeded!"
             CLASSES_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js 2>/dev/null || echo "0")
             echo "classes.js size: $CLASSES_SIZE bytes"
+
+            # Patch classes.js with default method workaround
+            # (TeaVM 0.15 bug: interface default methods not in subclass vtable)
+            echo "Patching classes.js with default method workaround..."
+            python3 scripts/patch_default_methods.py \
+              sources/build/generated/teavm/js/classes.js \
+              sources/build/generated/teavm/js/classes.js
+            PATCHED_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js)
+            echo "Patched classes.js size: $PATCHED_SIZE bytes"
           else
             echo "ERROR: TeaVM compilation failed - showing last 200 lines"
             tail -200 teavm.log

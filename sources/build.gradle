@@ -435,10 +435,10 @@ teavm {
     }
 
     js {
-        // TEMPORARY: Disable obfuscation. The obfuscated build has a
-        // TeaVM obfuscator bug where method 'qf' is referenced but never
-        // emitted. Unobfuscated build doesn't have this bug.
-        obfuscated = false
+        // Obfuscation enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
+        // The default method patcher (scripts/patch_default_methods.py) runs
+        // post-build and works on both obfuscated and unobfuscated output.
+        obfuscated = true
 
         sourceMap = false
 
