@@ -225,20 +225,24 @@ jobs:
           ./gradlew --no-daemon --rerun-tasks :sources:generateJavaScript 2>&1 | tee teavm.log
 
           if grep -q "BUILD SUCCESSFUL" teavm.log; then
-            echo "TeaVM compilation succeeded!"
+            echo "TeaVM compilation succeeded!" | tee -a teavm.log
             CLASSES_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js 2>/dev/null || echo "0")
-            echo "classes.js size: $CLASSES_SIZE bytes"
+            echo "classes.js size: $CLASSES_SIZE bytes" | tee -a teavm.log
 
             # Patch classes.js with default method workaround
             # (TeaVM 0.15 bug: interface default methods not in subclass vtable)
-            echo "Patching classes.js with default method workaround..."
+            echo "Patching classes.js with default method workaround..." | tee -a teavm.log
             python3 scripts/patch_default_methods.py \
               sources/build/generated/teavm/js/classes.js \
-              sources/build/generated/teavm/js/classes.js
+              sources/build/generated/teavm/js/classes.js 2>&1 | tee -a teavm.log
+            if [ $? -ne 0 ]; then
+              echo "ERROR: patch_default_methods.py failed!" | tee -a teavm.log
+              exit 1
+            fi
             PATCHED_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js)
-            echo "Patched classes.js size: $PATCHED_SIZE bytes"
+            echo "Patched classes.js size: $PATCHED_SIZE bytes" | tee -a teavm.log
           else
-            echo "ERROR: TeaVM compilation failed - showing last 200 lines"
+            echo "ERROR: TeaVM compilation failed - showing last 200 lines" | tee -a teavm.log
             tail -200 teavm.log
           fi
 
