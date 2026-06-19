@@ -90,15 +90,6 @@ def build_patcher_js(registry):
     Instead of using eval(), builds a lookup map by scanning global scope
     for known function names.
     """
-    # Collect all function names referenced in the registry
-    all_func_names = set()
-    for iface, methods in registry.items():
-        all_func_names.add(iface)
-        for vmethod, func_name in methods.items():
-            all_func_names.add(func_name)
-
-    # Build JS array of function names to look up
-    func_names_json = json.dumps(sorted(all_func_names))
     registry_json = json.dumps(registry, separators=(',', ':'))
 
     patcher = """
@@ -107,24 +98,12 @@ def build_patcher_js(registry):
 // Workaround for TeaVM 0.15 bug: interface default methods not
 // included in implementing classes' virtual method tables.
 // ============================================================
+// This code runs INSIDE the TeaVM IIFE, so it has direct access to
+// Fnk (class registry), GN (metadata symbol), and all top-level
+// function names (cms_Codec, cms_Codec_listOf, etc.).
 (function() {
     var __registry = %s;
-    var __funcNames = %s;
 
-    // Build lookup map: function name → function reference
-    var __funcs = {};
-    var __global = typeof self !== 'undefined' ? self : (typeof global !== 'undefined' ? global : this);
-    for (var i = 0; i < __funcNames.length; i++) {
-        var name = __funcNames[i];
-        if (typeof __global[name] === 'function') {
-            __funcs[name] = __global[name];
-        }
-    }
-
-    // GN is TeaVM's metadata symbol on class functions
-    var GN = typeof Symbol !== 'undefined' ? Symbol('teavm_meta') : '__teavm_meta__';
-
-    // Fnk is the array of all registered classes
     if (typeof Fnk === 'undefined' || !Fnk) {
         console.warn('[DefaultMethodPatcher] Fnk not found, skipping');
         return;
@@ -148,7 +127,8 @@ def build_patcher_js(registry):
 
             // Find this interface in our registry by matching function reference
             for (var ifaceName in __registry) {
-                var ifaceFunc = __funcs[ifaceName];
+                // Look up the interface function by name (it's a local var in the IIFE)
+                var ifaceFunc = eval('(typeof ' + ifaceName + ' !== "undefined" ? ' + ifaceName + ' : undefined)');
                 if (!ifaceFunc || ifaceFunc !== iface) continue;
 
                 var methods = __registry[ifaceName];
@@ -156,7 +136,7 @@ def build_patcher_js(registry):
                     if (typeof cls.prototype[vmethod] === 'function') continue;
 
                     var funcName = methods[vmethod];
-                    var func = __funcs[funcName];
+                    var func = eval('(typeof ' + funcName + ' !== "undefined" ? ' + funcName + ' : undefined)');
                     if (typeof func !== 'function') continue;
 
                     // Wrap: prototype.$method = function(args...) { return func(this, args...); }
@@ -184,7 +164,7 @@ def build_patcher_js(registry):
         console.log('[DefaultMethodPatcher] No methods needed patching');
     }
 })();
-""" % (registry_json, func_names_json)
+""" % registry_json
 
     return patcher
 
@@ -204,8 +184,23 @@ def patch_classes_js(input_path, output_path):
 
     patcher = build_patcher_js(registry)
 
-    # Append the patcher to classes.js
-    patched_data = data + "\n" + patcher
+    # Insert the patcher INSIDE the TeaVM IIFE, right before the closing
+    # The IIFE ends with: $rt_exports.main = $rt_export_main;\n}));
+    # We insert before the last }));
+    # This ensures the patcher has access to Fnk, GN, and all internal
+    # variables (which are local to the IIFE, not global).
+    insert_marker = '}));'
+    last_pos = data.rfind(insert_marker)
+    if last_pos < 0:
+        # Fallback: try }))) (3 parens)
+        insert_marker = '})))'
+        last_pos = data.rfind(insert_marker)
+    if last_pos < 0:
+        # Fallback: try just appending
+        print("WARNING: Could not find IIFE closing })); — appending at end")
+        patched_data = data + "\n" + patcher
+    else:
+        patched_data = data[:last_pos] + "\n" + patcher + "\n" + data[last_pos:]
 
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(patched_data)
