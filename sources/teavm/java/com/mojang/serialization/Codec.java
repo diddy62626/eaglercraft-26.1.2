@@ -31,27 +31,27 @@ public interface Codec<T> {
     default DataResult<Object> encodeStart(DynamicOps<?> ops, T value) { return DataResult.success(encode(value)); }
 
     // Instance methods
-    default <S> Codec<S> comap(Function<S, T> fn) { return this; }
-    default <S> Codec<S> flatComap(Function<T, DataResult<S>> fn) { return this; }
-    default <S> Codec<S> comapFlatMap(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return this; }
-    default <S> Codec<S> flatComapMap(Function<S, DataResult<T>> decoder, Function<T, S> encoder) { return this; }
-    default <S> Codec<S> flatXmap(Function<T, DataResult<S>> to, Function<S, DataResult<T>> from) { return this; }
-    default <S> Codec<S> xmap(Function<T, S> to, Function<S, T> from) { return this; }
-    default <S> Codec<S> flatMap(Function<T, Codec<S>> fn) { return this; }
-    default <S> Codec<S> adapt(Function<T, S> to, Function<S, T> from) { return this; }
-    default <S> Codec<S> dispatch(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return this; }
-    default <S> Codec<S> dispatch(Function<T, Codec<? extends T>> codec) { return this; }
-    default <S> Codec<S> dispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return this; }
-    default <S> Codec<S> dispatchStable(Function<T, Codec<? extends T>> codec) { return this; }
-    default <S> Codec<S> partialDispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return this; }
+    default <S> Codec<S> comap(Function<S, T> fn) { return (Codec<S>) this; }
+    default <S> Codec<S> flatComap(Function<T, DataResult<S>> fn) { return (Codec<S>) this; }
+    default <S> Codec<S> comapFlatMap(Function<T, DataResult<S>> fn, Function<S, T> inverse) { return (Codec<S>) this; }
+    default <S> Codec<S> flatComapMap(Function<S, DataResult<T>> decoder, Function<T, S> encoder) { return (Codec<S>) this; }
+    default <S> Codec<S> flatXmap(Function<T, DataResult<S>> to, Function<S, DataResult<T>> from) { return (Codec<S>) this; }
+    default <S> Codec<S> xmap(Function<T, S> to, Function<S, T> from) { return (Codec<S>) this; }
+    default <S> Codec<S> flatMap(Function<T, Codec<S>> fn) { return (Codec<S>) this; }
+    default <S> Codec<S> adapt(Function<T, S> to, Function<S, T> from) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatch(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatch(Function<T, Codec<? extends T>> codec) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatchStable(Function<T, Codec<? extends T>> codec) { return (Codec<S>) this; }
+    default <S> Codec<S> partialDispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
     default <S> MapCodec<S> dispatchMap(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return null; }
     default <S> MapCodec<S> dispatchMap(Function<T, Codec<? extends T>> codec) { return null; }
-    default <S> Codec<S> dispatched(Function<T, Codec<? extends T>> function) { return this; }
-    default <S> Codec<S> dispatchedMap(Codec<S> codec, Function<T, S> fn) { return this; }
-    default <S> Codec<S> dispatchSafe(Function<T, Codec<? extends S>> function) { return this; }
-    default <S> Codec<S> typeFor(Function<T, S> name, Function<S, Codec<? extends T>> codec) { return this; }
-    default <S> Codec<S> dispatchByName(Function<String, Codec<? extends T>> byName) { return this; }
-    default <S> Codec<S> dispatchByName(Function<String, Codec<? extends S>> byName, Function<T, String> name) { return this; }
+    default <S> Codec<S> dispatched(Function<T, Codec<? extends T>> function) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatchedMap(Codec<S> codec, Function<T, S> fn) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatchSafe(Function<T, Codec<? extends S>> function) { return (Codec<S>) this; }
+    default <S> Codec<S> typeFor(Function<T, S> name, Function<S, Codec<? extends T>> codec) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatchByName(Function<String, Codec<? extends T>> byName) { return (Codec<S>) this; }
+    default <S> Codec<S> dispatchByName(Function<String, Codec<? extends S>> byName, Function<T, String> name) { return (Codec<S>) this; }
 
     default Codec<T> stable() { return this; }
     default Codec<T> withLifecycle(Lifecycle lifecycle) { return this; }
@@ -167,7 +167,7 @@ public interface Codec<T> {
     static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return null; }
 
     default DataResult<T> decode(DynamicOps<?> ops, Object input) { return DataResult.success(decode(input)); }
-    default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return this; }
+    default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return (Codec<S>) this; }
     default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
     default MapCodec<T> lenientOptionalFieldOf(String name) { return null; }
     default Codec<java.util.Map<String, T>> simpleMap(Codec<String> keyCodec, Codec<T> valueCodec, com.mojang.serialization.Keyable keys) { return null; }
@@ -179,7 +179,7 @@ public interface Codec<T> {
         DataResult<T> coApplyInverse(DynamicOps<?> ops, T input, DataResult<Object> result);
     }
 
-    default <S> Codec<S> dispatchStable(java.util.function.Function<S, ?> name, java.util.function.Function<?, Codec<? extends T>> codec) { return this; }
+    default <S> Codec<S> dispatchStable(java.util.function.Function<S, ?> name, java.util.function.Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
     default Codec<T> xor(Codec<T> other, Codec<T> alternative) { return this; }
     default com.mojang.serialization.codecs.UnboundedMapCodec<String, T> unboundedMap(Codec<T> valueCodec) { return null; }
 
