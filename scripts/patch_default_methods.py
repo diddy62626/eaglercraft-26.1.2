@@ -99,30 +99,41 @@ def build_patcher_js(registry):
 // included in implementing classes' virtual method tables.
 // ============================================================
 // This code runs INSIDE the TeaVM IIFE, so it has direct access to
-// Fnk (class registry), GN (metadata symbol), and all top-level
-// function names (cms_Codec, cms_Codec_listOf, etc.).
+// $rt_allClasses (class registry), $rt_meta (metadata symbol), and
+// all top-level function names (cms_Codec, cms_Codec_listOf, etc.).
 (function() {
     var __registry = %s;
 
-    if (typeof Fnk === 'undefined' || !Fnk) {
-        console.warn('[DefaultMethodPatcher] Fnk not found, skipping');
+    // Try different names for the class registry array
+    var allClasses = typeof $rt_allClasses !== 'undefined' ? $rt_allClasses :
+                     typeof Fnk !== 'undefined' ? Fnk : null;
+    if (!allClasses) {
+        console.warn('[DefaultMethodPatcher] Class registry not found, skipping');
+        return;
+    }
+
+    // Try different names for the metadata symbol
+    var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
+               typeof GN !== 'undefined' ? GN : null;
+    if (!meta) {
+        console.warn('[DefaultMethodPatcher] Metadata symbol not found, skipping');
         return;
     }
 
     var patched = 0;
     var classesPatched = 0;
 
-    for (var i = 0; i < Fnk.length; i++) {
-        var cls = Fnk[i];
-        if (!cls || !cls.prototype || !cls[GN]) continue;
+    for (var i = 0; i < allClasses.length; i++) {
+        var cls = allClasses[i];
+        if (!cls || !cls.prototype || !cls[meta]) continue;
 
-        var meta = cls[GN];
-        if (!meta.superinterfaces || meta.superinterfaces.length === 0) continue;
+        var clsMeta = cls[meta];
+        if (!clsMeta.superinterfaces || clsMeta.superinterfaces.length === 0) continue;
 
         var classPatched = false;
 
-        for (var j = 0; j < meta.superinterfaces.length; j++) {
-            var iface = meta.superinterfaces[j];
+        for (var j = 0; j < clsMeta.superinterfaces.length; j++) {
+            var iface = clsMeta.superinterfaces[j];
             if (!iface) continue;
 
             // Find this interface in our registry by matching function reference
