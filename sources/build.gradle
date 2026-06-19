@@ -435,10 +435,14 @@ teavm {
     }
 
     js {
-        // Obfuscation enabled — produces ~16MB classes.js (vs 59MB unobfuscated).
-        // The default method patcher (scripts/patch_default_methods.py) runs
-        // post-build and works on both obfuscated and unobfuscated output.
-        obfuscated = true
+        // Obfuscation DISABLED — the default method patcher
+        // (scripts/patch_default_methods.py) scans for function name
+        // patterns like cms_<Interface>_<method> which only exist in
+        // unobfuscated builds. The 59MB file is slower to download
+        // but the patcher can fix the TeaVM default method inheritance bug.
+        // Once the game works, we can investigate making the patcher
+        // work with obfuscated names to reduce file size.
+        obfuscated = false
 
         sourceMap = false
 
