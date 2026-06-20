@@ -44,8 +44,8 @@ public interface Codec<T> {
     default <S> Codec<S> dispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
     default <S> Codec<S> dispatchStable(Function<T, Codec<? extends T>> codec) { return (Codec<S>) this; }
     default <S> Codec<S> partialDispatch(String name, Function<T, ?> fn, Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
-    default <S> MapCodec<S> dispatchMap(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return null; }
-    default <S> MapCodec<S> dispatchMap(Function<T, Codec<? extends T>> codec) { return null; }
+    default <S> MapCodec<S> dispatchMap(Function<T, String> name, Function<String, Codec<? extends T>> codec) { return __dummyMapCodec(); }
+    default <S> MapCodec<S> dispatchMap(Function<T, Codec<? extends T>> codec) { return __dummyMapCodec(); }
     default <S> Codec<S> dispatched(Function<T, Codec<? extends T>> function) { return (Codec<S>) this; }
     default <S> Codec<S> dispatchedMap(Codec<S> codec, Function<T, S> fn) { return (Codec<S>) this; }
     default <S> Codec<S> dispatchSafe(Function<T, Codec<? extends S>> function) { return (Codec<S>) this; }
@@ -102,16 +102,16 @@ public interface Codec<T> {
     }
     default Codec<List<T>> listOf(int minSize) { return listOf(); }
     default Codec<List<T>> listOf(int minSize, int maxSize) { return listOf(); }
-    default Codec<List<T>> sizeLimitedListOf(int maxSize) { return null; }
-    default Codec<List<T>> list(Codec<T> codec) { return null; }
+    default Codec<List<T>> sizeLimitedListOf(int maxSize) { return new Codec<List<T>>() { public List<T> decode(Object i) { return java.util.Collections.emptyList(); } public Object encode(List<T> v) { return null; } }; }
+    default Codec<List<T>> list(Codec<T> codec) { return new Codec<List<T>>() { public List<T> decode(Object i) { return java.util.Collections.emptyList(); } public Object encode(List<T> v) { return null; } }; }
 
     // Field / optional methods
-    default MapCodec<T> fieldOf(String name) { return null; }
-    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return null; }
-    default MapCodec<T> optionalFieldOf(String name) { return null; }
-    default Codec<java.util.Optional<T>> optionalFieldOf(String name, java.util.Optional<T> defaultValue) { return null; }
-    default MapCodec<T> lenientOptionalFieldOf(String name, T defaultValue) { return null; }
-    default Codec<java.util.Optional<T>> optionalFieldOfOptional(String name) { return null; }
+    default MapCodec<T> fieldOf(String name) { return __dummyMapCodec(); }
+    default MapCodec<T> optionalFieldOf(String name, T defaultValue) { return __dummyMapCodec(); }
+    default MapCodec<T> optionalFieldOf(String name) { return __dummyMapCodec(); }
+    default Codec<java.util.Optional<T>> optionalFieldOf(String name, java.util.Optional<T> defaultValue) { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    default MapCodec<T> lenientOptionalFieldOf(String name, T defaultValue) { return __dummyMapCodec(); }
+    default Codec<java.util.Optional<T>> optionalFieldOfOptional(String name) { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
     default Codec<T> fieldOfOptional(String name) { return this; }
     default Codec<T> withDefaultedField(String name, T defaultValue) { return this; }
     default Codec<T> optFieldOf(String name) { return this; }
@@ -120,11 +120,11 @@ public interface Codec<T> {
     default Codec<T> validateFieldOf(String name, Function<T, DataResult<T>> v) { return this; }
 
     // Optional / alternative
-    default Codec<java.util.Optional<T>> optional() { return null; }
-    default Codec<java.util.Optional<T>> opt() { return null; }
-    default Codec<java.util.Optional<T>> optionalOf(String name) { return null; }
-    default Codec<java.util.Optional<T>> withFallback() { return null; }
-    default Codec<java.util.Optional<T>> withFallback(T defaultValue) { return null; }
+    default Codec<java.util.Optional<T>> optional() { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    default Codec<java.util.Optional<T>> opt() { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    default Codec<java.util.Optional<T>> optionalOf(String name) { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    default Codec<java.util.Optional<T>> withFallback() { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    default Codec<java.util.Optional<T>> withFallback(T defaultValue) { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
     default Codec<T> withAlternative(Codec<T> alternative, Function<T, T> alternativeEncoder) { return this; }
     default Codec<T> withAlternativeEncoding(Codec<T> alternative) { return this; }
     default Codec<T> withAlternativeOf(Codec<T> alternative) { return this; }
@@ -141,36 +141,36 @@ public interface Codec<T> {
     default Codec<T> longRange(long min, long max) { return this; }
 
     // Stream / map
-    default Codec<java.util.stream.Stream<T>> streamOf() { return null; }
-    default Codec<java.util.Map<String, T>> asMap() { return null; }
-    default <K> Codec<java.util.Map<K, T>> asMap(Codec<K> keyCodec) { return null; }
-    default Codec<java.util.Map<String, T>> asMapSorted() { return null; }
+    default Codec<java.util.stream.Stream<T>> streamOf() { return new Codec<java.util.stream.Stream<T>>() { public java.util.stream.Stream<T> decode(Object i) { return java.util.stream.Stream.empty(); } public Object encode(java.util.stream.Stream<T> v) { return null; } }; }
+    default Codec<java.util.Map<String, T>> asMap() { return new Codec<java.util.Map<String, T>>() { public java.util.Map<String, T> decode(Object i) { return java.util.Collections.emptyMap(); } public Object encode(java.util.Map<String, T> v) { return null; } }; }
+    default <K> Codec<java.util.Map<K, T>> asMap(Codec<K> keyCodec) { return new Codec<java.util.Map<K, T>>() { public java.util.Map<K, T> decode(Object i) { return java.util.Collections.emptyMap(); } public Object encode(java.util.Map<K, T> v) { return null; } }; }
+    default Codec<java.util.Map<String, T>> asMapSorted() { return new Codec<java.util.Map<String, T>>() { public java.util.Map<String, T> decode(Object i) { return java.util.Collections.emptyMap(); } public Object encode(java.util.Map<String, T> v) { return null; } }; }
 
     // Static factories
-    static <T> Codec<List<T>> list(Codec<T> codec, int minSize, int maxSize) { return null; }
-    static <T> Codec<T> lazyInitialized(Supplier<Codec<T>> supplier) { return null; }
+    static <T> Codec<List<T>> list(Codec<T> codec, int minSize, int maxSize) { return new Codec<List<T>>() { public List<T> decode(Object i) { return java.util.Collections.emptyList(); } public Object encode(List<T> v) { return null; } }; }
+    static <T> Codec<T> lazyInitialized(Supplier<Codec<T>> supplier) { return supplier.get(); }
     static <T> Codec<T> of(Encoder<T> encoder, Decoder<T> decoder) { return null; }
-    static <T> Codec<T> pair(Codec<T> left, Codec<T> right) { return null; }
-    static <T> Codec<T> either(Codec<T> left, Codec<T> right) { return null; }
+    static <T> Codec<T> pair(Codec<T> left, Codec<T> right) { return left; }
+    static <T> Codec<T> either(Codec<T> left, Codec<T> right) { return left; }
     static <T> Codec<T> withAlternative(Codec<T> first, Codec<T> second) { return first; }
     static <T> Codec<T> withAlternative(Codec<T> first, Codec<T> second, Function<T, T> encoder) { return first; }
-    static <K, V> com.mojang.serialization.codecs.UnboundedMapCodec<K, V> unboundedMap(Codec<K> keyCodec, Codec<V> valueCodec) { return null; }
-    static <F, S> Codec<java.util.Map.Entry<F, S>> compoundList(Codec<F> keyCodec, Codec<S> valueCodec) { return null; }
+    static <K, V> com.mojang.serialization.codecs.UnboundedMapCodec<K, V> unboundedMap(Codec<K> keyCodec, Codec<V> valueCodec) { return (com.mojang.serialization.codecs.UnboundedMapCodec<K, V>) valueCodec; }
+    static <F, S> Codec<java.util.Map.Entry<F, S>> compoundList(Codec<F> keyCodec, Codec<S> valueCodec) { return (Codec<java.util.Map.Entry<F, S>>) valueCodec; }
     static Codec<String> string(int min, int max) { return STRING; }
-    static <T> Codec<T> stringResolver(Function<T, String> toString, Function<String, T> fromString) { return null; }
-    static <T> Codec<java.util.List<T>> sizeLimitedListOf(int maxSize, Codec<T> codec) { return null; }
-    static <N extends Number> Codec<N> intRange(int min, int max, Class<N> type) { return null; }
+    static <T> Codec<T> stringResolver(Function<T, String> toString, Function<String, T> fromString) { return (Codec<T>) fromString; }
+    static <T> Codec<java.util.List<T>> sizeLimitedListOf(int maxSize, Codec<T> codec) { return new Codec<java.util.List<T>>() { public java.util.List<T> decode(Object i) { return java.util.Collections.emptyList(); } public Object encode(java.util.List<T> v) { return null; } }; }
+    static <N extends Number> Codec<N> intRange(int min, int max, Class<N> type) { return (Codec<N>) type.cast(null); }
 
     // Other static utilities
-    static <T> MapCodec<T> optionalFieldOf(String name, T defaultValue, Codec<T> codec) { return null; }
-    static <T> Codec<java.util.Optional<T>> optionalFieldOf(String name, Codec<T> codec) { return null; }
-    static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return null; }
+    static <T> MapCodec<T> optionalFieldOf(String name, T defaultValue, Codec<T> codec) { return __dummyMapCodec(); }
+    static <T> Codec<java.util.Optional<T>> optionalFieldOf(String name, Codec<T> codec) { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
+    static <T> MapCodec<T> mapEither(MapCodec<T> left, MapCodec<T> right) { return left; }
 
     default DataResult<T> decode(DynamicOps<?> ops, Object input) { return DataResult.success(decode(input)); }
     default <S> Codec<S> mapResult(com.mojang.serialization.Codec.ResultFunction<T> fn) { return (Codec<S>) this; }
-    default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return null; }
-    default MapCodec<T> lenientOptionalFieldOf(String name) { return null; }
-    default Codec<java.util.Map<String, T>> simpleMap(Codec<String> keyCodec, Codec<T> valueCodec, com.mojang.serialization.Keyable keys) { return null; }
+    default <S> MapCodec<S> dispatchMap(String name, java.util.function.Function<S, ?> fn, java.util.function.Function<?, Codec<? extends T>> codec) { return __dummyMapCodec(); }
+    default MapCodec<T> lenientOptionalFieldOf(String name) { return __dummyMapCodec(); }
+    default Codec<java.util.Map<String, T>> simpleMap(Codec<String> keyCodec, Codec<T> valueCodec, com.mojang.serialization.Keyable keys) { return new Codec<java.util.Map<String, T>>() { public java.util.Map<String, T> decode(Object i) { return java.util.Collections.emptyMap(); } public Object encode(java.util.Map<String, T> v) { return null; } }; }
     default Codec<T> sizeLimitedString(int maxSize) { return this; }
     default Codec<T> xor(Codec<T> alternative) { return this; }
 
@@ -181,11 +181,11 @@ public interface Codec<T> {
 
     default <S> Codec<S> dispatchStable(java.util.function.Function<S, ?> name, java.util.function.Function<?, Codec<? extends T>> codec) { return (Codec<S>) this; }
     default Codec<T> xor(Codec<T> other, Codec<T> alternative) { return this; }
-    default com.mojang.serialization.codecs.UnboundedMapCodec<String, T> unboundedMap(Codec<T> valueCodec) { return null; }
+    default com.mojang.serialization.codecs.UnboundedMapCodec<String, T> unboundedMap(Codec<T> valueCodec) { return (com.mojang.serialization.codecs.UnboundedMapCodec<String, T>) this; }
 
-    default Decoder<T> map(java.util.function.Function<T, T> fn) { return null; }
+    default Decoder<T> map(java.util.function.Function<T, T> fn) { return (Decoder<T>) this; }
 
-    default MapCodec<T> mapPair(MapCodec<T> left, MapCodec<T> right) { return null; }
+    default MapCodec<T> mapPair(MapCodec<T> left, MapCodec<T> right) { return __dummyMapCodec(); }
 
     // ===== Additional DFU methods that MC 26.1.2 references =====
     // These are no-arg instance methods that return a Codec or MapCodec.
@@ -193,13 +193,13 @@ public interface Codec<T> {
     // no method definition, causing 'X.qf is not a function' runtime errors.
 
     /** Returns a Codec for optional values of T. No-arg version. */
-    default Codec<java.util.Optional<T>> optionalFieldOf() { return null; }
+    default Codec<java.util.Optional<T>> optionalFieldOf() { return new Codec<java.util.Optional<T>>() { public java.util.Optional<T> decode(Object i) { return java.util.Optional.empty(); } public Object encode(java.util.Optional<T> v) { return null; } }; }
 
     /** Returns this codec with a terminal lifecycle. */
     default Codec<T> terminal() { return this; }
 
     /** Returns a sizeable version of this codec (for size-prefixed lists). */
-    default Codec<java.util.List<T>> sizeable() { return null; }
+    default Codec<java.util.List<T>> sizeable() { return new Codec<java.util.List<T>>() { public java.util.List<T> decode(Object i) { return java.util.Collections.emptyList(); } public Object encode(java.util.List<T> v) { return null; } }; }
 
     /** Returns a codec that promotes partial results to full results. */
     default Codec<T> promotePartial() { return this; }
@@ -211,7 +211,7 @@ public interface Codec<T> {
     default Codec<T> capture() { return this; }
 
     /** Returns a MapCodec that wraps this codec for dispatch. */
-    default MapCodec<T> dispatchMap() { return null; }
+    default MapCodec<T> dispatchMap() { return __dummyMapCodec(); }
 
     /** Returns a codec that validates during decode. */
     default Codec<T> validated() { return this; }
@@ -220,7 +220,7 @@ public interface Codec<T> {
     default Codec<T> noLifecycle() { return this; }
 
     /** Returns a codec for this type as a map value. */
-    default Codec<java.util.Map<String, T>> asMapOf() { return null; }
+    default Codec<java.util.Map<String, T>> asMapOf() { return new Codec<java.util.Map<String, T>>() { public java.util.Map<String, T> decode(Object i) { return java.util.Collections.emptyMap(); } public Object encode(java.util.Map<String, T> v) { return null; } }; }
 
     /** Returns a codec that decodes list elements. */
     default Codec<T> listElement() { return this; }
