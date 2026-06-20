@@ -242,4 +242,13 @@ public interface Codec<T> {
 
     /** Returns a codec for either type. */
     default Codec<T> eitherOf() { return this; }
+
+    /** Returns a dummy non-null MapCodec to prevent NPE when methods are chained. */
+    @SuppressWarnings("unchecked")
+    static <T> MapCodec<T> __dummyMapCodec() {
+        return new MapCodec<T>() {
+            @Override public T decode(Object input) { return null; }
+            @Override public Object encode(T value) { return null; }
+        };
+    }
 }
