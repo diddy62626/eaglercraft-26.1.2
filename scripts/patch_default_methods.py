@@ -188,13 +188,14 @@ def build_patcher_js(registry):
         var fileClass = eval(fileClassName);
         if (fileClass && fileClass.prototype && typeof fileClass.prototype.$toPath !== 'function') {
             fileClass.prototype.$toPath = function() {
-                // Return a simple path-like object with resolve() method.
+                // Return a simple path-like object with all methods MC might call.
                 // Avoid using arguments.callee (forbidden in strict mode).
                 var pathStr = this.$path || this.path || '/';
                 var pathObj = {
                     $resolve: function(other) { return pathObj; },
                     resolve: function(other) { return pathObj; },
                     toString: function() { return pathStr; },
+                    getParent: function() { return pathObj; },
                     getParent: function() { return pathObj; },
                     getFileName: function() { return pathObj; },
                     getFileNameString: function() { return pathStr; },
@@ -207,7 +208,16 @@ def build_patcher_js(registry):
                     startsWith: function(p) { return true; },
                     endsWith: function(p) { return true; },
                     compareTo: function(o) { return 0; },
-                    iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; }
+                    iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; },
+                    getFileSystem: function() { return { provider: function() { return {}; }, isOpen: function() { return true; }, close: function() {} }; },
+                    $getFileSystem: function() { return pathObj.getFileSystem(); },
+                    registerWatchService: function() { return {}; },
+                    toUri: function() { return { toString: function() { return 'file://' + pathStr; } }; },
+                    toRealPath: function() { return pathObj; },
+                    subpath: function(a, b) { return pathObj; },
+                    getNameCount: function() { return 1; },
+                    getName: function(i) { return pathObj; },
+                    resolveSibling: function(o) { return pathObj; }
                 };
                 return pathObj;
             };
