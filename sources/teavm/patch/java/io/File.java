@@ -67,7 +67,13 @@ public class File implements Serializable, Comparable<File> {
     public File getCanonicalFile() { return this; }
 
     public Path toPath() {
-        return Paths.get(path);
+        Path p = Paths.get(path);
+        // Side effect to prevent TeaVM DCE from eliminating this method
+        // and replacing it with 'return null'
+        if (p == null) {
+            throw new RuntimeException("Paths.get returned null for: " + path);
+        }
+        return p;
     }
 
     public String toString() { return path; }

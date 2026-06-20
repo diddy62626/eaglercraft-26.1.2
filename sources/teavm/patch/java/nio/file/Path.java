@@ -7,12 +7,30 @@ import java.io.File;
  * Browser filesystem access goes through IndexedDB, not real file paths.
  */
 public interface Path extends Comparable<Path>, Iterable<Path> {
+    // Use a static holder to prevent TeaVM from DCE'ing the StubPath class.
+    // TeaVM's optimizer eliminates 'new StubPath()' if it determines the
+    // constructor has no side effects, replacing it with null.
+    StubPath __STUB_PATH_FACTORY = new StubPath("__init__");
+
     static Path of(String first, String... more) {
-        return new StubPath(first);
+        // Build the full path string
+        StringBuilder sb = new StringBuilder(first);
+        if (more != null) {
+            for (String m : more) {
+                sb.append("/").append(m);
+            }
+        }
+        // Force non-null by using the factory instance as a base
+        StubPath result = new StubPath(sb.toString());
+        // Side effect to prevent DCE
+        if (result == null) result = __STUB_PATH_FACTORY;
+        return result;
     }
 
     static Path of(java.net.URI uri) {
-        return new StubPath(uri.toString());
+        StubPath result = new StubPath(uri.toString());
+        if (result == null) result = __STUB_PATH_FACTORY;
+        return result;
     }
 
     Path resolve(String other);
