@@ -174,51 +174,94 @@ def build_patcher_js(registry):
     } else {
         console.log('[DefaultMethodPatcher] No methods needed patching');
     }
-
-    // ============================================================
-    // Wrap all static initializers (cm.clinit) in try/catch.
-    // TeaVM 0.15 reorders static field initializations, causing forward
-    // references (e.g., AXISANGLE4F references QUATERNIONF before it's
-    // initialized). Without try/catch, this crashes the entire game.
-    // With try/catch, the failing class's static fields stay null but
-    // the game continues (falls back to adapter-only mode gracefully).
-    // ============================================================
-    var clinitsWrappedCount = 0;
-    var clinitFailures = 0;
-    for (var k = 0; k < allClasses.length; k++) {
-        var c = allClasses[k];
-        if (!c || !c[meta]) continue;
-        var cm = c[meta];
-        if (!cm.clinit) continue;
-
-        // Save original clinit and replace with try/catch wrapper.
-        // The original clinit pattern is:
-        //   () => { m.clinit = () => {}; actualClinit(); }
-        // It first replaces itself with a no-op (re-entry guard),
-        // THEN calls the actual init. If actualClinit() throws,
-        // our wrapper catches it. The re-entry guard ensures the
-        // clinit won't be retried (preventing infinite loops).
-        var origClinit = cm.clinit;
-        (function(origClinit, cm) {
-            cm.clinit = function() {
-                try {
-                    origClinit();
-                } catch(e) {
-                    if (clinitFailures < 10) {
-                        var clsName = (cm.name || 'unknown');
-                        console.warn('[ClinitWrap] ' + clsName + ' static init failed (continuing): ' + (e && e.message ? e.message : String(e)));
-                    }
-                    clinitFailures++;
-                }
-            };
-        })(origClinit, cm);
-        clinitsWrappedCount++;
-    }
-    console.log('[ClinitWrap] Wrapped ' + clinitsWrappedCount + ' static initializers with try/catch');
 })();
 """ % registry_json
 
     return patcher
+
+
+def wrap_clinits_textually(data):
+    """
+    Wrap all __clinit_ function bodies in try/catch.
+
+    TeaVM generates static initializers like:
+        nmu_ExtraCodecs__clinit_ = () => {
+            <body>
+        },
+
+    We wrap the body in try/catch:
+        nmu_ExtraCodecs__clinit_ = () => {
+            try { <body> } catch(__e) { if(!window.__eaglerClinitErrors) window.__eaglerClinitErrors=0; if(window.__eaglerClinitErrors<10) console.warn('[ClinitWrap] '+__e.message); window.__eaglerClinitErrors++; }
+        },
+
+    This prevents forward-reference crashes from killing the game.
+    """
+    # Pattern: <name>__clinit_ = () => {
+    # We need to find the matching closing brace and wrap the body.
+    # Since JS brace matching is complex, we use a simpler approach:
+    # Replace the opening pattern to add try/catch at the start,
+    # and add the catch before the closing brace.
+
+    # Strategy: Find all "__clinit_ = () => {" patterns
+    # For each, find the matching closing "}" (accounting for nested braces)
+    # and wrap the body.
+
+    import re
+
+    pattern = re.compile(r'(\w+__clinit_\s*=\s*\(\)\s*=>\s*\{)')
+
+    result = []
+    last_end = 0
+    wrapped_count = 0
+
+    for match in pattern.finditer(data):
+        # Find the matching closing brace
+        start_pos = match.end()  # position after the opening {
+        depth = 1
+        pos = start_pos
+        while pos < len(data) and depth > 0:
+            if data[pos] == '{':
+                depth += 1
+            elif data[pos] == '}':
+                depth -= 1
+            elif data[pos] == '"' or data[pos] == "'":
+                # Skip string literals
+                quote = data[pos]
+                pos += 1
+                while pos < len(data) and data[pos] != quote:
+                    if data[pos] == '\\':
+                        pos += 1
+                    pos += 1
+            elif data[pos] == '`':
+                # Skip template literals
+                pos += 1
+                while pos < len(data) and data[pos] != '`':
+                    if data[pos] == '\\':
+                        pos += 1
+                    pos += 1
+            pos += 1
+
+        if depth == 0:
+            # pos-1 is the closing }
+            body = data[start_pos:pos-1]
+            # Wrap the body in try/catch
+            wrapped_body = (
+                '\ntry {\n' + body + '\n} catch(__e) { '
+                'if(typeof window!=="undefined"){if(!window.__eaglerClinitErrors)window.__eaglerClinitErrors=0;'
+                'if(window.__eaglerClinitErrors<10)console.warn("[ClinitWrap] "+(__e&&__e.message?__e.message:String(__e)));'
+                'window.__eaglerClinitErrors++;} }'
+            )
+            result.append(data[last_end:match.start()])
+            result.append(match.group(1))
+            result.append(wrapped_body)
+            last_end = pos - 1  # include the closing }
+            wrapped_count += 1
+
+    result.append(data[last_end:])
+    patched = ''.join(result)
+
+    print(f"Wrapped {wrapped_count} __clinit_ functions in try/catch")
+    return patched
 
 
 def patch_classes_js(input_path, output_path):
@@ -233,6 +276,10 @@ def patch_classes_js(input_path, output_path):
     print(f"Found {len(registry)} interfaces with {total_methods} default methods:")
     for iface, methods in sorted(registry.items()):
         print(f"  {iface}: {len(methods)} methods")
+
+    # Wrap all __clinit_ functions in try/catch (textual replacement)
+    print("\nWrapping __clinit_ functions in try/catch...")
+    data = wrap_clinits_textually(data)
 
     patcher = build_patcher_js(registry)
 
