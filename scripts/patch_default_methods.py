@@ -188,19 +188,28 @@ def build_patcher_js(registry):
         var fileClass = eval(fileClassName);
         if (fileClass && fileClass.prototype && typeof fileClass.prototype.$toPath !== 'function') {
             fileClass.prototype.$toPath = function() {
-                // Return a simple path-like object with resolve() method
+                // Return a simple path-like object with resolve() method.
+                // Avoid using arguments.callee (forbidden in strict mode).
                 var pathStr = this.$path || this.path || '/';
-                return {
-                    $resolve: function(other) { return { $resolve: arguments.callee, toString: function() { return pathStr + '/' + other; } }; },
-                    resolve: function(other) { return this; },
+                var pathObj = {
+                    $resolve: function(other) { return pathObj; },
+                    resolve: function(other) { return pathObj; },
                     toString: function() { return pathStr; },
-                    getParent: function() { return this; },
-                    getFileName: function() { return this; },
-                    getRoot: function() { return this; },
+                    getParent: function() { return pathObj; },
+                    getFileName: function() { return pathObj; },
+                    getFileNameString: function() { return pathStr; },
+                    getRoot: function() { return pathObj; },
                     isAbsolute: function() { return true; },
-                    normalize: function() { return this; },
-                    relativize: function(o) { return o; }
+                    normalize: function() { return pathObj; },
+                    relativize: function(o) { return o; },
+                    toAbsolutePath: function() { return pathObj; },
+                    toFile: function() { return null; },
+                    startsWith: function(p) { return true; },
+                    endsWith: function(p) { return true; },
+                    compareTo: function(o) { return 0; },
+                    iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; }
                 };
+                return pathObj;
             };
             console.log('[DefaultMethodPatcher] Added $toPath to ' + fileClassName);
         }
