@@ -419,7 +419,12 @@ METHODS_TO_ADD = {
         ("toInstant", "()Ljava/time/Instant;", OBJ_RET, 1, 1, PUBLIC),
     ],
     "org/teavm/classlib/java/io/TFile": [
-        ("toPath", "()Ljava/nio/file/Path;", OBJ_RET, 1, 1, PUBLIC),
+        # toPath() is intentionally NOT added here. Our Java patch
+        # (sources/teavm/patch/java/io/File.java) provides a real
+        # toPath() implementation that returns a StubPath. If we add
+        # toPath() to TFile via bytecode (returning null), TeaVM uses
+        # that null-returning version instead of our Java patch.
+        # ("toPath", "()Ljava/nio/file/Path;", OBJ_RET, 1, 1, PUBLIC),
     ],
     "org/teavm/classlib/java/io/TBufferedReader": [
         ("transferTo", "(Ljava/io/Writer;)J", LONG_RET, 1, 2, PUBLIC),
