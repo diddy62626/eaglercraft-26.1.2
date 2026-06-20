@@ -174,6 +174,47 @@ def build_patcher_js(registry):
     } else {
         console.log('[DefaultMethodPatcher] No methods needed patching');
     }
+
+    // ============================================================
+    // Wrap all static initializers (cm.clinit) in try/catch.
+    // TeaVM 0.15 reorders static field initializations, causing forward
+    // references (e.g., AXISANGLE4F references QUATERNIONF before it's
+    // initialized). Without try/catch, this crashes the entire game.
+    // With try/catch, the failing class's static fields stay null but
+    // the game continues (falls back to adapter-only mode gracefully).
+    // ============================================================
+    var clinitsWrappedCount = 0;
+    var clinitFailures = 0;
+    for (var k = 0; k < allClasses.length; k++) {
+        var c = allClasses[k];
+        if (!c || !c[meta]) continue;
+        var cm = c[meta];
+        if (!cm.clinit) continue;
+
+        // Save original clinit and replace with try/catch wrapper.
+        // The original clinit pattern is:
+        //   () => { m.clinit = () => {}; actualClinit(); }
+        // It first replaces itself with a no-op (re-entry guard),
+        // THEN calls the actual init. If actualClinit() throws,
+        // our wrapper catches it. The re-entry guard ensures the
+        // clinit won't be retried (preventing infinite loops).
+        var origClinit = cm.clinit;
+        (function(origClinit, cm) {
+            cm.clinit = function() {
+                try {
+                    origClinit();
+                } catch(e) {
+                    if (clinitFailures < 10) {
+                        var clsName = (cm.name || 'unknown');
+                        console.warn('[ClinitWrap] ' + clsName + ' static init failed (continuing): ' + (e && e.message ? e.message : String(e)));
+                    }
+                    clinitFailures++;
+                }
+            };
+        })(origClinit, cm);
+        clinitsWrappedCount++;
+    }
+    console.log('[ClinitWrap] Wrapped ' + clinitsWrappedCount + ' static initializers with try/catch');
 })();
 """ % registry_json
 
