@@ -174,6 +174,37 @@ def build_patcher_js(registry):
     } else {
         console.log('[DefaultMethodPatcher] No methods needed patching');
     }
+
+    // ============================================================
+    // Special case: Add toPath() to java.io.File (TFile/ji_File)
+    // MC code calls File.toPath() which TeaVM's TFile doesn't have.
+    // Our Java patch provides toPath() but TeaVM doesn't use it for
+    // TFile instances. This patcher adds toPath() directly to
+    // ji_File.prototype, returning a StubPath-like object.
+    // ============================================================
+    var fileClassName = typeof ji_File !== 'undefined' ? 'ji_File' :
+                        (typeof org_teavm_classlib_java_io_TFile !== 'undefined' ? 'org_teavm_classlib_java_io_TFile' : null);
+    if (fileClassName) {
+        var fileClass = eval(fileClassName);
+        if (fileClass && fileClass.prototype && typeof fileClass.prototype.$toPath !== 'function') {
+            fileClass.prototype.$toPath = function() {
+                // Return a simple path-like object with resolve() method
+                var pathStr = this.$path || this.path || '/';
+                return {
+                    $resolve: function(other) { return { $resolve: arguments.callee, toString: function() { return pathStr + '/' + other; } }; },
+                    resolve: function(other) { return this; },
+                    toString: function() { return pathStr; },
+                    getParent: function() { return this; },
+                    getFileName: function() { return this; },
+                    getRoot: function() { return this; },
+                    isAbsolute: function() { return true; },
+                    normalize: function() { return this; },
+                    relativize: function(o) { return o; }
+                };
+            };
+            console.log('[DefaultMethodPatcher] Added $toPath to ' + fileClassName);
+        }
+    }
 })();
 """ % registry_json
 
