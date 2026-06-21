@@ -391,8 +391,42 @@ def build_patcher_js(registry):
                         };
                         return fsObj;
                     },
-                    $getFileSystem: function() { return pathObj.getFileSystem(); },
-                    getFileSystem: function() { return pathObj.getFileSystem(); },
+                    $getFileSystem: function() {
+                        // Build FileSystem object once (lazy init) to avoid recursion
+                        if (pathObj.__fs) return pathObj.__fs;
+                        var fsObj2 = {
+                            $provider: function() { return fsProvider2; },
+                            provider: function() { return fsProvider2; },
+                            $isOpen: function() { return 1; },
+                            isOpen: function() { return true; },
+                            $close: function() {},
+                            close: function() {},
+                            $isReadOnly: function() { return 0; },
+                            isReadOnly: function() { return false; },
+                            $getRootDirectories: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
+                            getRootDirectories: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
+                            $getFileStores: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
+                            getFileStores: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
+                            $supportedFileAttributeViews: function() { return { contains: function() { return false; } }; },
+                            supportedFileAttributeViews: function() { return { contains: function() { return false; } }; },
+                            $getPath: function() { return pathObj; },
+                            getPath: function() { return pathObj; },
+                            $toString: function() { return 'file:///'; },
+                            toString: function() { return 'file:///'; }
+                        };
+                        var fsProvider2 = {
+                            $getScheme: function() { return 'file'; },
+                            getScheme: function() { return 'file'; },
+                            $getFileSystem: function() { return fsObj2; },
+                            getFileSystem: function() { return fsObj2; },
+                            $getPath: function() { return pathObj; },
+                            getPath: function() { return pathObj; },
+                            $toString: function() { return 'file'; },
+                            toString: function() { return 'file'; }
+                        };
+                        pathObj.__fs = fsObj2;
+                        return fsObj2;
+                    },
                     registerWatchService: function() { return {}; },
                     $toUri: function() { return { toString: function() { return 'file://' + pathStr; }, $toString: function() { return 'file://' + pathStr; } }; },
                     toUri: function() { return { toString: function() { return 'file://' + pathStr; }, $toString: function() { return 'file://' + pathStr; } }; },
