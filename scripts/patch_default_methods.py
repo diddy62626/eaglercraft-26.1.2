@@ -392,8 +392,10 @@ def build_patcher_js(registry):
                         return fsObj;
                     },
                     $getFileSystem: function() { return pathObj.getFileSystem(); },
+                    getFileSystem: function() { return pathObj.getFileSystem(); },
                     registerWatchService: function() { return {}; },
-                    toUri: function() { return { toString: function() { return 'file://' + pathStr; } }; },
+                    $toUri: function() { return { toString: function() { return 'file://' + pathStr; }, $toString: function() { return 'file://' + pathStr; } }; },
+                    toUri: function() { return { toString: function() { return 'file://' + pathStr; }, $toString: function() { return 'file://' + pathStr; } }; },
                     toRealPath: function() { return pathObj; },
                     $toRealPath: function() { return pathObj; },
                     subpath: function(a, b) { return pathObj; },
