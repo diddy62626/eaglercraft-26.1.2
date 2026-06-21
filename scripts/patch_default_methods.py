@@ -176,6 +176,21 @@ def build_patcher_js(registry):
     }
 
     // ============================================================
+    // Add $toString to Object.prototype as a universal fallback.
+    // Many TeaVM/MC objects lack $toString but StringBuilder.append
+    // and String.valueOf call $toString on them.
+    // ============================================================
+    if (typeof Object.prototype.$toString !== 'function') {
+        Object.prototype.$toString = function() {
+            if (this && typeof this.toString === 'function' && this.toString !== Object.prototype.toString) {
+                return this.toString();
+            }
+            return '[object]';
+        };
+        console.log('[DefaultMethodPatcher] Added $toString to Object.prototype');
+    }
+
+    // ============================================================
     // Special case: Add toPath() to java.io.File (TFile/ji_File)
     // MC code calls File.toPath() which TeaVM's TFile doesn't have.
     // Our Java patch provides toPath() but TeaVM doesn't use it for
