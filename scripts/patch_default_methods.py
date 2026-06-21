@@ -182,25 +182,40 @@ def build_patcher_js(registry):
     // ============================================================
     if (typeof Object.prototype.$toString !== 'function') {
         Object.prototype.$toString = function() {
-            // Try various toString approaches
-            if (this === null) return 'null';
-            if (this === undefined) return 'undefined';
-            // If the object has a $toString already (from our patcher), use it
-            // Try the object's own toString first
-            try {
-                var s = String(this);
-                if (s !== '[object Object]') return s;
-            } catch(e) {}
-            // Check for common TeaVM fields
-            if (this.$path) return this.$path;
-            if (this.path) return this.path;
-            if (this.$name) return this.$name;
-            if (this.name && typeof this.name === 'string') return this.name;
-            // Check for TeaVM class metadata
-            if (this.constructor && this.constructor[meta] && this.constructor[meta].name) {
-                return this.constructor[meta].name;
+            // Return a TeaVM-compatible string (JS string with $nativeString)
+            var s;
+            if (this === null) s = 'null';
+            else if (this === undefined) s = 'undefined';
+            else {
+                // Try String(this) — works for most objects
+                try {
+                    s = String(this);
+                    if (s === '[object Object]') {
+                        // Check for common TeaVM fields
+                        if (this.$path) s = this.$path;
+                        else if (this.path) s = this.path;
+                        else if (this.$name) s = this.$name;
+                        else if (typeof this.name === 'string') s = this.name;
+                        else if (this.constructor && this.constructor[meta] && this.constructor[meta].name) {
+                            s = this.constructor[meta].name;
+                        } else {
+                            s = '[object]';
+                        }
+                    }
+                } catch(e) {
+                    s = '[object]';
+                }
             }
-            return '[object]';
+            // In TeaVM 0.15, JS strings ARE TeaVM strings.
+            // $nativeString is only on wrapped strings, not plain JS strings.
+            // TeaVM's jl_String_isEmpty accesses $this.$nativeString.length
+            // but if $this is a plain JS string, $nativeString is undefined.
+            // Fix: add $nativeString to the string.
+            // But we can't add properties to primitive strings.
+            // Instead, return a String object (not primitive).
+            var strObj = new String(s);
+            strObj.$nativeString = s;
+            return strObj;
         };
         console.log('[DefaultMethodPatcher] Added $toString to Object.prototype');
     }
