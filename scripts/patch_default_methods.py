@@ -403,6 +403,8 @@ def build_patcher_js(registry):
                             close: function() {},
                             $isReadOnly: function() { return 0; },
                             isReadOnly: function() { return false; },
+                            $toString: function() { return 'file:///'; },
+                            toString: function() { return 'file:///'; },
                             $getRootDirectories: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
                             getRootDirectories: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
                             $getFileStores: function() { return { iterator: function() { return { hasNext: function() { return false; }, next: function() { return null; } }; } }; },
@@ -411,8 +413,12 @@ def build_patcher_js(registry):
                             supportedFileAttributeViews: function() { return { contains: function() { return false; } }; },
                             $getPath: function() { return pathObj; },
                             getPath: function() { return pathObj; },
-                            $toString: function() { return 'file:///'; },
-                            toString: function() { return 'file:///'; }
+                            $getPathMatcher: function() { return { matches: function() { return false; } }; },
+                            getPathMatcher: function() { return { matches: function() { return false; } }; },
+                            $getUserPrincipalLookupService: function() { return { lookupPrincipalByName: function() { return {}; }, lookupPrincipalByGroupName: function() { return {}; } }; },
+                            getUserPrincipalLookupService: function() { return { lookupPrincipalByName: function() { return {}; }, lookupPrincipalByGroupName: function() { return {}; } }; },
+                            $newWatchService: function() { return { poll: function() { return null; }, take: function() { return null; }, close: function() {} }; },
+                            newWatchService: function() { return { poll: function() { return null; }, take: function() { return null; }, close: function() {} }; }
                         };
                         var fsProvider2 = {
                             $getScheme: function() { return 'file'; },
@@ -482,6 +488,11 @@ def build_patcher_js(registry):
                 return pathObj;
             };
             console.log('[DefaultMethodPatcher] Added $toPath to ' + fileClassName);
+        }
+        // Also add $toString to File prototype (MC calls StringBuilder.append(file))
+        if (fileClass && fileClass.prototype && typeof fileClass.prototype.$toString !== 'function') {
+            fileClass.prototype.$toString = function() { return this.$path || this.path || '/'; };
+            fileClass.prototype.toString = function() { return this.$path || this.path || '/'; };
         }
     }
 })();
