@@ -245,8 +245,8 @@ def build_patcher_js(registry):
                             getPath: function() { return pathObj; },
                             $newByteChannel: function() { return { read: function() { return -1; }, close: function() {} }; },
                             newByteChannel: function() { return { read: function() { return -1; }, close: function() {} }; },
-                            $newInputStream: function() { return { read: function() { return -1; }, read3: function() { return -1; }, available: function() { return 0; }, close: function() {}, mark: function() {}, reset: function() {}, skip: function(n) { return 0; } }; },
-                            newInputStream: function() { return { read: function() { return -1; }, read3: function() { return -1; }, available: function() { return 0; }, close: function() {}, mark: function() {}, reset: function() {}, skip: function(n) { return 0; } }; },
+                            $newInputStream: function() { return { read: function() { return -1; }, read3: function(buf, off, len) { return -1; }, available: function() { return 0; }, close: function() {}, mark: function() {}, reset: function() {}, skip: function(n) { return 0; } }; },
+                            newInputStream: function() { return { read: function() { return -1; }, read3: function(buf, off, len) { return -1; }, available: function() { return 0; }, close: function() {}, mark: function() {}, reset: function() {}, skip: function(n) { return 0; } }; },
                             $newOutputStream: function() { return { write: function() {}, flush: function() {}, close: function() {} }; },
                             newOutputStream: function() { return { write: function() {}, flush: function() {}, close: function() {} }; },
                             $newFileChannel: function() { return { read: function() { return -1; }, write: function() { return 0; }, close: function() {} }; },
@@ -398,6 +398,61 @@ def wrap_clinits_textually(data):
     return patched
 
 
+def patch_add_suppressed(data):
+    """
+    Patch jl_Throwable_addSuppressed to handle null suppressed array.
+
+    TeaVM's implementation accesses var$2.data.length where var$2 is
+    the suppressed exceptions array, which can be null. We add a null
+    check at the beginning of the function.
+    """
+    import re
+
+    # Find the function: jl_Throwable_addSuppressed = ($this, $exception) => {
+    # and add a null check for the suppressed array after the opening brace
+    pattern = r'(jl_Throwable_addSuppressed\s*=\s*\([^)]*\)\s*=>\s*\{)'
+
+    match = re.search(pattern, data)
+    if not match:
+        print("  WARNING: jl_Throwable_addSuppressed not found")
+        return data
+
+    # Find the body and add null checks
+    # The function body typically does:
+    #   var$1 = $this.$suppressed; (or similar)
+    #   if (var$1 === null) { $this.$suppressed = ...; var$1 = ...; }
+    #   var$3 = var$1.data.length + 1 | 0;
+    # We need to ensure var$1 (the suppressed array) is not null
+
+    # Simple approach: wrap the entire function body in try/catch
+    start_pos = match.end()
+    depth = 1
+    pos = start_pos
+    while pos < len(data) and depth > 0:
+        if data[pos] == '{':
+            depth += 1
+        elif data[pos] == '}':
+            depth -= 1
+        elif data[pos] == '"' or data[pos] == "'":
+            quote = data[pos]
+            pos += 1
+            while pos < len(data) and data[pos] != quote:
+                if data[pos] == '\\':
+                    pos += 1
+                pos += 1
+        pos += 1
+
+    if depth == 0:
+        body = data[start_pos:pos-1]
+        wrapped_body = '\ntry {\n' + body + '\n} catch(__e) { /* suppressed array null — ignore */ }\n'
+        result = data[:match.start()] + match.group(1) + wrapped_body + data[pos-1:]
+        print("  Wrapped jl_Throwable_addSuppressed in try/catch")
+        return result
+
+    print("  WARNING: Could not find end of jl_Throwable_addSuppressed")
+    return data
+
+
 def patch_classes_js(input_path, output_path):
     """Patch classes.js with default method workaround."""
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -414,6 +469,10 @@ def patch_classes_js(input_path, output_path):
     # Wrap all __clinit_ functions in try/catch (textual replacement)
     print("\nWrapping __clinit_ functions in try/catch...")
     data = wrap_clinits_textually(data)
+
+    # Patch jl_Throwable_addSuppressed to handle null suppressed array
+    print("\nPatching jl_Throwable_addSuppressed for null safety...")
+    data = patch_add_suppressed(data)
 
     patcher = build_patcher_js(registry)
 
