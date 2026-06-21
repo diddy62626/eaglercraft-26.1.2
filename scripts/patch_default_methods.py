@@ -370,6 +370,7 @@ def build_patcher_js(registry):
                     registerWatchService: function() { return {}; },
                     toUri: function() { return { toString: function() { return 'file://' + pathStr; } }; },
                     toRealPath: function() { return pathObj; },
+                    $toRealPath: function() { return pathObj; },
                     subpath: function(a, b) { return pathObj; },
                     getNameCount: function() { return 1; },
                     getName: function(i) { return pathObj; },
