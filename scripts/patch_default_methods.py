@@ -182,8 +182,23 @@ def build_patcher_js(registry):
     // ============================================================
     if (typeof Object.prototype.$toString !== 'function') {
         Object.prototype.$toString = function() {
-            if (this && typeof this.toString === 'function' && this.toString !== Object.prototype.toString) {
-                return this.toString();
+            // Try various toString approaches
+            if (this === null) return 'null';
+            if (this === undefined) return 'undefined';
+            // If the object has a $toString already (from our patcher), use it
+            // Try the object's own toString first
+            try {
+                var s = String(this);
+                if (s !== '[object Object]') return s;
+            } catch(e) {}
+            // Check for common TeaVM fields
+            if (this.$path) return this.$path;
+            if (this.path) return this.path;
+            if (this.$name) return this.$name;
+            if (this.name && typeof this.name === 'string') return this.name;
+            // Check for TeaVM class metadata
+            if (this.constructor && this.constructor[meta] && this.constructor[meta].name) {
+                return this.constructor[meta].name;
             }
             return '[object]';
         };
