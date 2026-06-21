@@ -685,6 +685,106 @@ def patch_add_suppressed(data):
     return data
 
 
+def patch_file_channel_open(data):
+    """
+    Patch jnc_FileChannel_open to return a fake FileChannel instead of
+    throwing IOException("Cannot open file channel in browser").
+
+    The original implementation always throws. We replace it with a
+    function that returns a fake channel object with read/write/close
+    methods that do nothing.
+    """
+    import re
+
+    # Find the function: jnc_FileChannel_open = (var$1, var$2) => { ... throw ... };
+    pattern = r'(jnc_FileChannel_open\s*=\s*\([^)]*\)\s*=>\s*\{)'
+
+    match = re.search(pattern, data)
+    if not match:
+        print("  WARNING: jnc_FileChannel_open not found")
+        return data
+
+    # Find the matching closing brace
+    start_pos = match.end()
+    depth = 1
+    pos = start_pos
+    while pos < len(data) and depth > 0:
+        if data[pos] == '{':
+            depth += 1
+        elif data[pos] == '}':
+            depth -= 1
+        elif data[pos] == '"' or data[pos] == "'":
+            quote = data[pos]
+            pos += 1
+            while pos < len(data) and data[pos] != quote:
+                if data[pos] == '\\':
+                    pos += 1
+                pos += 1
+        pos += 1
+
+    if depth == 0:
+        # Replace the body with a fake channel return
+        fake_body = """
+    // PATCHED: Return fake FileChannel instead of throwing IOException.
+    // MC's DownloadQueue needs a FileChannel for persistent storage.
+    // In the browser, we don't have real file channels, so return a
+    // fake one that does nothing (all reads return -1, writes no-op).
+    var fakeChannel = {
+        $read: function() { return -1; },
+        read: function() { return -1; },
+        $read0: function() { return -1; },
+        read0: function() { return -1; },
+        $read1: function(b) { return -1; },
+        read1: function(b) { return -1; },
+        $read2: function(b,o,l) { return -1; },
+        read2: function(b,o,l) { return -1; },
+        $read3: function(b,o,l) { return -1; },
+        read3: function(b,o,l) { return -1; },
+        $write: function() { return 0; },
+        write: function() { return 0; },
+        $write0: function() { return 0; },
+        write0: function() { return 0; },
+        $write1: function(b) { return 0; },
+        write1: function(b) { return 0; },
+        $close: function() {},
+        close: function() {},
+        $isOpen: function() { return 1; },
+        isOpen: function() { return true; },
+        $position: function() { return 0; },
+        position: function() { return 0; },
+        $position0: function(p) { return this; },
+        position0: function(p) { return this; },
+        $size: function() { return 0; },
+        size: function() { return 0; },
+        $truncate: function(s) { return this; },
+        truncate: function(s) { return this; },
+        $force: function() {},
+        force: function() {},
+        $lock: function() { return this; },
+        lock: function() { return this; },
+        $tryLock: function() { return this; },
+        tryLock: function() { return this; },
+        $map: function() { return null; },
+        map: function() { return null; },
+        $transferFrom: function() { return 0; },
+        transferFrom: function() { return 0; },
+        $transferTo: function() { return 0; },
+        transferTo: function() { return 0; },
+        $write2: function(b,p) { return 0; },
+        write2: function(b,p) { return 0; },
+        $read4: function(b,p) { return -1; },
+        read4: function(b,p) { return -1; }
+    };
+    return fakeChannel;
+"""
+        result = data[:match.start()] + match.group(1) + fake_body + data[pos-1:]
+        print("  Replaced jnc_FileChannel_open with fake channel return")
+        return result
+
+    print("  WARNING: Could not find end of jnc_FileChannel_open")
+    return data
+
+
 def patch_classes_js(input_path, output_path):
     """Patch classes.js with default method workaround."""
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -705,6 +805,10 @@ def patch_classes_js(input_path, output_path):
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
+
+    # Patch jnc_FileChannel_open to return a fake channel instead of throwing
+    print("\nPatching jnc_FileChannel_open to return fake channel...")
+    data = patch_file_channel_open(data)
 
     patcher = build_patcher_js(registry)
 
