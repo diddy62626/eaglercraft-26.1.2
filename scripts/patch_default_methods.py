@@ -973,7 +973,13 @@ def patch_classes_js(input_path, output_path):
         $toRealPath: function() { return __pathObj; }, toRealPath: function() { return __pathObj; },
         $toUri: function() { return { toString: function() { return 'file://'+__p; }, $toString: function() { return 'file://'+__p; } }; },
         toUri: function() { return { toString: function() { return 'file://'+__p; }, $toString: function() { return 'file://'+__p; } }; },
-        $getFileSystem: function() { return __pathObj.__fs || (__pathObj.__fs = { $provider: function() { return { $getScheme: function() { return 'file'; }, $readAttributes: function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; }, $lastModifiedTime: function() { return { toMillis: function() { return 0; } }; } }; }, $newInputStream: function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; }, $newDirectoryStream0: function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; }, $exists: function() { return 0; }, $createDirectories: function() {}, $isDirectory: function() { return 0; } }; }); },
+        $getFileSystem: function() {
+            if (__pathObj.__fs) return __pathObj.__fs;
+            __pathObj.__fs = {
+                $provider: function() { return { $getScheme: function() { return 'file'; }, $readAttributes: function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; }, $lastModifiedTime: function() { return { toMillis: function() { return 0; } }; } }; }, $newInputStream: function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; }, $newDirectoryStream0: function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; }, $exists: function() { return 0; }, $createDirectories: function() {}, $isDirectory: function() { return 0; } };
+            };
+            return __pathObj.__fs;
+        },
         getFileSystem: function() { return __pathObj.$getFileSystem(); }
     };
     return __pathObj;
