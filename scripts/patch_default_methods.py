@@ -180,7 +180,7 @@ def build_patcher_js(registry):
     // TeaVM DCE'd this method because the bytecode patch returns null.
     // MC's YggdrasilAuthenticationService needs a ScheduledExecutorService.
     // ============================================================
-    if (typeof juc_Executors_newScheduledThreadPool !== 'function' && typeof juc_Executors !== 'undefined') {
+    if (typeof juc_Executors_newScheduledThreadPool !== 'function') {
         // Create a fake ScheduledExecutorService
         var fakeExecutor = {
             $execute: function(r) { try { r.$run(); } catch(e) {} return; },
@@ -268,6 +268,7 @@ def build_patcher_js(registry):
     // ============================================================
     var fileClassName = typeof ji_File !== 'undefined' ? 'ji_File' :
                         (typeof org_teavm_classlib_java_io_TFile !== 'undefined' ? 'org_teavm_classlib_java_io_TFile' : null);
+    console.log('[DefaultMethodPatcher] fileClassName check: ji_File=' + (typeof ji_File) + ' TFile=' + (typeof org_teavm_classlib_java_io_TFile));
     if (fileClassName) {
         var fileClass = eval(fileClassName);
         if (fileClass && fileClass.prototype && typeof fileClass.prototype.$toPath !== 'function') {
