@@ -208,10 +208,22 @@ def build_patcher_js(registry):
             $toString: function() { return 'fake-executor'; },
             toString: function() { return 'fake-executor'; }
         };
-        juc_Executors_newScheduledThreadPool = function(threadCount, threadFactory) {
-            return fakeExecutor;
-        };
-        console.log('[DefaultMethodPatcher] Added juc_Executors_newScheduledThreadPool');
+        // Try to assign — may fail if juc_Executors_newScheduledThreadPool
+        // is a let-declared variable (can't reassign in strict mode)
+        try {
+            juc_Executors_newScheduledThreadPool = function(threadCount, threadFactory) {
+                return fakeExecutor;
+            };
+            console.log('[DefaultMethodPatcher] Added juc_Executors_newScheduledThreadPool');
+        } catch(e) {
+            console.warn('[DefaultMethodPatcher] Could not assign juc_Executors_newScheduledThreadPool: ' + e.message);
+            // Store on global scope as fallback
+            if (typeof self !== 'undefined') {
+                self.juc_Executors_newScheduledThreadPool = function(threadCount, threadFactory) {
+                    return fakeExecutor;
+                };
+            }
+        }
     }
 
     // ============================================================
