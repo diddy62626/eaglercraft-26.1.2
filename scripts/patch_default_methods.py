@@ -930,6 +930,59 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching SharedConstants.getCurrentVersion for null safety...")
     data = patch_shared_constants(data)
 
+    # Patch ji_File_toPath to return a non-null path (TeaVM's version returns null)
+    print("\nPatching ji_File_toPath to return fake path...")
+    old_toPath = 'ji_File_toPath = var$0 => {'
+    if old_toPath in data:
+        # Find the end of the function and replace the body
+        pos = data.find(old_toPath)
+        # Find matching closing };
+        start = data.find('{', pos)
+        depth = 1
+        p = start + 1
+        while p < len(data) and depth > 0:
+            if data[p] == '{': depth += 1
+            elif data[p] == '}': depth -= 1
+            p += 1
+        # p is now after the closing }
+        # Find the next ; after }
+        end = data.find(';', p)
+        if end >= 0:
+            old_func = data[pos:end+1]
+            new_func = '''ji_File_toPath = var$0 => {
+    var __p = var$0.$path || var$0.path || '/';
+    var __pathObj = {
+        $resolve: function(o) { return __pathObj; }, resolve: function(o) { return __pathObj; },
+        $resolveSibling: function(o) { return __pathObj; }, resolveSibling: function(o) { return __pathObj; },
+        $toString: function() { var s = new String(__p); s.$nativeString = __p; return s; }, toString: function() { return __p; },
+        $getParent: function() { return __pathObj; }, getParent: function() { return __pathObj; },
+        $getFileName: function() { return __pathObj; }, getFileName: function() { return __pathObj; },
+        $getFileNameString: function() { return __p; }, getFileNameString: function() { return __p; },
+        $getRoot: function() { return __pathObj; }, getRoot: function() { return __pathObj; },
+        $isAbsolute: function() { return 1; }, isAbsolute: function() { return true; },
+        $normalize: function() { return __pathObj; }, normalize: function() { return __pathObj; },
+        $relativize: function(o) { return o; }, relativize: function(o) { return o; },
+        $toAbsolutePath: function() { return __pathObj; }, toAbsolutePath: function() { return __pathObj; },
+        $toFile: function() { return null; }, toFile: function() { return null; },
+        $startsWith: function(p) { return 1; }, startsWith: function(p) { return true; },
+        $endsWith: function(p) { return 1; }, endsWith: function(p) { return true; },
+        $compareTo: function(o) { return 0; }, compareTo: function(o) { return 0; },
+        $subpath: function(a,b) { return __pathObj; }, subpath: function(a,b) { return __pathObj; },
+        $getNameCount: function() { return 1; }, getNameCount: function() { return 1; },
+        $getName: function(i) { return __pathObj; }, getName: function(i) { return __pathObj; },
+        $toRealPath: function() { return __pathObj; }, toRealPath: function() { return __pathObj; },
+        $toUri: function() { return { toString: function() { return 'file://'+__p; }, $toString: function() { return 'file://'+__p; } }; },
+        toUri: function() { return { toString: function() { return 'file://'+__p; }, $toString: function() { return 'file://'+__p; } }; },
+        $getFileSystem: function() { return __pathObj.__fs || (__pathObj.__fs = { $provider: function() { return { $getScheme: function() { return 'file'; }, $readAttributes: function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; }, $lastModifiedTime: function() { return { toMillis: function() { return 0; } }; } }; }, $newInputStream: function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; }, $newDirectoryStream0: function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; }, $exists: function() { return 0; }, $createDirectories: function() {}, $isDirectory: function() { return 0; } }; }); },
+        getFileSystem: function() { return __pathObj.$getFileSystem(); }
+    };
+    return __pathObj;
+};'''
+            data = data.replace(old_func, new_func)
+            print("  Replaced ji_File_toPath with fake path return")
+    else:
+        print("  WARNING: ji_File_toPath not found")
+
     # Patch BuiltInPackSource.populatePackList to handle null packDir
     print("\nPacking populatePackList for null safety...")
     data = data.replace(
