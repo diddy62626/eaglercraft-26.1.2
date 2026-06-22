@@ -924,6 +924,14 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching SharedConstants.getCurrentVersion for null safety...")
     data = patch_shared_constants(data)
 
+    # Patch BuiltInPackSource.populatePackList to handle null packDir
+    print("\nPacking populatePackList for null safety...")
+    data = data.replace(
+        '$discoveredPacks = var$4.$path3;',
+        'if (var$4 === null || var$4 === undefined) { return; } $discoveredPacks = var$4.$path3;'
+    )
+    print("  Patched populatePackList null check")
+
     patcher = build_patcher_js(registry)
 
     # Insert the patcher INSIDE the TeaVM IIFE, right before the closing
