@@ -176,6 +176,45 @@ def build_patcher_js(registry):
     }
 
     // ============================================================
+    // Special case: Add Executors.newScheduledThreadPool as a global function.
+    // TeaVM DCE'd this method because the bytecode patch returns null.
+    // MC's YggdrasilAuthenticationService needs a ScheduledExecutorService.
+    // ============================================================
+    if (typeof juc_Executors_newScheduledThreadPool !== 'function' && typeof juc_Executors !== 'undefined') {
+        // Create a fake ScheduledExecutorService
+        var fakeExecutor = {
+            $execute: function(r) { try { r.$run(); } catch(e) {} return; },
+            execute: function(r) { try { r.$run(); } catch(e) {} return; },
+            $submit: function(r) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            submit: function(r) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            $schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            $scheduleAtFixedRate: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            scheduleAtFixedRate: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            $scheduleWithFixedDelay: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            scheduleWithFixedDelay: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return true; }, isCancelled: function() { return false; }, cancel: function() { return false; } }; },
+            $shutdown: function() {},
+            shutdown: function() {},
+            $shutdownNow: function() { return []; },
+            shutdownNow: function() { return []; },
+            $isShutdown: function() { return 0; },
+            isShutdown: function() { return false; },
+            $isTerminated: function() { return 0; },
+            isTerminated: function() { return false; },
+            $isTerminating: function() { return 0; },
+            isTerminating: function() { return false; },
+            $awaitTermination: function(t, u) { return 1; },
+            awaitTermination: function(t, u) { return true; },
+            $toString: function() { return 'fake-executor'; },
+            toString: function() { return 'fake-executor'; }
+        };
+        juc_Executors_newScheduledThreadPool = function(threadCount, threadFactory) {
+            return fakeExecutor;
+        };
+        console.log('[DefaultMethodPatcher] Added juc_Executors_newScheduledThreadPool');
+    }
+
+    // ============================================================
     // Add $toString to Object.prototype as a universal fallback.
     // Many TeaVM/MC objects lack $toString but StringBuilder.append
     // and String.valueOf call $toString on them.
