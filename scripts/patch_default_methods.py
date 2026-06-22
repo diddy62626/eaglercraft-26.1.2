@@ -837,6 +837,24 @@ def patch_file_channel_open(data):
     return data
 
 
+def patch_data_fixer(data):
+    """
+    Patch nmud_DataFixers_getDataFixer to return a dummy fixer when
+    DATA_FIXER is null (because the clinit failed and was caught).
+
+    The original: return nmud_DataFixers_DATA_FIXER.$fixerUpper0;
+    Patched: return (nmud_DataFixers_DATA_FIXER && nmud_DataFixers_DATA_FIXER.$fixerUpper0) || {};
+    """
+    old = 'return nmud_DataFixers_DATA_FIXER.$fixerUpper0;'
+    new = 'return (nmud_DataFixers_DATA_FIXER && nmud_DataFixers_DATA_FIXER.$fixerUpper0) || {};'
+    if old in data:
+        data = data.replace(old, new)
+        print("  Patched getDataFixer with null safety")
+    else:
+        print("  WARNING: getDataFixer pattern not found")
+    return data
+
+
 def patch_classes_js(input_path, output_path):
     """Patch classes.js with default method workaround."""
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -861,6 +879,10 @@ def patch_classes_js(input_path, output_path):
     # Patch jnc_FileChannel_open to return a fake channel instead of throwing
     print("\nPatching jnc_FileChannel_open to return fake channel...")
     data = patch_file_channel_open(data)
+
+    # Patch nmud_DataFixers_getDataFixer to handle null DATA_FIXER
+    print("\nPatching DataFixers.getDataFixer for null safety...")
+    data = patch_data_fixer(data)
 
     patcher = build_patcher_js(registry)
 
