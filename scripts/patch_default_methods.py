@@ -855,6 +855,41 @@ def patch_data_fixer(data):
     return data
 
 
+def patch_shared_constants(data):
+    """
+    Patch SharedConstants.getCurrentVersion to return a dummy version
+    when CURRENT_VERSION is null (because the clinit failed).
+
+    Original:
+        var$1 = nm_SharedConstants_CURRENT_VERSION;
+        if (var$1 !== null)
+            return var$1;
+        var$2 = new jl_IllegalStateException;
+        jl_Throwable__init_(var$2, $rt_s(1994));
+        $rt_throw(var$2);
+
+    Patched: Return a dummy version object when CURRENT_VERSION is null.
+    """
+    old = """var$1 = nm_SharedConstants_CURRENT_VERSION;
+        if (var$1 !== null)
+            return var$1;
+        var$2 = new jl_IllegalStateException;
+        jl_Throwable__init_(var$2, $rt_s(1994));
+        $rt_throw(var$2);"""
+
+    new = """var$1 = nm_SharedConstants_CURRENT_VERSION;
+        if (var$1 !== null)
+            return var$1;
+        return { $getName: function() { return '26.1.2'; }, getName: function() { return '26.1.2'; }, $getProtocolVersion: function() { return 775; }, getProtocolVersion: function() { return 775; }, $getProtocolVersionIp: function() { return 775; }, $getDataVersion: function() { return 4189; }, getDataVersion: function() { return 4189; }, $toString: function() { return '26.1.2'; }, toString: function() { return '26.1.2'; } };"""
+
+    if old in data:
+        data = data.replace(old, new)
+        print("  Patched getCurrentVersion with dummy version return")
+    else:
+        print("  WARNING: getCurrentVersion pattern not found")
+    return data
+
+
 def patch_classes_js(input_path, output_path):
     """Patch classes.js with default method workaround."""
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -883,6 +918,10 @@ def patch_classes_js(input_path, output_path):
     # Patch nmud_DataFixers_getDataFixer to handle null DATA_FIXER
     print("\nPatching DataFixers.getDataFixer for null safety...")
     data = patch_data_fixer(data)
+
+    # Patch SharedConstants.getCurrentVersion to return dummy version
+    print("\nPatching SharedConstants.getCurrentVersion for null safety...")
+    data = patch_shared_constants(data)
 
     patcher = build_patcher_js(registry)
 
