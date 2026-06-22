@@ -429,8 +429,8 @@ teavm {
 
         // Additional TeaVM properties
         properties = [
-            'teavm.minHeapSize' : '512MB',
-            'teavm.maxHeapSize' : '4096MB'
+            'teavm.minHeapSize' : '1024MB',
+            'teavm.maxHeapSize' : '8192MB'
         ]
     }
 
