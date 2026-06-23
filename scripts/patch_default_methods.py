@@ -114,51 +114,9 @@ def build_patcher_js(registry):
     // We need to wrap Cd() to capture these registrations and then
     // copy interface methods to implementing classes.
 
-    // Build a map: class -> {methodName: func}
-    var interfaceMethodMap = new Map();
-
-    // Find and wrap the Cd function
-    var origCd = typeof Cd !== 'undefined' ? Cd : null;
-    if (origCd) {
-        Cd = function(data) {
-            origCd(data);
-            // After Cd processes the data, scan it for interface methods
-            // The data format is: [cls, name, flags, parent, interfaces, ..., virtualMethods, ...]
-            // We need to check if cls is an interface (flags & 0x0200 = abstract)
-            var i = 0;
-            while (i < data.length) {
-                var cls2 = data[i++];
-                var name2 = data[i++];
-                if (name2 !== 0) {
-                    var pkgIdx = data[i++];
-                    // Skip package name processing
-                }
-                i++; // superclass
-                var ifaces = data[i++];
-                i++; // modifiers
-                i++; // innerClassInfo
-                var vmethods = data[i++];
-                // If this class has interfaces AND virtual methods, store them
-                if (ifaces !== 0 && ifaces.length > 0 && vmethods !== 0 && vmethods.length > 0) {
-                    if (!interfaceMethodMap.has(cls2)) {
-                        interfaceMethodMap.set(cls2, {});
-                    }
-                    var map = interfaceMethodMap.get(cls2);
-                    for (var j = 0; j < vmethods.length; j += 2) {
-                        var mname = vmethods[j];
-                        var mfunc = vmethods[j + 1];
-                        if (typeof mname === 'string') {
-                            map[mname] = mfunc;
-                        } else if (Array.isArray(mname)) {
-                            for (var k = 0; k < mname.length; k++) {
-                                map[mname[k]] = mfunc;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-    }
+    // Use the global interface method map captured by the Cd wrapper
+    var interfaceMethodMap = typeof __eaglercraftInterfaceMethods !== 'undefined' ? __eaglercraftInterfaceMethods : new Map();
+    console.log('[DefaultMethodPatcher] interfaceMethodMap size: ' + interfaceMethodMap.size);
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
@@ -619,6 +577,53 @@ def patch_classes_js(input_path, output_path):
             print("  Patched Files.exists null check")
     else:
         print("\nSkipping unobfuscated-only textual patches (obfuscated build)")
+
+    # Insert Cd wrapper right after Cd function definition
+    # Cd ends with '}}}},'  followed by next function
+    cd_wrapper = '''
+// Cd wrapper: captures interface method registrations for later patching
+var __eaglercraftInterfaceMethods = new Map();
+var __origCd = Cd;
+Cd = function(data) {
+    __origCd(data);
+    var idx = 0;
+    while (idx < data.length) {
+        var cls2 = data[idx++];
+        var name2 = data[idx++];
+        if (name2 !== 0) { idx++; }
+        idx++; // superclass
+        var ifaces = data[idx++];
+        idx++; // modifiers
+        idx++; // innerClassInfo
+        var vmethods = data[idx++];
+        if (ifaces !== 0 && ifaces.length > 0 && vmethods !== 0 && vmethods.length > 0) {
+            if (!__eaglercraftInterfaceMethods.has(cls2)) {
+                __eaglercraftInterfaceMethods.set(cls2, {});
+            }
+            var map = __eaglercraftInterfaceMethods.get(cls2);
+            for (var j = 0; j < vmethods.length; j += 2) {
+                var mn = vmethods[j];
+                var mf = vmethods[j + 1];
+                if (typeof mn === 'string') { map[mn] = mf; }
+                else if (Array.isArray(mn)) { for (var k = 0; k < mn.length; k++) { map[mn[k]] = mf; } }
+            }
+        }
+    }
+};
+'''
+    # Find the Cd function definition end and insert after it
+    cd_end_marker = '}}}},'
+    cd_pos = data.find('Cd=data=>{')
+    if cd_pos >= 0:
+        cd_end = data.find(cd_end_marker, cd_pos)
+        if cd_end >= 0:
+            cd_end += len(cd_end_marker)
+            data = data[:cd_end] + '\n' + cd_wrapper + '\n' + data[cd_end:]
+            print("  Inserted Cd wrapper after Cd function definition")
+        else:
+            print("  WARNING: Could not find Cd function end")
+    else:
+        print("  WARNING: Cd function not found")
 
     patcher = build_patcher_js(registry)
 
