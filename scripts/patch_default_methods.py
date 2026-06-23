@@ -114,9 +114,8 @@ def build_patcher_js(registry):
     // We need to wrap Cd() to capture these registrations and then
     // copy interface methods to implementing classes.
 
-    // Use the global interface method map captured by the Cd wrapper
-    var interfaceMethodMap = typeof __eaglercraftInterfaceMethods !== 'undefined' ? __eaglercraftInterfaceMethods : new Map();
-    console.log('[DefaultMethodPatcher] interfaceMethodMap size: ' + interfaceMethodMap.size);
+    // Interface methods should be on interface prototypes after Cd() runs
+    // In obfuscated builds, Cd() assigns methods to cls.prototype directly
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
@@ -146,22 +145,7 @@ def build_patcher_js(registry):
                 }
             }
 
-            // Also try interfaceMethodMap (obfuscated builds where Cd captured methods)
-            if (interfaceMethodMap.has(iface)) {
-                var imap = interfaceMethodMap.get(iface);
-                for (var mkey in imap) {
-                    if (typeof cls.prototype[mkey] !== 'function') {
-                        (function(mkey, fn) {
-                            cls.prototype[mkey] = function() {
-                                var args = [this];
-                                for (var k = 0; k < arguments.length; k++) args.push(arguments[k]);
-                                return fn.apply(null, args);
-                            };
-                        })(mkey, imap[mkey]);
-                        patched++; classPatched = true;
-                    }
-                }
-            }
+
         }
         if (classPatched) classesPatched++;
     }
@@ -577,56 +561,6 @@ def patch_classes_js(input_path, output_path):
             print("  Patched Files.exists null check")
     else:
         print("\nSkipping unobfuscated-only textual patches (obfuscated build)")
-
-    # Insert Cd wrapper right after Cd function definition
-    # Cd ends with '}}}},'  followed by next function
-    cd_wrapper = '''
-// Cd wrapper: captures interface method registrations for later patching
-(function(){
-var __eaglercraftInterfaceMethods = new Map();
-var __origCd = Cd;
-Cd = function(data) {
-    __origCd(data);
-    var idx = 0;
-    while (idx < data.length) {
-        var cls2 = data[idx++];
-        var name2 = data[idx++];
-        if (name2 !== 0) { idx++; }
-        idx++; // superclass
-        var ifaces = data[idx++];
-        idx++; // modifiers
-        idx++; // innerClassInfo
-        var vmethods = data[idx++];
-        if (ifaces !== 0 && ifaces.length > 0 && vmethods !== 0 && vmethods.length > 0) {
-            if (!__eaglercraftInterfaceMethods.has(cls2)) {
-                __eaglercraftInterfaceMethods.set(cls2, {});
-            }
-            var map = __eaglercraftInterfaceMethods.get(cls2);
-            for (var j = 0; j < vmethods.length; j += 2) {
-                var mn = vmethods[j];
-                var mf = vmethods[j + 1];
-                if (typeof mn === 'string') { map[mn] = mf; }
-                else if (Array.isArray(mn)) { for (var k = 0; k < mn.length; k++) { map[mn[k]] = mf; } }
-            }
-        }
-    }
-};
-window.__eaglercraftInterfaceMethods = __eaglercraftInterfaceMethods;
-})();
-'''
-    # Find the Cd function definition end and insert after it
-    cd_end_marker = '}}}},'
-    cd_pos = data.find('Cd=data=>{')
-    if cd_pos >= 0:
-        cd_end = data.find(cd_end_marker, cd_pos)
-        if cd_end >= 0:
-            cd_end += len(cd_end_marker)
-            data = data[:cd_end] + '\n' + cd_wrapper + '\n' + data[cd_end:]
-            print("  Inserted Cd wrapper after Cd function definition")
-        else:
-            print("  WARNING: Could not find Cd function end")
-    else:
-        print("  WARNING: Cd function not found")
 
     patcher = build_patcher_js(registry)
 
