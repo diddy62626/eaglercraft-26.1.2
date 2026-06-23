@@ -98,11 +98,13 @@ def build_patcher_js(registry):
 // ============================================================
 (function() {
     var allClasses = typeof $rt_allClasses !== 'undefined' ? $rt_allClasses :
-                     typeof Fnk !== 'undefined' ? Fnk : null;
+                     typeof Fnk !== 'undefined' ? Fnk :
+                     typeof FnY !== 'undefined' ? FnY : null;
     if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
     var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
                typeof GN !== 'undefined' ? GN : null;
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
+    console.log('[DefaultMethodPatcher] Using allClasses=' + (typeof $rt_allClasses !== 'undefined' ? '$rt_allClasses' : typeof Fnk !== 'undefined' ? 'Fnk' : 'FnY') + ' meta=' + (typeof $rt_meta !== 'undefined' ? '$rt_meta' : 'GN') + ' count=' + allClasses.length);
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
