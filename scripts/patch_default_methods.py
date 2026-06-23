@@ -606,10 +606,10 @@ def patch_classes_js(input_path, output_path):
     # Patch Collection.toArray to handle null generator
     if 'ju_Collection_toArray = ' in data:
         data = data.replace(
-            'ju_Collection_toArray = ($this, $gen) => {',
-            'ju_Collection_toArray = ($this, $gen) => {\n    if ($gen === null || $gen === undefined) return [];'
+            '$tmp = $gen.$apply1(var$2);',
+            'if ($gen === null || $gen === undefined) return []; $tmp = $gen.$apply1(var$2);'
         )
-        print("  Patched Collection.toArray null check")
+        print("  Patched Collection.toArray null check (inside case 1)")
     else:
         print("  WARNING: HashMap.putAll not found")
 
