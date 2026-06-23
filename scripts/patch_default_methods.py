@@ -136,7 +136,7 @@ def build_patcher_js(registry):
             }
             for (var key in proto) {
                 if (typeof proto[key] === 'function' && key !== 'constructor') {
-                    if (typeof cls.prototype[key] !== 'function') {
+                    if (!Object.prototype.hasOwnProperty.call(cls.prototype, key)) {
                         (function(key, fn) {
                             cls.prototype[key] = function() {
                                 var args = [this];
