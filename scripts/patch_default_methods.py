@@ -575,35 +575,32 @@ def patch_classes_js(input_path, output_path):
     print("  Patched Object.identity null check")
 
     # Replace juc_Executors_newScheduledThreadPool body (returns null from bytecode patcher)
-    old_exec = 'juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {\n    return null;\n}'
-    new_exec = '''juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
-    return {
-        $execute: function(r) { try { r.$run(); } catch(e) {} return; },
-        execute: function(r) { try { r.$run(); } catch(e) {} return; },
-        $submit: function(r) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        submit: function(r) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        $schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        $shutdown: function() {}, shutdown: function() {},
-        $shutdownNow: function() { return []; }, shutdownNow: function() { return []; },
-        $isShutdown: function() { return 0; }, isShutdown: function() { return 0; },
-        $isTerminated: function() { return 0; }, isTerminated: function() { return 0; },
-        $toString: function() { return 'fake-executor'; }, toString: function() { return 'fake-executor'; }
-    };
-}'''
-    if old_exec in data:
-        data = data.replace(old_exec, new_exec)
-        print("  Replaced juc_Executors_newScheduledThreadPool body (was return null)")
-    else:
-        # Try alternate pattern
+    # or add it if DCE'd entirely
+    if 'juc_Executors_newScheduledThreadPool' in data and 'juc_Executors_newScheduledThreadPool =' in data:
+        # Function exists but returns null — replace body
         import re
-        pattern = r'(juc_Executors_newScheduledThreadPool\s*=\s*\([^)]*\)\s*=>\s*\{)\s*return null;\s*\}'
+        pattern = r'(juc_Executors_newScheduledThreadPool\s*=\s*\([^)]*\)\s*=>\s*\{)[^}]*(?:\{[^}]*\}[^}]*)*\}'
         match = re.search(pattern, data)
         if match:
-            data = data[:match.start()] + new_exec + data[match.end():]
-            print("  Replaced juc_Executors_newScheduledThreadPool body (regex match)")
+            new_body = '''juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
+    return { $execute: function(r) { try { r.$run(); } catch(e) {} }, execute: function(r) { try { r.$run(); } catch(e) {} }, $shutdown: function() {}, shutdown: function() {}, $isShutdown: function() { return 0; }, $toString: function() { return 'fake-executor'; } };
+}'''
+            data = data[:match.start()] + new_body + data[match.end():]
+            print("  Replaced juc_Executors_newScheduledThreadPool body")
+    else:
+        # Function doesn't exist — add it after newFixedThreadPool
+        insert_after = 'juc_Executors_newFixedThreadPool = (var$1, var$2) => {\n    return new juc_Executors$1;\n},'
+        if insert_after in data:
+            new_func = '''juc_Executors_newFixedThreadPool = (var$1, var$2) => {
+    return new juc_Executors$1;
+},
+juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
+    return { $execute: function(r) { try { r.$run(); } catch(e) {} }, execute: function(r) { try { r.$run(); } catch(e) {} }, $shutdown: function() {}, shutdown: function() {}, $isShutdown: function() { return 0; }, $toString: function() { return 'fake-executor'; } };
+},'''
+            data = data.replace(insert_after, new_func)
+            print("  Added juc_Executors_newScheduledThreadPool (was DCE'd)")
         else:
-            print("  WARNING: Could not find juc_Executors_newScheduledThreadPool to replace")
+            print("  WARNING: Could not find insertion point for newScheduledThreadPool")
 
     patcher = build_patcher_js(registry)
 
