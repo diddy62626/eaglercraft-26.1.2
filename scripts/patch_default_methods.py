@@ -610,6 +610,20 @@ def patch_classes_js(input_path, output_path):
             'if ($gen === null || $gen === undefined) return []; $tmp = $gen.$apply1(var$2);'
         )
         print("  Patched Collection.toArray null check (inside case 1)")
+
+    # Patch ImmutableMap.copyOf to handle undefined/null input
+    if 'cgcc_ImmutableMap_copyOf = ' in data:
+        data = data.replace(
+            'cgcc_ImmutableMap_copyOf = ',
+            'cgcc_ImmutableMap_copyOf = '
+        )
+        # Add null check at the crash point
+        data = data.replace(
+            'var$1.data.length',
+            '(var$1 && var$1.data) ? var$1.data.length : 0',
+            1  # Only first occurrence in copyOf
+        )
+        print("  Patched ImmutableMap.copyOf null check")
     else:
         print("  WARNING: HashMap.putAll not found")
 
