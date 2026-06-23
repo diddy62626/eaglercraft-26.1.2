@@ -525,27 +525,24 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  WARNING: ji_File_toPath original pattern not found - may already be patched")
 
-    # Patch BuiltInPackSource.populatePackList to handle null packDir
-    print("\nPatching populatePackList for null safety...")
-    data = data.replace(
-        '$discoveredPacks = var$4.$path3;',
-        'if (var$4 === null || var$4 === undefined) { return; } $discoveredPacks = var$4.$path3;'
-    )
-    print("  Patched populatePackList null check")
-
-    # Patch getExternalAssetSource to handle null var$2 (forward reference)
-    data = data.replace(
-        '$tmp = var$2.$resolve(var$3);',
-        'if (var$2 === null || var$2 === undefined) return null; $tmp = var$2.$resolve(var$3);'
-    )
-    print("  Patched getExternalAssetSource null check")
-
-    # Patch Files.exists to return false for null paths
-    data = data.replace(
-        'jnf_Files_exists = ($path, $options) => {',
-        'jnf_Files_exists = ($path, $options) => {\n    if ($path === null || $path === undefined) return 0;'
-    )
-    print("  Patched Files.exists null check")
+    # Textual patches that use hardcoded function names — only apply in unobfuscated builds
+    is_unobfuscated = 'ji_File_toPath' in data or 'jnf_Files_exists' in data
+    if is_unobfuscated:
+        print("\nApplying unobfuscated-only textual patches...")
+        # Patch populatePackList
+        if '$discoveredPacks = var$4.$path3;' in data:
+            data = data.replace('$discoveredPacks = var$4.$path3;', 'if (var$4 === null || var$4 === undefined) { return; } $discoveredPacks = var$4.$path3;')
+            print("  Patched populatePackList null check")
+        # Patch getExternalAssetSource
+        if '$tmp = var$2.$resolve(var$3);' in data:
+            data = data.replace('$tmp = var$2.$resolve(var$3);', 'if (var$2 === null || var$2 === undefined) return null; $tmp = var$2.$resolve(var$3);')
+            print("  Patched getExternalAssetSource null check")
+        # Patch Files.exists
+        if 'jnf_Files_exists = ($path, $options) => {' in data:
+            data = data.replace('jnf_Files_exists = ($path, $options) => {', 'jnf_Files_exists = ($path, $options) => {\n    if ($path === null || $path === undefined) return 0;')
+            print("  Patched Files.exists null check")
+    else:
+        print("\nSkipping unobfuscated-only textual patches (obfuscated build)")
 
     patcher = build_patcher_js(registry)
 
