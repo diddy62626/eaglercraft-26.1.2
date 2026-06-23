@@ -97,9 +97,10 @@ def build_patcher_js(registry):
 // TeaVM Default Method Patcher (runtime, works with obfuscated builds)
 // ============================================================
 (function() {
-    var allClasses = typeof $rt_allClasses !== 'undefined' ? $rt_allClasses :
-                     typeof Fnk !== 'undefined' ? Fnk :
-                     typeof FnY !== 'undefined' ? FnY : null;
+    var allClasses = null;
+    if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses)) allClasses = $rt_allClasses;
+    else if (typeof FnY !== 'undefined' && Array.isArray(FnY)) allClasses = FnY;
+    else if (typeof Fnk !== 'undefined' && Array.isArray(Fnk)) allClasses = Fnk;
     if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
     var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
                typeof GN !== 'undefined' ? GN : null;
