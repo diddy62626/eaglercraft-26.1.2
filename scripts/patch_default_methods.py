@@ -606,7 +606,7 @@ def patch_classes_js(input_path, output_path):
     # Patch Collection.toArray to handle null generator
     if 'ju_Collection_toArray = ' in data:
         data = data.replace(
-            'ju_Collection_toArray = ($this, var$1) => {',
+            'ju_Collection_toArray = ($this, $gen) => {',
             'ju_Collection_toArray = ($this, var$1) => {\n    if (var$1 === null || var$1 === undefined) return [];'
         )
         print("  Patched Collection.toArray null check")
