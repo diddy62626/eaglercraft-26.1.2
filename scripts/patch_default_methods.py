@@ -964,7 +964,7 @@ def patch_classes_js(input_path, output_path):
             if (__pathObj.__fs) return __pathObj.__fs;
             var __fsp = {};
             __fsp.$getScheme = function() { return 'file'; };
-            __fsp.$readAttributes = function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; } }; };
+            __fsp.$readAttributes = function() { return { $isDirectory: function() { return 0; }, $isRegularFile: function() { return 0; }, $size: function() { return 0; }, $isReadable: function() { return 0; }, $isWritable: function() { return 0; }, $isHidden: function() { return 0; }, $lastModifiedTime: function() { return { toMillis: function() { return 0; } }; }, $toString: function() { return '{}'; } }; };
             __fsp.$newInputStream = function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; };
             __fsp.$newDirectoryStream0 = function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; };
             __fsp.$exists = function() { return 0; };
