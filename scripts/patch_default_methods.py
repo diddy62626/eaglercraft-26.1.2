@@ -1005,6 +1005,13 @@ def patch_classes_js(input_path, output_path):
     )
     print("  Patched getExternalAssetSource null check")
 
+    # Patch Files.exists to return false for null paths
+    data = data.replace(
+        'jnf_Files_exists = ($path, $options) => {',
+        'jnf_Files_exists = ($path, $options) => {\n    if ($path === null || $path === undefined) return 0;'
+    )
+    print("  Patched Files.exists null check")
+
     patcher = build_patcher_js(registry)
 
     # Insert the patcher INSIDE the TeaVM IIFE, right before the closing
