@@ -435,12 +435,11 @@ teavm {
     }
 
     js {
-        // Obfuscation ENABLED — produces ~16MB classes.js (vs 60MB unobfuscated).
-        // The 60MB unobfuscated build freezes the browser ("not responding")
-        // because parsing takes too long on Chromebooks.
-        // The patcher has been updated to work with obfuscated names by
-        // using class metadata to map obfuscated function names.
-        obfuscated = true
+        // Unobfuscated build — obfuscated builds have TeaVM DCE that removes
+        // default methods from virtual method table. Python scanner finds
+        // default methods by name pattern only in unobfuscated builds.
+        // 60MB file takes 2-5 min to parse on Chromebooks but game works.
+        obfuscated = false
 
         sourceMap = false
 
