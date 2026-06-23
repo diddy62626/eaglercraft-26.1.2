@@ -116,7 +116,7 @@ def build_patcher_js(registry):
             if (!iface || !iface.prototype) continue;
             var proto = iface.prototype;
             for (var key in proto) {
-                if (key.charAt(0) === '$' && typeof proto[key] === 'function') {
+                if (typeof proto[key] === 'function' && key !== 'constructor') {
                     if (typeof cls.prototype[key] !== 'function') {
                         (function(key, fn) {
                             cls.prototype[key] = function() {
