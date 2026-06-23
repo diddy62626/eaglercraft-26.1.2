@@ -107,8 +107,58 @@ def build_patcher_js(registry):
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
     console.log('[DefaultMethodPatcher] Using allClasses=' + (typeof $rt_allClasses !== 'undefined' ? '$rt_allClasses' : typeof FnY !== 'undefined' ? 'FnY' : 'Fnk') + ' meta=' + (typeof $rt_meta !== 'undefined' ? '$rt_meta' : 'GN') + ' count=' + allClasses.length);
 
-    // Debug: Log a few classes with interfaces and their interface methods
-    var debugCount = 0;
+    // In obfuscated builds, interface prototypes have NO methods.
+    // Methods are registered via Cd() as virtual method arrays:
+    //   Cd([cls, name, ..., virtualMethods, ...])
+    // where virtualMethods = ["method1", func1, "method2", func2, ...]
+    // We need to wrap Cd() to capture these registrations and then
+    // copy interface methods to implementing classes.
+
+    // Build a map: class -> {methodName: func}
+    var interfaceMethodMap = new Map();
+
+    // Find and wrap the Cd function
+    var origCd = typeof Cd !== 'undefined' ? Cd : null;
+    if (origCd) {
+        Cd = function(data) {
+            origCd(data);
+            // After Cd processes the data, scan it for interface methods
+            // The data format is: [cls, name, flags, parent, interfaces, ..., virtualMethods, ...]
+            // We need to check if cls is an interface (flags & 0x0200 = abstract)
+            var i = 0;
+            while (i < data.length) {
+                var cls2 = data[i++];
+                var name2 = data[i++];
+                if (name2 !== 0) {
+                    var pkgIdx = data[i++];
+                    // Skip package name processing
+                }
+                i++; // superclass
+                var ifaces = data[i++];
+                i++; // modifiers
+                i++; // innerClassInfo
+                var vmethods = data[i++];
+                // If this class has interfaces AND virtual methods, store them
+                if (ifaces !== 0 && ifaces.length > 0 && vmethods !== 0 && vmethods.length > 0) {
+                    if (!interfaceMethodMap.has(cls2)) {
+                        interfaceMethodMap.set(cls2, {});
+                    }
+                    var map = interfaceMethodMap.get(cls2);
+                    for (var j = 0; j < vmethods.length; j += 2) {
+                        var mname = vmethods[j];
+                        var mfunc = vmethods[j + 1];
+                        if (typeof mname === 'string') {
+                            map[mname] = mfunc;
+                        } else if (Array.isArray(mname)) {
+                            for (var k = 0; k < mname.length; k++) {
+                                map[mname[k]] = mfunc;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
@@ -119,13 +169,10 @@ def build_patcher_js(registry):
         var classPatched = false;
         for (var j = 0; j < clsMeta.superinterfaces.length; j++) {
             var iface = clsMeta.superinterfaces[j];
-            if (!iface || !iface.prototype) continue;
+            if (!iface) continue;
+
+            // Try prototype first (unobfuscated builds)
             var proto = iface.prototype;
-            if (debugCount < 3) {
-                var pkeys = Object.keys(proto).filter(function(k) { return typeof proto[k] === 'function' && k !== 'constructor'; });
-                console.log('[DefaultMethodPatcher] DEBUG: ' + (clsMeta.name || '?') + ' iface ' + j + ' has ' + pkeys.length + ' proto methods: ' + pkeys.slice(0,10).join(','));
-                debugCount++;
-            }
             for (var key in proto) {
                 if (typeof proto[key] === 'function' && key !== 'constructor') {
                     if (typeof cls.prototype[key] !== 'function') {
@@ -136,6 +183,23 @@ def build_patcher_js(registry):
                                 return fn.apply(null, args);
                             };
                         })(key, proto[key]);
+                        patched++; classPatched = true;
+                    }
+                }
+            }
+
+            // Also try interfaceMethodMap (obfuscated builds where Cd captured methods)
+            if (interfaceMethodMap.has(iface)) {
+                var imap = interfaceMethodMap.get(iface);
+                for (var mkey in imap) {
+                    if (typeof cls.prototype[mkey] !== 'function') {
+                        (function(mkey, fn) {
+                            cls.prototype[mkey] = function() {
+                                var args = [this];
+                                for (var k = 0; k < arguments.length; k++) args.push(arguments[k]);
+                                return fn.apply(null, args);
+                            };
+                        })(mkey, imap[mkey]);
                         patched++; classPatched = true;
                     }
                 }
