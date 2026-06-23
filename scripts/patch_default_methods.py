@@ -133,6 +133,7 @@ def build_patcher_js(registry):
         if (classPatched) classesPatched++;
     }
     console.log('[DefaultMethodPatcher] Patched ' + patched + ' methods across ' + classesPatched + ' classes');
+})();
 """
 
     return patcher
