@@ -628,8 +628,6 @@ def patch_classes_js(input_path, output_path):
             print("  WARNING: var$4 = var$3.data not found in ImmutableMap.copyOf")
     else:
         print("  WARNING: ImmutableMap.copyOf not found")
-    else:
-        print("  WARNING: HashMap.putAll not found")
 
     # Replace juc_Executors_newScheduledThreadPool body (returns null from bytecode patcher)
     # or add it if DCE'd entirely
