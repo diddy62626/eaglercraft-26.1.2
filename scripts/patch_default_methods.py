@@ -130,6 +130,10 @@ def build_patcher_js(registry):
 
             // Try prototype first (unobfuscated builds)
             var proto = iface.prototype;
+            var protoKeys = Object.keys(proto).filter(function(k) { return typeof proto[k] === 'function' && k !== 'constructor'; });
+            if (protoKeys.length > 0 && patched < 20) {
+                console.log('[DefaultMethodPatcher] DEBUG: ' + (clsMeta.name || '?') + ' iface has ' + protoKeys.length + ' methods: ' + protoKeys.slice(0,5).join(','));
+            }
             for (var key in proto) {
                 if (typeof proto[key] === 'function' && key !== 'constructor') {
                     if (typeof cls.prototype[key] !== 'function') {
