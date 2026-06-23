@@ -105,7 +105,10 @@ def build_patcher_js(registry):
     var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
                typeof GN !== 'undefined' ? GN : null;
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
-    console.log('[DefaultMethodPatcher] Using allClasses=' + (typeof $rt_allClasses !== 'undefined' ? '$rt_allClasses' : typeof Fnk !== 'undefined' ? 'Fnk' : 'FnY') + ' meta=' + (typeof $rt_meta !== 'undefined' ? '$rt_meta' : 'GN') + ' count=' + allClasses.length);
+    console.log('[DefaultMethodPatcher] Using allClasses=' + (typeof $rt_allClasses !== 'undefined' ? '$rt_allClasses' : typeof FnY !== 'undefined' ? 'FnY' : 'Fnk') + ' meta=' + (typeof $rt_meta !== 'undefined' ? '$rt_meta' : 'GN') + ' count=' + allClasses.length);
+
+    // Debug: Log a few classes with interfaces and their interface methods
+    var debugCount = 0;
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
@@ -118,6 +121,11 @@ def build_patcher_js(registry):
             var iface = clsMeta.superinterfaces[j];
             if (!iface || !iface.prototype) continue;
             var proto = iface.prototype;
+            if (debugCount < 3) {
+                var pkeys = Object.keys(proto).filter(function(k) { return typeof proto[k] === 'function' && k !== 'constructor'; });
+                console.log('[DefaultMethodPatcher] DEBUG: ' + (clsMeta.name || '?') + ' iface ' + j + ' has ' + pkeys.length + ' proto methods: ' + pkeys.slice(0,10).join(','));
+                debugCount++;
+            }
             for (var key in proto) {
                 if (typeof proto[key] === 'function' && key !== 'constructor') {
                     if (typeof cls.prototype[key] !== 'function') {
