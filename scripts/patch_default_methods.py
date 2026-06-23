@@ -932,24 +932,11 @@ def patch_classes_js(input_path, output_path):
 
     # Patch ji_File_toPath to return a non-null path (TeaVM's version returns null)
     print("\nPatching ji_File_toPath to return fake path...")
-    old_toPath = 'ji_File_toPath = var$0 => {'
-    if old_toPath in data:
-        # Find the end of the function and replace the body
-        pos = data.find(old_toPath)
-        # Find matching closing };
-        start = data.find('{', pos)
-        depth = 1
-        p = start + 1
-        while p < len(data) and depth > 0:
-            if data[p] == '{': depth += 1
-            elif data[p] == '}': depth -= 1
-            p += 1
-        # p is now after the closing }
-        # Find the next ; after }
-        end = data.find(';', p)
-        if end >= 0:
-            old_func = data[pos:end+1]
-            new_func = '''ji_File_toPath = var$0 => {
+    # The original function body is: case 0: return null;
+    # We replace 'return null;' with 'return (function() { ... })();'
+    old_return = 'ji_File_toPath = var$0 => {\n    let $ptr, $tmp;\n    $ptr = 0;\n    if ($rt_resuming()) {\n        let $thread = $rt_nativeThread();\n        $ptr = $thread.pop();var$0 = $thread.pop();\n    }\n    main: while (true) { switch ($ptr) {\n    case 0:\n        return null;'
+    if old_return in data:
+        new_return = '''ji_File_toPath = var$0 => {
     var __p = var$0.$path || var$0.path || '/';
     var __pathObj = {
         $resolve: function(o) { return __pathObj; }, resolve: function(o) { return __pathObj; },
@@ -975,19 +962,33 @@ def patch_classes_js(input_path, output_path):
         toUri: function() { return { toString: function() { return 'file://'+__p; }, $toString: function() { return 'file://'+__p; } }; },
         $getFileSystem: function() {
             if (__pathObj.__fs) return __pathObj.__fs;
-            __pathObj.__fs = {
-                $provider: function() { return { $getScheme: function() { return 'file'; }, $readAttributes: function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; }, $lastModifiedTime: function() { return { toMillis: function() { return 0; } }; } }; }, $newInputStream: function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; }, $newDirectoryStream0: function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; }, $exists: function() { return 0; }, $createDirectories: function() {}, $isDirectory: function() { return 0; } };
-            };
-            return __pathObj.__fs;
+            var __fsp = {};
+            __fsp.$getScheme = function() { return 'file'; };
+            __fsp.$readAttributes = function() { return { $isDirectory: function() { return 0; }, $size: function() { return 0; } }; };
+            __fsp.$newInputStream = function() { return { $read: function() { return -1; }, $available: function() { return 0; }, $close: function() {} }; };
+            __fsp.$newDirectoryStream0 = function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; };
+            __fsp.$exists = function() { return 0; };
+            __fsp.$createDirectories = function() {};
+            __fsp.$isDirectory = function() { return 0; };
+            __fsp.$toString = function() { return 'file'; };
+            var __fs = {};
+            __fs.$provider = function() { return __fsp; };
+            __fs.$isOpen = function() { return 1; };
+            __fs.$close = function() {};
+            __fs.$toString = function() { return 'file:///'; };
+            __pathObj.__fs = __fs;
+            return __fs;
         },
         getFileSystem: function() { return __pathObj.$getFileSystem(); }
     };
     return __pathObj;
-};'''
-            data = data.replace(old_func, new_func)
-            print("  Replaced ji_File_toPath with fake path return")
+    main: while (true) { switch (0) {
+    case 0:
+        return __pathObj;'''
+        data = data.replace(old_return, new_return)
+        print("  Replaced ji_File_toPath return null with fake path")
     else:
-        print("  WARNING: ji_File_toPath not found")
+        print("  WARNING: ji_File_toPath original pattern not found - may already be patched")
 
     # Patch BuiltInPackSource.populatePackList to handle null packDir
     print("\nPacking populatePackList for null safety...")
