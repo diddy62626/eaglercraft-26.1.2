@@ -582,6 +582,7 @@ def patch_classes_js(input_path, output_path):
     # Cd ends with '}}}},'  followed by next function
     cd_wrapper = '''
 // Cd wrapper: captures interface method registrations for later patching
+;(function(){
 var __eaglercraftInterfaceMethods = new Map();
 var __origCd = Cd;
 Cd = function(data) {
@@ -610,6 +611,8 @@ Cd = function(data) {
         }
     }
 };
+window.__eaglercraftInterfaceMethods = __eaglercraftInterfaceMethods;
+})();
 '''
     # Find the Cd function definition end and insert after it
     cd_end_marker = '}}}},'
