@@ -590,6 +590,21 @@ def patch_classes_js(input_path, output_path):
     )
     print("  Patched Object.identity null check")
 
+    # Patch HashMap.putAll to handle null map
+    if 'ju_HashMap_putAll = ' in data:
+        data = data.replace(
+            'ju_HashMap_putAll = ',
+            'ju_HashMap_putAll = nullSafePutAll || ' if False else 'ju_HashMap_putAll = '
+        )
+        # Actually just add a null check at the start
+        data = data.replace(
+            'ju_HashMap_putAll = ($this, var$1) => {',
+            'ju_HashMap_putAll = ($this, var$1) => {\n    if (var$1 === null || var$1 === undefined) return;'
+        )
+        print("  Patched HashMap.putAll null check")
+    else:
+        print("  WARNING: HashMap.putAll not found")
+
     # Replace juc_Executors_newScheduledThreadPool body (returns null from bytecode patcher)
     # or add it if DCE'd entirely
     if 'juc_Executors_newScheduledThreadPool' in data and 'juc_Executors_newScheduledThreadPool =' in data:
