@@ -559,12 +559,20 @@ def patch_classes_js(input_path, output_path):
         if '$tmp = var$2.$resolve(var$3);' in data:
             data = data.replace('$tmp = var$2.$resolve(var$3);', 'if (var$2 === null || var$2 === undefined) return null; $tmp = var$2.$resolve(var$3);')
             print("  Patched getExternalAssetSource null check")
+
         # Patch Files.exists
         if 'jnf_Files_exists = ($path, $options) => {' in data:
             data = data.replace('jnf_Files_exists = ($path, $options) => {', 'jnf_Files_exists = ($path, $options) => {\n    if ($path === null || $path === undefined) return 0;')
             print("  Patched Files.exists null check")
     else:
         print("\nSkipping unobfuscated-only textual patches (obfuscated build)")
+
+    # Patch jl_Object_identity to handle null this (works for both builds)
+    data = data.replace(
+        'jl_Object_identity = $this => {',
+        'jl_Object_identity = $this => {\n    if ($this === null || $this === undefined) return 0;'
+    )
+    print("  Patched Object.identity null check")
 
     patcher = build_patcher_js(registry)
 
