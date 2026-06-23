@@ -991,12 +991,19 @@ def patch_classes_js(input_path, output_path):
         print("  WARNING: ji_File_toPath original pattern not found - may already be patched")
 
     # Patch BuiltInPackSource.populatePackList to handle null packDir
-    print("\nPacking populatePackList for null safety...")
+    print("\nPatching populatePackList for null safety...")
     data = data.replace(
         '$discoveredPacks = var$4.$path3;',
         'if (var$4 === null || var$4 === undefined) { return; } $discoveredPacks = var$4.$path3;'
     )
     print("  Patched populatePackList null check")
+
+    # Patch getExternalAssetSource to handle null var$2 (forward reference)
+    data = data.replace(
+        '$tmp = var$2.$resolve(var$3);',
+        'if (var$2 === null || var$2 === undefined) return null; $tmp = var$2.$resolve(var$3);'
+    )
+    print("  Patched getExternalAssetSource null check")
 
     patcher = build_patcher_js(registry)
 
