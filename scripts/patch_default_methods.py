@@ -612,13 +612,22 @@ def patch_classes_js(input_path, output_path):
         print("  Patched Collection.toArray null check (inside case 1)")
 
     # Patch ImmutableMap.copyOf to handle undefined var$3.data
-    if 'cgcc_ImmutableMap_copyOf = ' in data:
-        data = data.replace(
-            'var$4 = var$3.data;',
-            'var$4 = (var$3 && var$3.data) ? var$3.data : {length: 0};',
-            1
-        )
-        print("  Patched ImmutableMap.copyOf null check")
+    # Find the function and replace within its body
+    im_pos = data.find('cgcc_ImmutableMap_copyOf = ')
+    if im_pos >= 0:
+        # Find the var$4 = var$3.data; within this function (next 2000 chars)
+        search_end = min(len(data), im_pos + 3000)
+        search_chunk = data[im_pos:search_end]
+        target = 'var$4 = var$3.data;'
+        target_pos = search_chunk.find(target)
+        if target_pos >= 0:
+            abs_pos = im_pos + target_pos
+            data = data[:abs_pos] + 'var$4 = (var$3 && var$3.data) ? var$3.data : {length: 0};' + data[abs_pos + len(target):]
+            print("  Patched ImmutableMap.copyOf null check (within function)")
+        else:
+            print("  WARNING: var$4 = var$3.data not found in ImmutableMap.copyOf")
+    else:
+        print("  WARNING: ImmutableMap.copyOf not found")
     else:
         print("  WARNING: HashMap.putAll not found")
 
