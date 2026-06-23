@@ -598,7 +598,7 @@ def patch_classes_js(input_path, output_path):
         )
         # Actually just add a null check at the start
         data = data.replace(
-            'ju_HashMap_putAll = ($this, var$1) => {',
+            'ju_HashMap_putAll = ($this, $map) => {',
             'ju_HashMap_putAll = ($this, var$1) => {\n    if (var$1 === null || var$1 === undefined) return;'
         )
         print("  Patched HashMap.putAll null check")
