@@ -574,15 +574,9 @@ def patch_classes_js(input_path, output_path):
     )
     print("  Patched Object.identity null check")
 
-    # Add juc_Executors_newScheduledThreadPool if it was DCE'd
-    if 'juc_Executors_newScheduledThreadPool' not in data:
-        # Insert after juc_Executors class definition
-        pos = data.find('juc_Executors = ')
-        if pos >= 0:
-            # Find the end of the let declaration (next ;)
-            end = data.find(';', pos)
-            if end >= 0:
-                insert_code = '''\nlet juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
+    # Replace juc_Executors_newScheduledThreadPool body (returns null from bytecode patcher)
+    old_exec = 'juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {\n    return null;\n}'
+    new_exec = '''juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
     return {
         $execute: function(r) { try { r.$run(); } catch(e) {} return; },
         execute: function(r) { try { r.$run(); } catch(e) {} return; },
@@ -590,23 +584,26 @@ def patch_classes_js(input_path, output_path):
         submit: function(r) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
         $schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
         schedule: function(r, d, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        $scheduleAtFixedRate: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        scheduleAtFixedRate: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        $scheduleWithFixedDelay: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
-        scheduleWithFixedDelay: function(r, i, p, u) { return { get: function() { return null; }, isDone: function() { return 1; }, isCancelled: function() { return 0; }, cancel: function() { return 0; } }; },
         $shutdown: function() {}, shutdown: function() {},
         $shutdownNow: function() { return []; }, shutdownNow: function() { return []; },
         $isShutdown: function() { return 0; }, isShutdown: function() { return 0; },
         $isTerminated: function() { return 0; }, isTerminated: function() { return 0; },
-        $isTerminating: function() { return 0; }, isTerminating: function() { return 0; },
-        $awaitTermination: function(t, u) { return 1; }, awaitTermination: function(t, u) { return 1; },
         $toString: function() { return 'fake-executor'; }, toString: function() { return 'fake-executor'; }
     };
-};'''
-                data = data[:end+1] + insert_code + data[end+1:]
-                print("  Added juc_Executors_newScheduledThreadPool (was DCE'd)")
+}'''
+    if old_exec in data:
+        data = data.replace(old_exec, new_exec)
+        print("  Replaced juc_Executors_newScheduledThreadPool body (was return null)")
     else:
-        print("  juc_Executors_newScheduledThreadPool already exists")
+        # Try alternate pattern
+        import re
+        pattern = r'(juc_Executors_newScheduledThreadPool\s*=\s*\([^)]*\)\s*=>\s*\{)\s*return null;\s*\}'
+        match = re.search(pattern, data)
+        if match:
+            data = data[:match.start()] + new_exec + data[match.end():]
+            print("  Replaced juc_Executors_newScheduledThreadPool body (regex match)")
+        else:
+            print("  WARNING: Could not find juc_Executors_newScheduledThreadPool to replace")
 
     patcher = build_patcher_js(registry)
 
