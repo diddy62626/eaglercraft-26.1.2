@@ -969,6 +969,7 @@ def patch_classes_js(input_path, output_path):
             __fsp.$newDirectoryStream0 = function() { return { $iterator: function() { return { $hasNext: function() { return 0; }, $next: function() { return null; } }; }, $close: function() {} }; };
             __fsp.$exists = function() { return 0; };
             __fsp.$createDirectories = function() {};
+            __fsp.$createDirectory = function() {};
             __fsp.$isDirectory = function() { return 0; };
             __fsp.$toString = function() { return 'file'; };
             var __fs = {};
