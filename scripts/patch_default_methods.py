@@ -607,7 +607,7 @@ def patch_classes_js(input_path, output_path):
     if 'ju_Collection_toArray = ' in data:
         data = data.replace(
             'ju_Collection_toArray = ($this, $gen) => {',
-            'ju_Collection_toArray = ($this, var$1) => {\n    if (var$1 === null || var$1 === undefined) return [];'
+            'ju_Collection_toArray = ($this, $gen) => {\n    if ($gen === null || $gen === undefined) return [];'
         )
         print("  Patched Collection.toArray null check")
     else:
