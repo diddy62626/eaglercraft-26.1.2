@@ -94,9 +94,10 @@ def build_patcher_js(registry):
 
     patcher = """
 // ============================================================
-// TeaVM Default Method Patcher (runtime, works with obfuscated builds)
+// TeaVM Default Method Patcher (hybrid: prototype + registry)
 // ============================================================
 (function() {
+    var __registry = %s;
     var allClasses = null;
     if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses)) allClasses = $rt_allClasses;
     else if (typeof FnY !== 'undefined' && Array.isArray(FnY)) allClasses = FnY;
@@ -105,17 +106,15 @@ def build_patcher_js(registry):
     var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
                typeof GN !== 'undefined' ? GN : null;
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
-    console.log('[DefaultMethodPatcher] Using allClasses=' + (typeof $rt_allClasses !== 'undefined' ? '$rt_allClasses' : typeof FnY !== 'undefined' ? 'FnY' : 'Fnk') + ' meta=' + (typeof $rt_meta !== 'undefined' ? '$rt_meta' : 'GN') + ' count=' + allClasses.length);
+    console.log('[DefaultMethodPatcher] count=' + allClasses.length);
 
-    // In obfuscated builds, interface prototypes have NO methods.
-    // Methods are registered via Cd() as virtual method arrays:
-    //   Cd([cls, name, ..., virtualMethods, ...])
-    // where virtualMethods = ["method1", func1, "method2", func2, ...]
-    // We need to wrap Cd() to capture these registrations and then
-    // copy interface methods to implementing classes.
-
-    // Interface methods should be on interface prototypes after Cd() runs
-    // In obfuscated builds, Cd() assigns methods to cls.prototype directly
+    var __funcs = {};
+    for (var __n in __registry) {
+        try { __funcs[__n] = eval(__n); } catch(e) {}
+        for (var __m in __registry[__n]) {
+            try { __funcs[__registry[__n][__m]] = eval(__registry[__n][__m]); } catch(e) {}
+        }
+    }
 
     var patched = 0, classesPatched = 0;
     for (var i = 0; i < allClasses.length; i++) {
@@ -128,12 +127,8 @@ def build_patcher_js(registry):
             var iface = clsMeta.superinterfaces[j];
             if (!iface) continue;
 
-            // Try prototype first (unobfuscated builds)
+            // Method 1: Copy from interface prototype
             var proto = iface.prototype;
-            var protoKeys = Object.keys(proto).filter(function(k) { return typeof proto[k] === 'function' && k !== 'constructor'; });
-            if (protoKeys.length > 0 && patched < 20) {
-                console.log('[DefaultMethodPatcher] DEBUG: ' + (clsMeta.name || '?') + ' iface has ' + protoKeys.length + ' methods: ' + protoKeys.slice(0,5).join(','));
-            }
             for (var key in proto) {
                 if (typeof proto[key] === 'function' && key !== 'constructor') {
                     if (!Object.prototype.hasOwnProperty.call(cls.prototype, key)) {
@@ -149,14 +144,35 @@ def build_patcher_js(registry):
                 }
             }
 
-
+            // Method 2: Copy from registry (for DCE'd methods not on prototype)
+            for (var ifaceName in __registry) {
+                var ifaceFunc = __funcs[ifaceName];
+                if (!ifaceFunc || ifaceFunc !== iface) continue;
+                var methods = __registry[ifaceName];
+                for (var vmethod in methods) {
+                    if (!Object.prototype.hasOwnProperty.call(cls.prototype, vmethod)) {
+                        var func = __funcs[methods[vmethod]];
+                        if (typeof func === 'function') {
+                            (function(vmethod, func) {
+                                cls.prototype[vmethod] = function() {
+                                    var args = [this];
+                                    for (var k = 0; k < arguments.length; k++) args.push(arguments[k]);
+                                    return func.apply(null, args);
+                                };
+                            })(vmethod, func);
+                            patched++; classPatched = true;
+                        }
+                    }
+                }
+            }
         }
         if (classPatched) classesPatched++;
     }
     console.log('[DefaultMethodPatcher] Patched ' + patched + ' methods across ' + classesPatched + ' classes');
 })();
-"""
+""" % registry_json
 
+    return patcher
     return patcher
 
 
