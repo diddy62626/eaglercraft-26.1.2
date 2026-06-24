@@ -97,21 +97,19 @@ def build_patcher_js(registry):
 // TeaVM Default Method Patcher (hybrid: prototype + registry)
 // Works with both obfuscated and unobfuscated builds.
 // ============================================================
+// This code is inserted INSIDE the TeaVM IIFE, so it has direct access
+// to closure variables like FnY (class registry array) and GN (metadata
+// Symbol). We reference them directly — eval() only works for globals.
 (function() {
     var __registry = %s;
 
-    // Find the class registry array — try known names first, then scan
+    // Find the class registry array — direct closure access (no eval)
     var allClasses = null;
-    var knownNames = ['$rt_allClasses', 'FnY', 'Fnk'];
-    for (var i = 0; i < knownNames.length; i++) {
-        try {
-            var val = eval(knownNames[i]);
-            if (Array.isArray(val) && val.length > 100) { allClasses = val; break; }
-        } catch(e) {}
-    }
+    try { if (typeof FnY !== 'undefined' && Array.isArray(FnY)) allClasses = FnY; } catch(e) {}
+    if (!allClasses) try { if (typeof Fnk !== 'undefined' && Array.isArray(Fnk)) allClasses = Fnk; } catch(e) {}
+    if (!allClasses) try { if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses)) allClasses = $rt_allClasses; } catch(e) {}
 
-    // If known names didn't work (obfuscated build), scan global scope
-    // for large arrays of constructor-like functions
+    // Fallback: scan global scope for large arrays of constructor functions
     if (!allClasses) {
         var globalObj = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
         var bestCandidate = null;
@@ -120,13 +118,9 @@ def build_patcher_js(registry):
             try {
                 var val = globalObj[key];
                 if (Array.isArray(val) && val.length > 500) {
-                    // Check if entries look like class constructors (have prototype)
                     var sample = val[0];
                     if (sample && typeof sample === 'function' && sample.prototype) {
-                        if (val.length > bestLen) {
-                            bestLen = val.length;
-                            bestCandidate = val;
-                        }
+                        if (val.length > bestLen) { bestLen = val.length; bestCandidate = val; }
                     }
                 }
             } catch(e) {}
@@ -136,30 +130,40 @@ def build_patcher_js(registry):
 
     if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
 
-    // Find the metadata symbol — try known names, then scan class objects
+    // Find the metadata symbol — direct closure access (no eval)
     var meta = null;
-    var knownMeta = ['$rt_meta', 'GN'];
-    for (var i = 0; i < knownMeta.length; i++) {
-        try {
-            if (typeof eval(knownMeta[i]) !== 'undefined') { meta = eval(knownMeta[i]); break; }
-        } catch(e) {}
-    }
+    try { if (typeof GN !== 'undefined') meta = GN; } catch(e) {}
+    if (!meta) try { if (typeof $rt_meta !== 'undefined') meta = $rt_meta; } catch(e) {}
 
-    // If known names didn't work, scan class object properties for metadata
+    // Fallback: scan class object properties for metadata
     if (!meta) {
         for (var i = 0; i < Math.min(allClasses.length, 50); i++) {
             var cls = allClasses[i];
             if (!cls || typeof cls !== 'function') continue;
-            for (var key in cls) {
+            var keys = Object.getOwnPropertyNames(cls);
+            for (var k = 0; k < keys.length; k++) {
                 try {
-                    var val = cls[key];
-                    // Metadata objects have superinterfaces or parent or name fields
+                    var val = cls[keys[k]];
                     if (val && typeof val === 'object' &&
                         (val.superinterfaces || val.parent || val.name || val.simpleName)) {
-                        meta = key;
+                        meta = keys[k];
                         break;
                     }
                 } catch(e) {}
+            }
+            // Also check Symbol keys
+            if (!meta) {
+                var symKeys = Object.getOwnPropertySymbols(cls);
+                for (var k = 0; k < symKeys.length; k++) {
+                    try {
+                        var val = cls[symKeys[k]];
+                        if (val && typeof val === 'object' &&
+                            (val.superinterfaces || val.parent || val.name || val.simpleName)) {
+                            meta = symKeys[k];
+                            break;
+                        }
+                    } catch(e) {}
+                }
             }
             if (meta) break;
         }
