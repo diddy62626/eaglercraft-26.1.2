@@ -419,26 +419,25 @@ teavm {
         // Common configuration (applies to all targets)
         mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-        // TeaVM optimization level. Previously NONE because BALANCED caused
-        // "CXq is not defined" crashes when DCE removed method definitions
-        // whose references survived in static initializers.
+        // TeaVM optimization level investigation:
+        // Previous CI runs showed NONE and BALANCED produce IDENTICAL output
+        // (60,520,591 vs 60,520,603 bytes — 12 byte diff = just build hash).
+        // TeaVMTask.class has `convention(BALANCED)` as default, suggesting
+        // our explicit `optimization = NONE` in `all { }` was NOT being
+        // propagated to the actual TeaVM task (inheritance via setupDefaults
+        // likely happens before our override).
         //
-        // Now that we have:
-        //   - patch_default_methods.py (restores interface default methods
-        //     to subclass prototypes by scanning name patterns)
-        //   - clinit try/catch wrapper (handles forward-reference crashes
-        //     in static initializers)
-        //   - hybrid runtime patcher (prototype + registry fallback)
-        // we can retry BALANCED. With obfuscated=false the function names
-        // (cms_Codec_$listOf etc.) are preserved so the patcher still
-        // finds them. DCE removes unused methods → much smaller classes.js
-        // (target: <30MB vs current 60MB).
+        // Now trying AGGRESSIVE to:
+        //   1. Verify the optimization setting is actually being applied
+        //      (if AGGRESSIVE produces different output than BALANCED, it works)
+        //   2. Get maximum DCE to shrink the 60MB classes.js
         //
-        // Bumped heap to 12GB so DCE/inlining has room to work.
         // TeaVM 0.15 OptimizationLevel enum values: NONE, BALANCED, AGGRESSIVE
-        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
+        // TeaVM 0.15 TeaVMOptimizationLevel (internal): SIMPLE, ADVANCED, FULL
+        // The gradle plugin maps OptimizationLevel → TeaVMOptimizationLevel.
+        optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
 
-        // Additional TeaVM properties (bumped for BALANCED optimization)
+        // Additional TeaVM properties (bumped for AGGRESSIVE optimization)
         properties = [
             'teavm.minHeapSize' : '2048MB',
             'teavm.maxHeapSize' : '12288MB'
