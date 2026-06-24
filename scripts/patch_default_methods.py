@@ -166,7 +166,7 @@ def build_patcher_js(registry):
     }
 
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
-    console.log('[DefaultMethodPatcher] count=' + allClasses.length + ' meta=' + meta);
+    console.log('[DefaultMethodPatcher] count=' + allClasses.length + ' meta=' + (typeof meta === 'symbol' ? meta.toString() : String(meta)));
 
     var __funcs = {};
     // Only use eval-based lookup for unobfuscated builds (registry non-empty)
