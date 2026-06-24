@@ -892,22 +892,29 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: return obj if non-null, else a callable function
+// Null-return stub helper: return obj if non-null, else a chain-safe Proxy
+// The Proxy returns callables for ANY property access, preventing both
+// 'is not a function' and 'Cannot read properties of null' crashes.
+// ONLY used for null/undefined — real objects pass through unchanged,
+// so TeaVM's class system never sees a Proxy for real class objects.
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
-    // Return a callable that returns itself, so method chains don't crash
-    var f = function() { return f; };
-    f.$id$ = 0;
-    f.prototype = f;
-    return f;
+    // Create a chain-safe Proxy that absorbs all method calls
+    var p = new Proxy(function(){return p;}, {
+        get: function(target, prop) {
+            if (prop === '$id$') return 0;
+            if (prop === 'length') return 0;
+            if (prop === 'constructor') return Object;
+            if (prop === Symbol.toPrimitive) return function(){return 0;};
+            if (prop === Symbol.iterator) return function(){return {next:function(){return {done:true};}};};
+            // Return a callable that returns p (chain-safe)
+            return function(){return p;};
+        },
+        apply: function(target, thisArg, args) { return p; },
+        construct: function(target, args) { return p; }
+    });
+    return p;
 };
-// Add a catch-all for missing methods on Object.prototype
-// This makes any missing method return a chain-safe empty object
-if (!Object.prototype.__chainSafe) {
-    var __noop = function() { return {}; };
-    // Use a Proxy handler on the prototype to catch missing methods
-    // But this is too risky for TeaVM internals, so skip it
-}
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
