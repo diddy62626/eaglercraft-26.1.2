@@ -893,13 +893,8 @@ def patch_null_return_stubs(data):
         # Add __safe helper at the top of the file
         helper = """
 // Null-return stub helper: return obj if non-null, else a chain-safe Proxy
-// The Proxy returns callables for ANY property access, preventing both
-// 'is not a function' and 'Cannot read properties of null' crashes.
-// ONLY used for null/undefined — real objects pass through unchanged,
-// so TeaVM's class system never sees a Proxy for real class objects.
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
-    // Create a chain-safe Proxy that absorbs all method calls
     var p = new Proxy(function(){return p;}, {
         get: function(target, prop) {
             if (prop === '$id$') return 0;
@@ -907,7 +902,6 @@ var __safe = function(obj) {
             if (prop === 'constructor') return Object;
             if (prop === Symbol.toPrimitive) return function(){return 0;};
             if (prop === Symbol.iterator) return function(){return {next:function(){return {done:true};}};};
-            // Return a callable that returns p (chain-safe)
             return function(){return p;};
         },
         apply: function(target, thisArg, args) { return p; },
@@ -915,6 +909,24 @@ var __safe = function(obj) {
     });
     return p;
 };
+// Add common DFU method names to Object.prototype as no-ops.
+// This prevents 'X is not a function' when stub methods return objects
+// that don't have these methods. The no-op returns 'this' for chaining.
+// Only added if not already defined (doesn't override real methods).
+(function(){
+    var noopMethods = ['fa','zJ','wm','mk','qt','fb','fc','fd','fe','fg','fh','fi','fj','fk','fl','fm','fn','fo','fp','fq','fr','fs','ft','fu','fv','fw','fx','fy','fz','g0','g1','g2','g3','g4','g5','g6','g7','g8','g9','ga','gb','gc','gd','ge','gf','gg','gh','gi','gj','gk','gl','gm','gn','go','gp','gq','gr','gs','gt','gu','gv','gw','gx','gy','gz'];
+    for (var i = 0; i < noopMethods.length; i++) {
+        var name = noopMethods[i];
+        if (!(name in Object.prototype)) {
+            Object.defineProperty(Object.prototype, name, {
+                value: function() { return this; },
+                writable: true,
+                configurable: true,
+                enumerable: false
+            });
+        }
+    }
+})();
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
