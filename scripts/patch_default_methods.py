@@ -568,6 +568,18 @@ def patch_classes_js(input_path, output_path):
     print("\nWrapping __clinit_ functions in try/catch...")
     data = wrap_clinits_textually(data)
 
+    # Wrap the obfuscated clinit template in try/catch
+    # TeaVM 0.15 obfuscated builds use: ()=>{m.clinit=()=>{};clinit();}
+    # This template is used for ALL class clinits. Wrapping it once protects all.
+    print("\nWrapping obfuscated clinit template in try/catch...")
+    obf_clinit_old = '()=>{m.clinit=()=>{};clinit();}'
+    obf_clinit_new = '()=>{m.clinit=()=>{};try{clinit();}catch(e){if(typeof console!=="undefined")console.warn("[ClinitWrap]",e&&e.message?e.message:e);}}'
+    if obf_clinit_old in data:
+        data = data.replace(obf_clinit_old, obf_clinit_new)
+        print("  Wrapped obfuscated clinit template (protects all class clinits)")
+    else:
+        print("  Obfuscated clinit template not found (may be unobfuscated build)")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
