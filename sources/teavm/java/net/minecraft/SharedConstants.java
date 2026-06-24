@@ -1,18 +1,7 @@
 package net.minecraft;
 
 // PATCHED: SharedConstants for browser/EaglerCraft environment.
-// The original SharedConstants clinit tries to load version info from
-// system properties and the OS, which fails in a browser. This causes
-// getCurrentVersion() to return null, crashing DataFixers initialization.
-//
-// We can't create a WorldVersion ourselves (the real one is in the MC jar
-// with a complex API). Instead, we just make getCurrentVersion() catch
-// any errors and return null gracefully. The clinit wrapper + downstream
-// null checks should handle the rest.
-//
-// The key fix: ensure the clinit doesn't crash (the obfuscated clinit
-// wrapper handles this). This class just provides the method signatures
-// that TeaVM can find.
+// Provides all fields and methods that MC references, with browser-safe defaults.
 
 public class SharedConstants {
     public static final boolean SNAPSHOT = false;
@@ -22,11 +11,49 @@ public class SharedConstants {
     public static final int RESOURCE_PACK_FORMAT = 26;
     public static final int DATA_PACK_FORMAT = 26;
 
+    // Debug fields (all false for production)
+    public static final boolean IS_RUNNING_IN_IDE = false;
+    public static final boolean DEBUG_SYNCHRONOUS_GL_LOGS = false;
+    public static final boolean DEBUG_ALLOW_LOW_SIM_DISTANCE = false;
+    public static final boolean DEBUG_SUBTITLES = false;
+    public static final boolean DEBUG_PATHFINDING = false;
+    public static final boolean DEBUG_NEIGHBORSUPDATE = false;
+    public static final boolean DEBUG_EXPERIMENTAL_REDSTONEWIRE_UPDATE_ORDER = false;
+    public static final boolean DEBUG_STRUCTURES = false;
+    public static final boolean DEBUG_VILLAGE_SECTIONS = false;
+    public static final boolean DEBUG_BRAIN = false;
+    public static final boolean DEBUG_BEES = false;
+    public static final boolean DEBUG_RAIDS = false;
+    public static final boolean DEBUG_POI = false;
+    public static final boolean DEBUG_GOAL_SELECTOR = false;
+    public static final boolean DEBUG_GAME_EVENT_LISTENERS = false;
+    public static final boolean DEBUG_SHAPES = false;
+    public static final boolean DEBUG_SHOW_SERVER_DEBUG_VALUES = false;
+    public static final boolean DEBUG_SOCIAL_INTERACTIONS = false;
+    public static final boolean DEBUG_HOTKEYS = false;
+    public static final boolean DEBUG_CURSOR_POS = false;
+    public static final boolean DEBUG_RENDER_UI_LAYERING_RECTANGLES = false;
+    public static final boolean DEBUG_SHUFFLE_MODELS = false;
+    public static final boolean DEBUG_SHUFFLE_UI_RENDERING_ORDER = false;
+    public static final boolean DEBUG_ACTIVE_TEXT_AREAS = false;
+    public static final boolean DEBUG_ENTITY_BLOCK_INTERSECTION = false;
+    public static final boolean DEBUG_BREEZE_MOB = false;
+    public static final boolean DEBUG_OPEN_INCOMPATIBLE_WORLDS = false;
+    public static final boolean DEBUG_FORCE_ONBOARDING_SCREEN = false;
+    public static final boolean DEBUG_FORCE_TELEMETRY = false;
+    public static final boolean DEBUG_DONT_SEND_TELEMETRY_TO_BACKEND = false;
+    public static final boolean DEBUG_BYPASS_REALMS_VERSION_CHECK = false;
+    public static final boolean DEBUG_WORLD_RECREATE = false;
+    public static final boolean DEBUG_VALIDATE_RESOURCE_PATH_CASE = false;
+    public static final boolean DEBUG_DISABLE_BELOW_ZERO_RETROGENERATION = false;
+    public static final boolean CHECK_DATA_FIXER_SCHEMA = false;
+
+    // Illegal file characters (browser-safe)
+    public static final char[] ILLEGAL_FILE_CHARACTERS = new char[]{'/', '\n', '\r', '\t', '\0', '\\', ':', '*', '?', '"', '<', '>', '|'};
+
     private static WorldVersion CURRENT_VERSION;
 
     public static WorldVersion getCurrentVersion() {
-        // Return the cached version. If clinit failed, CURRENT_VERSION
-        // will be null. The caller should handle null gracefully.
         return CURRENT_VERSION;
     }
 
