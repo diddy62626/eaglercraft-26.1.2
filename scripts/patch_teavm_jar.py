@@ -98,15 +98,117 @@ if patched_count == 0:
             patched_count += 1
     print(f"Aggressive patch: replaced {patched_count} athrow instructions")
 
-# Write the patched class back to the JAR
+# ============================================================
+# Compile and inject null-safe optimizer patches
+# ============================================================
+# TeaVM 0.15 AGGRESSIVE optimization triggers NPE in:
+#   - VariableEscapeAnalyzer$InstructionAnalyzer.visit(BranchingInstruction)
+#   - ConstantConditionElimination.constantTarget()
+#   - EscapeAnalysis$InstructionEscapeVisitor.visit(BranchingInstruction)
+# These call getOperand().getIndex() without null-checking getOperand().
+# We compile patched versions of these Java files (with null checks added)
+# and replace the .class files in the JAR.
+
+import subprocess
+import os
+
+PATCHES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'teavm-patches')
+JAVA_HOME = os.environ.get('JAVA_HOME', '')
+JAVAC = os.path.join(JAVA_HOME, 'bin', 'javac') if JAVA_HOME else 'javac'
+
+# Classes to patch: (source path relative to PATCHES_DIR, class file in JAR)
+PATCH_CLASSES = [
+    ('org/teavm/model/optimization/VariableEscapeAnalyzer.java',
+     ['org/teavm/model/optimization/VariableEscapeAnalyzer.class',
+      'org/teavm/model/optimization/VariableEscapeAnalyzer$InstructionAnalyzer.class']),
+    ('org/teavm/model/optimization/ConstantConditionElimination.java',
+     ['org/teavm/model/optimization/ConstantConditionElimination.class']),
+    ('org/teavm/model/analysis/EscapeAnalysis.java',
+     ['org/teavm/model/analysis/EscapeAnalysis.class',
+      'org/teavm/model/analysis/EscapeAnalysis$InstructionEscapeVisitor.class']),
+]
+
+# Compile patched Java files
+compiled_classes = {}  # class file name -> bytes
+if os.path.isdir(PATCHES_DIR):
+    print(f"\n=== Compiling null-safe optimizer patches ===")
+    print(f"PATCHES_DIR: {PATCHES_DIR}")
+    print(f"JAVAC: {JAVAC}")
+    print(f"JAR_PATH (classpath): {JAR_PATH}")
+
+    # Collect all .java files to compile
+    java_files = []
+    for src_rel, _ in PATCH_CLASSES:
+        src_abs = os.path.join(PATCHES_DIR, src_rel)
+        if os.path.exists(src_abs):
+            java_files.append(src_abs)
+            print(f"  Found: {src_rel}")
+        else:
+            print(f"  WARNING: {src_rel} not found!")
+
+    if java_files:
+        # Compile with teavm-core JAR as classpath
+        compile_dir = OUTPUT_PATH + '.compile_out'
+        os.makedirs(compile_dir, exist_ok=True)
+
+        cmd = [JAVAC, '-cp', JAR_PATH, '-d', compile_dir] + java_files
+        print(f"  Running: {' '.join(cmd)}")
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            if result.returncode != 0:
+                print(f"  COMPILE ERROR (returncode={result.returncode}):")
+                print(result.stderr[:2000])
+                print("--- stdout ---")
+                print(result.stdout[:1000])
+                print("WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
+            else:
+                print(f"  Compilation succeeded!")
+                # Walk the output directory and collect .class files
+                for root, dirs, files in os.walk(compile_dir):
+                    for fname in files:
+                        if fname.endswith('.class'):
+                            class_path = os.path.join(root, fname)
+                            rel_path = os.path.relpath(class_path, compile_dir)
+                            with open(class_path, 'rb') as f:
+                                compiled_classes[rel_path.replace(os.sep, '/')] = f.read()
+                            print(f"    Compiled: {rel_path} ({os.path.getsize(class_path)} bytes)")
+        except FileNotFoundError:
+            print(f"  ERROR: javac not found at '{JAVAC}'")
+            print("  WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
+        except subprocess.TimeoutExpired:
+            print(f"  ERROR: javac compilation timed out (60s)")
+            print("  WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
+
+        # Clean up
+        import shutil
+        shutil.rmtree(compile_dir, ignore_errors=True)
+else:
+    print(f"WARNING: Patches directory not found: {PATCHES_DIR}")
+    print("Skipping optimizer null-safety patches")
+
+# Write the patched JAR with both PhiUpdater fix and optimizer patches
 with zipfile.ZipFile(OUTPUT_PATH, 'r') as zin:
     with zipfile.ZipFile(OUTPUT_PATH + '.tmp', 'w', zipfile.ZIP_DEFLATED) as zout:
         for item in zin.infolist():
             if item.filename == 'org/teavm/model/util/PhiUpdater.class':
                 zout.writestr(item, bytes(patched_data))
                 print(f"Wrote patched PhiUpdater.class ({len(patched_data)} bytes)")
+            elif item.filename in compiled_classes:
+                zout.writestr(item, compiled_classes[item.filename])
+                print(f"Replaced {item.filename} with null-safe version ({len(compiled_classes[item.filename])} bytes)")
             else:
                 zout.writestr(item, zin.read(item.filename))
 
+# Also write any new inner class files that didn't exist in the original JAR
+if compiled_classes:
+    with zipfile.ZipFile(OUTPUT_PATH + '.tmp', 'a', zipfile.ZIP_DEFLATED) as zappend:
+        existing_names = set()
+        with zipfile.ZipFile(OUTPUT_PATH, 'r') as zin:
+            existing_names = set(zin.namelist())
+        for class_name, class_bytes in compiled_classes.items():
+            if class_name not in existing_names:
+                zappend.writestr(class_name, class_bytes)
+                print(f"Added new class: {class_name} ({len(class_bytes)} bytes)")
+
 os.replace(OUTPUT_PATH + '.tmp', OUTPUT_PATH)
-print(f"Patched JAR saved to {OUTPUT_PATH}")
+print(f"\nPatched JAR saved to {OUTPUT_PATH}")
