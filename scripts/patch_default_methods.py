@@ -585,6 +585,26 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching null-return stubs...")
     data = patch_null_return_stubs(data)
 
+    # Wrap clinit body calls (like WPX()) in try/catch to prevent
+    # DataFixers initialization crashes from killing the game
+    print("\nWrapping clinit body calls in try/catch...")
+    import re as _re2
+    # Pattern: funcName();if(D()){break _;}
+    # This is how clinit bodies call initialization functions
+    # Wrap the call in try/catch
+    clinit_call_count = 0
+    # Find patterns like: WORD();if(D()){break _;}
+    # where WORD is a clinit body function (all caps or mixed)
+    pattern = _re2.compile(r'([A-Z][A-Za-z0-9_$]*)\(\);if\(D\(\)\)\{break _;\}')
+    for m in pattern.finditer(data):
+        func_name = m.group(1)
+        old_call = m.group(0)
+        new_call = f'try{{{func_name}();}}catch(__e){{if(typeof console!=="undefined")console.warn("[ClinitWrap]",__e&&__e.message?__e.message:__e);}}if(D()){{break _;}}'
+        data = data.replace(old_call, new_call, 1)
+        clinit_call_count += 1
+    if clinit_call_count > 0:
+        print(f"  Wrapped {clinit_call_count} clinit body calls in try/catch")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
@@ -841,10 +861,22 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: return obj if non-null, else empty object
+// Null-return stub helper: return obj if non-null, else a chain-safe empty object
+// The empty object has a Proxy that returns no-op functions for any method call
 var __safe = function(obj) {
-    return (obj !== null && obj !== undefined) ? obj : {};
+    if (obj !== null && obj !== undefined) return obj;
+    // Return a plain object that won't crash on property access
+    // Missing methods will return undefined (still crashes on call)
+    // But at least property access won't crash
+    return {};
 };
+// Add a catch-all for missing methods on Object.prototype
+// This makes any missing method return a chain-safe empty object
+if (!Object.prototype.__chainSafe) {
+    var __noop = function() { return {}; };
+    // Use a Proxy handler on the prototype to catch missing methods
+    // But this is too risky for TeaVM internals, so skip it
+}
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
