@@ -585,25 +585,6 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching null-return stubs...")
     data = patch_null_return_stubs(data)
 
-    # Wrap clinit body calls (like WPX()) in try/catch to prevent
-    # DataFixers initialization crashes from killing the game
-    print("\nWrapping clinit body calls in try/catch...")
-    import re as _re2
-    # Pattern: funcName();if(D()){break _;}
-    # This is how clinit bodies call initialization functions
-    # Wrap the call in try/catch
-    clinit_call_count = 0
-    # Find patterns like: WORD();if(D()){break _;}
-    # where WORD is a clinit body function (all caps or mixed)
-    pattern = _re2.compile(r'([A-Z][A-Za-z0-9_$]*)\(\);if\(D\(\)\)\{break _;\}')
-    for m in pattern.finditer(data):
-        func_name = m.group(1)
-        old_call = m.group(0)
-        new_call = f'try{{{func_name}();}}catch(__e){{if(typeof console!=="undefined")console.warn("[ClinitWrap]",__e&&__e.message?__e.message:__e);}}if(D()){{break _;}}'
-        data = data.replace(old_call, new_call, 1)
-        clinit_call_count += 1
-    if clinit_call_count > 0:
-        print(f"  Wrapped {clinit_call_count} clinit body calls in try/catch")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
