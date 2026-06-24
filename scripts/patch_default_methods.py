@@ -815,16 +815,14 @@ def patch_null_return_stubs(data):
     Patch functions that return null (stubs from MissingMethodTransformer).
     
     Pattern: X=b=>{return null;}
-    Replace with: X=b=>{return b;}
+    Replace with: X=b=>{return __nop(b);}
     
-    This makes stub methods return their first argument instead of null.
-    For DataFixers DSL methods, this allows the builder chain to continue
-    with a non-null (though incorrect) object instead of crashing.
+    __nop returns a Proxy that absorbs all method calls and property accesses,
+    preventing 'is not a function' and 'Cannot read properties of null' crashes.
     """
     import re
     
     # Pattern: name=param=>{return null;}
-    # Also handles newlines: name\n=param=>{return null;}
     pattern = re.compile(r'(\w{1,5})\s*=\s*(\w)\s*=>\s*\{return null;\}')
     
     count = 0
@@ -833,12 +831,54 @@ def patch_null_return_stubs(data):
         name = match.group(1)
         param = match.group(2)
         old = match.group(0)
-        new = f'{name}={param}=>{{return {param};}}'
+        new = f'{name}={param}=>{{return __nop({param});}}'
         patched = patched.replace(old, new, 1)
         count += 1
     
     if count > 0:
-        print(f"  Patched {count} null-return stubs to return first arg")
+        print(f"  Patched {count} null-return stubs to return __nop(obj)")
+        # Add the __nop helper function at the top of the file (after "use strict")
+        nop_helper = """
+// Null-return stub helper: returns a Proxy that absorbs all method calls
+var __nop_target = function(){return __nop_proxy;};
+var __nop_proxy = new Proxy(__nop_target, {
+    get: function(target, prop) {
+        if (prop === Symbol.toPrimitive) return function(){return 0;};
+        if (prop === 'length') return 0;
+        if (prop === 'constructor') return Object;
+        // Return a callable that returns another __nop_proxy
+        return function(){return __nop_proxy;};
+    },
+    apply: function(target, thisArg, args) { return __nop_proxy; },
+    construct: function(target, args) { return __nop_proxy; }
+});
+var __nop = function(obj) {
+    if (obj === null || obj === undefined) return __nop_proxy;
+    if (typeof obj === 'object' || typeof obj === 'function') {
+        // Wrap the object in a Proxy that falls back to __nop_proxy
+        // for missing methods/properties
+        try {
+            return new Proxy(obj, {
+                get: function(target, prop) {
+                    var val = target[prop];
+                    if (val === undefined) {
+                        return function(){return __nop_proxy;};
+                    }
+                    return val;
+                }
+            });
+        } catch(e) { return obj; }
+    }
+    return obj;
+};
+"""
+        # Insert after "use strict";
+
+        use_strict = '"use strict";\n'
+        if use_strict in patched:
+            patched = patched.replace(use_strict, use_strict + nop_helper, 1)
+        else:
+            patched = nop_helper + patched
     return patched
 
 if __name__ == '__main__':
