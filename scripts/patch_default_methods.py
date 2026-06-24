@@ -914,22 +914,15 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: return obj if non-null, else a chain-safe Proxy
+// Null-return stub helper: return obj if non-null, else a simple stub object
+// NO Proxy — Proxy causes infinite loops and crashes in TeaVM internals
+var __safeObj = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
-    var p = new Proxy(function(){return p;}, {
-        get: function(target, prop) {
-            if (prop === '$id$') return 0;
-            if (prop === 'length') return 0;
-            if (prop === 'constructor') return Object;
-            if (prop === Symbol.toPrimitive) return function(){return 0;};
-            if (prop === Symbol.iterator) return function(){return {next:function(){return {done:true};}};};
-            return function(){return p;};
-        },
-        apply: function(target, thisArg, args) { return p; },
-        construct: function(target, args) { return p; }
-    });
-    return p;
+    // Return a shared stub object (singleton to avoid memory bloat)
+    if (__safeObj) return __safeObj;
+    __safeObj = {$id$:0};
+    return __safeObj;
 };
 // Add common DFU method names to Object.prototype as no-ops.
 // This prevents 'X is not a function' when stub methods return objects
