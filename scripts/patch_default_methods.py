@@ -606,6 +606,28 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  $id$ function pattern not found")
 
+    # Wrap null-unsafe property accesses with __safe()
+    # Pattern: $z=VAR.METHOD( where VAR could be null
+    # Replace: $z=__safe(VAR).METHOD(
+    # This prevents "Cannot read properties of null" crashes
+    print("\nWrapping null-unsafe property accesses with __safe()...")
+    import re as _re_safe
+    # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
+    # Only match after = (assignment), not after . (method chain)
+    safe_pattern = _re_safe.compile(
+        r'=([a-z]\w{0,1})\.(ev|fa|zJ|wm|mk|qt|bJs|h5f|g9i|iqJ|gfT|hEC|hFC)\('
+    )
+    safe_count = 0
+    for m in safe_pattern.finditer(data):
+        var_name = m.group(1)
+        method_name = m.group(2)
+        old_text = m.group(0)
+        new_text = f'=__safe({var_name}).{method_name}('
+        data = data.replace(old_text, new_text, 1)
+        safe_count += 1
+    if safe_count > 0:
+        print(f"  Wrapped {safe_count} null-unsafe property accesses")
+
     # Wrap ONLY clinit body calls in try/catch (targeted, not broad regex)
     # Clinit functions have the pattern: FLAG=true;$p=1;case 1:BODYFUNC();if(D()){break _;}
     # We wrap only BODYFUNC() — the actual initialization code.
