@@ -419,26 +419,40 @@ teavm {
         // Common configuration (applies to all targets)
         mainClass = 'net.lax1dude.eaglercraft.v2_6.internal.teavm.MainClass'
 
-        // TeaVM optimization level. BALANCED was causing DCE issues where
-        // method definitions were eliminated but references in static
-        // initializers survived ('CXq is not defined').
+        // TeaVM optimization level. Previously NONE because BALANCED caused
+        // "CXq is not defined" crashes when DCE removed method definitions
+        // whose references survived in static initializers.
+        //
+        // Now that we have:
+        //   - patch_default_methods.py (restores interface default methods
+        //     to subclass prototypes by scanning name patterns)
+        //   - clinit try/catch wrapper (handles forward-reference crashes
+        //     in static initializers)
+        //   - hybrid runtime patcher (prototype + registry fallback)
+        // we can retry BALANCED. With obfuscated=false the function names
+        // (cms_Codec_$listOf etc.) are preserved so the patcher still
+        // finds them. DCE removes unused methods → much smaller classes.js
+        // (target: <30MB vs current 60MB).
+        //
+        // Bumped heap to 12GB so DCE/inlining has room to work.
         // TeaVM 0.15 OptimizationLevel enum values: NONE, BALANCED, AGGRESSIVE
-        // Using NONE to disable optimization entirely — produces larger
-        // output but keeps all method definitions intact.
-        optimization = org.teavm.gradle.api.OptimizationLevel.NONE
+        optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
 
-        // Additional TeaVM properties
+        // Additional TeaVM properties (bumped for BALANCED optimization)
         properties = [
-            'teavm.minHeapSize' : '1024MB',
-            'teavm.maxHeapSize' : '8192MB'
+            'teavm.minHeapSize' : '2048MB',
+            'teavm.maxHeapSize' : '12288MB'
         ]
     }
 
     js {
-        // Unobfuscated build — obfuscated builds have TeaVM DCE that removes
-        // default methods from virtual method table. Python scanner finds
-        // default methods by name pattern only in unobfuscated builds.
-        // 60MB file takes 2-5 min to parse on Chromebooks but game works.
+        // Unobfuscated build — obfuscated builds mangle function names
+        // (cms_Codec_$listOf → a.b.c) which breaks the Python patcher's
+        // regex pattern matching. With obfuscated=false the names are
+        // preserved even under BALANCED optimization, so the patcher can
+        // still find default method definitions and restore them to
+        // subclass prototypes. BALANCED DCE should reduce file size from
+        // ~60MB to <30MB. Target: parseable on Chromebooks in <60s.
         obfuscated = false
 
         sourceMap = false
