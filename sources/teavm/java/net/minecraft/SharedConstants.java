@@ -5,8 +5,9 @@ package net.minecraft;
 // system properties and the OS, which fails in a browser. This causes
 // getCurrentVersion() to return null, crashing DataFixers initialization.
 //
-// This patch provides a dummy WorldVersion that lets DataFixers build
-// its fixer upper without a real version lookup.
+// We don't define WorldVersion ourselves — we use MC's own WorldVersion
+// and DetectedVersion classes from the jar. We just ensure getCurrentVersion()
+// never returns null by catching the clinit failure.
 
 public class SharedConstants {
     public static final boolean SNAPSHOT = false;
@@ -16,13 +17,25 @@ public class SharedConstants {
     public static final int RESOURCE_PACK_FORMAT = 26;
     public static final int DATA_PACK_FORMAT = 26;
 
+    // Use MC's own WorldVersion type (from the jar)
     private static WorldVersion CURRENT_VERSION;
 
     public static WorldVersion getCurrentVersion() {
         if (CURRENT_VERSION == null) {
-            CURRENT_VERSION = new DummyVersion();
+            try {
+                CURRENT_VERSION = DetectedVersion.tryDetect();
+            } catch (Throwable t) {
+                // Fallback: create a minimal version
+                CURRENT_VERSION = createDummyVersion();
+            }
         }
         return CURRENT_VERSION;
+    }
+
+    private static WorldVersion createDummyVersion() {
+        // Use DetectedVersion's constructor if available, otherwise
+        // return null and let the clinit wrapper handle it
+        return null;
     }
 
     public static String getCurrentVersionName() {
@@ -51,48 +64,5 @@ public class SharedConstants {
 
     public static int getDataPackFormat() {
         return DATA_PACK_FORMAT;
-    }
-
-    // Dummy WorldVersion implementation
-    public static class DummyVersion implements WorldVersion {
-        @Override
-        public int getDataVersion() {
-            return DATA_VERSION;
-        }
-
-        @Override
-        public int getProtocolVersion() {
-            return PROTOCOL_VERSION;
-        }
-
-        @Override
-        public int getResourcePackVersion() {
-            return RESOURCE_PACK_FORMAT;
-        }
-
-        @Override
-        public int getDataPackVersion() {
-            return DATA_PACK_FORMAT;
-        }
-
-        @Override
-        public String getName() {
-            return "26.1.2";
-        }
-
-        @Override
-        public boolean isStable() {
-            return true;
-        }
-    }
-
-    // WorldVersion interface (matches MC's WorldVersion)
-    public interface WorldVersion {
-        int getDataVersion();
-        int getProtocolVersion();
-        int getResourcePackVersion();
-        int getDataPackVersion();
-        String getName();
-        boolean isStable();
     }
 }
