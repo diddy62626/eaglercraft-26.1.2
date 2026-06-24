@@ -810,12 +810,6 @@ juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
     print(f"  Patcher:  {len(patcher)} bytes")
 
 
-if __name__ == '__main__':
-    input_path = sys.argv[1] if len(sys.argv) > 1 else 'public/classes.js'
-    output_path = sys.argv[2] if len(sys.argv) > 2 else input_path
-    patch_classes_js(input_path, output_path)
-
-
 def patch_null_return_stubs(data):
     """
     Patch functions that return null (stubs from MissingMethodTransformer).
@@ -846,3 +840,9 @@ def patch_null_return_stubs(data):
     if count > 0:
         print(f"  Patched {count} null-return stubs to return first arg")
     return patched
+
+if __name__ == '__main__':
+    input_path = sys.argv[1] if len(sys.argv) > 1 else 'public/classes.js'
+    output_path = sys.argv[2] if len(sys.argv) > 2 else input_path
+    patch_classes_js(input_path, output_path)
+
