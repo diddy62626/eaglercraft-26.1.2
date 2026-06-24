@@ -393,12 +393,11 @@ public class EaglerCraft {
                         // Construct Minecraft directly — TeaVM handles the class reference.
                         // Wrap in a JS-level try/catch to capture the ORIGINAL JS error stack
                         // (TeaVM's Throwable loses the original JS stack when wrapping).
-                        //
-                        // TEMPORARILY DISABLED: The MC constructor calls DataFixers which
-                        // has stub methods that return null, causing infinite loops with
-                        // the Proxy/__safe fallbacks. Skipping until DFU is properly ported.
-                        ClientMain.log("[EaglerCraft] MC constructor skipped (DataFixers not yet ported)");
-                        ClientMain.log("[EaglerCraft] Running in title-screen-only mode");
+                        runWithJsStackCapture(() -> {
+                                net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
+                                minecraftInstance = mc;
+                        });
+                        ClientMain.log("[EaglerCraft] Minecraft instance created!");
 
                 } catch (Throwable t) {
                         ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getClass().getName() + ": " + t.getMessage());

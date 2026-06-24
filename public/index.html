@@ -81,7 +81,7 @@
     <canvas id="game_frame" tabindex="1"></canvas>
 
     <!-- Title Screen Overlay (shown after WebGL2 initializes) -->
-    <div id="title-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:auto;z-index:100;display:none;font-family:'Segoe UI',system-ui,sans-serif;">
+    <div id="title-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;display:none;font-family:'Segoe UI',system-ui,sans-serif;">
         <div style="position:absolute;top:12%;left:50%;transform:translateX(-50%);text-align:center;">
             <div style="font-size:3rem;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.5);letter-spacing:2px;">EaglerCraftX</div>
             <div style="font-size:1.2rem;color:rgba(255,255,255,0.8);margin-top:4px;">Minecraft 26.1.2</div>
@@ -90,16 +90,9 @@
             <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);">WebGL2 Client - Protocol 775</div>
             <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;" id="title-fps"></div>
         </div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;max-width:600px;">
-            <div style="font-size:1.1rem;color:rgba(255,255,255,0.9);padding:20px 32px;background:rgba(0,0,0,0.5);border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
-                <div style="font-size:1.3rem;font-weight:600;margin-bottom:12px;color:#4ade80;">✓ EaglerCraft 26.1.2 Loaded</div>
-                <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);line-height:1.6;">
-                    The TeaVM port compiled successfully (20MB classes.js).<br>
-                    The Minecraft constructor is currently disabled because<br>
-                    DataFixerUpper (DFU) library methods return null in the browser.<br><br>
-                    <span style="color:#fbbf24;">Status: Title-screen-only mode</span><br>
-                    Game engine port in progress — DFU needs real implementations.
-                </div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+            <div style="font-size:1rem;color:rgba(255,255,255,0.7);padding:12px 24px;background:rgba(0,0,0,0.3);border-radius:8px;">
+                MC 26.1.2 classes compiling via TeaVM - Game engine port in progress
             </div>
         </div>
     </div>
