@@ -3,19 +3,17 @@ package com.mojang.serialization.codecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 // PATCHED: Returns no-op Codec/MapCodec instances instead of null.
-// The original methods return null which causes 'X is not a function'
-// when MC tries to chain method calls on the result.
-// These no-op implementations return 'this' for all method calls,
-// allowing the builder chain to complete without crashing.
 
 public class RecordCodecBuilder {
     
     @SuppressWarnings("unchecked")
     public static <O> Codec<O> create(Function<O, MapCodec<O>> builder) {
-        return (Codec<O>) NoOpCodec.INSTANCE;
+        return (Codec<O>) Codec.PASSTHROUGH;
     }
     
     @SuppressWarnings("unchecked")
@@ -33,38 +31,23 @@ public class RecordCodecBuilder {
         return (MapCodec<F>) NoOpMapCodec.INSTANCE;
     }
     
-    // No-op Codec that returns defaults for all operations
-    private static class NoOpCodec implements Codec<Object> {
-        static final NoOpCodec INSTANCE = new NoOpCodec();
+    // Simple no-op MapCodec implementation
+    private static class NoOpMapCodec<T> extends MapCodec<T> {
+        static final NoOpMapCodec<Object> INSTANCE = new NoOpMapCodec<>();
         
         @Override
-        public <T> DataResult<Object> decode(com.mojang.serialization.Dynamic<T> input) {
+        public <T2> DataResult<T> decode(DynamicOps<T2> ops, com.mojang.serialization.MapLike<T2> input) {
             return DataResult.success(null);
         }
         
         @Override
-        public <T> DataResult<T> encode(Object input, com.mojang.serialization.DynamicOps<T> ops, T prefix) {
-            return DataResult.success(prefix);
-        }
-    }
-    
-    // No-op MapCodec that returns defaults for all operations
-    private static class NoOpMapCodec extends MapCodec<Object> {
-        static final NoOpMapCodec INSTANCE = new NoOpMapCodec();
-        
-        @Override
-        public <T> DataResult<Object> decode(com.mojang.serialization.DynamicOps<T> ops, com.mojang.serialization.MapLike<T> input) {
-            return DataResult.success(null);
-        }
-        
-        @Override
-        public <T> DataResult<T> encode(Object input, com.mojang.serialization.DynamicOps<T> ops, T prefix) {
+        public <T2> DataResult<T2> encode(T input, DynamicOps<T2> ops, T2 prefix) {
             return DataResult.success(prefix);
         }
         
         @Override
-        public <T> java.util.stream.Stream<T> keys(com.mojang.serialization.DynamicOps<T> ops) {
-            return java.util.stream.Stream.empty();
+        public <T2> Stream<T2> keys(DynamicOps<T2> ops) {
+            return Stream.empty();
         }
     }
 }
