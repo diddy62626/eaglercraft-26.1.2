@@ -78,14 +78,75 @@ public abstract class FileChannel extends AbstractInterruptibleChannel
     }
 
     // -- Open --
+    // In a browser, we can't open real file channels. Instead of throwing
+    // (which crashes MC's DataFixers initialization), return a fake
+    // in-memory channel that absorbs all reads/writes. This lets the
+    // game continue past the file I/O code path.
 
     public static FileChannel open(java.nio.file.Path path, java.util.Set<? extends java.nio.file.OpenOption> options,
                                     java.nio.file.attribute.FileAttribute<?>... attrs) throws IOException {
-        throw new IOException("Cannot open file channel in browser");
+        return new FakeFileChannel();
     }
 
     public static FileChannel open(java.nio.file.Path path, java.nio.file.OpenOption... options) throws IOException {
-        throw new IOException("Cannot open file channel in browser");
+        return new FakeFileChannel();
+    }
+
+    // Fake in-memory FileChannel that absorbs all operations
+    private static class FakeFileChannel extends FileChannel {
+        private long pos = 0;
+        private long sizeVal = 0;
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException { return -1; }
+        @Override
+        public long read(ByteBuffer[] dsts, int offset, int length) throws IOException { return -1; }
+        @Override
+        public int read(ByteBuffer dst, long position) throws IOException { return -1; }
+        @Override
+        public int write(ByteBuffer src) throws IOException {
+            int n = src.remaining();
+            pos += n;
+            sizeVal = Math.max(sizeVal, pos);
+            src.position(src.limit());
+            return n;
+        }
+        @Override
+        public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
+            long total = 0;
+            for (int i = offset; i < offset + length; i++) { total += write(srcs[i]); }
+            return total;
+        }
+        @Override
+        public int write(ByteBuffer src, long position) throws IOException { return write(src); }
+        @Override
+        public long position() throws IOException { return pos; }
+        @Override
+        public FileChannel position(long newPosition) throws IOException { pos = newPosition; return this; }
+        @Override
+        public long size() throws IOException { return sizeVal; }
+        @Override
+        public FileChannel truncate(long size) throws IOException {
+            sizeVal = Math.min(sizeVal, size);
+            if (pos > sizeVal) pos = sizeVal;
+            return this;
+        }
+        @Override
+        public void force(boolean metaData) throws IOException { }
+        @Override
+        public long transferTo(long position, long count, WritableByteChannel target) throws IOException { return 0; }
+        @Override
+        public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException { return 0; }
+        @Override
+        public MappedByteBuffer map(MapMode mode, long position, long size) throws IOException {
+            return null;
+        }
+        @Override
+        public FileLock lock(long position, long size, boolean shared) throws IOException { return null; }
+        @Override
+        public FileLock tryLock(long position, long size, boolean shared) throws IOException { return null; }
+        @Override
+        protected void implCloseChannel() throws IOException { }
     }
 
     // -- MapMode inner class --
