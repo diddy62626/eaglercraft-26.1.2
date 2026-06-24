@@ -871,14 +871,14 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: return obj if non-null, else a chain-safe empty object
-// The empty object has a Proxy that returns no-op functions for any method call
+// Null-return stub helper: return obj if non-null, else a callable function
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
-    // Return a plain object that won't crash on property access
-    // Missing methods will return undefined (still crashes on call)
-    // But at least property access won't crash
-    return {};
+    // Return a callable that returns itself, so method chains don't crash
+    var f = function() { return f; };
+    f.$id$ = 0;
+    f.prototype = f;
+    return f;
 };
 // Add a catch-all for missing methods on Object.prototype
 // This makes any missing method return a chain-safe empty object
