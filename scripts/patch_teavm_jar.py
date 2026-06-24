@@ -147,17 +147,30 @@ if os.path.isdir(PATCHES_DIR):
             print(f"  WARNING: {src_rel} not found!")
 
     if java_files:
-        # Compile with teavm-core JAR as classpath
+        # Compile with teavm-core JAR AND all its dependencies as classpath
         compile_dir = OUTPUT_PATH + '.compile_out'
         os.makedirs(compile_dir, exist_ok=True)
 
-        cmd = [JAVAC, '-cp', JAR_PATH, '-d', compile_dir] + java_files
-        print(f"  Running: {' '.join(cmd)}")
+        # Find all JARs in the Gradle cache to use as classpath.
+        # teavm-core depends on hppc, common, etc. which need to be on
+        # the classpath for EscapeAnalysis.java to compile.
+        import glob
+        cache_dir = os.path.expanduser('~/.gradle/caches/modules-2/files-2.1')
+        all_jars = glob.glob(os.path.join(cache_dir, '**', '*.jar'), recursive=True)
+        # Filter out sources and javadoc JARs
+        all_jars = [j for j in all_jars if not (j.endswith('-sources.jar') or j.endswith('-javadoc.jar'))]
+        # Always include the teavm-core JAR itself
+        all_jars.append(JAR_PATH)
+        classpath = ':'.join(all_jars)
+        print(f"  Classpath has {len(all_jars)} JARs")
+
+        cmd = [JAVAC, '-cp', classpath, '-d', compile_dir] + java_files
+        print(f"  Running: {JAVAC} -cp <{len(all_jars)} JARs> -d {compile_dir} {len(java_files)} files")
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
             if result.returncode != 0:
                 print(f"  COMPILE ERROR (returncode={result.returncode}):")
-                print(result.stderr[:2000])
+                print(result.stderr[:3000])
                 print("--- stdout ---")
                 print(result.stdout[:1000])
                 print("WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
@@ -176,7 +189,7 @@ if os.path.isdir(PATCHES_DIR):
             print(f"  ERROR: javac not found at '{JAVAC}'")
             print("  WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
         except subprocess.TimeoutExpired:
-            print(f"  ERROR: javac compilation timed out (60s)")
+            print(f"  ERROR: javac compilation timed out (120s)")
             print("  WARNING: Optimizer patches NOT applied. AGGRESSIVE optimization may NPE.")
 
         # Clean up
