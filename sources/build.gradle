@@ -476,7 +476,19 @@ teavm {
 // convention. This is the only way to actually change the optimization
 // level in TeaVM 0.15.0's gradle plugin.
 tasks.withType(org.teavm.gradle.tasks.GenerateJavaScriptTask).configureEach {
-    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
+    // BALANCED is the default convention, but setting it explicitly on
+    // the task ensures it's actually applied (the `all { }` block's
+    // optimization setting was NOT propagated — confirmed by CI runs
+    // #293-#295 which all produced identical 60.5MB output).
+    //
+    // AGGRESSIVE was tried (CI #296) but fails with a TeaVM 0.15 NPE:
+    //   Cannot invoke "Variable.getIndex()" because the return value of
+    //   "BranchingInstruction.getOperand()" is null
+    // This is a TeaVM bug where an optimizer pass creates a
+    // BranchingInstruction without setting the operand. Fixing it
+    // requires either patching the visitor (risky — corrupts normal
+    // case) or finding/fixing the creator pass. Left as future work.
+    optimization = org.teavm.gradle.api.OptimizationLevel.BALANCED
     // Give the TeaVM daemon 12GB for DCE+inlining on 10,000+ classes
     processMemory = 12288
 }
