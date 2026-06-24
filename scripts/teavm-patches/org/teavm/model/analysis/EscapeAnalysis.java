@@ -15,10 +15,10 @@
  */
 package org.teavm.model.analysis;
 
-import com.carrotsearch.hppc.IntArrayDeque;
-import com.carrotsearch.hppc.IntDeque;
-import com.carrotsearch.hppc.IntHashSet;
-import com.carrotsearch.hppc.IntSet;
+import org.teavm.hppc.IntArrayDeque;
+import org.teavm.hppc.IntDeque;
+import org.teavm.hppc.IntHashSet;
+import org.teavm.hppc.IntSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
