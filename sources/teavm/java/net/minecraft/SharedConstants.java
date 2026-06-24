@@ -2,6 +2,7 @@ package net.minecraft;
 
 // PATCHED: SharedConstants for browser/EaglerCraft environment.
 // Provides all fields and methods that MC references, with browser-safe defaults.
+// getCurrentVersion() uses DetectedVersion.tryDetectVersion() with fallback.
 
 public class SharedConstants {
     public static final boolean SNAPSHOT = false;
@@ -57,6 +58,18 @@ public class SharedConstants {
     private static WorldVersion CURRENT_VERSION;
 
     public static WorldVersion getCurrentVersion() {
+        if (CURRENT_VERSION == null) {
+            try {
+                CURRENT_VERSION = DetectedVersion.tryDetectVersion();
+            } catch (Throwable t) {
+                // Fallback: use createBuiltIn with known version info
+                try {
+                    CURRENT_VERSION = DetectedVersion.createBuiltIn("26.1.2", "26.1.2", true);
+                } catch (Throwable t2) {
+                    // Last resort: leave null (may crash downstream)
+                }
+            }
+        }
         return CURRENT_VERSION;
     }
 
