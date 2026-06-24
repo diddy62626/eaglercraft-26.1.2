@@ -82,15 +82,34 @@ def find_default_methods(data):
     return registry
 
 
-def build_patcher_js(registry):
+def build_patcher_js(registry, registry_names=None, meta_names=None):
     """
     Build a JS snippet that patches all class prototypes with missing
     default methods from their interfaces.
 
-    Instead of using eval(), builds a lookup map by scanning global scope
-    for known function names.
+    registry_names: list of detected variable names for the class registry
+                    array (e.g., ['ETN', 'FnY']). These are closure vars.
+    meta_names: list of detected variable names for the metadata Symbol
+                (e.g., ['Gf', 'GN']). These are closure vars.
     """
     registry_json = json.dumps(registry, separators=(',', ':'))
+
+    # Build JS expressions to try each detected name
+    if registry_names:
+        registry_checks = ' || '.join(
+            f'(typeof {name}!=="undefined"&&Array.isArray({name})&&{name}.length>100?{name}:null)'
+            for name in registry_names
+        )
+    else:
+        registry_checks = 'null'
+
+    if meta_names:
+        meta_checks = ' || '.join(
+            f'(typeof {name}!=="undefined"?{name}:null)'
+            for name in meta_names
+        )
+    else:
+        meta_checks = 'null'
 
     patcher = """
 // ============================================================
@@ -98,28 +117,65 @@ def build_patcher_js(registry):
 // Works with both obfuscated and unobfuscated builds.
 // ============================================================
 // This code is inserted INSIDE the TeaVM IIFE, so it has direct access
-// to closure variables like FnY (class registry array) and GN (metadata
-// Symbol). We reference them directly — eval() only works for globals.
+// to closure variables. However, obfuscated builds mangle variable
+// names (FnY→ETN, GN→Gf, etc.) so we can't hardcode them.
+// Instead, we scan for the metadata Symbol by its description
+// "teavm_meta" and find the class registry by checking candidate arrays.
 (function() {
     var __registry = %s;
 
-    // Find the class registry array — direct closure access (no eval)
-    var allClasses = null;
-    try { if (typeof FnY !== 'undefined' && Array.isArray(FnY)) allClasses = FnY; } catch(e) {}
-    if (!allClasses) try { if (typeof Fnk !== 'undefined' && Array.isArray(Fnk)) allClasses = Fnk; } catch(e) {}
-    if (!allClasses) try { if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses)) allClasses = $rt_allClasses; } catch(e) {}
 
-    // Fallback: scan global scope for large arrays of constructor functions
-    if (!allClasses) {
+    // === Find the metadata Symbol ===
+    // Try detected names first (from Python scan of source code)
+    var meta = %(meta_checks)s;
+    // Fallback: try known unobfuscated names
+    if (!meta) try { if (typeof GN !== 'undefined') meta = GN; } catch(e) {}
+    if (!meta) try { if (typeof $rt_meta !== 'undefined') meta = $rt_meta; } catch(e) {}
+
+    // For obfuscated builds, find Symbol("teavm_meta") by scanning
+    if (!meta) {
         var globalObj = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
-        var bestCandidate = null;
-        var bestLen = 0;
+        var checked = 0;
         for (var key in globalObj) {
+            if (checked > 2000) break;
             try {
                 var val = globalObj[key];
+                if (typeof val === 'function' && val.prototype) {
+                    var symKeys = Object.getOwnPropertySymbols(val);
+                    for (var k = 0; k < symKeys.length; k++) {
+                        if (symKeys[k].toString() === 'Symbol(teavm_meta)') {
+                            meta = symKeys[k];
+                            break;
+                        }
+                    }
+                    if (meta) break;
+                    checked++;
+                }
+            } catch(e) {}
+        }
+    }
+
+    if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
+
+    // === Find the class registry array ===
+    // Try detected names first (from Python scan of source code)
+    var allClasses = %(registry_checks)s;
+    // Fallback: try known unobfuscated names
+    if (!allClasses) try { if (typeof FnY !== 'undefined' && Array.isArray(FnY) && FnY.length > 100) allClasses = FnY; } catch(e) {}
+    if (!allClasses) try { if (typeof Fnk !== 'undefined' && Array.isArray(Fnk) && Fnk.length > 100) allClasses = Fnk; } catch(e) {}
+    if (!allClasses) try { if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses) && $rt_allClasses.length > 100) allClasses = $rt_allClasses; } catch(e) {}
+
+    // For obfuscated builds, scan global scope for large arrays
+    if (!allClasses) {
+        var globalObj2 = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
+        var bestCandidate = null;
+        var bestLen = 0;
+        for (var key in globalObj2) {
+            try {
+                var val = globalObj2[key];
                 if (Array.isArray(val) && val.length > 500) {
                     var sample = val[0];
-                    if (sample && typeof sample === 'function' && sample.prototype) {
+                    if (sample && typeof sample === 'function' && sample[meta]) {
                         if (val.length > bestLen) { bestLen = val.length; bestCandidate = val; }
                     }
                 }
@@ -129,47 +185,6 @@ def build_patcher_js(registry):
     }
 
     if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
-
-    // Find the metadata symbol — direct closure access (no eval)
-    var meta = null;
-    try { if (typeof GN !== 'undefined') meta = GN; } catch(e) {}
-    if (!meta) try { if (typeof $rt_meta !== 'undefined') meta = $rt_meta; } catch(e) {}
-
-    // Fallback: scan class object properties for metadata
-    if (!meta) {
-        for (var i = 0; i < Math.min(allClasses.length, 50); i++) {
-            var cls = allClasses[i];
-            if (!cls || typeof cls !== 'function') continue;
-            var keys = Object.getOwnPropertyNames(cls);
-            for (var k = 0; k < keys.length; k++) {
-                try {
-                    var val = cls[keys[k]];
-                    if (val && typeof val === 'object' &&
-                        (val.superinterfaces || val.parent || val.name || val.simpleName)) {
-                        meta = keys[k];
-                        break;
-                    }
-                } catch(e) {}
-            }
-            // Also check Symbol keys
-            if (!meta) {
-                var symKeys = Object.getOwnPropertySymbols(cls);
-                for (var k = 0; k < symKeys.length; k++) {
-                    try {
-                        var val = cls[symKeys[k]];
-                        if (val && typeof val === 'object' &&
-                            (val.superinterfaces || val.parent || val.name || val.simpleName)) {
-                            meta = symKeys[k];
-                            break;
-                        }
-                    } catch(e) {}
-                }
-            }
-            if (meta) break;
-        }
-    }
-
-    if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
     console.log('[DefaultMethodPatcher] count=' + allClasses.length + ' meta=' + (typeof meta === 'symbol' ? meta.toString() : String(meta)));
 
     var __funcs = {};
@@ -237,9 +252,9 @@ def build_patcher_js(registry):
     }
     console.log('[DefaultMethodPatcher] Patched ' + patched + ' methods across ' + classesPatched + ' classes');
 })();
-""" % registry_json
-
-    return patcher
+""" % {'meta_checks': meta_checks, 'registry_checks': registry_checks}
+    # Now substitute the registry JSON (can't use %s with named params)
+    patcher = patcher.replace('%s', registry_json, 1)
     return patcher
 
 
@@ -724,7 +739,32 @@ juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
         else:
             print("  WARNING: Could not find insertion point for newScheduledThreadPool")
 
-    patcher = build_patcher_js(registry)
+    # Find the actual variable names for the class registry and metadata Symbol
+    # by scanning the source code. These names change between obfuscated builds
+    # (e.g., FnY→ETN, GN→Gf) so we must detect them dynamically.
+    import re as _re
+    registry_names = []
+    meta_names = []
+
+    # Pattern: X.push(cls) — X is the class registry array
+    for m in _re.finditer(r'(\w{1,8})\.push\(cls\)', data):
+        name = m.group(1)
+        if name not in registry_names:
+            registry_names.append(name)
+
+    # Pattern: X=Symbol("teavm_meta") — X is the metadata Symbol
+    for m in _re.finditer(r'(\w{1,8})=Symbol\("teavm_meta"\)', data):
+        name = m.group(1)
+        if name not in meta_names:
+            meta_names.append(name)
+
+    # Also try unobfuscated patterns: X=[] ... X.push(cls)
+    # And: X=Symbol("teavm_meta")
+
+    print(f"\nDetected class registry names: {registry_names}")
+    print(f"Detected metadata symbol names: {meta_names}")
+
+    patcher = build_patcher_js(registry, registry_names, meta_names)
 
     # Insert the patcher INSIDE the TeaVM IIFE, right before the closing
     # The IIFE ends with: $rt_exports.main = $rt_export_main;\n}));
