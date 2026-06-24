@@ -580,6 +580,11 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  Obfuscated clinit template not found (may be unobfuscated build)")
 
+    # Patch null-return stubs to return their first argument instead of null
+    # This fixes DataFixers DSL builder chain crashes (CY returns null → .fa() crashes)
+    print("\nPatching null-return stubs...")
+    data = patch_null_return_stubs(data)
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
@@ -809,3 +814,35 @@ if __name__ == '__main__':
     input_path = sys.argv[1] if len(sys.argv) > 1 else 'public/classes.js'
     output_path = sys.argv[2] if len(sys.argv) > 2 else input_path
     patch_classes_js(input_path, output_path)
+
+
+def patch_null_return_stubs(data):
+    """
+    Patch functions that return null (stubs from MissingMethodTransformer).
+    
+    Pattern: X=b=>{return null;}
+    Replace with: X=b=>{return b;}
+    
+    This makes stub methods return their first argument instead of null.
+    For DataFixers DSL methods, this allows the builder chain to continue
+    with a non-null (though incorrect) object instead of crashing.
+    """
+    import re
+    
+    # Pattern: name=param=>{return null;}
+    # Also handles newlines: name\n=param=>{return null;}
+    pattern = re.compile(r'(\w{1,5})\s*=\s*(\w)\s*=>\s*\{return null;\}')
+    
+    count = 0
+    patched = data
+    for match in pattern.finditer(data):
+        name = match.group(1)
+        param = match.group(2)
+        old = match.group(0)
+        new = f'{name}={param}=>{{return {param};}}'
+        patched = patched.replace(old, new, 1)
+        count += 1
+    
+    if count > 0:
+        print(f"  Patched {count} null-return stubs to return first arg")
+    return patched
