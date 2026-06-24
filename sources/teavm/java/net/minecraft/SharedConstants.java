@@ -60,14 +60,11 @@ public class SharedConstants {
     public static WorldVersion getCurrentVersion() {
         if (CURRENT_VERSION == null) {
             try {
-                CURRENT_VERSION = DetectedVersion.tryDetectVersion();
+                // Use createBuiltIn directly — tryDetectVersion() uses
+                // Date.from(Instant) which TeaVM's classlib doesn't support
+                CURRENT_VERSION = DetectedVersion.createBuiltIn("26.1.2", "26.1.2", true);
             } catch (Throwable t) {
-                // Fallback: use createBuiltIn with known version info
-                try {
-                    CURRENT_VERSION = DetectedVersion.createBuiltIn("26.1.2", "26.1.2", true);
-                } catch (Throwable t2) {
-                    // Last resort: leave null (may crash downstream)
-                }
+                // Last resort: leave null (may crash downstream)
             }
         }
         return CURRENT_VERSION;
