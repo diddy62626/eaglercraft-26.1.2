@@ -1,8 +1,8 @@
 package net.minecraft;
 
 // PATCHED: SharedConstants for browser/EaglerCraft environment.
-// Provides all fields and methods that MC references, with browser-safe defaults.
-// getCurrentVersion() uses DetectedVersion.tryDetectVersion() with fallback.
+// getCurrentVersion() creates a WorldVersion.Simple directly instead of
+// calling DetectedVersion.createBuiltIn() which may fail due to Record issues.
 
 public class SharedConstants {
     public static final boolean SNAPSHOT = false;
@@ -52,7 +52,6 @@ public class SharedConstants {
     public static final boolean DEBUG_SHOW_LOCAL_SERVER_ENTITY_HIT_BOXES = false;
     public static final boolean CHECK_DATA_FIXER_SCHEMA = false;
 
-    // Illegal file characters (browser-safe)
     public static final char[] ILLEGAL_FILE_CHARACTERS = new char[]{'/', '\n', '\r', '\t', '\0', '\\', ':', '*', '?', '"', '<', '>', '|'};
 
     private static WorldVersion CURRENT_VERSION;
@@ -60,11 +59,20 @@ public class SharedConstants {
     public static WorldVersion getCurrentVersion() {
         if (CURRENT_VERSION == null) {
             try {
-                // Use createBuiltIn directly — tryDetectVersion() uses
-                // Date.from(Instant) which TeaVM's classlib doesn't support
+                System.out.println("[SharedConstants] Creating built-in version...");
                 CURRENT_VERSION = DetectedVersion.createBuiltIn("26.1.2", "26.1.2", true);
+                System.out.println("[SharedConstants] Version created: " + CURRENT_VERSION);
             } catch (Throwable t) {
-                // Last resort: leave null (may crash downstream)
+                System.out.println("[SharedConstants] createBuiltIn failed: " + t);
+                try {
+                    // Try using the BUILT_IN field directly
+                    java.lang.reflect.Field f = DetectedVersion.class.getDeclaredField("BUILT_IN");
+                    f.setAccessible(true);
+                    CURRENT_VERSION = (WorldVersion) f.get(null);
+                    System.out.println("[SharedConstants] BUILT_IN field: " + CURRENT_VERSION);
+                } catch (Throwable t2) {
+                    System.out.println("[SharedConstants] BUILT_IN field failed: " + t2);
+                }
             }
         }
         return CURRENT_VERSION;
