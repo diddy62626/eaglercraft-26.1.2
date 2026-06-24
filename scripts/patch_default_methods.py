@@ -585,6 +585,27 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching null-return stubs...")
     data = patch_null_return_stubs(data)
 
+    # Patch the $id$ function to be null-safe
+    # TeaVM has a function like: X=a=>{let b;b=a;if(!b.$id$)b.$id$=Y();return a.$id$;}
+    # When a is null, b.$id$ crashes. Add null check.
+    print("\nPatching $id$ function for null safety...")
+    import re as _re_id
+    # Pattern: =a=>{let b;b=a;if(!b.$id$)b.$id$=WORD();return a.$id$;}
+    id_pattern = _re_id.compile(
+        r'=(\w)=>\{let (\w);\2=\1;if\(!\2\.\$id\$\)\2\.\$id\$=(\w+)\(\);return \1\.\$id\$;\}'
+    )
+    id_match = id_pattern.search(data)
+    if id_match:
+        param = id_match.group(1)
+        bvar = id_match.group(2)
+        gen_func = id_match.group(3)
+        old_text = id_match.group(0)
+        new_text = f'={param}=>{{if({param}===null||{param}===undefined)return 0;let {bvar};{bvar}={param};if(!{bvar}.$id$){bvar}.$id$={gen_func}();return {param}.$id$;}}'
+        data = data.replace(old_text, new_text, 1)
+        print(f"  Patched $id$ function (null check added)")
+    else:
+        print("  $id$ function pattern not found")
+
     # Wrap ONLY clinit body calls in try/catch (targeted, not broad regex)
     # Clinit functions have the pattern: FLAG=true;$p=1;case 1:BODYFUNC();if(D()){break _;}
     # We wrap only BODYFUNC() — the actual initialization code.
