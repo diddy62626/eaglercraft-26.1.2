@@ -585,6 +585,35 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching null-return stubs...")
     data = patch_null_return_stubs(data)
 
+    # Wrap ONLY clinit body calls in try/catch (targeted, not broad regex)
+    # Clinit functions have the pattern: FLAG=true;$p=1;case 1:BODYFUNC();if(D()){break _;}
+    # We wrap only BODYFUNC() — the actual initialization code.
+    # This prevents DataFixers init crashes without breaking other code.
+    print("\nWrapping clinit body calls in try/catch (targeted)...")
+    import re as _re_clinit
+    # Pattern: =true;$p=1;case 1:FUNCNAME();if(D()){break _;}
+    # The "=true;$p=1;case 1:" prefix identifies this as a clinit body call
+    # (not just any func();if(D()){break _;} pattern)
+    clinit_pattern = _re_clinit.compile(
+        r'(=true;\$p=1;case 1:)([A-Za-z_$][A-Za-z0-9_$]*)\(\);if\(D\(\)\)\{break _;\}'
+    )
+    clinit_count = 0
+    for m in clinit_pattern.finditer(data):
+        prefix = m.group(1)
+        func_name = m.group(2)
+        old_text = m.group(0)
+        new_text = (
+            f'{prefix}try{{{func_name}();}}catch(__e)'
+            f'{{if(typeof console!=="undefined")console.warn("[ClinitWrap]",'
+            f'__e&&__e.message?__e.message:__e);}}if(D()){{break _;}}'
+        )
+        data = data.replace(old_text, new_text, 1)
+        clinit_count += 1
+    if clinit_count > 0:
+        print(f"  Wrapped {clinit_count} clinit body calls in try/catch")
+    else:
+        print("  No clinit body calls found (pattern may differ)")
+
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
