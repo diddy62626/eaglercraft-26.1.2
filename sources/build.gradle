@@ -463,6 +463,25 @@ teavm {
 }
 
 // ============================================================
+// Override TeaVM optimization directly on the task
+// ============================================================
+// The `optimization = ...` setting inside `teavm { all { } }` is NOT
+// propagated to the actual generateJavaScript task. Confirmed by CI
+// runs #293 (NONE), #294 (BALANCED), #295 (AGGRESSIVE) — all produced
+// identical 60.5MB output. TeaVMTask.class has `convention(BALANCED)`
+// as default, and the `all { }` → task inheritance via setupDefaults
+// happens before our override, so the convention wins.
+//
+// Setting it directly on the task forces the value and bypasses the
+// convention. This is the only way to actually change the optimization
+// level in TeaVM 0.15.0's gradle plugin.
+tasks.withType(org.teavm.gradle.tasks.GenerateJavaScriptTask).configureEach {
+    optimization = org.teavm.gradle.api.OptimizationLevel.AGGRESSIVE
+    // Give the TeaVM daemon 12GB for DCE+inlining on 10,000+ classes
+    processMemory = 12288
+}
+
+// ============================================================
 // Java Compilation Options
 // ============================================================
 tasks.withType(JavaCompile) {
