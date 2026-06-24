@@ -46,6 +46,9 @@ public class SharedConstants {
     public static final boolean DEBUG_WORLD_RECREATE = false;
     public static final boolean DEBUG_VALIDATE_RESOURCE_PATH_CASE = false;
     public static final boolean DEBUG_DISABLE_BELOW_ZERO_RETROGENERATION = false;
+    public static final boolean DEBUG_UI_NARRATION = false;
+    public static final boolean DEBUG_DEFAULT_SKIN_OVERRIDE = false;
+    public static final boolean DEBUG_SHOW_LOCAL_SERVER_ENTITY_HIT_BOXES = false;
     public static final boolean CHECK_DATA_FIXER_SCHEMA = false;
 
     // Illegal file characters (browser-safe)
