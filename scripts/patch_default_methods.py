@@ -95,24 +95,87 @@ def build_patcher_js(registry):
     patcher = """
 // ============================================================
 // TeaVM Default Method Patcher (hybrid: prototype + registry)
+// Works with both obfuscated and unobfuscated builds.
 // ============================================================
 (function() {
     var __registry = %s;
+
+    // Find the class registry array — try known names first, then scan
     var allClasses = null;
-    if (typeof $rt_allClasses !== 'undefined' && Array.isArray($rt_allClasses)) allClasses = $rt_allClasses;
-    else if (typeof FnY !== 'undefined' && Array.isArray(FnY)) allClasses = FnY;
-    else if (typeof Fnk !== 'undefined' && Array.isArray(Fnk)) allClasses = Fnk;
+    var knownNames = ['$rt_allClasses', 'FnY', 'Fnk'];
+    for (var i = 0; i < knownNames.length; i++) {
+        try {
+            var val = eval(knownNames[i]);
+            if (Array.isArray(val) && val.length > 100) { allClasses = val; break; }
+        } catch(e) {}
+    }
+
+    // If known names didn't work (obfuscated build), scan global scope
+    // for large arrays of constructor-like functions
+    if (!allClasses) {
+        var globalObj = typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this;
+        var bestCandidate = null;
+        var bestLen = 0;
+        for (var key in globalObj) {
+            try {
+                var val = globalObj[key];
+                if (Array.isArray(val) && val.length > 500) {
+                    // Check if entries look like class constructors (have prototype)
+                    var sample = val[0];
+                    if (sample && typeof sample === 'function' && sample.prototype) {
+                        if (val.length > bestLen) {
+                            bestLen = val.length;
+                            bestCandidate = val;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+        if (bestCandidate) allClasses = bestCandidate;
+    }
+
     if (!allClasses) { console.warn('[DefaultMethodPatcher] Class registry not found'); return; }
-    var meta = typeof $rt_meta !== 'undefined' ? $rt_meta :
-               typeof GN !== 'undefined' ? GN : null;
+
+    // Find the metadata symbol — try known names, then scan class objects
+    var meta = null;
+    var knownMeta = ['$rt_meta', 'GN'];
+    for (var i = 0; i < knownMeta.length; i++) {
+        try {
+            if (typeof eval(knownMeta[i]) !== 'undefined') { meta = eval(knownMeta[i]); break; }
+        } catch(e) {}
+    }
+
+    // If known names didn't work, scan class object properties for metadata
+    if (!meta) {
+        for (var i = 0; i < Math.min(allClasses.length, 50); i++) {
+            var cls = allClasses[i];
+            if (!cls || typeof cls !== 'function') continue;
+            for (var key in cls) {
+                try {
+                    var val = cls[key];
+                    // Metadata objects have superinterfaces or parent or name fields
+                    if (val && typeof val === 'object' &&
+                        (val.superinterfaces || val.parent || val.name || val.simpleName)) {
+                        meta = key;
+                        break;
+                    }
+                } catch(e) {}
+            }
+            if (meta) break;
+        }
+    }
+
     if (!meta) { console.warn('[DefaultMethodPatcher] Metadata symbol not found'); return; }
-    console.log('[DefaultMethodPatcher] count=' + allClasses.length);
+    console.log('[DefaultMethodPatcher] count=' + allClasses.length + ' meta=' + meta);
 
     var __funcs = {};
-    for (var __n in __registry) {
-        try { __funcs[__n] = eval(__n); } catch(e) {}
-        for (var __m in __registry[__n]) {
-            try { __funcs[__registry[__n][__m]] = eval(__registry[__n][__m]); } catch(e) {}
+    // Only use eval-based lookup for unobfuscated builds (registry non-empty)
+    if (Object.keys(__registry).length > 0) {
+        for (var __n in __registry) {
+            try { __funcs[__n] = eval(__n); } catch(e) {}
+            for (var __m in __registry[__n]) {
+                try { __funcs[__registry[__n][__m]] = eval(__registry[__n][__m]); } catch(e) {}
+            }
         }
     }
 

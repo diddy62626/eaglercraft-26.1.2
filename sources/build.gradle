@@ -445,14 +445,24 @@ teavm {
     }
 
     js {
-        // Unobfuscated build — obfuscated builds mangle function names
-        // (cms_Codec_$listOf → a.b.c) which breaks the Python patcher's
-        // regex pattern matching. With obfuscated=false the names are
-        // preserved even under BALANCED optimization, so the patcher can
-        // still find default method definitions and restore them to
-        // subclass prototypes. BALANCED DCE should reduce file size from
-        // ~60MB to <30MB. Target: parseable on Chromebooks in <60s.
-        obfuscated = false
+        // OBFUSCATED build — TeaVM shortens all function/variable names
+        // (cms_Codec_$listOf → a, b, c etc.) producing a much smaller file.
+        //
+        // Previous: obfuscated=false produced 60MB classes.js which froze
+        // browsers during parsing ("Page doesn't respond"). JS parsing is
+        // synchronous and can't be made non-blocking on the main thread.
+        //
+        // Now: obfuscated=true should produce ~15MB classes.js that parses
+        // in 2-5 seconds. The default-method patcher's runtime prototype
+        // scanner (Method 1) works regardless of obfuscation because it
+        // inspects interface objects at runtime, not name patterns.
+        //
+        // Text patches (File.toPath, FileChannel.open, clinit wrapping, etc.)
+        // rely on unobfuscated function names and will be silently skipped.
+        // These patches fix null-safety and platform issues. If the game
+        // crashes without them, we'll need to move the fixes to Java source
+        // patches (sources/teavm/patch/) which survive obfuscation.
+        obfuscated = true
 
         sourceMap = false
 
