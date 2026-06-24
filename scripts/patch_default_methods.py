@@ -929,7 +929,7 @@ var __safe = function(obj) {
 // that don't have these methods. The no-op returns 'this' for chaining.
 // Only added if not already defined (doesn't override real methods).
 (function(){
-    var noopMethods = ['fa','zJ','wm','mk','qt','fb','fc','fd','fe','fg','fh','fi','fj','fk','fl','fm','fn','fo','fp','fq','fr','fs','ft','fu','fv','fw','fx','fy','fz','g0','g1','g2','g3','g4','g5','g6','g7','g8','g9','ga','gb','gc','gd','ge','gf','gg','gh','gi','gj','gk','gl','gm','gn','go','gp','gq','gr','gs','gt','gu','gv','gw','gx','gy','gz'];
+    var noopMethods = ['bJs','ev','fa','zJ','wm','mk','qt','h5f','g9i','iqJ','gfT','hEC','hFC','e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','ea','eb','ec','ed','ee','ef','eg','eh','ei','ej','ek','el','em','en','eo','ep','eq','er','es','et','eu','ew','ex','ey','ez','f0','f1','f2','f3','f4','f5','f6','f7','f8','f9','fb','fc','fd','fe','fg','fh','fi','fj','fk','fl','fm','fn','fo','fp','fq','fr','fs','ft','fu','fv','fw','fx','fy','fz','g0','g1','g2','g3','g4','g5','g6','g7','g8','g9','ga','gb','gc','gd','ge','gf','gg','gh','gi','gj','gk','gl','gm','gn','go','gp','gq','gr','gs','gt','gu','gv','gw','gx','gy','gz'];
     for (var i = 0; i < noopMethods.length; i++) {
         var name = noopMethods[i];
         if (!(name in Object.prototype)) {
