@@ -615,7 +615,7 @@ def patch_classes_js(input_path, output_path):
     # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
     # Only match after = (assignment), not after . (method chain)
     safe_pattern = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.(ev|fa|zJ|wm|mk|qt|bJs|h5f|g9i|iqJ|gfT|hEC|hFC|LU|btL|oL|ua|d_|bEc|ul|gzS|mi|rp|nx|fcZ)\('
+        r'=([a-z]\w{0,1})\.(ev|fa|zJ|wm|mk|qt|bJs|h5f|g9i|iqJ|gfT|hEC|hFC|LU|btL|oL|ua|d_|bEc|ul|gzS|mi|rp|nx|fcZ|PS|CDV)\('
     )
     safe_count = 0
     for m in safe_pattern.finditer(data):
@@ -948,6 +948,22 @@ var __safe = function(obj) {
         });
     } catch(e) { return obj; }
 };
+// Add no-op for ALL 2-char methods starting with uppercase
+(function(){
+    for (var i = 65; i <= 90; i++) {
+        for (var j = 0; j < 128; j++) {
+            var c1 = String.fromCharCode(i);
+            var c2 = String.fromCharCode(j < 26 ? 97+j : (j < 52 ? 65+(j-26) : (j < 62 ? 48+(j-52) : 95)));
+            var name = c1 + c2;
+            if (!(name in Object.prototype)) {
+                Object.defineProperty(Object.prototype, name, {
+                    value: function() { return this; },
+                    writable: true, configurable: true, enumerable: false
+                });
+            }
+        }
+    }
+})();
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
