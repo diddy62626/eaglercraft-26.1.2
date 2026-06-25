@@ -948,7 +948,17 @@ var __safe = function(obj) {
         });
     } catch(e) { return obj; }
 };
-// Add no-op for ALL 2-char and 3-char method names (a-z, A-Z, 0-9, _)
+// Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
+var __extraNoOps = ['fmz','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul'];
+for (var ni = 0; ni < __extraNoOps.length; ni++) {
+    if (!(__extraNoOps[ni] in Object.prototype)) {
+        Object.defineProperty(Object.prototype, __extraNoOps[ni], {
+            value: function() { return this; },
+            writable: true, configurable: true, enumerable: false
+        });
+    }
+}
+// Add no-op for ALL 2-char method names (a-z, A-Z, 0-9, _)
 // Covers ALL obfuscated TeaVM method names. Safe because:
 // - defineProperty checks 'if (!(name in Object.prototype)' first
 // - Real methods on prototypes take precedence
