@@ -618,13 +618,14 @@ def patch_classes_js(input_path, output_path):
         r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,3})([;(,]|$)'
     )
     safe_count = 0
-    for m in safe_pattern.finditer(data):
+    def __safe_replace(m):
+        nonlocal safe_count
+        safe_count += 1
         var_name = m.group(1)
         method_name = m.group(2)
-        old_text = m.group(0)
-        new_text = f'=__safe({var_name}).{method_name}' + m.group(3) if m.group(3) else '('
-        data = data.replace(old_text, new_text, 1)
-        safe_count += 1
+        trailing = m.group(3) if m.group(3) else '('
+        return f'=__safe({var_name}).{method_name}' + trailing
+    data = safe_pattern.sub(__safe_replace, data)
     if safe_count > 0:
         print(f"  Wrapped {safe_count} null-unsafe property accesses")
 
