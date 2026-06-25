@@ -615,7 +615,7 @@ def patch_classes_js(input_path, output_path):
     # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
     # Only match after = (assignment), not after . (method chain)
     safe_pattern = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,3})([;(,]|$)'
+        r'=([a-z]\w{0,1})\.(ev|fa|zJ|wm|mk|qt|bJs|h5f|g9i|iqJ|gfT|hEC|hFC|LU|btL|oL|ua|d_|bEc|ul|gzS|mi|rp|nx|fcZ|PS|CDV|fmz|HR|cJ)\('
     )
     safe_count = 0
     def __safe_replace(m):
@@ -915,39 +915,14 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: wraps ALL objects from stubs in a Proxy
-// that returns no-op callables for missing methods.
-// Real objects keep their real methods; only missing methods get no-ops.
+// Null-return stub helper: NO Proxy (too slow for 53K call sites)
+// Return object as-is if non-null, shared stub if null
+var __safeStub = null;
 var __safe = function(obj) {
-    if (obj === null || obj === undefined) {
-        // Null stub: return a Proxy that absorbs everything
-        var p = new Proxy(function(){return p;}, {
-            get: function(t, prop) {
-                if (prop === '$id$') return 0;
-                if (prop === 'length') return 0;
-                if (prop === 'constructor') return Object;
-                if (typeof prop === 'symbol') return undefined;
-                return function(){return p;};
-            },
-            has: function(t, prop) { return false; },
-            ownKeys: function(t) { return []; },
-            getOwnPropertyDescriptor: function(t, prop) { return undefined; }
-        });
-        return p;
-    }
-    // Real object: wrap in Proxy that returns no-op for missing methods
-    // but passes through existing properties unchanged
-    try {
-        return new Proxy(obj, {
-            get: function(target, prop) {
-                var val = target[prop];
-                if (val !== undefined && val !== null) return val;
-                // Missing method: return a no-op that returns the target
-                if (typeof prop === 'symbol') return undefined;
-                return function(){return target;};
-            }
-        });
-    } catch(e) { return obj; }
+    if (obj !== null && obj !== undefined) return obj;
+    if (__safeStub) return __safeStub;
+    __safeStub = {$id$:0};
+    return __safeStub;
 };
 // Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
 var __extraNoOps = ['fmz','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul'];
