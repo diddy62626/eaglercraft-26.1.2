@@ -920,7 +920,17 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    __safeStub = {$id$:0};
+    // Stub with Proxy prototype: returns null for ALL missing methods
+    // null (not undefined) breaks loops: while(c.next()!=null) stops
+    var proto = new Proxy(Object.prototype, {
+        get: function(t, p) {
+            if (p in t) return t[p];
+            if (typeof p === 'symbol') return undefined;
+            return function() { return null; };
+        }
+    });
+    __safeStub = Object.create(proto);
+    __safeStub.$id$ = 0;
     return __safeStub;
 };
 // Add no-op for ALL 2-char methods + ALL 3-char methods with uppercase/digit
