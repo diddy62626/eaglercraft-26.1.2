@@ -920,9 +920,38 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    __safeStub = {$id$:0};
+    // Stub with Proxy prototype: returns undefined for ALL missing methods.
+    // In JS, undefined != null is FALSE, so while(c.next()!=null) stops.
+    // Only 51 stubs get Proxy (minimal overhead, no freeze).
+    var proto = new Proxy(Object.prototype, {
+        get: function(t, p) {
+            if (p in t) return t[p];
+            if (typeof p === 'symbol') return undefined;
+            // Return a function that returns undefined (breaks loops)
+            return function() { return undefined; };
+        }
+    });
+    __safeStub = Object.create(proto);
+    __safeStub.$id$ = 0;
     return __safeStub;
 };
+// 2-char Object.prototype no-ops: covers ALL 2-char method names.
+// 4K defineProperty calls, takes <10ms. Does NOT block page load.
+// The 50K 3-char loop was what blocked startup, not this 4K loop.
+(function(){
+    var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$";
+    for (var i = 0; i < chars.length; i++) {
+        for (var j = 0; j < chars.length; j++) {
+            var name = chars[i] + chars[j];
+            if (!(name in Object.prototype)) {
+                Object.defineProperty(Object.prototype, name, {
+                    value: function() { return this; },
+                    writable: true, configurable: true, enumerable: false
+                });
+            }
+        }
+    }
+})();
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
