@@ -920,19 +920,7 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    // Stub with Proxy prototype: returns undefined for ALL missing methods.
-    // In JS, undefined != null is FALSE, so while(c.next()!=null) stops.
-    // Only 51 stubs get Proxy (minimal overhead, no freeze).
-    var proto = new Proxy(Object.prototype, {
-        get: function(t, p) {
-            if (p in t) return t[p];
-            if (typeof p === 'symbol') return undefined;
-            // Return a function that returns undefined (breaks loops)
-            return function() { return undefined; };
-        }
-    });
-    __safeStub = Object.create(proto);
-    __safeStub.$id$ = 0;
+    __safeStub = {$id$:0};
     return __safeStub;
 };
 // 2-char Object.prototype no-ops: covers ALL 2-char method names.
