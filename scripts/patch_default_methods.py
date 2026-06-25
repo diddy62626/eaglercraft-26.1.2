@@ -914,26 +914,41 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: return obj if non-null, else a Proxy stub
-// The Proxy is ONLY created for null returns — real objects pass through.
-// TeaVM's class system never sees a Proxy for real class objects.
+// Null-return stub helper: wraps ALL objects from stubs in a Proxy
+// that returns no-op callables for missing methods.
+// Real objects keep their real methods; only missing methods get no-ops.
 var __safe = function(obj) {
-    if (obj !== null && obj !== undefined) return obj;
-    // Create a chain-safe Proxy stub that absorbs ALL method calls
-    var p = new Proxy(function(){return p;}, {
-        get: function(target, prop) {
-            if (prop === '$id$') return 0;
-            if (prop === 'length') return 0;
-            if (prop === 'constructor') return Object;
-            if (typeof prop === 'symbol') return undefined;
-            return function(){return p;};
-        },
-        has: function(target, prop) { return false; },
-        ownKeys: function(target) { return []; },
-        getOwnPropertyDescriptor: function(target, prop) { return undefined; }
-    });
-    return p;
+    if (obj === null || obj === undefined) {
+        // Null stub: return a Proxy that absorbs everything
+        var p = new Proxy(function(){return p;}, {
+            get: function(t, prop) {
+                if (prop === '$id$') return 0;
+                if (prop === 'length') return 0;
+                if (prop === 'constructor') return Object;
+                if (typeof prop === 'symbol') return undefined;
+                return function(){return p;};
+            },
+            has: function(t, prop) { return false; },
+            ownKeys: function(t) { return []; },
+            getOwnPropertyDescriptor: function(t, prop) { return undefined; }
+        });
+        return p;
+    }
+    // Real object: wrap in Proxy that returns no-op for missing methods
+    // but passes through existing properties unchanged
+    try {
+        return new Proxy(obj, {
+            get: function(target, prop) {
+                var val = target[prop];
+                if (val !== undefined && val !== null) return val;
+                // Missing method: return a no-op that returns the target
+                if (typeof prop === 'symbol') return undefined;
+                return function(){return target;};
+            }
+        });
+    } catch(e) { return obj; }
 };
+"""
 // Add common DFU method names to Object.prototype as no-ops.
 // This prevents 'X is not a function' when stub methods return objects
 // that don't have these methods. The no-op returns 'this' for chaining.
