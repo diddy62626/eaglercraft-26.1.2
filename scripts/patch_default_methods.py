@@ -920,15 +920,17 @@ def patch_null_return_stubs(data):
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     // Create a chain-safe Proxy stub that absorbs ALL method calls
-    var p = new Proxy({$id$:0}, {
+    var p = new Proxy(function(){return p;}, {
         get: function(target, prop) {
-            if (prop in target) return target[prop];
+            if (prop === '$id$') return 0;
             if (prop === 'length') return 0;
             if (prop === 'constructor') return Object;
             if (typeof prop === 'symbol') return undefined;
-            // Return a function that returns p for chaining
             return function(){return p;};
-        }
+        },
+        has: function(target, prop) { return false; },
+        ownKeys: function(target) { return []; },
+        getOwnPropertyDescriptor: function(target, prop) { return undefined; }
     });
     return p;
 };
