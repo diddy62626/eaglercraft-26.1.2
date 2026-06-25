@@ -967,20 +967,7 @@ var __safe = function(obj) {
             }
         }
     }
-    // 3-char methods (common in TeaVM obfuscation)
-    for (var i = 0; i < chars.length; i++) {
-        for (var j = 0; j < chars.length; j++) {
-            for (var k = 0; k < chars.length; k++) {
-                var name = chars[i] + chars[j] + chars[k];
-                if (!(name in Object.prototype)) {
-                    Object.defineProperty(Object.prototype, name, {
-                        value: function() { return this; },
-                        writable: true, configurable: true, enumerable: false
-                    });
-                }
-            }
-        }
-    }
+
 })();
 """
         use_strict = '"use strict";\n'
