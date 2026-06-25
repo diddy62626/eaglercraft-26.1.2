@@ -615,7 +615,7 @@ def patch_classes_js(input_path, output_path):
     # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
     # Only match after = (assignment), not after . (method chain)
     safe_pattern = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.(ev|fa|zJ|wm|mk|qt|bJs|h5f|g9i|iqJ|gfT|hEC|hFC|LU|btL|oL|ua|d_|bEc|ul|gzS|mi|rp|nx|fcZ|PS|CDV|fmz)([;(,]|$)'
+        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,3})([;(,]|$)'
     )
     safe_count = 0
     for m in safe_pattern.finditer(data):
