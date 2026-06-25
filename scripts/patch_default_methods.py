@@ -923,49 +923,6 @@ var __safe = function(obj) {
     __safeStub = {$id$:0};
     return __safeStub;
 };
-// Add no-op for ALL 2-char methods + ALL 3-char methods with uppercase/digit
-// 3-char methods generated at runtime (covers ~50K TeaVM obfuscated names)
-// Safe: real Java methods are all-lowercase (get, put, run) - skipped
-// TeaVM obfuscated names contain uppercase/digit (b0H, boZ, dF7) - covered
-// Add no-op for ALL 2-char method names (a-z, A-Z, 0-9, _)
-// Covers ALL obfuscated TeaVM method names. Safe because:
-// - defineProperty checks 'if (!(name in Object.prototype)' first
-// - Real methods on prototypes take precedence
-// - Only adds missing methods as no-ops that return 'this'
-(function(){
-    var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$";
-    // 2-char methods
-    for (var i = 0; i < chars.length; i++) {
-        for (var j = 0; j < chars.length; j++) {
-            var name = chars[i] + chars[j];
-            if (!(name in Object.prototype)) {
-                Object.defineProperty(Object.prototype, name, {
-                    value: function() { return this; },
-                    writable: true, configurable: true, enumerable: false
-                });
-            }
-        }
-    }
-    // 3-char methods with uppercase/digit (TeaVM obfuscated names)
-    for (var i = 0; i < chars.length; i++) {
-        if (chars[i] >= '0' && chars[i] <= '9') continue;
-        for (var j = 0; j < chars.length; j++) {
-            for (var k = 0; k < chars.length; k++) {
-                var name = chars[i] + chars[j] + chars[k];
-                var hasUpper = name !== name.toLowerCase();
-                var hasDigit = /\\d/.test(name);
-                if (!hasUpper && !hasDigit) continue;
-                if (!(name in Object.prototype)) {
-                    Object.defineProperty(Object.prototype, name, {
-                        value: function() { return this; },
-                        writable: true, configurable: true, enumerable: false
-                    });
-                }
-            }
-        }
-    }
-
-})();
 """
         use_strict = '"use strict";\n'
         if use_strict in patched:
