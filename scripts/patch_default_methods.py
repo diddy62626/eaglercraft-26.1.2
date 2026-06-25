@@ -923,16 +923,10 @@ var __safe = function(obj) {
     __safeStub = {$id$:0};
     return __safeStub;
 };
-// Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
-var __extraNoOps = ['fmz','bo1','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul','cJ','HR','hDo','ffk','ffl','dF7','fDf','mi','rp','nx','fcZ','boZ','dF7','fDf','hDo','ffk','ffl','cdV','btL','cJ'];
-for (var ni = 0; ni < __extraNoOps.length; ni++) {
-    if (!(__extraNoOps[ni] in Object.prototype)) {
-        Object.defineProperty(Object.prototype, __extraNoOps[ni], {
-            value: function() { return this; },
-            writable: true, configurable: true, enumerable: false
-        });
-    }
-}
+// Add no-op for ALL 2-char methods + ALL 3-char methods with uppercase/digit
+// 3-char methods generated at runtime (covers ~50K TeaVM obfuscated names)
+// Safe: real Java methods are all-lowercase (get, put, run) - skipped
+// TeaVM obfuscated names contain uppercase/digit (b0H, boZ, dF7) - covered
 // Add no-op for ALL 2-char method names (a-z, A-Z, 0-9, _)
 // Covers ALL obfuscated TeaVM method names. Safe because:
 // - defineProperty checks 'if (!(name in Object.prototype)' first
@@ -949,6 +943,24 @@ for (var ni = 0; ni < __extraNoOps.length; ni++) {
                     value: function() { return this; },
                     writable: true, configurable: true, enumerable: false
                 });
+            }
+        }
+    }
+    // 3-char methods with uppercase/digit (TeaVM obfuscated names)
+    for (var i = 0; i < chars.length; i++) {
+        if (chars[i] >= '0' && chars[i] <= '9') continue;
+        for (var j = 0; j < chars.length; j++) {
+            for (var k = 0; k < chars.length; k++) {
+                var name = chars[i] + chars[j] + chars[k];
+                var hasUpper = name !== name.toLowerCase();
+                var hasDigit = /\\d/.test(name);
+                if (!hasUpper && !hasDigit) continue;
+                if (!(name in Object.prototype)) {
+                    Object.defineProperty(Object.prototype, name, {
+                        value: function() { return this; },
+                        writable: true, configurable: true, enumerable: false
+                    });
+                }
             }
         }
     }
