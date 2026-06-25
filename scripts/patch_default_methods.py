@@ -623,8 +623,7 @@ def patch_classes_js(input_path, output_path):
         safe_count += 1
         var_name = m.group(1)
         method_name = m.group(2)
-        trailing = m.group(3) if m.group(3) else '('
-        return f'=__safe({var_name}).{method_name}' + trailing
+        return '=__safe(' + var_name + ').' + method_name + '('
     data = safe_pattern.sub(__safe_replace, data)
     if safe_count > 0:
         print(f"  Wrapped {safe_count} null-unsafe property accesses")
