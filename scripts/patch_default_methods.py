@@ -949,25 +949,6 @@ var __safe = function(obj) {
     } catch(e) { return obj; }
 };
 """
-// Add common DFU method names to Object.prototype as no-ops.
-// This prevents 'X is not a function' when stub methods return objects
-// that don't have these methods. The no-op returns 'this' for chaining.
-// Only added if not already defined (doesn't override real methods).
-(function(){
-    var noopMethods = ['bJs','ev','fa','zJ','wm','mk','qt','h5f','g9i','iqJ','gfT','hEC','hFC','e0','e1','e2','e3','e4','e5','e6','e7','e8','e9','ea','eb','ec','ed','ee','ef','eg','eh','ei','ej','ek','el','em','en','eo','ep','eq','er','es','et','eu','ew','ex','ey','ez','f0','f1','f2','f3','f4','f5','f6','f7','f8','f9','fb','fc','fd','fe','fg','fh','fi','fj','fk','fl','fm','fn','fo','fp','fq','fr','fs','ft','fu','fv','fw','fx','fy','fz','g0','g1','g2','g3','g4','g5','g6','g7','g8','g9','ga','gb','gc','gd','ge','gf','gg','gh','gi','gj','gk','gl','gm','gn','go','gp','gq','gr','gs','gt','gu','gv','gw','gx','gy','gz'];
-    for (var i = 0; i < noopMethods.length; i++) {
-        var name = noopMethods[i];
-        if (!(name in Object.prototype)) {
-            Object.defineProperty(Object.prototype, name, {
-                value: function() { return this; },
-                writable: true,
-                configurable: true,
-                enumerable: false
-            });
-        }
-    }
-})();
-"""
         use_strict = '"use strict";\n'
         if use_strict in patched:
             patched = patched.replace(use_strict, use_strict + helper, 1)
