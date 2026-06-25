@@ -924,7 +924,7 @@ var __safe = function(obj) {
     return __safeStub;
 };
 // Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
-var __extraNoOps = ['fmz','bo1','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul','cJ','HR','hDo','ffk','ffl','dF7','fDf','mi','rp','nx','fcZ'];
+var __extraNoOps = ['fmz','bo1','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul','cJ','HR','hDo','ffk','ffl','dF7','fDf','mi','rp','nx','fcZ','boZ','dF7','fDf','hDo','ffk','ffl','cdV','btL','cJ'];
 for (var ni = 0; ni < __extraNoOps.length; ni++) {
     if (!(__extraNoOps[ni] in Object.prototype)) {
         Object.defineProperty(Object.prototype, __extraNoOps[ni], {
