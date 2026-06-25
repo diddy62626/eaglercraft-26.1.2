@@ -615,7 +615,7 @@ def patch_classes_js(input_path, output_path):
     # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
     # Only match after = (assignment), not after . (method chain)
     safe_pattern = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})\('
+        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,]|\s*=\s*[^=])'
     )
     safe_count = 0
     def __safe_replace(m):
@@ -623,7 +623,8 @@ def patch_classes_js(input_path, output_path):
         safe_count += 1
         var_name = m.group(1)
         method_name = m.group(2)
-        return '=__safe(' + var_name + ').' + method_name + '('
+        trailing = m.group(3) if m.group(3) else '('
+        return '=__safe(' + var_name + ').' + method_name + trailing
     data = safe_pattern.sub(__safe_replace, data)
     if safe_count > 0:
         print(f"  Wrapped {safe_count} null-unsafe property accesses")
