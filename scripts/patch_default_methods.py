@@ -920,7 +920,17 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    __safeStub = {$id$:0};
+    // Create stub with Proxy prototype that returns no-op functions
+    // Key: no-op returns undefined (falsy) to break loops
+    var proto = new Proxy({}, {
+        get: function(t, prop) {
+            if (typeof prop === 'symbol') return undefined;
+            // Return a function that returns undefined (falsy, breaks loops)
+            return function() { return undefined; };
+        }
+    });
+    __safeStub = Object.create(proto);
+    __safeStub.$id$ = 0;
     return __safeStub;
 };
 // Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
