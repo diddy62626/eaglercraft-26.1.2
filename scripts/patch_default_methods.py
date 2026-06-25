@@ -917,18 +917,34 @@ def patch_null_return_stubs(data):
 // Null-return stub helper: NO Proxy (too slow for 53K call sites)
 // Return object as-is if non-null, shared stub if null
 var __safe = function(obj) {
-    if (obj !== null && obj !== undefined) return obj;
-    // Null/undefined: return a Proxy that absorbs all method calls
-    var p = new Proxy(function(){return p;}, {
-        get: function(t, prop) {
-            if (prop === '$id$') return 0;
-            if (typeof prop === 'symbol') return undefined;
-            return function(){return p;};
-        },
-        has: function() { return false; },
-        ownKeys: function() { return []; }
-    });
-    return p;
+    // ALWAYS return a Proxy that passes through existing properties
+    // and returns no-op callables for missing methods.
+    // Only called from 51 stub methods, so overhead is minimal.
+    if (obj === null || obj === undefined) {
+        // Null: return absorbing Proxy
+        var np = new Proxy(function(){return np;}, {
+            get: function(t, prop) {
+                if (prop === '$id$') return 0;
+                if (typeof prop === 'symbol') return undefined;
+                return function(){return np;};
+            },
+            has: function() { return false; },
+            ownKeys: function() { return []; }
+        });
+        return np;
+    }
+    // Non-null: wrap in Proxy that passes through existing props
+    // and returns no-op for missing methods
+    try {
+        return new Proxy(obj, {
+            get: function(target, prop) {
+                var val = target[prop];
+                if (val !== undefined && val !== null) return val;
+                if (typeof prop === 'symbol') return undefined;
+                return function(){return target;};
+            }
+        });
+    } catch(e) { return obj; }
 };
 // Add no-op for ALL 2-char methods + specific 3-char methods from crash traces
 var __extraNoOps = ['fmz','bo1','gzS','gzS','bJs','iqJ','gfT','hEC','hFC','btL','bEc','CDV','PS','LU','oL','ua','d_','ul'];
