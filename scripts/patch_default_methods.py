@@ -927,7 +927,7 @@ var __safe = function(obj) {
         get: function(t, prop) {
             if (typeof prop === 'symbol') return undefined;
             // Return a function that returns undefined (falsy, breaks loops)
-            return function() { return undefined; };
+            return function() { return null; };
         }
     });
     __safeStub = Object.create(proto);
