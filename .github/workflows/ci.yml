@@ -193,14 +193,14 @@ jobs:
           echo "Libraries in sources/libs/:"
           ls -la sources/libs/
 
-      # ── Create DFU patches jar (un-final DataFixer + Schema) ─
-      - name: Create DFU patches jar
+      # ── Create DFU patches (un-final DataFixer + Schema) ─────
+      - name: Create DFU patches (un-finaled class files)
         run: |
           DFU_JAR=$(find sources/libs ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
           if [ -n "$DFU_JAR" ]; then
-            echo "Creating DFU patches jar from: $DFU_JAR"
-            python3 scripts/patch_dfu_final.py "$DFU_JAR" sources/libs/dfu-patches.jar
-            echo "DFU patches jar created (un-finaled DataFixer + Schema)"
+            echo "Creating DFU patches from: $DFU_JAR"
+            python3 scripts/patch_dfu_final.py "$DFU_JAR" sources/teavm/patch/dfu-classes
+            echo "DFU patches created (un-finaled DataFixer + Schema)"
           else
             echo "WARNING: DFU jar not found!"
           fi
