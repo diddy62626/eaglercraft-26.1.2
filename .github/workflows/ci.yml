@@ -118,6 +118,16 @@ jobs:
           else
             echo "WARNING: teavm-classlib JAR not found!"
           fi
+          
+          echo "Patching DFU jar (replace null returns with non-null)..."
+          DFU_JAR=$(find ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          if [ -n "$DFU_JAR" ]; then
+            python3 scripts/patch_dfu_jar.py "$DFU_JAR" "$DFU_JAR.tmp"
+            mv "$DFU_JAR.tmp" "$DFU_JAR"
+            echo "Patched DFU jar: $DFU_JAR"
+          else
+            echo "WARNING: DFU jar not found!"
+          fi
 
       # ── Make scripts executable ──────────────────────────────
       - name: Make scripts executable
