@@ -662,17 +662,16 @@ def patch_classes_js(input_path, output_path):
         print(f"  Wrapped {safe_count2} chained property accesses")
     
     # Patch functions containing .itemType to be null-safe with try/catch
-    # Pattern: X=a=>{...itemType...} → X=a=>{try{...itemType...}catch(e){return 0;}}
+    # Match: X=a=>{let b;b=...itemType...;return ...;}
     import re as _re_it
-    # Find arrow functions with .itemType that return ?0:1 (boolean-like)
-    it_pattern = _re_it.compile(r'(\w+)=(\w)=>\{(let [^}]+itemType[^}]*return [^}]*\?0:1);\}')
+    it_pattern = _re_it.compile(r'(\w+)=(\w)=>\{(let [^;]+;[^}]*itemType[^}]*return [^}]+);\}')
     it_count = 0
     for m in it_pattern.finditer(data):
         fname = m.group(1)
         param = m.group(2)
         body = m.group(3)
         old_text = m.group(0)
-        new_text = f'{fname}={param}=>{{try{{{body};}}catch(e){{return 0;}}}}'
+        new_text = f'{fname}={param}=>{{try{{{body};}}catch(e){{return null;}}}}'
         data = data.replace(old_text, new_text, 1)
         it_count += 1
     if it_count > 0:
