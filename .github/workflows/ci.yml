@@ -193,19 +193,6 @@ jobs:
           echo "Libraries in sources/libs/:"
           ls -la sources/libs/
 
-      # ── Patch DFU jar (remove FINAL flag from DataFixer/Schema) ──
-      - name: Patch DFU jar (un-final DataFixer + Schema)
-        run: |
-          DFU_JAR=$(find sources/libs ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$DFU_JAR" ]; then
-            echo "Patching DFU jar: $DFU_JAR"
-            python3 scripts/patch_dfu_final.py "$DFU_JAR" "$DFU_JAR.tmp"
-            mv "$DFU_JAR.tmp" "$DFU_JAR"
-            echo "DFU jar patched (removed FINAL flag from DataFixer + Schema)"
-          else
-            echo "WARNING: DFU jar not found!"
-          fi
-
       # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle
         run: |
