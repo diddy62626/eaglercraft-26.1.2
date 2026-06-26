@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Patch DFU jar to remove FINAL flag from DataFixer and Schema classes.
-This allows our Java source patches to extend them.
+Access flags are at bytes 8-9 (after magic(4) + minor(2) + major(2)).
 """
 import zipfile, os, sys, struct
 
@@ -21,9 +21,10 @@ with zipfile.ZipFile(JAR_PATH, 'r') as zin:
             data = zin.read(item.filename)
             if item.filename in UNFINAL_CLASSES:
                 patched = bytearray(data)
-                flags = struct.unpack('>H', patched[6:8])[0]
+                # Access flags are at offset 8 (after magic(4)+minor(2)+major(2))
+                flags = struct.unpack('>H', patched[8:10])[0]
                 new_flags = flags & ~ACC_FINAL
-                struct.pack_into('>H', patched, 6, new_flags)
+                struct.pack_into('>H', patched, 8, new_flags)
                 data = bytes(patched)
                 print(f'  {item.filename}: {hex(flags)} -> {hex(new_flags)} (removed FINAL)')
             zout.writestr(item, data)
