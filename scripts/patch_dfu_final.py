@@ -14,7 +14,7 @@ with zipfile.ZipFile(DFU_JAR, 'r') as zf:
     for cls in UNFINAL_CLASSES:
         data = bytearray(zf.read(cls))
         flags = struct.unpack('>H', data[8:10])[0]
-        new_flags = flags & ~ACC_FINAL
+        new_flags = flags new_flags = flags & ~ACC_FINAL ~ACC_FINAL new_flags = flags & ~ACC_FINAL ~0x0002  # Also remove unknown 0x02 flag
         struct.pack_into('>H', data, 8, new_flags)
         outpath = os.path.join(OUTPUT_DIR, cls)
         os.makedirs(os.path.dirname(outpath), exist_ok=True)

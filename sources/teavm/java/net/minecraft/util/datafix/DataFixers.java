@@ -3,7 +3,7 @@ package net.minecraft.util.datafix;
 import com.mojang.datafixers.schemas.Schema;
 
 public class DataFixers {
-    public static class NoOpDataFixer extends com.mojang.datafixers.DataFixer {
+    public static class NoOpDataFixer implements com.mojang.datafixers.DataFixer {
         @Override
         public com.mojang.serialization.Dynamic update(
                 com.mojang.datafixers.DSL.TypeReference type,
