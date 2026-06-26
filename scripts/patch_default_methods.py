@@ -622,6 +622,26 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  .constructor function pattern not found")
 
+    # Patch CCY (clinit exception re-thrower) to silently swallow exceptions
+    # CCY=a=>{KPv(a);} re-throws clinit exceptions even after our try/catch
+    # Wrap: CCY=a=>{try{KPv(a);}catch(e){}}
+    print("\nPatching CCY (clinit re-thrower) to swallow exceptions...")
+    import re as _re_ccy
+    # Pattern: X=a=>{Y(a);}
+    ccy_pattern = _re_ccy.compile(r'(\w+)=(\w)=>\{(\w+)\(\2\);\}')
+    ccy_count = 0
+    for m in ccy_pattern.finditer(data):
+        fname = m.group(1)
+        param = m.group(2)
+        throw_func = m.group(3)
+        old_text = m.group(0)
+        new_text = f'{fname}={param}=>{{try{{{throw_func}({param});}}catch(e){{}}}}'
+        data = data.replace(old_text, new_text, 1)
+        ccy_count += 1
+        if ccy_count >= 5: break  # Only patch first 5 matches
+    if ccy_count > 0:
+        print(f"  Patched {ccy_count} exception re-throwers to swallow")
+    
     # Patch the classObject function to be null-safe
     # TeaVM has: X=cls=>{if(cls[SYM].classObject===null){...
     # When cls[SYM] is undefined, .classObject crashes. Add null check.
