@@ -946,19 +946,16 @@ var __u3=__USED3CHARS__;
 for(var i3=0;i3<__u3.length;i3++){if(!(__u3[i3] in Object.prototype))Object.defineProperty(Object.prototype,__u3[i3],{value:function(){return this;},writable:true,configurable:true,enumerable:false});}
 """
         # Scan classes.js for used 3-char method names
-        # Include methods with uppercase, digit, or underscore (TeaVM obfuscated names)
-        # Skip all-lowercase without underscore (real Java methods like get, put, run)
+        # Include ALL except a blacklist of known real Java method names
         import re as _re3
+        _blacklist = {'get','set','put','add','run','run','fix','map','key','val','let','new','del','use','end','sum','min','max','mid','cap','log','abs','pow','exp','sin','cos','tan','atn','hex','oct','bin','sub','mul','div','mod','rem','neg','not','and','xor','ior','shl','shr','cmp','eq','ne','lt','gt','le','ge','add','sub','mul','div'}
         _used3 = set()
         for _m in _re3.finditer(r'\.([a-zA-Z_$][a-zA-Z0-9_$]{2})\(', data):
             _n = _m.group(1)
-            _has_upper = _n != _n.lower()
-            _has_digit = any(c.isdigit() for c in _n)
-            _has_underscore = '_' in _n
-            if _has_upper or _has_digit or _has_underscore:
+            if _n not in _blacklist:
                 _used3.add(_n)
         _used3_str = ','.join(f"'{n}'" for n in sorted(_used3))
-        print(f"  Found {len(_used3)} used 3-char methods (obfuscated)")
+        print(f"  Found {len(_used3)} used 3-char methods (excluding {len(_blacklist)} real Java methods)")
         helper = helper.replace('__USED3CHARS__', f'[{_used3_str}]')
         
         use_strict = '"use strict";\n'
