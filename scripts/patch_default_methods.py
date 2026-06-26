@@ -661,22 +661,22 @@ def patch_classes_js(input_path, output_path):
     if safe_count2 > 0:
         print(f"  Wrapped {safe_count2} chained property accesses")
     
-    # Patch R8-like functions that access .itemType on potentially undefined objects
-    # Pattern: X=a=>{let b;b=a.FIELD[SYM].itemType;return b===null?0:1;}
-    # Add null check: X=a=>{if(a===null)return 0;let b;b=(a.FIELD&&a.FIELD[SYM])?a.FIELD[SYM].itemType:null;...
-    import re as _re_itemtype
-    it_pattern = _re_itemtype.compile(r'(\w+)=(\w)=>\{let (\w);(\3)=\2\.(\w+)\[(\w+)\]\.itemType;return \3===null\?0:1;\}')
-    it_match = it_pattern.search(data)
-    if it_match:
-        fname = it_match.group(1)
-        param = it_match.group(2)
-        bvar = it_match.group(3)
-        field = it_match.group(4)
-        sym = it_match.group(5)
-        old_text = it_match.group(0)
-        new_text = f'{fname}={param}=>{{if({param}===null||{param}===undefined)return 0;try{{let {bvar};{bvar}=({param}.{field}&&{param}.{field}[{sym}])?{param}.{field}[{sym}].itemType:null;return {bvar}===null?0:1;}}catch(e){{return 0;}}}}'
+    # Patch functions containing .itemType to be null-safe with try/catch
+    # Pattern: X=a=>{...itemType...} → X=a=>{try{...itemType...}catch(e){return 0;}}
+    import re as _re_it
+    # Find arrow functions with .itemType that return ?0:1 (boolean-like)
+    it_pattern = _re_it.compile(r'(\w+)=(\w)=>\{(let [^}]+itemType[^}]*return [^}]*\?0:1);\}')
+    it_count = 0
+    for m in it_pattern.finditer(data):
+        fname = m.group(1)
+        param = m.group(2)
+        body = m.group(3)
+        old_text = m.group(0)
+        new_text = f'{fname}={param}=>{{try{{{body};}}catch(e){{return 0;}}}}'
         data = data.replace(old_text, new_text, 1)
-        print(f"  Patched {fname} function for itemType null safety")
+        it_count += 1
+    if it_count > 0:
+        print(f"  Patched {it_count} itemType functions with try/catch")
     
     # Then run single pattern: =VAR.field( → =__safe(VAR).field(
     safe_pattern = _re_safe.compile(
