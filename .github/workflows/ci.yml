@@ -120,13 +120,14 @@ jobs:
           fi
           
           echo "Patching DFU jar (replace null returns with non-null)..."
-          DFU_JAR=$(find ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          DFU_JAR=$(find ~/.gradle/caches sources/libs -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
           if [ -n "$DFU_JAR" ]; then
             python3 scripts/patch_dfu_jar.py "$DFU_JAR" "$DFU_JAR.tmp"
             mv "$DFU_JAR.tmp" "$DFU_JAR"
             echo "Patched DFU jar: $DFU_JAR"
           else
-            echo "WARNING: DFU jar not found!"
+            echo "WARNING: DFU jar not found in cache or sources/libs!"
+            echo "Will try again after workspace init..."
           fi
 
       # ── Make scripts executable ──────────────────────────────
@@ -192,6 +193,19 @@ jobs:
           "
           echo "Libraries in sources/libs/:"
           ls -la sources/libs/
+
+      # ── Patch DFU jar AFTER workspace init downloads it ─────
+      - name: Patch DFU jar (null returns → non-null)
+        run: |
+          DFU_JAR=$(find sources/libs ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          if [ -n "$DFU_JAR" ]; then
+            echo "Patching DFU jar: $DFU_JAR"
+            python3 scripts/patch_dfu_jar.py "$DFU_JAR" "$DFU_JAR.tmp"
+            mv "$DFU_JAR.tmp" "$DFU_JAR"
+            echo "DFU jar patched successfully!"
+          else
+            echo "WARNING: DFU jar not found!"
+          fi
 
       # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle
