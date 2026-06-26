@@ -626,6 +626,20 @@ def patch_classes_js(input_path, output_path):
         trailing = m.group(3) if m.group(3) else '('
         return '=__safe(' + var_name + ').' + method_name + trailing
     data = safe_pattern.sub(__safe_replace, data)
+    
+    # Also wrap chained property access: =VAR.field1.field2 → =__safe(VAR.field1).field2
+    safe_pattern2 = _re_safe.compile(
+        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,])'
+    )
+    safe_count2 = 0
+    def __safe_replace2(m):
+        nonlocal safe_count2
+        safe_count2 += 1
+        v = m.group(1); f1 = m.group(2); f2 = m.group(3); t = m.group(4) if m.group(4) else '('
+        return '=__safe(' + v + '.' + f1 + ').' + f2 + t
+    data = safe_pattern2.sub(__safe_replace2, data)
+    if safe_count2 > 0:
+        print(f"  Wrapped {safe_count2} chained property accesses")
     if safe_count > 0:
         print(f"  Wrapped {safe_count} null-unsafe property accesses")
 
