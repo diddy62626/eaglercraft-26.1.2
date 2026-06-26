@@ -201,16 +201,6 @@ jobs:
             echo "Creating DFU patches jar from: $DFU_JAR"
             python3 scripts/patch_dfu_final.py "$DFU_JAR" sources/libs/dfu-patches.jar
             echo "DFU patches jar created (un-finaled DataFixer + Schema)"
-            # Verify
-            python3 -c "
-import struct, zipfile
-with zipfile.ZipFile('sources/libs/dfu-patches.jar') as zf:
-    data = zf.read('com/mojang/datafixers/DataFixer.class')
-    major = struct.unpack('>H', data[6:8])[0]
-    access = struct.unpack('>H', data[8:10])[0]
-    cp = struct.unpack('>H', data[10:12])[0]
-    print(f'DataFixer: major={major}, access={hex(access)}, FINAL={bool(access & 0x0010)}, CP={cp}')
-"
           else
             echo "WARNING: DFU jar not found!"
           fi
