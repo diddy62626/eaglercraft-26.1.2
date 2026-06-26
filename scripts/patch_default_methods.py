@@ -629,7 +629,7 @@ def patch_classes_js(input_path, output_path):
     
     # Also wrap chained property access: =VAR.field1.field2 → =__safe(VAR.field1).field2
     safe_pattern2 = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,])'
+        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,.])'
     )
     safe_count2 = 0
     def __safe_replace2(m):
