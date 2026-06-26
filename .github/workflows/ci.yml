@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  JAVA_VERSION: '25.0.2'
+  JAVA_VERSION: '25'
   NODE_VERSION: '22'
   GRADLE_OPTS: '-Xmx12g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '25.0.2'
+          java-version: '25'
           cache: 'gradle'
 
       # ── Setup Node.js 22 ─────────────────────────────────────
@@ -192,18 +192,6 @@ jobs:
           "
           echo "Libraries in sources/libs/:"
           ls -la sources/libs/
-
-      # ── Create DFU patches (un-final DataFixer + Schema) ─────
-      - name: Create DFU patches (un-finaled class files)
-        run: |
-          DFU_JAR=$(find sources/libs ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
-          if [ -n "$DFU_JAR" ]; then
-            echo "Creating DFU patches from: $DFU_JAR"
-            python3 scripts/patch_dfu_final.py "$DFU_JAR" sources/teavm/patch/dfu-classes
-            echo "DFU patches created (un-finaled DataFixer + Schema)"
-          else
-            echo "WARNING: DFU jar not found!"
-          fi
 
       # ── Build: Compile with Gradle ───────────────────────────
       - name: Build with Gradle

@@ -75,7 +75,6 @@ dependencies {
     teavmImplementation files("libs/minecraft-${minecraftVersion}.jar")
     // DFU patches jar (un-finaled DataFixer + Schema) - BEFORE the DFU jar
     // so javac reads our un-finaled versions instead of the original FINAL ones
-    // DFU un-finaled classes directory (added to classpath in generateJavaScript task)
     mcLibs.each { lib ->
         teavmImplementation files("libs/${lib}.jar")
     }
@@ -294,10 +293,7 @@ afterEvaluate {
 
         // Prepend our classes so they're scanned first by TeaVM.
         def patchClassesDir = file('teavm/patch/classes')
-        def dfuClassesDir = file("teavm/patch/dfu-classes")
         def jdkPatchClassesDir = file('teavm/patch/jdk-classes')
-        def dfuPatchesDir = file('teavm/patch/dfu-classes')
-        def ourClasses = [patchClassesDir, jdkPatchClassesDir, dfuClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
         def existingCp = classpath.files
         classpath.setFrom(ourClasses)
         classpath.from(existingCp)
@@ -312,7 +308,6 @@ tasks.register('compileTeavmPatches') {
     description = 'Compiles java.base patches for TeaVM classlib overrides'
     def patchSrcDir = file('teavm/patch/java')
     def patchClassesDir = file('teavm/patch/classes')
-        def dfuClassesDir = file("teavm/patch/dfu-classes")
     inputs.dir patchSrcDir
     outputs.dir patchClassesDir
     doLast {
