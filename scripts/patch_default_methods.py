@@ -945,17 +945,14 @@ var __safe = function(obj) {
 var __u3=__USED3CHARS__;
 for(var i3=0;i3<__u3.length;i3++){if(!(__u3[i3] in Object.prototype))Object.defineProperty(Object.prototype,__u3[i3],{value:function(){return this;},writable:true,configurable:true,enumerable:false});}
 """
-        # Scan classes.js for used 3-char method names with uppercase/digit
+        # Scan classes.js for used 3-char method names (ALL, not just uppercase/digit)
         import re as _re3
         _used3 = set()
         for _m in _re3.finditer(r'\.([a-zA-Z_$][a-zA-Z0-9_$]{2})\(', data):
             _n = _m.group(1)
-            _has_upper = _n != _n.lower()
-            _has_digit = any(c.isdigit() for c in _n)
-            if _has_upper or _has_digit:
-                _used3.add(_n)
+            _used3.add(_n)
         _used3_str = ','.join(f"'{n}'" for n in sorted(_used3))
-        print(f"  Found {len(_used3)} used 3-char methods with uppercase/digit")
+        print(f"  Found {len(_used3)} used 3-char methods")
         helper = helper.replace('__USED3CHARS__', f'[{_used3_str}]')
         
         use_strict = '"use strict";\n'
