@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Patch DFU jar to remove FINAL flag from DataFixer and Schema.
-Uses 'zip' command to replace files (avoids Python zipfile corruption).
+Uses jar command (always available with JDK) to update the jar.
 """
-import sys, os, struct, subprocess, tempfile, zipfile
+import sys, os, struct, subprocess, tempfile, zipfile, shutil
 
 JAR_PATH = sys.argv[1]
 
@@ -13,38 +13,39 @@ UNFINAL_CLASSES = [
 ]
 
 ACC_FINAL = 0x0010
+JAVA_HOME = os.environ.get('JAVA_HOME', '')
+JAR_CMD = os.path.join(JAVA_HOME, 'bin', 'jar') if JAVA_HOME else 'jar'
 
-# Create temp dir
 tmpdir = tempfile.mkdtemp()
-files_to_update = []
 
 with zipfile.ZipFile(JAR_PATH, 'r') as zf:
     for cls in UNFINAL_CLASSES:
-        # Extract
         data = bytearray(zf.read(cls))
         flags = struct.unpack('>H', data[8:10])[0]
         new_flags = flags & ~ACC_FINAL
         struct.pack_into('>H', data, 8, new_flags)
         
-        # Write to temp dir
         outpath = os.path.join(tmpdir, cls)
         os.makedirs(os.path.dirname(outpath), exist_ok=True)
         with open(outpath, 'wb') as f:
             f.write(data)
-        files_to_update.append(cls)
         print(f'  {cls}: {hex(flags)} -> {hex(new_flags)} (removed FINAL)')
 
-# Use 'zip' command to update the jar
-for cls in files_to_update:
+# Use 'jar' command to update (always available with JDK)
+for cls in UNFINAL_CLASSES:
     result = subprocess.run(
-        ['zip', JAR_PATH, cls],
-        cwd=tmpdir,
+        [JAR_CMD, 'uf', JAR_PATH, '-C', tmpdir, cls],
         capture_output=True, text=True
     )
     if result.returncode != 0:
         print(f'  ERROR updating {cls}: {result.stderr}')
+        # Fallback: try zip command
+        result2 = subprocess.run(
+            ['zip', JAR_PATH, cls],
+            cwd=tmpdir, capture_output=True, text=True
+        )
+        if result2.returncode != 0:
+            print(f'  zip also failed: {result2.stderr}')
 
-# Cleanup
-import shutil
 shutil.rmtree(tmpdir)
-print(f'Patched {JAR_PATH} in-place (using zip command)')
+print(f'Patched {JAR_PATH} in-place')
