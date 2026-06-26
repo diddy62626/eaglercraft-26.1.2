@@ -622,41 +622,25 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  .constructor function pattern not found")
 
-    # Patch the $rt_throw function to be a no-op (swallow all Java exceptions)
-    # TeaVM's exception mechanism uses $rt_throw which is called to throw.
-    # Making it a no-op means Java exceptions are silently ignored.
-    print("\nPatching $rt_throw to swallow Java exceptions...")
-    # Find: $rt_throw= or similar
+    # Patch the Java exception throw function to be a no-op
+    # TeaVM uses: V=ex=>{throw BN7(ex);} to throw Java exceptions
+    # Making it a no-op means all Java exceptions are silently ignored
+    print("\nPatching Java exception throw function to no-op...")
     import re as _re_throw
-    # Pattern: $rt_throw=function... or $rt_throw=(ex)=>{...throw...}
-    throw_pattern = _re_throw.compile(r'\$rt_throw\s*=\s*(?:function|\([^)]*\)\s*=>)')
+    # Pattern: V=ex=>{throw WORD(ex);}
+    throw_pattern = _re_throw.compile(r'(\w+)=(\w+)=>\{throw (\w+)\(\2\);\}')
     throw_match = throw_pattern.search(data)
     if throw_match:
-        pos = throw_match.start()
-        # Find the end of the function definition
-        # Look for the next comma or semicolon at depth 0
-        depth = 0
-        i = throw_match.end()
-        in_str = False
-        while i < len(data):
-            c = data[i]
-            if in_str:
-                if c == '\\': i += 1
-                elif c == in_str: in_str = False
-            elif c in '"\'': in_str = c
-            elif c == '{': depth += 1
-            elif c == '}': depth -= 1
-            elif depth == 0 and c in ',;': break
-            i += 1
-        old_func = data[pos:i]
-        # Replace with no-op
-        data = data[:pos] + '$rt_throw=function(){}' + data[i:]
-        print(f"  Patched $rt_throw to no-op (was {i-pos} bytes)")
+        fname = throw_match.group(1)
+        param = throw_match.group(2)
+        throw_func = throw_match.group(3)
+        old_text = throw_match.group(0)
+        # Replace with no-op (don't throw, just return)
+        new_text = f'{fname}={param}=>{{/* throw swallowed */}}'
+        data = data.replace(old_text, new_text, 1)
+        print(f"  Patched {fname}={param}=>{{throw {throw_func}({param});}} to no-op")
     else:
-        print("  $rt_throw not found, trying $rt_throw alternative...")
-        # Try: throw err; pattern in KPv
-        # Actually let's just wrap the throw in a try/catch at the JS level
-        pass
+        print("  Throw function pattern not found")
     
     # Patch the classObject function to be null-safe
     # TeaVM has: X=cls=>{if(cls[SYM].classObject===null){...
