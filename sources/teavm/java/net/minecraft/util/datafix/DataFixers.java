@@ -1,13 +1,11 @@
 package net.minecraft.util.datafix;
 
-// PATCHED: DataFixers returns null (handled by __safe stub at runtime).
-
+// Return Object to avoid referencing DataFixer (triggers javac NPE)
 public class DataFixers {
-    public static com.mojang.datafixers.DataFixer getDataFixer() {
+    public static Object getDataFixer() {
         return null;
     }
-    
-    public static net.minecraft.util.filefix.FileFixerUpper getFileFixer() {
+    public static Object getFileFixer() {
         return null;
     }
 }
