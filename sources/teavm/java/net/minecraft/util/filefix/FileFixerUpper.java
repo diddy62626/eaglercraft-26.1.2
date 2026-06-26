@@ -1,6 +1,5 @@
 package net.minecraft.util.filefix;
 
-// Use raw types to avoid javac crash with DFU generics
 public class FileFixerUpper {
     public static boolean requiresFileFixing(int version) {
         return false;
