@@ -648,7 +648,7 @@ def patch_classes_js(input_path, output_path):
     # Find patterns: =VAR.ev( or =VAR.fa( etc where VAR is 1-2 chars
     # Only match after = (assignment), not after . (method chain)
     safe_pattern = _re_safe.compile(
-        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,])'
+        r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,.\[])'
     )
     safe_count = 0
     def __safe_replace(m):
