@@ -15,7 +15,7 @@ UNFINAL_CLASSES = [
 ACC_FINAL = 0x0010
 
 with zipfile.ZipFile(DFU_JAR, 'r') as zin:
-    with zipfile.ZipFile(OUTPUT_JAR, 'w', zipfile.ZIP_DEFLATED) as zout:
+    with zipfile.ZipFile(OUTPUT_JAR, 'w', zipfile.ZIP_STORED) as zout:
         for cls in UNFINAL_CLASSES:
             data = bytearray(zin.read(cls))
             flags = struct.unpack('>H', data[8:10])[0]
