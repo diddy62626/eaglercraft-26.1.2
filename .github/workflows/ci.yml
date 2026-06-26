@@ -193,15 +193,24 @@ jobs:
           echo "Libraries in sources/libs/:"
           ls -la sources/libs/
 
-      # ── Patch DFU jar (remove FINAL flag) ──────────────────
-      - name: Patch DFU jar (un-final DataFixer + Schema)
+      # ── Create DFU patches jar (un-final DataFixer + Schema) ─
+      - name: Create DFU patches jar
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq zip
           DFU_JAR=$(find sources/libs ~/.gradle/caches -name "datafixerupper-*.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
           if [ -n "$DFU_JAR" ]; then
-            echo "Patching DFU jar: $DFU_JAR"
-            python3 scripts/patch_dfu_final.py "$DFU_JAR"
-            echo "DFU jar patched (removed FINAL flag)"
+            echo "Creating DFU patches jar from: $DFU_JAR"
+            python3 scripts/patch_dfu_final.py "$DFU_JAR" sources/libs/dfu-patches.jar
+            echo "DFU patches jar created (un-finaled DataFixer + Schema)"
+            # Verify
+            python3 -c "
+import struct, zipfile
+with zipfile.ZipFile('sources/libs/dfu-patches.jar') as zf:
+    data = zf.read('com/mojang/datafixers/DataFixer.class')
+    major = struct.unpack('>H', data[6:8])[0]
+    access = struct.unpack('>H', data[8:10])[0]
+    cp = struct.unpack('>H', data[10:12])[0]
+    print(f'DataFixer: major={major}, access={hex(access)}, FINAL={bool(access & 0x0010)}, CP={cp}')
+"
           else
             echo "WARNING: DFU jar not found!"
           fi

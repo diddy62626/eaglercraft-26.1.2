@@ -292,7 +292,8 @@ afterEvaluate {
         // Prepend our classes so they're scanned first by TeaVM.
         def patchClassesDir = file('teavm/patch/classes')
         def jdkPatchClassesDir = file('teavm/patch/jdk-classes')
-        def ourClasses = [patchClassesDir, jdkPatchClassesDir] + sourceSets.teavm.output.files + sourceSets.main.output.files
+        def dfuPatchesJar = file('libs/dfu-patches.jar')
+        def ourClasses = [patchClassesDir, jdkPatchClassesDir, dfuPatchesJar] + sourceSets.teavm.output.files + sourceSets.main.output.files
         def existingCp = classpath.files
         classpath.setFrom(ourClasses)
         classpath.from(existingCp)
