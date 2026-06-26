@@ -622,6 +622,23 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  .constructor function pattern not found")
 
+    # Patch the classObject function to be null-safe
+    # TeaVM has: X=cls=>{if(cls[SYM].classObject===null){...
+    # When cls[SYM] is undefined, .classObject crashes. Add null check.
+    print("\nPatching classObject function for null safety...")
+    import re as _re_co
+    co_pattern = _re_co.compile(r'=(\w+)=>\{if\(\1\[(\w+)\]\.classObject===null\)\{')
+    co_match = co_pattern.search(data)
+    if co_match:
+        param = co_match.group(1)
+        sym = co_match.group(2)
+        old_text = co_match.group(0)
+        new_text = f'={param}=>{{if({param}[{sym}]===undefined||{param}[{sym}]===null)return null;if({param}[{sym}].classObject===null){{'
+        data = data.replace(old_text, new_text, 1)
+        print(f"  Patched classObject function (null check added)")
+    else:
+        print("  classObject function pattern not found")
+
     # Wrap null-unsafe property accesses with __safe()
     # Pattern: $z=VAR.METHOD( where VAR could be null
     # Replace: $z=__safe(VAR).METHOD(
