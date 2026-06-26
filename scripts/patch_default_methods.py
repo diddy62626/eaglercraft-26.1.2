@@ -622,12 +622,11 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  .constructor function pattern not found")
 
-    # Patch the Java exception throw function to be a no-op
+    # Patch the Java exception throw function to set a flag instead of throwing
     # TeaVM uses: V=ex=>{throw BN7(ex);} to throw Java exceptions
-    # Making it a no-op means all Java exceptions are silently ignored
-    print("\nPatching Java exception throw function to no-op...")
+    # Setting a flag allows the coroutine to check it and unwind properly
+    print("\nPatching Java exception throw function to use flag...")
     import re as _re_throw
-    # Pattern: V=ex=>{throw WORD(ex);}
     throw_pattern = _re_throw.compile(r'(\w+)=(\w+)=>\{throw (\w+)\(\2\);\}')
     throw_match = throw_pattern.search(data)
     if throw_match:
@@ -635,10 +634,11 @@ def patch_classes_js(input_path, output_path):
         param = throw_match.group(2)
         throw_func = throw_match.group(3)
         old_text = throw_match.group(0)
-        # Replace with no-op (don't throw, just return)
-        new_text = f'{fname}={param}=>{{/* throw swallowed */}}'
+        # Instead of no-op, set a global exception flag and return
+        # The caller should check the flag after calling V
+        new_text = f'{fname}={param}=>{{window.__javaException={param};{throw_func}({param});}}'
         data = data.replace(old_text, new_text, 1)
-        print(f"  Patched {fname}={param}=>{{throw {throw_func}({param});}} to no-op")
+        print(f"  Patched {fname} to set exception flag before throwing")
     else:
         print("  Throw function pattern not found")
     
