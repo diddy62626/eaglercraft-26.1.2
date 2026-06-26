@@ -920,35 +920,28 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    __safeStub = {$id$:0};
-    return __safeStub;
-};
-// 2-char Object.prototype no-ops: covers ALL 2-char method names.
-// 4K defineProperty calls, takes <10ms. Does NOT block page load.
-// The 50K 3-char loop was what blocked startup, not this 4K loop.
-(function(){
-    var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$";
-    for (var i = 0; i < chars.length; i++) {
-        for (var j = 0; j < chars.length; j++) {
-            var name = chars[i] + chars[j];
-            if (!(name in Object.prototype)) {
-                Object.defineProperty(Object.prototype, name, {
-                    value: function() { return this; },
-                    writable: true, configurable: true, enumerable: false
-                });
-            }
+    // Create stub with custom prototype that has ALL no-op methods
+    // Only affects the stub, not real objects (no Object.prototype pollution)
+    var proto = {};
+    var noop = function() { return this; };
+    // 2-char methods
+    var chars2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$";
+    for (var i = 0; i < chars2.length; i++) {
+        for (var j = 0; j < chars2.length; j++) {
+            proto[chars2[i] + chars2[j]] = noop;
         }
     }
-})();
-// 3-char methods: pre-scanned from classes.js at build time
-// Only methods with uppercase/digit that are actually used (~200, not 50K)
-var __u3=__USED3CHARS__;
-for(var i3=0;i3<__u3.length;i3++){if(!(__u3[i3] in Object.prototype))Object.defineProperty(Object.prototype,__u3[i3],{value:function(){return this;},writable:true,configurable:true,enumerable:false});}
+    // 3-char methods (pre-scanned at build time)
+    var u3=__USED3CHARS__;
+    for (var k3=0;k3<u3.length;k3++){proto[u3[k3]]=noop;}
+    __safeStub = Object.create(proto);
+    __safeStub.$id$ = 0;
+    return __safeStub;
+};
 """
         # Scan classes.js for used 3-char method names
-        # Include ALL except a blacklist of known real Java method names
         import re as _re3
-        _blacklist = {'get','set','put','add','run','run','fix','map','key','val','let','new','del','use','end','sum','min','max','mid','cap','log','abs','pow','exp','sin','cos','tan','atn','hex','oct','bin','sub','mul','div','mod','rem','neg','not','and','xor','ior','shl','shr','cmp','eq','ne','lt','gt','le','ge','add','sub','mul','div'}
+        _blacklist = {'get','set','put','add','run','fix','map','key','val','let','new','del','use','end','sum','min','max','mid','cap','log','abs','pow','exp','sin','cos','tan','hex','oct','bin','sub','mul','div','mod','rem','neg','not','and','xor','ior','shl','shr','cmp'}
         _used3 = set()
         for _m in _re3.finditer(r'\.([a-zA-Z_$][a-zA-Z0-9_$]{2})\(', data):
             _n = _m.group(1)
@@ -956,6 +949,7 @@ for(var i3=0;i3<__u3.length;i3++){if(!(__u3[i3] in Object.prototype))Object.defi
                 _used3.add(_n)
         _used3_str = ','.join(f"'{n}'" for n in sorted(_used3))
         print(f"  Found {len(_used3)} used 3-char methods (excluding {len(_blacklist)} real Java methods)")
+        # Add 3-char no-ops to the stub's prototype (not Object.prototype)
         helper = helper.replace('__USED3CHARS__', f'[{_used3_str}]')
         
         use_strict = '"use strict";\n'
