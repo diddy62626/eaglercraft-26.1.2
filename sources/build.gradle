@@ -73,6 +73,9 @@ dependencies {
     teavmImplementation teavm.libs.jsoApis
     teavmImplementation "org.teavm:teavm-classlib:${teaVMVersion}"
     teavmImplementation files("libs/minecraft-${minecraftVersion}.jar")
+    // DFU patches jar (un-finaled DataFixer + Schema) - BEFORE the DFU jar
+    // so javac reads our un-finaled versions instead of the original FINAL ones
+    teavmImplementation files("libs/dfu-patches.jar")
     mcLibs.each { lib ->
         teavmImplementation files("libs/${lib}.jar")
     }
