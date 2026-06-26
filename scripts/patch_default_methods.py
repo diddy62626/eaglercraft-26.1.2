@@ -624,23 +624,20 @@ def patch_classes_js(input_path, output_path):
 
     # Patch CCY (clinit exception re-thrower) to silently swallow exceptions
     # CCY=a=>{KPv(a);} re-throws clinit exceptions even after our try/catch
-    # Wrap: CCY=a=>{try{KPv(a);}catch(e){}}
     print("\nPatching CCY (clinit re-thrower) to swallow exceptions...")
+    # Specifically find CCY=a=>{WORD(a);}
     import re as _re_ccy
-    # Pattern: X=a=>{Y(a);}
-    ccy_pattern = _re_ccy.compile(r'(\w+)=(\w)=>\{(\w+)\(\2\);\}')
-    ccy_count = 0
-    for m in ccy_pattern.finditer(data):
-        fname = m.group(1)
-        param = m.group(2)
-        throw_func = m.group(3)
-        old_text = m.group(0)
-        new_text = f'{fname}={param}=>{{try{{{throw_func}({param});}}catch(e){{}}}}'
+    ccy_pattern = _re_ccy.compile(r'CCY=(\w)=>\{(\w+)\(\1\);\}')
+    ccy_match = ccy_pattern.search(data)
+    if ccy_match:
+        param = ccy_match.group(1)
+        throw_func = ccy_match.group(2)
+        old_text = ccy_match.group(0)
+        new_text = f'CCY={param}=>{{try{{{throw_func}({param});}}catch(e){{}}}}'
         data = data.replace(old_text, new_text, 1)
-        ccy_count += 1
-        if ccy_count >= 5: break  # Only patch first 5 matches
-    if ccy_count > 0:
-        print(f"  Patched {ccy_count} exception re-throwers to swallow")
+        print(f"  Patched CCY to swallow exceptions (was: CCY={param}=>{{{throw_func}({param});}})")
+    else:
+        print("  CCY pattern not found")
     
     # Patch the classObject function to be null-safe
     # TeaVM has: X=cls=>{if(cls[SYM].classObject===null){...
