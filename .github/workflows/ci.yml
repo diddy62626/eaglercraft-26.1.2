@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  JAVA_VERSION: '25'
+  JAVA_VERSION: '25.0.2+10'
   NODE_VERSION: '22'
   GRADLE_OPTS: '-Xmx12g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '25'
+          java-version: '25.0.2+10'
           cache: 'gradle'
 
       # ── Setup Node.js 22 ─────────────────────────────────────
