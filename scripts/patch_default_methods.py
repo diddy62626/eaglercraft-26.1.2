@@ -920,20 +920,18 @@ var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    // Create stub with custom prototype that has ALL no-op methods
-    // Only affects the stub, not real objects (no Object.prototype pollution)
-    var proto = {};
-    var noop = function() { return this; };
-    // 2-char methods
-    var chars2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$";
-    for (var i = 0; i < chars2.length; i++) {
-        for (var j = 0; j < chars2.length; j++) {
-            proto[chars2[i] + chars2[j]] = noop;
+    // Create stub with Proxy on custom prototype (NOT Object.prototype)
+    // Proxy returns noop for ANY property access - covers ALL method names
+    // Safe because: only on stub's proto, TeaVM internals use Object.prototype
+    var noop = function() { return undefined; };
+    var proto = new Proxy({}, {
+        get: function(t, p) {
+            if (p === '$id$') return 0;
+            if (typeof p === 'symbol') return undefined;
+            // Return noop that returns undefined (breaks while loops)
+            return noop;
         }
-    }
-    // 3-char methods (pre-scanned at build time)
-    var u3=__USED3CHARS__;
-    for (var k3=0;k3<u3.length;k3++){proto[u3[k3]]=noop;}
+    });
     __safeStub = Object.create(proto);
     __safeStub.$id$ = 0;
     return __safeStub;
