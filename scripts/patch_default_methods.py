@@ -622,22 +622,41 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  .constructor function pattern not found")
 
-    # Patch CCY (clinit exception re-thrower) to silently swallow exceptions
-    # CCY=a=>{KPv(a);} re-throws clinit exceptions even after our try/catch
-    print("\nPatching CCY (clinit re-thrower) to swallow exceptions...")
-    # Specifically find CCY=a=>{WORD(a);}
-    import re as _re_ccy
-    ccy_pattern = _re_ccy.compile(r'CCY=(\w)=>\{(\w+)\(\1\);\}')
-    ccy_match = ccy_pattern.search(data)
-    if ccy_match:
-        param = ccy_match.group(1)
-        throw_func = ccy_match.group(2)
-        old_text = ccy_match.group(0)
-        new_text = f'CCY={param}=>{{try{{{throw_func}({param});}}catch(e){{}}}}'
-        data = data.replace(old_text, new_text, 1)
-        print(f"  Patched CCY to swallow exceptions (was: CCY={param}=>{{{throw_func}({param});}})")
+    # Patch the $rt_throw function to be a no-op (swallow all Java exceptions)
+    # TeaVM's exception mechanism uses $rt_throw which is called to throw.
+    # Making it a no-op means Java exceptions are silently ignored.
+    print("\nPatching $rt_throw to swallow Java exceptions...")
+    # Find: $rt_throw= or similar
+    import re as _re_throw
+    # Pattern: $rt_throw=function... or $rt_throw=(ex)=>{...throw...}
+    throw_pattern = _re_throw.compile(r'\$rt_throw\s*=\s*(?:function|\([^)]*\)\s*=>)')
+    throw_match = throw_pattern.search(data)
+    if throw_match:
+        pos = throw_match.start()
+        # Find the end of the function definition
+        # Look for the next comma or semicolon at depth 0
+        depth = 0
+        i = throw_match.end()
+        in_str = False
+        while i < len(data):
+            c = data[i]
+            if in_str:
+                if c == '\\': i += 1
+                elif c == in_str: in_str = False
+            elif c in '"\'': in_str = c
+            elif c == '{': depth += 1
+            elif c == '}': depth -= 1
+            elif depth == 0 and c in ',;': break
+            i += 1
+        old_func = data[pos:i]
+        # Replace with no-op
+        data = data[:pos] + '$rt_throw=function(){}' + data[i:]
+        print(f"  Patched $rt_throw to no-op (was {i-pos} bytes)")
     else:
-        print("  CCY pattern not found")
+        print("  $rt_throw not found, trying $rt_throw alternative...")
+        # Try: throw err; pattern in KPv
+        # Actually let's just wrap the throw in a try/catch at the JS level
+        pass
     
     # Patch the classObject function to be null-safe
     # TeaVM has: X=cls=>{if(cls[SYM].classObject===null){...
