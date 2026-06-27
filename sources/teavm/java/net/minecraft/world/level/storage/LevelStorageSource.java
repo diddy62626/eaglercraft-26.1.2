@@ -44,5 +44,4 @@ public class LevelStorageSource {
         public Instant getFileModificationTime(boolean flag) { return Instant.EPOCH; }
     }
     public static class LevelCandidates {}
-    public static class LevelSummary {}
 }
