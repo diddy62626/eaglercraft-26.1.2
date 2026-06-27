@@ -132,6 +132,16 @@ jobs:
           else
             echo "WARNING: DFU jar not found!"
           fi
+          
+          echo "Patching teavm-relocated-libs-asm JAR (accept class file version 70 for JDK 26)..."
+          TEAVM_ASM=$(find ~/.gradle/caches -name "teavm-relocated-libs-asm-0.15.0.jar" -not -name "*sources*" -type f 2>/dev/null | head -1)
+          if [ -n "$TEAVM_ASM" ]; then
+            python3 scripts/patch_teavm_asm.py "$TEAVM_ASM" "$TEAVM_ASM.tmp"
+            mv "$TEAVM_ASM.tmp" "$TEAVM_ASM"
+            echo "Patched teavm-asm: $TEAVM_ASM"
+          else
+            echo "WARNING: teavm-relocated-libs-asm JAR not found!"
+          fi
 
       # ── Make scripts executable ──────────────────────────────
       - name: Make scripts executable
