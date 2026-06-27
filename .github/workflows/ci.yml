@@ -254,6 +254,13 @@ jobs:
           echo "This may take 15-20 minutes for MC 26.1.2 (10,000+ classes)"
           echo "Working directory: $(pwd)"
           ls -la gradlew
+          # First, compile just the teavm Java sources so we can verify
+          # our stubs have the expected methods before running TeaVM.
+          ./gradlew --no-daemon --rerun-tasks --no-build-cache :sources:compileTeavmJava 2>&1 | tail -20
+          echo "=== Verifying LevelStorageSource$LevelStorageAccess methods ==="
+          find sources/build -name "LevelStorageSource\$LevelStorageAccess.class" -exec $JAVA_HOME/bin/javap -p {} \; 2>&1 | head -30
+          echo "=== Verifying LevelStorageSource methods ==="
+          find sources/build -name "LevelStorageSource.class" -not -name "*\\\$*" -exec $JAVA_HOME/bin/javap -p {} \; 2>&1 | head -30
           # Use --rerun-tasks to force recompilation of Java sources.
           # Without this, Gradle uses FROM-CACHE for compileTeavmJava and
           # our Java source changes (e.g., Codec.java, MapCodec.java) are
