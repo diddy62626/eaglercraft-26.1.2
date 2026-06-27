@@ -32,6 +32,10 @@ public class DSL {
     public static TypeTemplate compoundList(Type<?> t1, Type<?> t2) { return and(constType(t1), constType(t2)); }
     public static TypeTemplate remainder() { return EMPTY; }
     public static Type<?> string() { return null; }
+    // Stub methods called by DFU's Schema.<init> via buildTypes()
+    public static TypeTemplate check(String name, int version, TypeTemplate template) { return template; }
+    public static TypeTemplate named(String name, TypeTemplate template) { return template; }
+    public static TypeTemplate or(TypeTemplate t1, TypeTemplate t2) { return and(t1, t2); }
     public int size() { return 0; }
     public Object get(int index) { return null; }
     public List<?> subList(int from, int to) { return Collections.emptyList(); }
