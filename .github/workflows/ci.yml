@@ -258,7 +258,7 @@ jobs:
           # Without this, Gradle uses FROM-CACHE for compileTeavmJava and
           # our Java source changes (e.g., Codec.java, MapCodec.java) are
           # NOT recompiled — the old cached .class files are used instead.
-          ./gradlew --no-daemon --rerun-tasks --stacktrace :sources:generateJavaScript 2>&1 | tee teavm.log
+          ./gradlew --no-daemon --rerun-tasks --no-build-cache --stacktrace :sources:generateJavaScript 2>&1 | tee teavm.log
 
           if grep -q "BUILD SUCCESSFUL" teavm.log; then
             echo "TeaVM compilation succeeded!" | tee -a teavm.log
