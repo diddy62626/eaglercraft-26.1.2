@@ -1,6 +1,7 @@
 package net.minecraft.util.worldupdate;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.network.chat.Component;
 public class UpgradeProgress {
     public static class FileFixStats {
         public int finishedOperations() { return 0; }
@@ -9,7 +10,9 @@ public class UpgradeProgress {
         public float getProgress() { return 0f; }
     }
     public static class Status {}
-    public static class Type {}
+    public static class Type {
+        public Component label() { return null; }
+    }
     public FileFixStats getTotalFileFixStats() { return null; }
     public FileFixStats getTypeFileFixStats() { return null; }
     public FileFixStats getRunningFileFixerStats() { return null; }
