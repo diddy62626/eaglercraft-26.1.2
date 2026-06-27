@@ -324,7 +324,7 @@ tasks.register('compileTeavmPatches') {
         if (!srcFiles.isEmpty()) {
             // Use Java exec API directly since project.exec() isn't available in doLast
             def pb = new ProcessBuilder()
-            pb.command(javac, '--source', '26', '--enable-preview',
+            pb.command(javac, '--source', '25',
                     "--patch-module", "java.base=${patchSrcDir.absolutePath}",
                     '-d', patchClassesDir.absolutePath)
             pb.command().addAll(srcFiles)
@@ -362,7 +362,7 @@ tasks.register('compileJdkJfrPatches') {
         fileTree(jfrSrcDir).matching { include '**/*.java' }.each { srcFiles << it.absolutePath }
         if (!srcFiles.isEmpty()) {
             def pb = new ProcessBuilder()
-            pb.command(javac, '--source', '26', '--enable-preview',
+            pb.command(javac, '--source', '25',
                     "--patch-module", "jdk.jfr=${jfrSrcDir.absolutePath}",
                     '-d', jfrClassesDir.absolutePath)
             pb.command().addAll(srcFiles)
@@ -388,8 +388,8 @@ tasks.matching { it.name == 'generateJavaScript' }.configureEach {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_26
-    targetCompatibility = JavaVersion.VERSION_26
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 // Set JDK path for Java compilation
@@ -399,8 +399,6 @@ if (file(jdkHome).exists()) {
     tasks.withType(JavaCompile).configureEach {
         options.fork = true
         options.forkOptions.javaHome = file(jdkHome)
-        options.compilerArgs += ['--enable-preview']
-        options.forkOptions.jvmArgs += ['--enable-preview']
     }
 }
 
