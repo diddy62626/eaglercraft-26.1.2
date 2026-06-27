@@ -5,4 +5,5 @@ public class UpgradeProgress {
     }
     public FileFixStats getTotalFileFixStats() { return null; }
     public FileFixStats getTypeFileFixStats() { return null; }
+    public FileFixStats getRunningFileFixerStats() { return null; }
 }
