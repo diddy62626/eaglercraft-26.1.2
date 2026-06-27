@@ -19,8 +19,15 @@ public class LevelStorageSource {
     public LevelStorageAccess createAccess(String name) {
         return new LevelStorageAccess();
     }
+    public LevelCandidates findLevelCandidates() {
+        return new LevelCandidates();
+    }
+    public boolean levelExists(String name) {
+        return false;
+    }
     public static class LevelStorageAccess {
         public void close() {}
         public boolean hasWorldData() { return false; }
     }
+    public static class LevelCandidates {}
 }
