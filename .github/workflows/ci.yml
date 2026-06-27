@@ -215,7 +215,7 @@ jobs:
           echo "Building TeaVM classlib patches..."
           mkdir -p sources/teavm/patch/classes
           cd sources/teavm/patch
-          $JAVA_HOME/bin/javac --source 25 \
+          $JAVA_HOME/bin/javac --release 25 \
             --patch-module java.base=$(pwd) \
             -d classes \
             $(find java -name "*.java" -type f)

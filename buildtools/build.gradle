@@ -64,6 +64,10 @@ java {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    // Use --release 25 (instead of --source/--target) so javac 26 produces
+    // version 69 class files that TeaVM 0.15.0's repackaged ASM can parse.
+    // Without --release, javac 26 emits version 70 classes even with --source 25.
+    options.release = 25
     options.fork = true
 }
 

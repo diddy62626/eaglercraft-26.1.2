@@ -324,7 +324,7 @@ tasks.register('compileTeavmPatches') {
         if (!srcFiles.isEmpty()) {
             // Use Java exec API directly since project.exec() isn't available in doLast
             def pb = new ProcessBuilder()
-            pb.command(javac, '--source', '25',
+            pb.command(javac, '--release', '25',
                     "--patch-module", "java.base=${patchSrcDir.absolutePath}",
                     '-d', patchClassesDir.absolutePath)
             pb.command().addAll(srcFiles)
@@ -362,7 +362,7 @@ tasks.register('compileJdkJfrPatches') {
         fileTree(jfrSrcDir).matching { include '**/*.java' }.each { srcFiles << it.absolutePath }
         if (!srcFiles.isEmpty()) {
             def pb = new ProcessBuilder()
-            pb.command(javac, '--source', '25',
+            pb.command(javac, '--release', '25',
                     "--patch-module", "jdk.jfr=${jfrSrcDir.absolutePath}",
                     '-d', jfrClassesDir.absolutePath)
             pb.command().addAll(srcFiles)
@@ -399,6 +399,10 @@ if (file(jdkHome).exists()) {
     tasks.withType(JavaCompile).configureEach {
         options.fork = true
         options.forkOptions.javaHome = file(jdkHome)
+        // Use --release 25 (instead of --source/--target) so javac 26 produces
+        // version 69 class files that TeaVM 0.15.0's repackaged ASM can parse.
+        // Without --release, javac 26 emits version 70 classes even with --source 25.
+        options.release = 25
     }
 }
 

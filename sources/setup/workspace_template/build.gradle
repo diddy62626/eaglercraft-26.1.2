@@ -71,6 +71,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.release = 25
+    options.fork = true
+}
+
 // ============================================================
 // TeaVM Configuration (0.15.0 DSL)
 // ============================================================
