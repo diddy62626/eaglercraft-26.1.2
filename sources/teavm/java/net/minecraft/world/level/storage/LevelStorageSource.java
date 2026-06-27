@@ -39,6 +39,7 @@ public class LevelStorageSource {
     public static WorldLoader.PackConfig getPackConfig(Dynamic<?> dynamic, PackRepository repo, boolean flag) {
         return null;
     }
+    public DirectoryValidator getWorldDirValidator() { return validator; }
     public class LevelStorageAccess {
         public void close() {}
         public void safeClose() {}
