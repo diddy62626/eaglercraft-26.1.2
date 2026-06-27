@@ -39,9 +39,10 @@ public class LevelStorageSource {
     public static WorldLoader.PackConfig getPackConfig(Dynamic<?> dynamic, PackRepository repo, boolean flag) {
         return null;
     }
-    public static class LevelStorageAccess {
+    public class LevelStorageAccess {
         public void close() {}
         public void safeClose() {}
+        public LevelStorageSource parent() { return LevelStorageSource.this; }
         public boolean hasWorldData() { return false; }
         public String getLevelId() { return ""; }
         public Dynamic<?> getUnfixedDataTag(boolean flag) { return null; }
