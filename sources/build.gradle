@@ -162,6 +162,10 @@ tasks.register('compileTeavmPlugin', JavaCompile) {
     destinationDirectory = file('teavm-plugin/classes')
     options.encoding = 'UTF-8'
     options.fork = true
+    // Use --release 25 so javac 26 produces version 69 class files that
+    // TeaVM 0.15.0's repackaged ASM can parse. Without this, the plugin
+    // JAR would contain version 70 classes that TeaVM rejects.
+    options.release = 25
 }
 
 // Package the TeaVM plugin as a JAR
@@ -529,6 +533,9 @@ tasks.withType(JavaCompile) {
     // --enable-preview removed - Java 21 doesn't support Java 25 preview features
     // MC 26.1.2 JAR is pre-compiled; TeaVM reads bytecode directly
     options.fork = true
+    // --release 25 (not --source/--target) so javac 26 emits version 69 class
+    // files that TeaVM 0.15.0's repackaged ASM can parse.
+    options.release = 25
 }
 
 // ============================================================
