@@ -1,6 +1,8 @@
 package net.minecraft.world.level.storage;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.world.level.validation.DirectoryValidator;
 public class LevelStorageSource {
     private final Path baseDir;
@@ -19,15 +21,23 @@ public class LevelStorageSource {
     public LevelStorageAccess createAccess(String name) {
         return new LevelStorageAccess();
     }
+    public LevelStorageAccess validateAndCreateAccess(String name) {
+        return new LevelStorageAccess();
+    }
     public LevelCandidates findLevelCandidates() {
         return new LevelCandidates();
     }
     public boolean levelExists(String name) {
         return false;
     }
+    public CompletableFuture<Object> loadLevelSummaries(LevelCandidates candidates) {
+        return CompletableFuture.completedFuture(null);
+    }
     public static class LevelStorageAccess {
         public void close() {}
         public boolean hasWorldData() { return false; }
+        public String getLevelId() { return ""; }
+        public Dynamic<?> getUnfixedDataTag(boolean flag) { return null; }
     }
     public static class LevelCandidates {}
 }
