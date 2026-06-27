@@ -1,5 +1,6 @@
 package net.minecraft.world.level.storage;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
@@ -38,6 +39,10 @@ public class LevelStorageSource {
         public boolean hasWorldData() { return false; }
         public String getLevelId() { return ""; }
         public Dynamic<?> getUnfixedDataTag(boolean flag) { return null; }
+        public void collectIssues(boolean flag) {}
+        public LevelSummary fixAndGetSummaryFromTag(Dynamic<?> tag) { return null; }
+        public Instant getFileModificationTime(boolean flag) { return Instant.EPOCH; }
     }
     public static class LevelCandidates {}
+    public static class LevelSummary {}
 }
