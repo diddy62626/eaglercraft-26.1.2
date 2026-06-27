@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
+import net.minecraft.server.WorldLoader;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.validation.DirectoryValidator;
 public class LevelStorageSource {
     private final Path baseDir;
@@ -34,14 +36,19 @@ public class LevelStorageSource {
     public CompletableFuture<Object> loadLevelSummaries(LevelCandidates candidates) {
         return CompletableFuture.completedFuture(null);
     }
+    public static WorldLoader.PackConfig getPackConfig(Dynamic<?> dynamic, PackRepository repo, boolean flag) {
+        return null;
+    }
     public static class LevelStorageAccess {
         public void close() {}
+        public void safeClose() {}
         public boolean hasWorldData() { return false; }
         public String getLevelId() { return ""; }
         public Dynamic<?> getUnfixedDataTag(boolean flag) { return null; }
         public void collectIssues(boolean flag) {}
         public LevelSummary fixAndGetSummaryFromTag(Dynamic<?> tag) { return null; }
         public Instant getFileModificationTime(boolean flag) { return Instant.EPOCH; }
+        public Path getLevelPath(LevelResource resource) { return null; }
     }
     public static class LevelCandidates {}
 }
