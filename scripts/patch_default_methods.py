@@ -736,7 +736,7 @@ def patch_classes_js(input_path, output_path):
         new_text = (
             f'{prefix}try{{{func_name}();}}catch(__e)'
             f'{{if(typeof console!=="undefined")console.warn("[ClinitWrap]",'
-            f'"{func_name}",__e&&__e.message?__e.message:__e);}}if(D()){{break _;}}'
+            f'"{func_name}","|",__e&&__e.stack?__e.stack.split("\\n").slice(0,5).join(" | "):(__e&&__e.message?__e.message:__e));}}if(D()){{break _;}}'
         )
         data = data.replace(old_text, new_text, 1)
         clinit_count += 1
