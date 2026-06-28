@@ -103,6 +103,9 @@ sourceSets {
         java {
             srcDirs = ['teavm/java']
         }
+        resources {
+            srcDirs = ['teavm/resources']
+        }
         compileClasspath += sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.runtimeClasspath
     }

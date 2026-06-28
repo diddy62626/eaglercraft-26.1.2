@@ -1,4 +1,4 @@
-package java.nio.file.spi;
+package net.lax1dude.eaglercraft.v2_6.patch;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -8,6 +8,7 @@ import java.util.Set;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.OpenOption;
 import java.nio.file.attribute.FileAttribute;
+import java.nio.file.spi.FileSystemProvider;
 
 /**
  * Stub JarFileSystemProvider for the "jar" URI scheme.
@@ -15,14 +16,10 @@ import java.nio.file.attribute.FileAttribute;
  * Minecraft's Util.<clinit> calls FileSystemProvider.installedProviders()
  * and looks for a provider with scheme "jar". If none is found, it throws
  * IllegalStateException("No jar file system provider found"), which crashes
- * the Util class static initializer. Since Util is used everywhere in MC,
- * this cascades into NullPointerExceptions throughout the game.
+ * the Util class static initializer.
  *
- * In a browser/EaglerCraft environment, there are no real JAR files —
- * resources are loaded from the EPK asset bundle. This provider exists
- * solely to satisfy the Util.<clinit> lookup and prevent the crash.
- * All methods return null/empty/no-op since jar: URIs are never used
- * at runtime in the browser.
+ * In EaglerCraft, resources come from the EPK bundle, not JAR files.
+ * This provider exists solely to satisfy the Util.<clinit> lookup.
  */
 public class JarFileSystemProvider extends FileSystemProvider {
     @Override
