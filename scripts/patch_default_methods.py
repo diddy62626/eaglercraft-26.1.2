@@ -881,8 +881,9 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching ALL .LK() calls to be null-safe...")
     import re as _re_lk
     # Pattern: VAR.LK(ARG) -> (VAR&&VAR.LK?VAR.LK(ARG):null)
-    # This prevents NPE when the object is null
-    lk_pattern = _re_lk.compile(r'(\$(?:\w+|\$))\.LK\(([^)]+)\)')
+    # VAR can be any variable name (a-z, $, _)
+    # Only match simple variable names, not expressions like a.b.c
+    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w])\.LK\(([^)]+)\)')
     lk_count = 0
     def lk_replace(m):
         nonlocal lk_count
@@ -893,6 +894,8 @@ def patch_classes_js(input_path, output_path):
     data = lk_pattern.sub(lk_replace, data)
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
+    else:
+        print("  No .LK() calls found to patch")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
