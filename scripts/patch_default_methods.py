@@ -910,10 +910,14 @@ def patch_classes_js(input_path, output_path):
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
 
-    # Make ALL .cJ() calls null-safe (Gson type adapter method)
-    print("\nPatching ALL .cJ() calls to be null-safe...")
+    # Make specific .cJ() calls null-safe (Gson type adapter method)
+    # Can't use broad regex because arguments may contain nested parens
+    # like d.cJ(h.dz()) which breaks the pattern
+    print("\nPatching specific .cJ() calls to be null-safe...")
     import re as _re_cj
-    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\(([^)]+)\)')
+    # Only match simple arguments (no nested parens): VAR.cJ(simple_arg)
+    # Pattern: VAR.cJ(VAR2) where VAR2 is a simple variable
+    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\((\w)\)')
     cj_count = 0
     def cj_replace(m):
         nonlocal cj_count
@@ -923,7 +927,7 @@ def patch_classes_js(input_path, output_path):
         return f'({var}&&{var}.cJ?{var}.cJ({arg}):null)'
     data = cj_pattern.sub(cj_replace, data)
     if cj_count > 0:
-        print(f"  Patched {cj_count} .cJ() calls to be null-safe")
+        print(f"  Patched {cj_count} .cJ() calls with simple args")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
