@@ -748,25 +748,81 @@ def patch_classes_js(input_path, output_path):
 
 
     # Fix TeaVM bug: some arrow functions use variables without declaring them
-    # Pattern: ()=>{a=EXPR;return EXPR(a);} should be ()=>{let a=EXPR;return EXPR(a);}
     # This causes ReferenceError in strict mode.
-    # Fix: add 'let ' before the first assignment in arrow function bodies
-    # that don't start with 'let' or 'var'
+    # Patterns:
+    # 1. FUNC=()=>{a=EXPR;return EXPR(a);} → add 'let ' before 'a'
+    # 2. FUNC=b=>{BODY using 'a' without declaration} → add 'let a;' at start
+    # 3. FUNC=()=>{BODY using 'a' without declaration} → add 'let a;' at start
     print("\nFixing undeclared variables in arrow functions...")
     import re as _re_undecl
-    # Pattern: FUNC=()=>{VAR=EXPR where VAR is not preceded by let/var
-    # Match: =()=>{X=Y where X is a single letter var and Y is an expression
-    undecl_pattern = _re_undecl.compile(
+
+    # Pattern 1: FUNC=()=>{VAR=EXPR;return EXPR;} where VAR is not preceded by let/var
+    undecl_pattern1 = _re_undecl.compile(
         r'(\w+=\(\)=>\{)([a-z])(=[^;]+;return\s)'
     )
     undecl_count = 0
-    def undecl_replace(m):
+    def undecl_replace1(m):
         nonlocal undecl_count
         undecl_count += 1
         return m.group(1) + 'let ' + m.group(2) + m.group(3)
-    data = undecl_pattern.sub(undecl_replace, data)
-    if undecl_count > 0:
-        print(f"  Fixed {undecl_count} undeclared variables in arrow functions")
+    data = undecl_pattern1.sub(undecl_replace1, data)
+
+    # Pattern 2: Functions that use 'a' without declaring it
+    # Find: FUNC=PARAM=>{BODY} where BODY references 'a' but 'a' is not in PARAM
+    # and BODY doesn't have 'let a' or 'var a'
+    # Add 'let a;' at the start of the body
+    func_pattern = _re_undecl.compile(r'(\w+=(\w)=>\{)([^}]+)\}')
+    fixes2 = 0
+    def fix_undecl_a(m):
+        nonlocal fixes2
+        prefix = m.group(1)  # FUNC=PARAM=>{
+        param = m.group(2)   # PARAM
+        body = m.group(3)    # BODY}
+        
+        # Check if body uses 'a' as a bare variable (not a.x, not a[, etc.)
+        # and 'a' is not the parameter
+        if param == 'a':
+            return m.group(0)  # 'a' is the parameter, fine
+        
+        # Check if body already declares 'a'
+        if _re_undecl.search(r'(?:let|var|const)\s+a\b', body):
+            return m.group(0)  # already declared
+        
+        # Check if body references bare 'a'
+        # Exclude: a., a[, a:, break a, continue a, a= (assignment is handled by pattern 1)
+        bare_a = _re_undecl.findall(r'(?<![a-zA-Z0-9_$.])a(?![a-zA-Z0-9_$\[.:=])', body)
+        # Also check for a= (assignment without let)
+        assign_a = _re_undecl.findall(r'(?<![a-zA-Z0-9_$.])a=', body)
+        
+        if bare_a or assign_a:
+            fixes2 += 1
+            return prefix + 'let a;' + body + '}'
+        return m.group(0)
+    data = func_pattern.sub(fix_undecl_a, data)
+
+    # Pattern 3: Functions with no params that use 'a'
+    func_pattern2 = _re_undecl.compile(r'(\w+=\(\)=>\{)([^}]+)\}')
+    fixes3 = 0
+    def fix_undecl_a_noparam(m):
+        nonlocal fixes3
+        prefix = m.group(1)
+        body = m.group(2)
+        
+        if _re_undecl.search(r'(?:let|var|const)\s+a\b', body):
+            return m.group(0)
+        
+        bare_a = _re_undecl.findall(r'(?<![a-zA-Z0-9_$.])a(?![a-zA-Z0-9_$\[.:=])', body)
+        assign_a = _re_undecl.findall(r'(?<![a-zA-Z0-9_$.])a=', body)
+        
+        if bare_a or assign_a:
+            fixes3 += 1
+            return prefix + 'let a;' + body + '}'
+        return m.group(0)
+    data = func_pattern2.sub(fix_undecl_a_noparam, data)
+
+    total_fixes = undecl_count + fixes2 + fixes3
+    if total_fixes > 0:
+        print(f"  Fixed {undecl_count} (pattern 1) + {fixes2} (pattern 2) + {fixes3} (pattern 3) = {total_fixes} undeclared variables")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
