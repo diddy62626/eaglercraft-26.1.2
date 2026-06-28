@@ -851,6 +851,18 @@ def patch_classes_js(input_path, output_path):
     if total_fixes > 0:
         print(f"  Fixed {undecl_count} (pattern 1) + {fixes2} (pattern 2) + {fixes3} (pattern 3) = {total_fixes} undeclared variables")
 
+    # Add missing uk method to DDw (TemplateCollections$SingleElementList)
+    # The Tkp clinit (BlockableEventLoop.<clinit>) calls b.uk() on a DDw object,
+    # but DDw doesn't have a uk method. This is a TeaVM method dispatch bug.
+    # Adding a uk stub that returns null allows the clinit to complete.
+    print("\nAdding uk method stub to DDw (TemplateCollections$SingleElementList)...")
+    ddw_pattern = 'function DDw(){AQK.call(this);this.hw2=null;}'
+    if ddw_pattern in data:
+        data = data.replace(ddw_pattern, ddw_pattern + 'DDw.prototype.uk=function(){return null;};')
+        print("  Added DDw.prototype.uk stub")
+    else:
+        print("  DDw class definition not found (may be obfuscated differently)")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
