@@ -749,11 +749,20 @@ def patch_classes_js(input_path, output_path):
 
     # Fix TeaVM bug: some arrow functions use variables without declaring them
     # This causes ReferenceError in strict mode.
-    # Patterns:
-    # 1. FUNC=()=>{a=EXPR;return EXPR(a);} → add 'let ' before 'a'
-    # 2. FUNC=b=>{BODY using 'a' without declaration} → add 'let a;' at start
-    # 3. FUNC=()=>{BODY using 'a' without declaration} → add 'let a;' at start
-    print("\nFixing undeclared variables in arrow functions...")
+    # The comprehensive fix: remove "use strict" so undeclared assignments
+    # create global variables instead of throwing.
+    # This is safe because TeaVM's code doesn't rely on strict mode semantics
+    # (no arguments.callee, no caller/callee properties, etc.)
+    print("\nRemoving 'use strict' to fix undeclared variable ReferenceErrors...")
+    if data.startswith('"use strict";'):
+        data = data[len('"use strict";'):]
+        print("  Removed 'use strict' directive")
+    elif '"use strict";\n' in data[:100]:
+        data = data.replace('"use strict";\n', '', 1)
+        print("  Removed 'use strict' directive (with newline)")
+
+    # Also fix specific patterns as a backup
+    print("Fixing specific undeclared variable patterns...")
     import re as _re_undecl
 
     # Pattern 1: FUNC=()=>{VAR=EXPR;return EXPR;} where VAR is not preceded by let/var
