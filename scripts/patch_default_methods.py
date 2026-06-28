@@ -938,7 +938,7 @@ def patch_classes_js(input_path, output_path):
     def wrap_function_trycatch(data, func_name):
         """Wrap a function body in try/catch returning null."""
         import re as _re
-        pattern = _re.compile(r'\b' + re.escape(func_name) + r'\s*=\s*\(([^)]*)\)\s*=>\s*\{')
+        pattern = _re.compile(r'\b' + _re.escape(func_name) + r'\s*=\s*\(([^)]*)\)\s*=>\s*\{')
         m = pattern.search(data)
         if not m:
             return data, False
