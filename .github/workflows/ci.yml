@@ -284,6 +284,22 @@ jobs:
             fi
             PATCHED_SIZE=$(stat -c%s sources/build/generated/teavm/js/classes.js)
             echo "Patched classes.js size: $PATCHED_SIZE bytes" | tee -a teavm.log
+            echo "=== Verifying patches were applied ===" | tee -a teavm.log
+            if grep -q 'OxF=(b.uk?b.uk():null)' sources/build/generated/teavm/js/classes.js; then
+              echo "  OK: b.uk() null-safe patch applied" | tee -a teavm.log
+            else
+              echo "  WARNING: b.uk() null-safe patch NOT found!" | tee -a teavm.log
+            fi
+            if grep -q 'DDw.*this.uk' sources/build/generated/teavm/js/classes.js; then
+              echo "  OK: DDw uk method patch applied" | tee -a teavm.log
+            else
+              echo "  WARNING: DDw uk method patch NOT found!" | tee -a teavm.log
+            fi
+            if grep -q 'TfA.*__safe(null)' sources/build/generated/teavm/js/classes.js; then
+              echo "  OK: btB __safe patch applied" | tee -a teavm.log
+            else
+              echo "  WARNING: btB __safe patch NOT found!" | tee -a teavm.log
+            fi
           else
             echo "ERROR: TeaVM compilation failed - showing last 200 lines" | tee -a teavm.log
             tail -200 teavm.log
