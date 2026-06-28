@@ -15,5 +15,6 @@ public class EaglerCraftTeaVMPlugin implements TeaVMPlugin {
     @Override
     public void install(TeaVMHost host) {
         host.add(new MissingMethodTransformer());
+        host.add(new FileSystemProviderTransformer());
     }
 }
