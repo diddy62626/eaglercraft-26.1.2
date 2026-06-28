@@ -747,6 +747,27 @@ def patch_classes_js(input_path, output_path):
         print("  No clinit body calls found (pattern may differ)")
 
 
+    # Fix TeaVM bug: some arrow functions use variables without declaring them
+    # Pattern: ()=>{a=EXPR;return EXPR(a);} should be ()=>{let a=EXPR;return EXPR(a);}
+    # This causes ReferenceError in strict mode.
+    # Fix: add 'let ' before the first assignment in arrow function bodies
+    # that don't start with 'let' or 'var'
+    print("\nFixing undeclared variables in arrow functions...")
+    import re as _re_undecl
+    # Pattern: FUNC=()=>{VAR=EXPR where VAR is not preceded by let/var
+    # Match: =()=>{X=Y where X is a single letter var and Y is an expression
+    undecl_pattern = _re_undecl.compile(
+        r'(\w+=\(\)=>\{)([a-z])(=[^;]+;return\s)'
+    )
+    undecl_count = 0
+    def undecl_replace(m):
+        nonlocal undecl_count
+        undecl_count += 1
+        return m.group(1) + 'let ' + m.group(2) + m.group(3)
+    data = undecl_pattern.sub(undecl_replace, data)
+    if undecl_count > 0:
+        print(f"  Fixed {undecl_count} undeclared variables in arrow functions")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
