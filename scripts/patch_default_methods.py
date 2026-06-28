@@ -972,7 +972,7 @@ def patch_classes_js(input_path, output_path):
     # Ua_ = helper called by Qko
     # Wrapping them prevents cascading NPEs from crashing the MC constructor
     print("\nWrapping block registration functions in try/catch...")
-    for func_name in ['Qko', 'Ua_', 'W1m']:
+    for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP']:
         data, success = wrap_function_trycatch(data, func_name)
         if success:
             print(f"  Wrapped {func_name} in try/catch")
@@ -1258,6 +1258,9 @@ var __safe = function(obj) {
             if (p === '$id$') return 0;
             if (p === 'data') return emptyArray;
             if (p === 'length') return 0;
+            if (p === 'valueOf') return function() { return 0; };
+            if (p === 'toString') return function() { return ''; };
+            if (p === 'Symbol(Symbol.toPrimitive)') return function() { return 0; };
             if (typeof p === 'symbol') return undefined;
             if (typeof p === 'number') return undefined;
             // Return noop for method calls; noop returns __safeStub
