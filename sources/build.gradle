@@ -492,7 +492,7 @@ teavm {
         // patches (sources/teavm/patch/) which survive obfuscation.
         obfuscated = true
 
-        sourceMap = true
+        sourceMap = false
 
         targetFileName = 'classes.js'
 

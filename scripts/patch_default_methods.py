@@ -999,21 +999,26 @@ def patch_null_return_stubs(data):
         print(f"  Patched {count} null-return stubs to return __safe(obj)")
         # Add __safe helper at the top of the file
         helper = """
-// Null-return stub helper: NO Proxy (too slow for 53K call sites)
-// Return object as-is if non-null, shared stub if null
+// Null-return stub helper: returns obj as-is if non-null, shared stub if null.
+// The stub uses a Proxy that returns:
+//   - empty array [] for .data and .length (array-like accesses)
+//   - noop function for method calls (returns undefined)
+//   - the stub itself for property chaining (so a.b.c doesn't throw)
 var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    // Create stub with Proxy on custom prototype (NOT Object.prototype)
-    // Proxy returns noop for ANY property access - covers ALL method names
-    // Safe because: only on stub's proto, TeaVM internals use Object.prototype
-    var noop = function() { return undefined; };
+    var noop = function() { return __safeStub; };
+    var emptyArray = [];
     var proto = new Proxy({}, {
         get: function(t, p) {
             if (p === '$id$') return 0;
+            if (p === 'data') return emptyArray;
+            if (p === 'length') return 0;
             if (typeof p === 'symbol') return undefined;
-            // Return noop that returns undefined (breaks while loops)
+            if (typeof p === 'number') return undefined;
+            // Return noop for method calls; noop returns __safeStub
+            // so chained calls like a.b().c() don't throw
             return noop;
         }
     });
