@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 
