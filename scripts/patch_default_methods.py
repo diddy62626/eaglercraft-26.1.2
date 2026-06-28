@@ -966,6 +966,19 @@ def patch_classes_js(input_path, output_path):
         else:
             print(f"  {func_name} not found or wrap failed")
 
+    # Wrap block registration chain functions in try/catch
+    # These functions have cascading null errors from TeaVM method dispatch bugs
+    # Qko = VineBlock.java:26 (block registration clinit body)
+    # Ua_ = helper called by Qko
+    # Wrapping them prevents cascading NPEs from crashing the MC constructor
+    print("\nWrapping block registration functions in try/catch...")
+    for func_name in ['Qko', 'Ua_', 'W1m']:
+        data, success = wrap_function_trycatch(data, func_name)
+        if success:
+            print(f"  Wrapped {func_name} in try/catch")
+        else:
+            print(f"  {func_name} not found or wrap failed")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
