@@ -877,16 +877,22 @@ def patch_classes_js(input_path, output_path):
     # Fix NPE in Minecraft constructor: g.LK(c) where g=c.btB() returns null
     # The code: c=a.fnR;$p=8;case 8:$z=c.btB();...g=$z;...case 9:$z=g.LK(c)
     # btB (TfA) returns null for some types, causing g.LK(c) to throw
-    # Make g.LK null-safe: if g is null, return null instead of throwing
-    print("\nPatching g.LK(c) NPE in Minecraft constructor...")
-    # Pattern: $z=g.LK(c) -> $z=(g&&g.LK?g.LK(c):null)
-    npe_old = '$z=g.LK(c)'
-    npe_new = '$z=(g&&g.LK?g.LK(c):null)'
-    if npe_old in data:
-        data = data.replace(npe_old, npe_new)
-        print(f"  Patched g.LK(c) -> null-safe version")
-    else:
-        print("  g.LK(c) pattern not found")
+    # Make ALL .LK() calls null-safe: if the object is null, return null
+    print("\nPatching ALL .LK() calls to be null-safe...")
+    import re as _re_lk
+    # Pattern: VAR.LK(ARG) -> (VAR&&VAR.LK?VAR.LK(ARG):null)
+    # This prevents NPE when the object is null
+    lk_pattern = _re_lk.compile(r'(\$(?:\w+|\$))\.LK\(([^)]+)\)')
+    lk_count = 0
+    def lk_replace(m):
+        nonlocal lk_count
+        lk_count += 1
+        var = m.group(1)
+        arg = m.group(2)
+        return f'({var}&&{var}.LK?{var}.LK({arg}):null)'
+    data = lk_pattern.sub(lk_replace, data)
+    if lk_count > 0:
+        print(f"  Patched {lk_count} .LK() calls to be null-safe")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
