@@ -580,6 +580,24 @@ def patch_classes_js(input_path, output_path):
     else:
         print("  Obfuscated clinit template not found (may be unobfuscated build)")
 
+    # Wrap lazy clinit initializer body calls in try/catch
+    # Pattern: FUNC=()=>{FUNC=U(CLASS);BODYFUNC();}
+    # The BODYFUNC() is the actual clinit body. If it throws, the class
+    # is left in an invalid state. Wrap BODYFUNC() in try/catch.
+    print("\nWrapping lazy clinit initializer body calls in try/catch...")
+    import re as _re_lazy
+    lazy_pattern = _re_lazy.compile(r'(\w+=\(\)=>\{\w+=U\(\w+\);)(\w+)\(\);\}')
+    lazy_count = 0
+    def lazy_replace(m):
+        nonlocal lazy_count
+        lazy_count += 1
+        prefix = m.group(1)
+        body_func = m.group(2)
+        return f'{prefix}try{{{body_func}();}}catch(__e){{if(typeof console!=="undefined")console.warn("[ClinitWrap]","{body_func}","|",__e&&__e.stack?__e.stack.split("\\n").slice(0,3).join(" | "):(__e&&__e.message?__e.message:__e));}}}}'
+    data = lazy_pattern.sub(lazy_replace, data)
+    if lazy_count > 0:
+        print(f"  Wrapped {lazy_count} lazy clinit body calls in try/catch")
+
     # Patch null-return stubs to return their first argument instead of null
     # This fixes DataFixers DSL builder chain crashes (CY returns null → .fa() crashes)
     print("\nPatching null-return stubs...")
