@@ -856,10 +856,11 @@ def patch_classes_js(input_path, output_path):
     # but DDw doesn't have a uk method. This is a TeaVM method dispatch bug.
     # Adding a uk stub that returns null allows the clinit to complete.
     print("\nAdding uk method stub to DDw (TemplateCollections$SingleElementList)...")
-    ddw_pattern = 'function DDw(){AQK.call(this);this.hw2=null;}'
-    if ddw_pattern in data:
-        data = data.replace(ddw_pattern, ddw_pattern + 'DDw.prototype.uk=function(){return null;};')
-        print("  Added DDw.prototype.uk stub")
+    ddw_old = 'function DDw(){AQK.call(this);this.hw2=null;}'
+    ddw_new = 'function DDw(){AQK.call(this);this.hw2=null;this.uk=function(){return null;};}'
+    if ddw_old in data:
+        data = data.replace(ddw_old, ddw_new)
+        print("  Added uk method to DDw constructor")
     else:
         print("  DDw class definition not found (may be obfuscated differently)")
 
