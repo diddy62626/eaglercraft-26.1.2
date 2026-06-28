@@ -698,20 +698,21 @@ def patch_classes_js(input_path, output_path):
         print(f"  Patched {it_count} itemType functions with try/catch")
     
     # Then run single pattern: =VAR.field( → =__safe(VAR).field(
+    # DISABLED: This pattern was causing "a is not defined" ReferenceErrors
+    # because the regex matches variable names that aren't in scope (e.g.,
+    # inside string literals, or in functions where 'a' is not a parameter).
+    # The __safe(a) call evaluates 'a' first, which throws ReferenceError
+    # before __safe can check for null.
+    # The chained pattern above is sufficient for most null-safety cases.
     safe_pattern = _re_safe.compile(
         r'=([a-z]\w{0,1})\.([A-Za-z_$][A-Za-z0-9_$]{0,4})([;(,.\[])'
     )
     safe_count = 0
-    def __safe_replace(m):
-        nonlocal safe_count
-        safe_count += 1
-        var_name = m.group(1)
-        method_name = m.group(2)
-        trailing = m.group(3) if m.group(3) else '('
-        return '=__safe(' + var_name + ').' + method_name + trailing
-    data = safe_pattern.sub(__safe_replace, data)
-    if safe_count > 0:
-        print(f"  Wrapped {safe_count} null-unsafe property accesses")
+    # Commented out to prevent "a is not defined" errors
+    # data = safe_pattern.sub(__safe_replace, data)
+    # if safe_count > 0:
+    #     print(f"  Wrapped {safe_count} null-unsafe property accesses")
+    print(f"  Single-variable __safe pattern DISABLED (causes ReferenceError)")
 
     # Wrap ONLY clinit body calls in try/catch (targeted, not broad regex)
     # Clinit functions have the pattern: FLAG=true;$p=1;case 1:BODYFUNC();if(D()){break _;}
