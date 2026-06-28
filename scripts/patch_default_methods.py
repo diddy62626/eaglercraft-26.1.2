@@ -1190,6 +1190,13 @@ juc_Executors_newScheduledThreadPool = (threadCount, threadFactory) => {
     print(f"  Patched:  {len(patched_data)} bytes")
     print(f"  Patcher:  {len(patcher)} bytes")
 
+    # Verify patches were applied
+    print(f"\n=== Patch verification ===")
+    print(f"  OxF=(b.uk?b.uk():null) in patched_data: {'OxF=(b.uk?b.uk():null)' in patched_data}")
+    print(f"  OxF=b.uk() in patched_data: {'OxF=b.uk()' in patched_data}")
+    print(f"  DDw this.uk in patched_data: {'this.uk=function' in patched_data}")
+    print(f"  TfA __safe(null) in patched_data: {'__safe(null)' in patched_data}")
+
 
 def patch_null_return_stubs(data):
     """
