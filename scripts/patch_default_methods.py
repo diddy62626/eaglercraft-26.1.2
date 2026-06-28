@@ -910,6 +910,21 @@ def patch_classes_js(input_path, output_path):
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
 
+    # Make ALL .cJ() calls null-safe (Gson type adapter method)
+    print("\nPatching ALL .cJ() calls to be null-safe...")
+    import re as _re_cj
+    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\(([^)]+)\)')
+    cj_count = 0
+    def cj_replace(m):
+        nonlocal cj_count
+        cj_count += 1
+        var = m.group(1)
+        arg = m.group(2)
+        return f'({var}&&{var}.cJ?{var}.cJ({arg}):null)'
+    data = cj_pattern.sub(cj_replace, data)
+    if cj_count > 0:
+        print(f"  Patched {cj_count} .cJ() calls to be null-safe")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
