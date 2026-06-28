@@ -929,6 +929,31 @@ def patch_classes_js(input_path, output_path):
     if cj_count > 0:
         print(f"  Patched {cj_count} .cJ() calls with simple args")
 
+    # Wrap Gson AJM function in try/catch to prevent all Gson serialization errors
+    # AJM is Gson.java:1387 (fromJson/toJson adapter dispatch)
+    # It calls e.cJ(b), e.eY(), and many other methods on type adapters
+    # Instead of patching each method, wrap the whole function in try/catch
+    print("\nWrapping Gson AJM function in try/catch...")
+    ajm_match = _re_cj.search(r'AJM=\(a,b\)=>\{', data)
+    if ajm_match:
+        start = data.find('{', ajm_match.start()) + 1
+        depth = 1
+        end = start
+        while depth > 0 and end < len(data):
+            if data[end] == '{': depth += 1
+            elif data[end] == '}': depth -= 1
+            end += 1
+        body = data[start:end-1]
+        old_func = f'AJM=(a,b)=>{{{body}}}'
+        new_func = f'AJM=(a,b)=>{{try{{{body}}}catch(__e){{return null;}}}}'
+        if old_func in data:
+            data = data.replace(old_func, new_func, 1)
+            print("  Wrapped AJM in try/catch (returns null on error)")
+        else:
+            print("  AJM exact match failed")
+    else:
+        print("  AJM function not found")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
