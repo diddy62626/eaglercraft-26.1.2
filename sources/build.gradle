@@ -341,6 +341,19 @@ tasks.register('compileTeavmPatches') {
                 throw new GradleException("Patch compilation failed with exit code ${exitCode}")
             }
         }
+        // Copy META-INF/services into the classes directory so TeaVM's
+        // ServiceLoader can discover our FileSystemProvider implementations
+        // (e.g., JarFileSystemProvider for the "jar" URI scheme).
+        def metaInfDir = file('teavm/patch/META-INF')
+        if (metaInfDir.exists()) {
+            def targetDir = file("${patchClassesDir.absolutePath}/META-INF")
+            targetDir.mkdirs()
+            copy {
+                from metaInfDir
+                into targetDir
+            }
+            println "Copied META-INF/services to ${targetDir}"
+        }
     }
 }
 
