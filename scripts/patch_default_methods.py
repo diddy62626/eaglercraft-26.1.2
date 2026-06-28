@@ -874,15 +874,30 @@ def patch_classes_js(input_path, output_path):
         data = data.replace(ddw_old, ddw_new)
         print("  Also added uk to DDw constructor as backup")
 
-    # Fix NPE in Minecraft constructor: g.LK(c) where g=c.btB() returns null
-    # The code: c=a.fnR;$p=8;case 8:$z=c.btB();...g=$z;...case 9:$z=g.LK(c)
-    # btB (TfA) returns null for some types, causing g.LK(c) to throw
-    # Make ALL .LK() calls null-safe: if the object is null, return null
+    # Fix NPE: btB (TfA) returns null, causing cascading NPEs when methods
+    # are called on the result. Make btB return the __safe stub instead of null.
+    # The __safe stub returns noop for all method calls, preventing NPEs.
+    print("\nPatching btB (TfA) to return __safe stub instead of null...")
+    # TfA returns null: case 0:return null;
+    # Change to: case 0:return __safe(null);
+    tfA_old = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return null;default:F();}}E().s(a,$p);}'
+    tfA_new = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return __safe(null);default:F();}}E().s(a,$p);}'
+    if tfA_old in data:
+        data = data.replace(tfA_old, tfA_new)
+        print("  Patched TfA (btB) to return __safe(null) instead of null")
+    else:
+        # Try a simpler pattern match
+        tfA_simple_old = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return null;'
+        tfA_simple_new = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return __safe(null);'
+        if tfA_simple_old in data:
+            data = data.replace(tfA_simple_old, tfA_simple_new)
+            print("  Patched TfA (btB) with simple pattern")
+        else:
+            print("  TfA pattern not found")
+
+    # Also make ALL .LK() calls null-safe as a backup
     print("\nPatching ALL .LK() calls to be null-safe...")
     import re as _re_lk
-    # Pattern: VAR.LK(ARG) -> (VAR&&VAR.LK?VAR.LK(ARG):null)
-    # VAR can be any variable name (a-z, $, _)
-    # Only match simple variable names, not expressions like a.b.c
     lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w])\.LK\(([^)]+)\)')
     lk_count = 0
     def lk_replace(m):
@@ -894,8 +909,6 @@ def patch_classes_js(input_path, output_path):
     data = lk_pattern.sub(lk_replace, data)
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
-    else:
-        print("  No .LK() calls found to patch")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
