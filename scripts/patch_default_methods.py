@@ -874,6 +874,20 @@ def patch_classes_js(input_path, output_path):
         data = data.replace(ddw_old, ddw_new)
         print("  Also added uk to DDw constructor as backup")
 
+    # Fix NPE in Minecraft constructor: g.LK(c) where g=c.btB() returns null
+    # The code: c=a.fnR;$p=8;case 8:$z=c.btB();...g=$z;...case 9:$z=g.LK(c)
+    # btB (TfA) returns null for some types, causing g.LK(c) to throw
+    # Make g.LK null-safe: if g is null, return null instead of throwing
+    print("\nPatching g.LK(c) NPE in Minecraft constructor...")
+    # Pattern: $z=g.LK(c) -> $z=(g&&g.LK?g.LK(c):null)
+    npe_old = '$z=g.LK(c)'
+    npe_new = '$z=(g&&g.LK?g.LK(c):null)'
+    if npe_old in data:
+        data = data.replace(npe_old, npe_new)
+        print(f"  Patched g.LK(c) -> null-safe version")
+    else:
+        print("  g.LK(c) pattern not found")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
