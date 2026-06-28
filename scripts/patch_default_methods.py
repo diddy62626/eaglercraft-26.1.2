@@ -854,15 +854,25 @@ def patch_classes_js(input_path, output_path):
     # Add missing uk method to DDw (TemplateCollections$SingleElementList)
     # The Tkp clinit (BlockableEventLoop.<clinit>) calls b.uk() on a DDw object,
     # but DDw doesn't have a uk method. This is a TeaVM method dispatch bug.
-    # Adding a uk stub that returns null allows the clinit to complete.
-    print("\nAdding uk method stub to DDw (TemplateCollections$SingleElementList)...")
+    # TeaVM uses class metadata for method dispatch, so adding this.uk in the
+    # constructor doesn't help. Instead, make the call null-safe.
+    print("\nPatching b.uk() call in Tkp clinit to be null-safe...")
+    # The Tkp clinit has: OxF=b.uk() where b is a DDw that lacks uk
+    # Replace with: OxF=(b.uk?b.uk():null)
+    uk_call_old = 'OxF=b.uk()'
+    uk_call_new = 'OxF=(b.uk?b.uk():null)'
+    if uk_call_old in data:
+        data = data.replace(uk_call_old, uk_call_new)
+        print(f"  Patched b.uk() -> (b.uk?b.uk():null)")
+    else:
+        print("  b.uk() call not found (may be obfuscated differently)")
+
+    # Also add uk method to DDw constructor as a backup
     ddw_old = 'function DDw(){AQK.call(this);this.hw2=null;}'
     ddw_new = 'function DDw(){AQK.call(this);this.hw2=null;this.uk=function(){return null;};}'
     if ddw_old in data:
         data = data.replace(ddw_old, ddw_new)
-        print("  Added uk method to DDw constructor")
-    else:
-        print("  DDw class definition not found (may be obfuscated differently)")
+        print("  Also added uk to DDw constructor as backup")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
