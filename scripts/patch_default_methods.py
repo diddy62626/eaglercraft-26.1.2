@@ -573,7 +573,7 @@ def patch_classes_js(input_path, output_path):
     # This template is used for ALL class clinits. Wrapping it once protects all.
     print("\nWrapping obfuscated clinit template in try/catch...")
     obf_clinit_old = '()=>{m.clinit=()=>{};clinit();}'
-    obf_clinit_new = '()=>{m.clinit=()=>{};try{clinit();}catch(e){if(typeof console!=="undefined")console.warn("[ClinitWrap]",(m&&m.$name)?m.$name:"?",e&&e.message?e.message:e);}}'
+    obf_clinit_new = '()=>{m.clinit=()=>{};try{clinit();}catch(e){if(typeof console!=="undefined")console.warn("[ClinitWrap]",(m&&m.$name)?m.$name:"?","|",(e&&e.stack)?e.stack.split("\\n").slice(0,5).join(" | "):(e&&e.message?e.message:e));}}'
     if obf_clinit_old in data:
         data = data.replace(obf_clinit_old, obf_clinit_new)
         print("  Wrapped obfuscated clinit template (protects all class clinits)")
