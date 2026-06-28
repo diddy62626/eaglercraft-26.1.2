@@ -933,10 +933,16 @@ def patch_classes_js(input_path, output_path):
     # AJM is Gson.java:1387 (fromJson/toJson adapter dispatch)
     # It calls e.cJ(b), e.eY(), and many other methods on type adapters
     # Instead of patching each method, wrap the whole function in try/catch
-    print("\nWrapping Gson AJM function in try/catch...")
-    ajm_match = _re_cj.search(r'AJM=\(a,b\)=>\{', data)
-    if ajm_match:
-        start = data.find('{', ajm_match.start()) + 1
+    print("\nWrapping Gson functions in try/catch...")
+
+    def wrap_function_trycatch(data, func_name):
+        """Wrap a function body in try/catch returning null."""
+        import re as _re
+        pattern = _re.compile(r'\b' + re.escape(func_name) + r'\s*=\s*\(([^)]*)\)\s*=>\s*\{')
+        m = pattern.search(data)
+        if not m:
+            return data, False
+        start = data.find('{', m.start()) + 1
         depth = 1
         end = start
         while depth > 0 and end < len(data):
@@ -944,15 +950,21 @@ def patch_classes_js(input_path, output_path):
             elif data[end] == '}': depth -= 1
             end += 1
         body = data[start:end-1]
-        old_func = f'AJM=(a,b)=>{{{body}}}'
-        new_func = f'AJM=(a,b)=>{{try{{{body}}}catch(__e){{return null;}}}}'
+        params = m.group(1)
+        old_func = f'{func_name}=({params})=>{{{body}}}'
+        new_func = f'{func_name}=({params})=>{{try{{{body}}}catch(__e){{return null;}}}}'
         if old_func in data:
             data = data.replace(old_func, new_func, 1)
-            print("  Wrapped AJM in try/catch (returns null on error)")
+            return data, True
+        return data, False
+
+    # Wrap Gson-related functions that have method dispatch issues
+    for func_name in ['AJM', 'CCn', 'F5o', 'CR3']:
+        data, success = wrap_function_trycatch(data, func_name)
+        if success:
+            print(f"  Wrapped {func_name} in try/catch")
         else:
-            print("  AJM exact match failed")
-    else:
-        print("  AJM function not found")
+            print(f"  {func_name} not found or wrap failed")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
