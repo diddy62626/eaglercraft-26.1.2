@@ -62,8 +62,10 @@ public class FileSystemProviderTransformer implements ClassHolderTransformer {
         block.add(initCall);
 
         // 3. Call Collections.singletonList(provider)
+        // InvocationType has only VIRTUAL and SPECIAL; SPECIAL is used
+        // for static methods (invokestatic) in TeaVM IR.
         InvokeInstruction listCall = new InvokeInstruction();
-        listCall.setType(InvocationType.STATIC);
+        listCall.setType(InvocationType.SPECIAL);
         listCall.setMethod(new MethodReference(
             "java.util.Collections",
             "singletonList",
