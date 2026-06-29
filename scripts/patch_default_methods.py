@@ -855,13 +855,13 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .uk() calls null-safe using regex (obfuscated names change each build)
     print("\nPatching ALL .uk() calls to be null-safe...")
     import re as _re_uk
-    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w])\.uk\(\)')
+    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w])\.uk\(')
     uk_count = 0
     def uk_replace(m):
         nonlocal uk_count
         uk_count += 1
         var = m.group(1)
-        return f'({var}.uk||function(){{return null;}})()'
+        return f'({var}.uk||function(){{return null;}})('
     data = uk_pattern.sub(uk_replace, data)
     if uk_count > 0:
         print(f"  Patched {uk_count} .uk() calls")
@@ -869,13 +869,13 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .boR() calls null-safe (ComparatorMode.java cascading NPE)
     print("\nPatching ALL .boR() calls to be null-safe...")
     import re as _re_bor
-    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w])\.boR\(\)')
+    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w])\.boR\(')
     bor_count = 0
     def bor_replace(m):
         nonlocal bor_count
         bor_count += 1
         var = m.group(1)
-        return f'({var}.boR||function(){{return null;}})()'
+        return f'({var}.boR||function(){{return null;}})('
     data = bor_pattern.sub(bor_replace, data)
     if bor_count > 0:
         print(f"  Patched {bor_count} .boR() calls")
@@ -901,14 +901,13 @@ def patch_classes_js(input_path, output_path):
     # Also make ALL .LK() calls null-safe as a backup
     print("\nPatching ALL .LK() calls to be null-safe...")
     import re as _re_lk
-    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w])\.LK\(([^)]+)\)')
+    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w])\.LK\(')
     lk_count = 0
     def lk_replace(m):
         nonlocal lk_count
         lk_count += 1
         var = m.group(1)
-        arg = m.group(2)
-        return f'({var}&&{var}.LK?{var}.LK({arg}):null)'
+        return f'({var}.LK||function(){{return null;}})('
     data = lk_pattern.sub(lk_replace, data)
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
@@ -920,14 +919,13 @@ def patch_classes_js(input_path, output_path):
     import re as _re_cj
     # Only match simple arguments (no nested parens): VAR.cJ(simple_arg)
     # Pattern: VAR.cJ(VAR2) where VAR2 is a simple variable
-    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\((\w)\)')
+    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\(')
     cj_count = 0
     def cj_replace(m):
         nonlocal cj_count
         cj_count += 1
         var = m.group(1)
-        arg = m.group(2)
-        return f'({var}&&{var}.cJ?{var}.cJ({arg}):null)'
+        return f'({var}.cJ||function(){{return null;}})('
     data = cj_pattern.sub(cj_replace, data)
     if cj_count > 0:
         print(f"  Patched {cj_count} .cJ() calls with simple args")
@@ -984,22 +982,24 @@ def patch_classes_js(input_path, output_path):
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
 
-    # Make additional method calls null-safe using the (VAR.method||noop)() pattern
+    # Make additional method calls null-safe using the (VAR.method||noop)(args) pattern
     # These are methods that fail with "is not a function" due to TeaVM dispatch bugs
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
     # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz
-    # Use (VAR.method||function(){return null;})() pattern
+    # Use (VAR.method||function(){return null;})(args) pattern
+    # This handles both no-arg and multi-arg calls
     for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4']:
+        # Match VAR.method( with any args — just replace the VAR.method( part
         method_pattern = _re_methods.compile(
-            r'(?<![\w$.])([a-z$\w])\.' + _re_methods.escape(method_name) + r'\(\)'
+            r'(?<![\w$.])([a-z$\w])\.' + _re_methods.escape(method_name) + r'\('
         )
         method_count = 0
         def method_replace(m, _mn=method_name):
             nonlocal method_count
             method_count += 1
             var = m.group(1)
-            return f'({var}.{_mn}||function(){{return null;}})()'
+            return f'({var}.{_mn}||function(){{return null;}})('
         data = method_pattern.sub(method_replace, data)
         if method_count > 0:
             print(f"  Patched {method_count} .{method_name}() calls")
