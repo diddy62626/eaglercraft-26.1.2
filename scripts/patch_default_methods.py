@@ -992,7 +992,7 @@ def patch_classes_js(input_path, output_path):
     # Use (VAR.method||function(){return null;})() pattern
     for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4']:
         method_pattern = _re_methods.compile(
-            r'(?<![\w$.])([a-z$\w])\.' + re.escape(method_name) + r'\(\)'
+            r'(?<![\w$.])([a-z$\w])\.' + _re_methods.escape(method_name) + r'\(\)'
         )
         method_count = 0
         def method_replace(m, _mn=method_name):
