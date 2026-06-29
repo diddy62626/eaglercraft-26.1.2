@@ -855,13 +855,13 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .uk() calls null-safe using regex (obfuscated names change each build)
     print("\nPatching ALL .uk() calls to be null-safe...")
     import re as _re_uk
-    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w])\.uk\(')
+    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.uk\(')
     uk_count = 0
     def uk_replace(m):
         nonlocal uk_count
         uk_count += 1
-        var = m.group(1)
-        return f'({var}.uk||function(){{return null;}})('
+        obj = m.group(1)
+        return f'(__safe({obj}).uk||function(){{return null;}})('
     data = uk_pattern.sub(uk_replace, data)
     if uk_count > 0:
         print(f"  Patched {uk_count} .uk() calls")
@@ -869,13 +869,13 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .boR() calls null-safe (ComparatorMode.java cascading NPE)
     print("\nPatching ALL .boR() calls to be null-safe...")
     import re as _re_bor
-    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w])\.boR\(')
+    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.boR\(')
     bor_count = 0
     def bor_replace(m):
         nonlocal bor_count
         bor_count += 1
-        var = m.group(1)
-        return f'({var}.boR||function(){{return null;}})('
+        obj = m.group(1)
+        return f'(__safe({obj}).boR||function(){{return null;}})('
     data = bor_pattern.sub(bor_replace, data)
     if bor_count > 0:
         print(f"  Patched {bor_count} .boR() calls")
@@ -901,13 +901,13 @@ def patch_classes_js(input_path, output_path):
     # Also make ALL .LK() calls null-safe as a backup
     print("\nPatching ALL .LK() calls to be null-safe...")
     import re as _re_lk
-    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w])\.LK\(')
+    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.LK\(')
     lk_count = 0
     def lk_replace(m):
         nonlocal lk_count
         lk_count += 1
-        var = m.group(1)
-        return f'({var}.LK||function(){{return null;}})('
+        obj = m.group(1)
+        return f'(__safe({obj}).LK||function(){{return null;}})('
     data = lk_pattern.sub(lk_replace, data)
     if lk_count > 0:
         print(f"  Patched {lk_count} .LK() calls to be null-safe")
@@ -919,13 +919,13 @@ def patch_classes_js(input_path, output_path):
     import re as _re_cj
     # Only match simple arguments (no nested parens): VAR.cJ(simple_arg)
     # Pattern: VAR.cJ(VAR2) where VAR2 is a simple variable
-    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w])\.cJ\(')
+    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.cJ\(')
     cj_count = 0
     def cj_replace(m):
         nonlocal cj_count
         cj_count += 1
-        var = m.group(1)
-        return f'({var}.cJ||function(){{return null;}})('
+        obj = m.group(1)
+        return f'(__safe({obj}).cJ||function(){{return null;}})('
     data = cj_pattern.sub(cj_replace, data)
     if cj_count > 0:
         print(f"  Patched {cj_count} .cJ() calls with simple args")
@@ -971,38 +971,60 @@ def patch_classes_js(input_path, output_path):
     # Use (VAR.ek_||function(){return null;})(args) pattern to handle any args
     print("\nPatching .ek_() calls to be null-safe...")
     import re as _re_ek
-    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w])\.ek_\(')
+    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.ek_\(')
     ek_count = 0
     def ek_replace(m):
         nonlocal ek_count
         ek_count += 1
-        var = m.group(1)
-        return f'({var}.ek_||function(){{return null;}})('
+        obj = m.group(1)
+        return f'(__safe({obj}).ek_||function(){{return null;}})('
     data = ek_pattern.sub(ek_replace, data)
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
 
-    # Make additional method calls null-safe using the (VAR.method||noop)(args) pattern
-    # These are methods that fail with "is not a function" due to TeaVM dispatch bugs
+    # Make additional method calls null-safe using the (__safe(VAR).method||noop)(args) pattern
+    # These are methods that fail with "is not a function" or "reading X of undefined"
+    # due to TeaVM dispatch bugs or uninitialized fields.
+    # The regex captures full object expressions including field access chains:
+    #   a.q1(       -> __safe(a).q1
+    #   a.fEu.q1(   -> __safe(a.fEu).q1
+    #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz, q1
-    # Use (VAR.method||function(){return null;})(args) pattern
-    # This handles both no-arg and multi-arg calls
     for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz']:
-        # Match VAR.method( with any args — just replace the VAR.method( part
+        # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
-            r'(?<![\w$.])([a-z$\w])\.' + _re_methods.escape(method_name) + r'\('
+            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
         )
         method_count = 0
         def method_replace(m, _mn=method_name):
             nonlocal method_count
             method_count += 1
-            var = m.group(1)
-            return f'(__safe({var}).{_mn}||function(){{return null;}})('
+            obj_expr = m.group(1)
+            return f'(__safe({obj_expr}).{_mn}||function(){{return null;}})('
         data = method_pattern.sub(method_replace, data)
         if method_count > 0:
             print(f"  Patched {method_count} .{method_name}() calls")
+
+    # Make .data field accesses null-safe — wrap with __safe
+    # Pattern: VAR.field.data -> (__safe(VAR.field).data||[])
+    # This prevents "Cannot read properties of undefined (reading 'data')"
+    print("\nPatching .data field accesses to be null-safe...")
+    import re as _re_data
+    # Match VAR.data where VAR can be a field access chain
+    # Only match .data followed by . or [ (array-like access)
+    data_pattern = _re_data.compile(
+        r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.data(?=[.\[])'
+    )
+    data_count = 0
+    def data_replace(m):
+        nonlocal data_count
+        data_count += 1
+        obj_expr = m.group(1)
+        return f'(__safe({obj_expr}).data||[])'
+    data = data_pattern.sub(data_replace, data)
+    if data_count > 0:
+        print(f"  Patched {data_count} .data field accesses")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
