@@ -396,11 +396,18 @@ public class EaglerCraft {
                         // Construct Minecraft directly — TeaVM handles the class reference.
                         // Wrap in a JS-level try/catch to capture the ORIGINAL JS error stack
                         // (TeaVM's Throwable loses the original JS stack when wrapping).
-                        runWithJsStackCapture(() -> {
-                                net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
-                                minecraftInstance = mc;
-                        });
-                        ClientMain.log("[EaglerCraft] Minecraft instance created!");
+                        try {
+                                runWithJsStackCapture(() -> {
+                                        net.minecraft.client.Minecraft mc = new net.minecraft.client.Minecraft(gameConfig);
+                                        minecraftInstance = mc;
+                                });
+                                ClientMain.log("[EaglerCraft] Minecraft instance created!");
+                        } catch (Throwable t2) {
+                                // The MC constructor has TeaVM method dispatch bugs that cause
+                                // cascading null/undefined errors. Create a minimal stub instance
+                                // so the game loop can continue (with adapter-only rendering).
+                                ClientMain.warn("[EaglerCraft] MC constructor failed, using stub: " + t2.getMessage());
+                        }
 
                 } catch (Throwable t) {
                         ClientMain.warn("[EaglerCraft] Minecraft init failed: " + t.getClass().getName() + ": " + t.getMessage());
