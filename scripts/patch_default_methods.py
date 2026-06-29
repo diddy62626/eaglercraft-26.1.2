@@ -975,7 +975,10 @@ def patch_classes_js(input_path, output_path):
     for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ',
                       'PNW', 'CJy', 'TvQ', 'Ezr', 'ETw',
                       'RMe', 'H7', 'D$Y', 'Utb',
-                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90']:
+                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90',
+                      # Wrap the MC constructor itself to prevent all cascading errors
+                      # This allows partial initialization instead of complete failure
+                      'EfF', 'W9f', 'SDq']:
         data, success = wrap_function_trycatch(data, func_name)
         if success:
             print(f"  Wrapped {func_name} in try/catch")
