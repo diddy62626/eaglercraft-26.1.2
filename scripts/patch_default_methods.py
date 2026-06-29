@@ -983,16 +983,16 @@ def patch_classes_js(input_path, output_path):
             print(f"  {func_name} not found or wrap failed")
 
     # Make .ek_() calls null-safe (method dispatch in MC constructor)
+    # Use (VAR.ek_||function(){return null;})(args) pattern to handle any args
     print("\nPatching .ek_() calls to be null-safe...")
     import re as _re_ek
-    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w])\.ek_\((\w)\)')
+    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w])\.ek_\(')
     ek_count = 0
     def ek_replace(m):
         nonlocal ek_count
         ek_count += 1
         var = m.group(1)
-        arg = m.group(2)
-        return f'({var}&&{var}.ek_?{var}.ek_({arg}):null)'
+        return f'({var}.ek_||function(){{return null;}})('
     data = ek_pattern.sub(ek_replace, data)
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
