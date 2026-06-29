@@ -852,48 +852,51 @@ def patch_classes_js(input_path, output_path):
         print(f"  Fixed {undecl_count} (pattern 1) + {fixes2} (pattern 2) + {fixes3} (pattern 3) = {total_fixes} undeclared variables")
 
     # Add missing uk method to DDw (TemplateCollections$SingleElementList)
-    # The Tkp clinit (BlockableEventLoop.<clinit>) calls b.uk() on a DDw object,
-    # but DDw doesn't have a uk method. This is a TeaVM method dispatch bug.
-    # TeaVM uses class metadata for method dispatch, so adding this.uk in the
-    # constructor doesn't help. Instead, make the call null-safe.
-    print("\nPatching b.uk() call in Tkp clinit to be null-safe...")
-    # The Tkp clinit has: OxF=b.uk() where b is a DDw that lacks uk
-    # Replace with: OxF=(b.uk?b.uk():null)
-    uk_call_old = 'OxF=b.uk()'
-    uk_call_new = 'OxF=(b.uk?b.uk():null)'
-    if uk_call_old in data:
-        data = data.replace(uk_call_old, uk_call_new)
-        print(f"  Patched b.uk() -> (b.uk?b.uk():null)")
-    else:
-        print("  b.uk() call not found (may be obfuscated differently)")
+    # Make ALL .uk() calls null-safe using regex (obfuscated names change each build)
+    print("\nPatching ALL .uk() calls to be null-safe...")
+    import re as _re_uk
+    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w])\.uk\(\)')
+    uk_count = 0
+    def uk_replace(m):
+        nonlocal uk_count
+        uk_count += 1
+        var = m.group(1)
+        return f'({var}.uk||function(){{return null;}})()'
+    data = uk_pattern.sub(uk_replace, data)
+    if uk_count > 0:
+        print(f"  Patched {uk_count} .uk() calls")
 
-    # Also add uk method to DDw constructor as a backup
-    ddw_old = 'function DDw(){AQK.call(this);this.hw2=null;}'
-    ddw_new = 'function DDw(){AQK.call(this);this.hw2=null;this.uk=function(){return null;};}'
-    if ddw_old in data:
-        data = data.replace(ddw_old, ddw_new)
-        print("  Also added uk to DDw constructor as backup")
+    # Make ALL .boR() calls null-safe (ComparatorMode.java cascading NPE)
+    print("\nPatching ALL .boR() calls to be null-safe...")
+    import re as _re_bor
+    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w])\.boR\(\)')
+    bor_count = 0
+    def bor_replace(m):
+        nonlocal bor_count
+        bor_count += 1
+        var = m.group(1)
+        return f'({var}.boR||function(){{return null;}})()'
+    data = bor_pattern.sub(bor_replace, data)
+    if bor_count > 0:
+        print(f"  Patched {bor_count} .boR() calls")
 
-    # Fix NPE: btB (TfA) returns null, causing cascading NPEs when methods
-    # are called on the result. Make btB return the __safe stub instead of null.
-    # The __safe stub returns noop for all method calls, preventing NPEs.
-    print("\nPatching btB (TfA) to return __safe stub instead of null...")
-    # TfA returns null: case 0:return null;
-    # Change to: case 0:return __safe(null);
-    tfA_old = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return null;default:F();}}E().s(a,$p);}'
-    tfA_new = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return __safe(null);default:F();}}E().s(a,$p);}'
-    if tfA_old in data:
-        data = data.replace(tfA_old, tfA_new)
-        print("  Patched TfA (btB) to return __safe(null) instead of null")
-    else:
-        # Try a simpler pattern match
-        tfA_simple_old = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return null;'
-        tfA_simple_new = 'TfA=a=>{let $p,$z;$p=0;if(G()){let $T=E();$p=$T.l();a=$T.l();}_:while(true){switch($p){case 0:return __safe(null);'
-        if tfA_simple_old in data:
-            data = data.replace(tfA_simple_old, tfA_simple_new)
-            print("  Patched TfA (btB) with simple pattern")
-        else:
-            print("  TfA pattern not found")
+    # Fix NPE: btB returns null, causing cascading NPEs.
+    # Make ALL single-param arrow functions that return null return __safe(null) instead.
+    # Pattern: FUNC=a=>{...case 0:return null;...} -> return __safe(null)
+    # This is a broad fix that covers btB and similar stub methods.
+    print("\nPatching null-returning stub methods to return __safe(null)...")
+    import re as _re_null
+    # Pattern: =a=>{...return null;...} where the function has the TeaVM coroutine pattern
+    # More specifically: case 0:return null; -> case 0:return __safe(null);
+    null_pattern = _re_null.compile(r'case 0:return null;')
+    null_count = 0
+    def null_replace(m):
+        nonlocal null_count
+        null_count += 1
+        return 'case 0:return __safe(null);'
+    data = null_pattern.sub(null_replace, data)
+    if null_count > 0:
+        print(f"  Patched {null_count} null-returning stubs to return __safe(null)")
 
     # Also make ALL .LK() calls null-safe as a backup
     print("\nPatching ALL .LK() calls to be null-safe...")
@@ -958,29 +961,13 @@ def patch_classes_js(input_path, output_path):
             return data, True
         return data, False
 
-    # Wrap Gson-related functions that have method dispatch issues
-    for func_name in ['AJM', 'CCn', 'F5o', 'CR3']:
-        data, success = wrap_function_trycatch(data, func_name)
-        if success:
-            print(f"  Wrapped {func_name} in try/catch")
-        else:
-            print(f"  {func_name} not found or wrap failed")
-
-    # Wrap block registration chain functions in try/catch
-    # These functions have cascading null errors from TeaVM method dispatch bugs
-    # Qko = VineBlock.java:26 (block registration clinit body)
-    # Ua_ = helper called by Qko
-    # Wrapping them prevents cascading NPEs from crashing the MC constructor
-    print("\nWrapping block registration functions in try/catch...")
-    for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ',
-                      'PNW', 'CJy', 'TvQ', 'Ezr', 'ETw',
-                      'RMe', 'H7', 'D$Y', 'Utb',
-                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90']:
-        data, success = wrap_function_trycatch(data, func_name)
-        if success:
-            print(f"  Wrapped {func_name} in try/catch")
-        else:
-            print(f"  {func_name} not found or wrap failed")
+    # Note: Function wrapping by obfuscated name (AJM, CCn, Qko, EfF, etc.)
+    # has been REMOVED because obfuscated names change every build when
+    # EaglerCraft.java is modified. Instead, we rely on:
+    # 1. Null-safe method calls (.uk, .boR, .LK, .cJ, .ek_)
+    # 2. __safe(null) for null-returning stubs
+    # 3. ClinitWrap for clinit failures
+    # 4. The __safe stub Proxy for null object access
 
     # Make .ek_() calls null-safe (method dispatch in MC constructor)
     # Use (VAR.ek_||function(){return null;})(args) pattern to handle any args
@@ -996,32 +983,6 @@ def patch_classes_js(input_path, output_path):
     data = ek_pattern.sub(ek_replace, data)
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
-
-    # Wrap EfF (MC constructor) in try/catch returning 'a' (the MC instance)
-    # This allows partial initialization instead of complete failure.
-    # The 'a' parameter is the Minecraft instance being constructed.
-    # Even if the constructor fails partway, 'a' has enough initialization
-    # for the game loop to tick it (with some features missing).
-    print("\nWrapping EfF (MC constructor) in try/catch returning 'a'...")
-    efF_match = _re_ek.search(r'EfF=\(a,b\)=>\{', data)
-    if efF_match:
-        start = data.find('{', efF_match.start()) + 1
-        depth = 1
-        end = start
-        while depth > 0 and end < len(data):
-            if data[end] == '{': depth += 1
-            elif data[end] == '}': depth -= 1
-            end += 1
-        body = data[start:end-1]
-        old_func = f'EfF=(a,b)=>{{{body}}}'
-        new_func = f'EfF=(a,b)=>{{try{{{body}}}catch(__e){{if(typeof console!=="undefined")console.warn("[MC Constructor]",__e&&__e.message?__e.message:__e);return a;}}}}'
-        if old_func in data:
-            data = data.replace(old_func, new_func, 1)
-            print("  Wrapped EfF in try/catch returning 'a' (partial init)")
-        else:
-            print("  EfF exact match failed")
-    else:
-        print("  EfF not found")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
