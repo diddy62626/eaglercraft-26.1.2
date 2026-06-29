@@ -989,7 +989,7 @@ def patch_classes_js(input_path, output_path):
     # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz
     # Use (VAR.method||function(){return null;})(args) pattern
     # This handles both no-arg and multi-arg calls
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz']:
         # Match VAR.method( with any args — just replace the VAR.method( part
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-z$\w])\.' + _re_methods.escape(method_name) + r'\('
