@@ -1006,7 +1006,26 @@ def patch_classes_js(input_path, output_path):
         if method_count > 0:
             print(f"  Patched {method_count} .{method_name}() calls")
 
-    # Make .data field accesses null-safe — wrap with __safe
+    # Make field accesses null-safe — wrap with __safe
+    # These are FIELD accesses (not method calls) that fail with
+    # "Cannot read properties of undefined (reading 'FIELD')"
+    # Pattern: VAR.FIELD -> (__safe(VAR).FIELD)
+    print("\nPatching field accesses to be null-safe...")
+    import re as _re_fields
+    for field_name in ['fdU', 'fw$', 'f6r', 'fEu', 'fbq', 'fc2', 'fcM', 'fhf',
+                       'gi1', 'fDY', 'htO', 'fsP', 'fnR']:
+        field_pattern = _re_fields.compile(
+            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
+        )
+        field_count = 0
+        def field_replace(m, _fn=field_name):
+            nonlocal field_count
+            field_count += 1
+            obj_expr = m.group(1)
+            return f'__safe({obj_expr}).{_fn}'
+        data = field_pattern.sub(field_replace, data)
+        if field_count > 0:
+            print(f"  Patched {field_count} .{field_name} field accesses")
     # Pattern: VAR.field.data -> (__safe(VAR.field).data||[])
     # This prevents "Cannot read properties of undefined (reading 'data')"
     print("\nPatching .data field accesses to be null-safe...")
@@ -1290,33 +1309,38 @@ def patch_null_return_stubs(data):
         # Add __safe helper at the top of the file
         helper = """
 // Null-return stub helper: returns obj as-is if non-null, shared stub if null.
-// The stub uses a Proxy that returns:
-//   - empty array [] for .data and .length (array-like accesses)
-//   - noop function for method calls (returns undefined)
-//   - the stub itself for property chaining (so a.b.c doesn't throw)
+// The stub is a CALLABLE Proxy — can be used as both object and function.
+// ALL property accesses return the stub itself, so any chain works:
+//   __safe(null).a.b.c.d -> stub (no throw)
+//   __safe(null).method() -> stub (callable)
+//   __safe(null).data -> [] (array-like)
+//   __safe(null) + 1 -> 1 (numeric)
+//   __safe(null) + '' -> '' (string)
 var __safeStub = null;
 var __safe = function(obj) {
     if (obj !== null && obj !== undefined) return obj;
     if (__safeStub) return __safeStub;
-    var noop = function() { return __safeStub; };
     var emptyArray = [];
-    var proto = new Proxy({}, {
+    __safeStub = new Proxy(function(){}, {
         get: function(t, p) {
             if (p === '$id$') return 0;
             if (p === 'data') return emptyArray;
             if (p === 'length') return 0;
             if (p === 'valueOf') return function() { return 0; };
             if (p === 'toString') return function() { return ''; };
-            if (p === 'Symbol(Symbol.toPrimitive)') return function() { return 0; };
+            if (p === 'constructor') return function() { return __safeStub; };
             if (typeof p === 'symbol') return undefined;
             if (typeof p === 'number') return undefined;
-            // Return noop for method calls; noop returns __safeStub
-            // so chained calls like a.b().c() don't throw
-            return noop;
-        }
+            // Return stub itself for ALL property accesses
+            // This ensures chained access like a.b.c.d never throws
+            return __safeStub;
+        },
+        apply: function() {
+            // When called as a function, return stub
+            return __safeStub;
+        },
+        has: function() { return true; }
     });
-    __safeStub = Object.create(proto);
-    __safeStub.$id$ = 0;
     return __safeStub;
 };
 """
