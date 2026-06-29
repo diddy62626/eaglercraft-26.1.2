@@ -1339,8 +1339,9 @@ var __safe = function(obj) {
             return __safeStub;
         },
         apply: function() {
-            // When called as a function, return stub
-            return __safeStub;
+            // When called as a function, return null (not stub)
+            // This allows while(x.method()!==null) loops to terminate
+            return null;
         },
         has: function() { return true; }
     });
