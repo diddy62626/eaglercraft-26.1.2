@@ -143,6 +143,9 @@ public class EaglerCraft {
          */
         private static Object minecraftInstance = null;
 
+        /** Tracks whether the MC tick has ever succeeded. */
+        private static boolean mcTickSucceeded = false;
+
         // ========== Initialization ==========
 
         /**
@@ -544,9 +547,12 @@ public class EaglerCraft {
                         try {
                                 net.minecraft.client.Minecraft mc = (net.minecraft.client.Minecraft) minecraftInstance;
                                 mc.tick();
+                                mcTickSucceeded = true;
                         } catch (Throwable t) {
                                 // MC tick errors shouldn't crash the game loop
-                                ClientMain.warn("[EaglerCraft] MC tick error: " + t.getMessage());
+                                if (mcTickSucceeded) {
+                                        ClientMain.warn("[EaglerCraft] MC tick error: " + t.getMessage());
+                                }
                         }
                 }
                 totalTicks++;
@@ -572,7 +578,7 @@ public class EaglerCraft {
                 // MC's run() method has its own render loop.
                 // We only render our fallback title screen if MC isn't running.
 
-                if (minecraftInstance instanceof net.minecraft.client.Minecraft) {
+                if (minecraftInstance instanceof net.minecraft.client.Minecraft && mcTickSucceeded) {
                         // MC handles its own rendering through its game loop.
                         // The MC instance's run() method manages tick + render.
                         // We just need to clear the framebuffer as a safety net.
@@ -583,6 +589,7 @@ public class EaglerCraft {
                 }
 
                 // Fallback: render the title screen using WebGL2
+                // (also used when MC tick hasn't succeeded yet — partial init)
                 PlatformOpenGL._wglClear(
                         WebGL2RenderingContext.COLOR_BUFFER_BIT
                         | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
