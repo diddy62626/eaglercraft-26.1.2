@@ -997,6 +997,32 @@ def patch_classes_js(input_path, output_path):
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
 
+    # Wrap EfF (MC constructor) in try/catch returning 'a' (the MC instance)
+    # This allows partial initialization instead of complete failure.
+    # The 'a' parameter is the Minecraft instance being constructed.
+    # Even if the constructor fails partway, 'a' has enough initialization
+    # for the game loop to tick it (with some features missing).
+    print("\nWrapping EfF (MC constructor) in try/catch returning 'a'...")
+    efF_match = _re_ek.search(r'EfF=\(a,b\)=>\{', data)
+    if efF_match:
+        start = data.find('{', efF_match.start()) + 1
+        depth = 1
+        end = start
+        while depth > 0 and end < len(data):
+            if data[end] == '{': depth += 1
+            elif data[end] == '}': depth -= 1
+            end += 1
+        body = data[start:end-1]
+        old_func = f'EfF=(a,b)=>{{{body}}}'
+        new_func = f'EfF=(a,b)=>{{try{{{body}}}catch(__e){{if(typeof console!=="undefined")console.warn("[MC Constructor]",__e&&__e.message?__e.message:__e);return a;}}}}'
+        if old_func in data:
+            data = data.replace(old_func, new_func, 1)
+            print("  Wrapped EfF in try/catch returning 'a' (partial init)")
+        else:
+            print("  EfF exact match failed")
+    else:
+        print("  EfF not found")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
