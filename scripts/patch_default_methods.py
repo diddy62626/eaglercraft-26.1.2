@@ -972,7 +972,8 @@ def patch_classes_js(input_path, output_path):
     # Ua_ = helper called by Qko
     # Wrapping them prevents cascading NPEs from crashing the MC constructor
     print("\nWrapping block registration functions in try/catch...")
-    for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ']:
+    for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ',
+                      'PNW', 'CJy', 'TvQ', 'Ezr', 'ETw']:
         data, success = wrap_function_trycatch(data, func_name)
         if success:
             print(f"  Wrapped {func_name} in try/catch")
