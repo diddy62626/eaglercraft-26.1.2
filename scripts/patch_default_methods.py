@@ -1006,28 +1006,10 @@ def patch_classes_js(input_path, output_path):
         if method_count > 0:
             print(f"  Patched {method_count} .{method_name}() calls")
 
-    # Make field accesses null-safe — wrap with __safe
-    # These are FIELD accesses (not method calls) that fail with
-    # "Cannot read properties of undefined (reading 'FIELD')"
-    # Pattern: VAR.FIELD -> (__safe(VAR).FIELD)
-    print("\nPatching field accesses to be null-safe...")
-    import re as _re_fields
-    for field_name in ['fdU', 'fw$', 'f6r', 'fEu', 'fbq', 'fc2', 'fcM', 'fhf',
-                       'gi1', 'fDY', 'htO', 'fsP', 'fnR']:
-        field_pattern = _re_fields.compile(
-            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
-        )
-        field_count = 0
-        def field_replace(m, _fn=field_name):
-            nonlocal field_count
-            field_count += 1
-            obj_expr = m.group(1)
-            return f'__safe({obj_expr}).{_fn}'
-        data = field_pattern.sub(field_replace, data)
-        if field_count > 0:
-            print(f"  Patched {field_count} .{field_name} field accesses")
+    # Make .data field accesses null-safe — MUST run BEFORE field access patches
     # Pattern: VAR.field.data -> (__safe(VAR.field).data||[])
     # This prevents "Cannot read properties of undefined (reading 'data')"
+    # Must run first so the field patches don't break the .data chain
     print("\nPatching .data field accesses to be null-safe...")
     import re as _re_data
     # Match VAR.data where VAR can be a field access chain
@@ -1044,6 +1026,27 @@ def patch_classes_js(input_path, output_path):
     data = data_pattern.sub(data_replace, data)
     if data_count > 0:
         print(f"  Patched {data_count} .data field accesses")
+
+    # Make field accesses null-safe — wrap with __safe
+    # These are FIELD accesses (not method calls) that fail with
+    # "Cannot read properties of undefined (reading 'FIELD')"
+    # Pattern: VAR.FIELD -> __safe(VAR).FIELD
+    print("\nPatching field accesses to be null-safe...")
+    import re as _re_fields
+    for field_name in ['fdU', 'fw$', 'f6r', 'fEu', 'fbq', 'fc2', 'fcM', 'fhf',
+                       'gi1', 'fDY', 'htO', 'fsP', 'fnR']:
+        field_pattern = _re_fields.compile(
+            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
+        )
+        field_count = 0
+        def field_replace(m, _fn=field_name):
+            nonlocal field_count
+            field_count += 1
+            obj_expr = m.group(1)
+            return f'__safe({obj_expr}).{_fn}'
+        data = field_pattern.sub(field_replace, data)
+        if field_count > 0:
+            print(f"  Patched {field_count} .{field_name} field accesses")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
