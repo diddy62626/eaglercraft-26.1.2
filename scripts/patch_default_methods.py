@@ -986,7 +986,7 @@ def patch_classes_js(input_path, output_path):
     # These are methods that fail with "is not a function" due to TeaVM dispatch bugs
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz
+    # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz, q1
     # Use (VAR.method||function(){return null;})(args) pattern
     # This handles both no-arg and multi-arg calls
     for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz']:
@@ -999,7 +999,7 @@ def patch_classes_js(input_path, output_path):
             nonlocal method_count
             method_count += 1
             var = m.group(1)
-            return f'({var}.{_mn}||function(){{return null;}})('
+            return f'(__safe({var}).{_mn}||function(){{return null;}})('
         data = method_pattern.sub(method_replace, data)
         if method_count > 0:
             print(f"  Patched {method_count} .{method_name}() calls")
