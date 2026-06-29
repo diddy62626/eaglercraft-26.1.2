@@ -984,6 +984,26 @@ def patch_classes_js(input_path, output_path):
     if ek_count > 0:
         print(f"  Patched {ek_count} .ek_() calls")
 
+    # Make additional method calls null-safe using the (VAR.method||noop)() pattern
+    # These are methods that fail with "is not a function" due to TeaVM dispatch bugs
+    print("\nPatching additional method calls to be null-safe...")
+    import re as _re_methods
+    # Methods that have been observed failing: eY, d_, PG, elf, dha, a7k, N4, oz
+    # Use (VAR.method||function(){return null;})() pattern
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4']:
+        method_pattern = _re_methods.compile(
+            r'(?<![\w$.])([a-z$\w])\.' + re.escape(method_name) + r'\(\)'
+        )
+        method_count = 0
+        def method_replace(m, _mn=method_name):
+            nonlocal method_count
+            method_count += 1
+            var = m.group(1)
+            return f'({var}.{_mn}||function(){{return null;}})()'
+        data = method_pattern.sub(method_replace, data)
+        if method_count > 0:
+            print(f"  Patched {method_count} .{method_name}() calls")
+
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
