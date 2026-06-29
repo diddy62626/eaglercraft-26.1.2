@@ -975,15 +975,27 @@ def patch_classes_js(input_path, output_path):
     for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ',
                       'PNW', 'CJy', 'TvQ', 'Ezr', 'ETw',
                       'RMe', 'H7', 'D$Y', 'Utb',
-                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90',
-                      # Wrap the MC constructor itself to prevent all cascading errors
-                      # This allows partial initialization instead of complete failure
-                      'EfF', 'W9f', 'SDq']:
+                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90']:
         data, success = wrap_function_trycatch(data, func_name)
         if success:
             print(f"  Wrapped {func_name} in try/catch")
         else:
             print(f"  {func_name} not found or wrap failed")
+
+    # Make .ek_() calls null-safe (method dispatch in MC constructor)
+    print("\nPatching .ek_() calls to be null-safe...")
+    import re as _re_ek
+    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w])\.ek_\((\w)\)')
+    ek_count = 0
+    def ek_replace(m):
+        nonlocal ek_count
+        ek_count += 1
+        var = m.group(1)
+        arg = m.group(2)
+        return f'({var}&&{var}.ek_?{var}.ek_({arg}):null)'
+    data = ek_pattern.sub(ek_replace, data)
+    if ek_count > 0:
+        print(f"  Patched {ek_count} .ek_() calls")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
