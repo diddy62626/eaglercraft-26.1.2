@@ -974,7 +974,8 @@ def patch_classes_js(input_path, output_path):
     print("\nWrapping block registration functions in try/catch...")
     for func_name in ['Qko', 'Ua_', 'W1m', 'Vru', 'KR0', 'Cle', 'DLP', 'NlJ',
                       'PNW', 'CJy', 'TvQ', 'Ezr', 'ETw',
-                      'RMe', 'H7', 'D$Y', 'Utb']:
+                      'RMe', 'H7', 'D$Y', 'Utb',
+                      'Q4l', 'Kb7', 'EUM', 'Q86', 'E90']:
         data, success = wrap_function_trycatch(data, func_name)
         if success:
             print(f"  Wrapped {func_name} in try/catch")
