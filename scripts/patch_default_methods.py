@@ -1083,23 +1083,6 @@ def patch_classes_js(input_path, output_path):
         print("  Patched BD function for null safety")
     else:
         print("  BD function not found (may have different signature)")
-    # Also patch Bo and JF which use BigInt.asIntN
-    for bigint_func in ['Bo', 'JF', 'BX']:
-        old_pattern = bigint_func + '='
-        idx = data.find(old_pattern)
-        if idx >= 0:
-            end = data.find(',', idx)
-            func_text = data[idx:end]
-            if 'BigInt' in func_text and 'try{' not in func_text:
-                # Wrap in try/catch
-                # Extract the arrow function body
-                arrow_idx = func_text.find('=>')
-                if arrow_idx >= 0:
-                    body = func_text[arrow_idx+2:]
-                    params = func_text[len(bigint_func)+1:arrow_idx]
-                    new_func = bigint_func + '=' + params + '=>{try{' + body + '}catch(e){return 0;}}'
-                    data = data.replace(func_text, new_func, 1)
-                    print(f"  Patched {bigint_func} for BigInt null safety")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
