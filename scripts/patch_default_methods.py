@@ -991,7 +991,7 @@ def patch_classes_js(input_path, output_path):
     #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
@@ -1039,7 +1039,7 @@ def patch_classes_js(input_path, output_path):
                        'gIP', 'gJw', 'gMN', 'gRl', 'g_H', 'gvc', 'gR1',
                        'hyH', 'hlW', 'hY_', 'hiv', 'gFc', 'giT', 'gWp',
                        'g$k', 'fbl', 'faa', 'fa9', 'fgh', 'gdS', 'gC9', 'ha0', 'ha',
-                       'fg0', 'fmR', 'fdO', 'fh_', 'fiy', 'bHU', 'bHu', 'fpz', 'fdb']:
+                       'fg0', 'fmR', 'fdO', 'fh_', 'fiy', 'fpz', 'fdb', 'fFj']:
         field_pattern = _re_fields.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
         )
