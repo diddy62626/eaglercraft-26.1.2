@@ -1081,6 +1081,20 @@ def patch_classes_js(input_path, output_path):
     data = data.replace('BigInt.asIntN(', '__safeAsIntN(')
     # Replace BigInt.asUintN( with __safeAsUintN(
     data = data.replace('BigInt.asUintN(', '__safeAsUintN(')
+    # Add safe wrapper definitions at the VERY TOP of the file
+    # Must be before any function that uses them (line 49+)
+    bigint_wrappers = """
+var __safeAsIntN = function(bits, val) {
+    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
+    try { return BigInt.asIntN(bits, val); } catch(e) { return 0n; }
+};
+var __safeAsUintN = function(bits, val) {
+    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
+    try { return BigInt.asUintN(bits, val); } catch(e) { return 0n; }
+};
+"""
+    data = bigint_wrappers + data
+    print("  Added BigInt safe wrappers at top of file")
     # Wrap ALL functions containing BigInt operations in try/catch
     # The error happens during ARGUMENT evaluation (val>>BigInt(32))
     # before __safeAsIntN is called, so the wrapper alone isn't enough.
