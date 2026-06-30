@@ -1095,73 +1095,25 @@ var __safeAsUintN = function(bits, val) {
 """
     data = bigint_wrappers + data
     print("  Added BigInt safe wrappers at top of file")
-    # Wrap functions containing BigInt constructor (BigInt(N)) in try/catch
-    # The regex approach fails because of commas inside function arguments.
-    # Instead, search for all arrow functions containing BigInt( and wrap them.
-    print("\nWrapping BigInt constructor functions in try/catch...")
-    import re as _re_bi_ctor
-    # Find: NAME=PARAM=>EXPR containing BigInt( but NOT already wrapped in try{
-    # Use a simpler pattern: find =>...BigInt(... and walk to end of function
+    # Wrap simple BigInt arrow functions in try/catch
+    # Only match simple arrow functions (no braces) containing BigInt
+    # Skip functions with { (if/else blocks) to avoid breaking syntax
+    print("\nWrapping simple BigInt functions in try/catch...")
+    import re as _re_bi_simple
+    # Match: NAME=PARAM=>EXPR_WITH_BIGINT (no { in EXPR, ends at , or ;)
+    bi_simple_pattern = _re_bi_simple.compile(
+        r'(\w+=(?:\w+|\(\w+(?:,\w+)*\))=>)(BigInt[^,;{}]+)(?=[,;])'
+    )
     bi_count = 0
-    pos = 0
-    while True:
-        # Find next BigInt( that's NOT inside __safeAsIntN/__safeAsUintN
-        idx = data.find('BigInt(', pos)
-        if idx < 0:
-            break
-        pos = idx + 7  # move past BigInt(
-
-        # Check if this is inside __safeAsIntN/__safeAsUintN (skip those)
-        prefix = data[max(0,idx-20):idx]
-        if 'safeAs' in prefix:
-            continue
-
-        # Find the enclosing arrow function: search backwards for =>
-        arrow_idx = data.rfind('=>', max(0, idx-200), idx)
-        if arrow_idx < 0:
-            continue
-
-        # Find the function name (search backwards from =>)
-        eq_idx = data.rfind('=', max(0, arrow_idx-20), arrow_idx)
-        if eq_idx < 0:
-            continue
-        func_start = eq_idx - 1
-        while func_start > 0 and data[func_start-1] in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789':
-            func_start -= 1
-
-        # Check if already has try{
-        check_region = data[func_start:idx]
-        if 'try{' in check_region or 'typeof' in check_region:
-            continue
-
-        # Find end of function: next comma at depth 0
-        depth = 0
-        end = arrow_idx + 2
-        while end < len(data):
-            if data[end] == '(':
-                depth += 1
-            elif data[end] == ')':
-                depth -= 1
-            elif data[end] == ',' and depth == 0:
-                break
-            elif data[end] == ';' and depth == 0:
-                break
-            end += 1
-
-        # Extract the function
-        func_text = data[func_start:end]
-        if '=>' in func_text and 'BigInt' in func_text and 'try{' not in func_text:
-            # Extract params and body
-            arrow_pos = func_text.find('=>')
-            name_and_params = func_text[:arrow_pos]
-            body = func_text[arrow_pos+2:]
-            new_func = name_and_params + '=>{try{return ' + body + ';}catch(e){return 0;}}'
-            data = data[:func_start] + new_func + data[end:]
-            bi_count += 1
-            pos = func_start + len(new_func)
-
+    def bi_simple_replace(m):
+        nonlocal bi_count
+        prefix = m.group(1)
+        body = m.group(2)
+        bi_count += 1
+        return f'{prefix}{{try{{return {body};}}catch(e){{return 0;}}}}'
+    data = bi_simple_pattern.sub(bi_simple_replace, data)
     if bi_count > 0:
-        print(f"  Wrapped {bi_count} BigInt constructor functions in try/catch")
+        print(f"  Wrapped {bi_count} simple BigInt functions")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
