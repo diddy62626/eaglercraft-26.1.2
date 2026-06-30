@@ -991,7 +991,7 @@ def patch_classes_js(input_path, output_path):
     #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
@@ -1039,7 +1039,7 @@ def patch_classes_js(input_path, output_path):
                        'gIP', 'gJw', 'gMN', 'gRl', 'g_H', 'gvc', 'gR1',
                        'hyH', 'hlW', 'hY_', 'hiv', 'gFc', 'giT', 'gWp',
                        'g$k', 'fbl', 'faa', 'fa9', 'fgh', 'gdS', 'gC9', 'ha0', 'ha',
-                       'fg0', 'fmR', 'fdO', 'fh_']:
+                       'fg0', 'fmR', 'fdO', 'fh_', 'fiy', 'bHU', 'bHu']:
         field_pattern = _re_fields.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
         )
@@ -1073,7 +1073,23 @@ def patch_classes_js(input_path, output_path):
     if arr_count > 0:
         print(f"  Wrapped {arr_count} array access results with __safe")
 
-    # Patch jl_Throwable_addSuppressed to handle null suppressed array
+    # Fix BigInt conversion errors — wrap BD function to handle undefined
+    # Error: "Cannot convert undefined to a BigInt" at BigInt.asIntN
+    print("\nPatching BD (BigInt) function for null safety...")
+    bd_old = 'BD=(a,b)=>{return BigInt.asIntN(a,b);}'
+    bd_new = 'BD=(a,b)=>{if(b===null||b===undefined)return 0n;try{return BigInt.asIntN(a,b);}catch(e){return 0n;}}'
+    if bd_old in data:
+        data = data.replace(bd_old, bd_new)
+        print("  Patched BD function for null safety")
+    else:
+        # Try alternate pattern
+        import re as _re_bd
+        bd_pattern2 = _re_bd.compile(r'(BD=\([^)]*\)=>\{)([^}]*BigInt\.asIntN[^}]*)(\})')
+        if bd_pattern2.search(data):
+            data = bd_pattern2.sub(lambda m: m.group(1) + 'if(b===null||b===undefined)return 0n;try{' + m.group(2) + '}catch(e){return 0n;}' + m.group(3), data)
+            print("  Patched BD function (pattern 2)")
+        else:
+            print("  BD function not found")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
