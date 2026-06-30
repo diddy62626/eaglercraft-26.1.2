@@ -991,7 +991,7 @@ def patch_classes_js(input_path, output_path):
     #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
@@ -1034,7 +1034,11 @@ def patch_classes_js(input_path, output_path):
     print("\nPatching field accesses to be null-safe...")
     import re as _re_fields
     for field_name in ['fdU', 'fw$', 'f6r', 'fEu', 'fbq', 'fc2', 'fcM', 'fhf',
-                       'gi1', 'fDY', 'htO', 'fsP', 'fnR']:
+                       'gi1', 'fDY', 'htO', 'fsP', 'fnR', 'b5', 'fc0', 'bTt',
+                       'ekN', 'fWu', 'g0p', 'hdT', 'gev', 'gpC', 'frw',
+                       'gIP', 'gJw', 'gMN', 'gRl', 'g_H', 'gvc', 'gR1',
+                       'hyH', 'hlW', 'hY_', 'hiv', 'gFc', 'giT', 'gWp',
+                       'g$k', 'fbl', 'faa', 'fa9', 'fgh', 'gdS', 'gC9']:
         field_pattern = _re_fields.compile(
             r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
         )
@@ -1047,6 +1051,26 @@ def patch_classes_js(input_path, output_path):
         data = field_pattern.sub(field_replace, data)
         if field_count > 0:
             print(f"  Patched {field_count} .{field_name} field accesses")
+
+    # Wrap array element access results with __safe
+    # Pattern: =EXPR[VAR] -> =__safe(EXPR[VAR])
+    # This prevents undefined from array access propagating to field access
+    print("\nWrapping array access results with __safe...")
+    import re as _re_arr
+    # Match =[EXPR][VAR] where EXPR ends with .data or is a variable
+    # Only match simple cases: =(VAR.data)[VAR] and =VAR[VAR]
+    arr_pattern = _re_arr.compile(r'=(\w+\.\w+\[)(\w)(\])')
+    arr_count = 0
+    def arr_replace(m):
+        nonlocal arr_count
+        arr_count += 1
+        prefix = m.group(1)
+        idx_var = m.group(2)
+        suffix = m.group(3)
+        return f'=__safe({prefix}{idx_var}{suffix})'
+    data = arr_pattern.sub(arr_replace, data)
+    if arr_count > 0:
+        print(f"  Wrapped {arr_count} array access results with __safe")
 
     # Patch jl_Throwable_addSuppressed to handle null suppressed array
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
