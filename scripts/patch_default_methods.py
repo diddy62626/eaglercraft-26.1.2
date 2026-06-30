@@ -1081,7 +1081,8 @@ def patch_classes_js(input_path, output_path):
     data = data.replace('BigInt.asIntN(', '__safeAsIntN(')
     # Replace BigInt.asUintN( with __safeAsUintN(
     data = data.replace('BigInt.asUintN(', '__safeAsUintN(')
-    # Add safe wrappers at the top of the file (after __safe)
+    # Add safe wrappers at the VERY TOP of the file (before any function definitions)
+    # Line 49 has BigInt calls that execute before the __safe definition
     bigint_wrappers = """
 var __safeAsIntN = function(bits, val) {
     if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
@@ -1092,14 +1093,9 @@ var __safeAsUintN = function(bits, val) {
     try { return BigInt.asUintN(bits, val); } catch(e) { return 0n; }
 };
 """
-    # Insert after the __safe definition
-    safe_end = data.find('};', data.find('var __safe'))
-    if safe_end >= 0:
-        data = data[:safe_end+2] + bigint_wrappers + data[safe_end+2:]
-        print("  Replaced BigInt.asIntN/asUintN with safe wrappers")
-    else:
-        data = bigint_wrappers + data
-        print("  Added safe wrappers at top of file")
+    # Insert at the very beginning of the file
+    data = bigint_wrappers + data
+    print("  Added BigInt safe wrappers at top of file")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
