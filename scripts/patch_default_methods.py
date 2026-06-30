@@ -1073,16 +1073,33 @@ def patch_classes_js(input_path, output_path):
     if arr_count > 0:
         print(f"  Wrapped {arr_count} array access results with __safe")
 
-    # Fix BigInt conversion errors — BD function uses BigInt.asIntN
-    # Actual: BD=val=>Number(BigInt.asIntN(32,val))|0
-    print("\nPatching BD (BigInt) function for null safety...")
-    bd_old = 'BD=val=>Number(BigInt.asIntN(32,val))|0'
-    bd_new = 'BD=val=>{if(val===null||val===undefined)return 0;try{return Number(BigInt.asIntN(32,val))|0;}catch(e){return 0;}}'
-    if bd_old in data:
-        data = data.replace(bd_old, bd_new)
-        print("  Patched BD function for null safety")
-    else:
-        print("  BD function not found (may have different signature)")
+    # Fix BigInt conversion errors — BD and Gb functions use BigInt.asIntN
+    print("\nPatching BigInt functions for null safety...")
+    for bigint_old, bigint_new in [
+        ('BD=val=>Number(BigInt.asIntN(32,val))|0',
+         'BD=val=>{if(val===null||val===undefined)return 0;try{return Number(BigInt.asIntN(32,val))|0;}catch(e){return 0;}}'),
+        ('Gb=val=>Number(BigInt.asIntN(64,val>>BigInt(32)))|0',
+         'Gb=val=>{if(val===null||val===undefined)return 0;try{return Number(BigInt.asIntN(64,val>>BigInt(32)))|0;}catch(e){return 0;}}'),
+    ]:
+        if bigint_old in data:
+            data = data.replace(bigint_old, bigint_new)
+            print(f"  Patched {bigint_old[:20]}...")
+        else:
+            # Try partial match
+            short_name = bigint_old.split('=')[0]
+            idx = data.find(short_name + '=')
+            if idx >= 0:
+                end = data.find(',', idx)
+                func_text = data[idx:end]
+                if 'BigInt' in func_text and 'try{' not in func_text:
+                    # Extract params and body
+                    arrow_idx = func_text.find('=>')
+                    if arrow_idx >= 0:
+                        params = func_text[len(short_name)+1:arrow_idx]
+                        body = func_text[arrow_idx+2:]
+                        new_func = short_name + '=' + params + '=>{try{' + body + '}catch(e){return 0;}}'
+                        data = data.replace(func_text, new_func, 1)
+                        print(f"  Patched {short_name} (partial match)")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
