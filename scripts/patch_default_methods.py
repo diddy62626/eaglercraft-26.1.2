@@ -1074,32 +1074,48 @@ def patch_classes_js(input_path, output_path):
         print(f"  Wrapped {arr_count} array access results with __safe")
 
     # Fix BigInt conversion errors — BD and Gb functions use BigInt.asIntN
+    # The error "Cannot mix BigInt and other types" happens when val is a
+    # number but the function tries to use BigInt operations on it.
+    # Fix: check if val is a BigInt before doing BigInt operations.
     print("\nPatching BigInt functions for null safety...")
     for bigint_old, bigint_new in [
         ('BD=val=>Number(BigInt.asIntN(32,val))|0',
-         'BD=val=>{if(val===null||val===undefined)return 0;try{return Number(BigInt.asIntN(32,val))|0;}catch(e){return 0;}}'),
+         'BD=val=>{if(val===null||val===undefined||typeof val!==\'bigint\')return 0;try{return Number(BigInt.asIntN(32,val))|0;}catch(e){return 0;}}'),
         ('Gb=val=>Number(BigInt.asIntN(64,val>>BigInt(32)))|0',
-         'Gb=val=>{if(val===null||val===undefined)return 0;try{return Number(BigInt.asIntN(64,val>>BigInt(32)))|0;}catch(e){return 0;}}'),
+         'Gb=val=>{if(val===null||val===undefined||typeof val!==\'bigint\')return 0;try{return Number(BigInt.asIntN(64,val>>BigInt(32)))|0;}catch(e){return 0;}}'),
     ]:
         if bigint_old in data:
             data = data.replace(bigint_old, bigint_new)
             print(f"  Patched {bigint_old[:20]}...")
         else:
-            # Try partial match
+            # Try partial match for already-patched versions
             short_name = bigint_old.split('=')[0]
-            idx = data.find(short_name + '=')
+            old_prefix = short_name + '=val=>Number(BigInt.asIntN('
+            idx = data.find(old_prefix)
             if idx >= 0:
                 end = data.find(',', idx)
                 func_text = data[idx:end]
-                if 'BigInt' in func_text and 'try{' not in func_text:
-                    # Extract params and body
+                if 'BigInt' in func_text and 'typeof val' not in func_text:
                     arrow_idx = func_text.find('=>')
                     if arrow_idx >= 0:
-                        params = func_text[len(short_name)+1:arrow_idx]
                         body = func_text[arrow_idx+2:]
-                        new_func = short_name + '=' + params + '=>{try{' + body + '}catch(e){return 0;}}'
+                        new_func = short_name + '=val=>{if(val===null||val===undefined||typeof val!==\'bigint\')return 0;try{' + body + '}catch(e){return 0;}}'
                         data = data.replace(func_text, new_func, 1)
                         print(f"  Patched {short_name} (partial match)")
+            else:
+                # Check if already patched with try but missing typeof check
+                try_prefix = short_name + '=val=>{if(val===null||val===undefined)return 0;try{'
+                idx2 = data.find(try_prefix)
+                if idx2 >= 0:
+                    end2 = data.find('}', data.find('catch', idx2)) + 1
+                    func_text2 = data[idx2:end2]
+                    if 'typeof val' not in func_text2:
+                        new_func2 = func_text2.replace(
+                            'if(val===null||val===undefined)return 0;',
+                            'if(val===null||val===undefined||typeof val!==\'bigint\')return 0;'
+                        )
+                        data = data.replace(func_text2, new_func2, 1)
+                        print(f"  Updated {short_name} with typeof check")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
