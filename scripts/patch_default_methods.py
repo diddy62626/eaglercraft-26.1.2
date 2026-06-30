@@ -1081,21 +1081,31 @@ def patch_classes_js(input_path, output_path):
     data = data.replace('BigInt.asIntN(', '__safeAsIntN(')
     # Replace BigInt.asUintN( with __safeAsUintN(
     data = data.replace('BigInt.asUintN(', '__safeAsUintN(')
-    # Add safe wrappers at the VERY TOP of the file (before any function definitions)
-    # Line 49 has BigInt calls that execute before the __safe definition
-    bigint_wrappers = """
-var __safeAsIntN = function(bits, val) {
-    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
-    try { return BigInt.asIntN(bits, val); } catch(e) { return 0n; }
-};
-var __safeAsUintN = function(bits, val) {
-    if (val === null || val === undefined || typeof val !== 'bigint') return 0n;
-    try { return BigInt.asUintN(bits, val); } catch(e) { return 0n; }
-};
-"""
-    # Insert at the very beginning of the file
-    data = bigint_wrappers + data
-    print("  Added BigInt safe wrappers at top of file")
+    # Wrap ALL functions containing BigInt operations in try/catch
+    # The error happens during ARGUMENT evaluation (val>>BigInt(32))
+    # before __safeAsIntN is called, so the wrapper alone isn't enough.
+    print("\nWrapping ALL BigInt functions in try/catch...")
+    import re as _re_bigint_func
+    # Find arrow functions that contain BigInt (not BigInt.asIntN which is replaced)
+    # Pattern: NAME=PARAMS=>BODY where BODY contains BigInt
+    # Only match simple arrow functions (no braces) that have BigInt
+    bigint_func_pattern = _re_bigint_func.compile(
+        r'(\w+)=(\w+)=>([^,;{}]*BigInt[^,;{}]*)(?=[,;])'
+    )
+    bigint_func_count = 0
+    def bigint_func_replace(m):
+        nonlocal bigint_func_count
+        name = m.group(1)
+        param = m.group(2)
+        body = m.group(3)
+        # Skip if already has try{
+        if 'try{' in body or 'try {' in body:
+            return m.group(0)
+        bigint_func_count += 1
+        return f'{name}={param}=>{{try{{return {body};}}catch(e){{return 0;}}}}'
+    data = bigint_func_pattern.sub(bigint_func_replace, data)
+    if bigint_func_count > 0:
+        print(f"  Wrapped {bigint_func_count} BigInt functions in try/catch")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
