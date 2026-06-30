@@ -1358,9 +1358,11 @@ var __safe = function(obj) {
             if (p === 'constructor') return function() { return __safeStub; };
             if (typeof p === 'symbol') return undefined;
             if (typeof p === 'number') return undefined;
-            // Return stub itself for ALL property accesses
-            // This ensures chained access like a.b.c.d never throws
-            return __safeStub;
+            // Return null for ALL property accesses
+            // This allows while(x.field!==null) loops to terminate
+            // For method calls, use (obj.method||noop)() pattern which
+            // checks if method exists before calling
+            return null;
         },
         apply: function() {
             // When called as a function, return null (not stub)
