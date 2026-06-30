@@ -855,7 +855,7 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .uk() calls null-safe using regex (obfuscated names change each build)
     print("\nPatching ALL .uk() calls to be null-safe...")
     import re as _re_uk
-    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.uk\(')
+    uk_pattern = _re_uk.compile(r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.uk\(')
     uk_count = 0
     def uk_replace(m):
         nonlocal uk_count
@@ -869,7 +869,7 @@ def patch_classes_js(input_path, output_path):
     # Make ALL .boR() calls null-safe (ComparatorMode.java cascading NPE)
     print("\nPatching ALL .boR() calls to be null-safe...")
     import re as _re_bor
-    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.boR\(')
+    bor_pattern = _re_bor.compile(r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.boR\(')
     bor_count = 0
     def bor_replace(m):
         nonlocal bor_count
@@ -901,7 +901,7 @@ def patch_classes_js(input_path, output_path):
     # Also make ALL .LK() calls null-safe as a backup
     print("\nPatching ALL .LK() calls to be null-safe...")
     import re as _re_lk
-    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.LK\(')
+    lk_pattern = _re_lk.compile(r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.LK\(')
     lk_count = 0
     def lk_replace(m):
         nonlocal lk_count
@@ -919,7 +919,7 @@ def patch_classes_js(input_path, output_path):
     import re as _re_cj
     # Only match simple arguments (no nested parens): VAR.cJ(simple_arg)
     # Pattern: VAR.cJ(VAR2) where VAR2 is a simple variable
-    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.cJ\(')
+    cj_pattern = _re_cj.compile(r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.cJ\(')
     cj_count = 0
     def cj_replace(m):
         nonlocal cj_count
@@ -971,7 +971,7 @@ def patch_classes_js(input_path, output_path):
     # Use (VAR.ek_||function(){return null;})(args) pattern to handle any args
     print("\nPatching .ek_() calls to be null-safe...")
     import re as _re_ek
-    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.ek_\(')
+    ek_pattern = _re_ek.compile(r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.ek_\(')
     ek_count = 0
     def ek_replace(m):
         nonlocal ek_count
@@ -994,7 +994,7 @@ def patch_classes_js(input_path, output_path):
     for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
-            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
+            r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
         )
         method_count = 0
         def method_replace(m, _mn=method_name):
@@ -1015,7 +1015,7 @@ def patch_classes_js(input_path, output_path):
     # Match VAR.data where VAR can be a field access chain
     # Only match .data followed by . or [ (array-like access)
     data_pattern = _re_data.compile(
-        r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.data(?=[.\[])'
+        r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.data(?=[.\[])'
     )
     data_count = 0
     def data_replace(m):
@@ -1041,7 +1041,7 @@ def patch_classes_js(input_path, output_path):
                        'g$k', 'fbl', 'faa', 'fa9', 'fgh', 'gdS', 'gC9', 'ha0', 'ha',
                        'fg0', 'fmR', 'fdO', 'fh_', 'fiy', 'fpz', 'fdb', 'fFj']:
         field_pattern = _re_fields.compile(
-            r'(?<![\w$.])([a-z$\w](?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
+            r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.' + _re_fields.escape(field_name) + r'(?![\w(])'
         )
         field_count = 0
         def field_replace(m, _fn=field_name):
