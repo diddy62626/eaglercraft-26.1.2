@@ -991,7 +991,7 @@ def patch_classes_js(input_path, output_path):
     #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU', 'ks', 'O']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
@@ -1114,6 +1114,47 @@ var __safeAsUintN = function(bits, val) {
     data = bi_simple_pattern.sub(bi_simple_replace, data)
     if bi_count > 0:
         print(f"  Wrapped {bi_count} simple BigInt functions")
+
+    # Also directly patch Gb which has commas in its body
+    # Gb=val=>Number(__safeAsIntN(64,val>>BigInt(32)))|0
+    # The error: val>>BigInt(32) throws when val is a number
+    gb_old = 'Gb=val=>Number(__safeAsIntN(64,val>>BigInt(32)))|0'
+    gb_new = 'Gb=val=>{try{return Number(__safeAsIntN(64,val>>BigInt(32)))|0;}catch(e){return 0;}}'
+    if gb_old in data:
+        data = data.replace(gb_old, gb_new)
+        print("  Patched Gb (direct replacement)")
+
+    # Also patch Bo, JF, BX, CI, CP which use __safeAsIntN with arithmetic
+    # These can fail if arguments aren't BigInts
+    for func_name in ['Bo', 'JF', 'BX', 'CI', 'CP', 'T', 'KM']:
+        # Find the function
+        func_prefix = func_name + '='
+        idx = data.find(func_prefix)
+        if idx < 0:
+            continue
+        # Get the function text (up to next comma at depth 0)
+        depth = 0
+        end = idx
+        for i in range(idx, min(len(data), idx+200)):
+            c = data[i]
+            if c == '(':
+                depth += 1
+            elif c == ')':
+                depth -= 1
+            elif c == ',' and depth == 0:
+                end = i
+                break
+        func_text = data[idx:end]
+        # Check if it has __safeAsIntN/__safeAsUintN and no try{
+        if ('__safeAs' in func_text and 'try{' not in func_text and
+            '=>' in func_text and '{' not in func_text[func_text.find('=>')+2:]):
+            # Wrap in try/catch
+            arrow_pos = func_text.find('=>')
+            name_params = func_text[:arrow_pos+2]
+            body = func_text[arrow_pos+2:]
+            new_func = name_params + '{try{return ' + body + ';}catch(e){return 0;}}'
+            data = data.replace(func_text, new_func, 1)
+            print(f"  Patched {func_name} (try/catch wrapper)")
     print("\nPatching jl_Throwable_addSuppressed for null safety...")
     data = patch_add_suppressed(data)
 
