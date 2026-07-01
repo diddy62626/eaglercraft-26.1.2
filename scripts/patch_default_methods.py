@@ -1014,7 +1014,7 @@ def patch_classes_js(input_path, output_path):
     # Match VAR.data where VAR can be a field access chain
     # Only match .data followed by . or [ (array-like access)
     data_pattern = _re_data.compile(
-        r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.data(?=[.\[])'
+        r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.data(?=[.\[;,\)])'
     )
     data_count = 0
     def data_replace(m):
@@ -1029,7 +1029,7 @@ def patch_classes_js(input_path, output_path):
     # Also patch __safe(VAR).data which was already wrapped but data is null
     # Pattern: __safe(VAR).data. -> (__safe(VAR).data||[]).
     # This handles the case where __safe returns a real object but .data is null
-    safe_data_pattern = _re_data.compile(r'__safe\(([^)]+)\)\.data(?=[.\[])')
+    safe_data_pattern = _re_data.compile(r'__safe\(([^)]+)\)\.data(?=[.\[;,\)])')
     safe_data_count = 0
     def safe_data_replace(m):
         nonlocal safe_data_count
