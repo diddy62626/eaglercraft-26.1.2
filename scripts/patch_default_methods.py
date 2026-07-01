@@ -991,7 +991,7 @@ def patch_classes_js(input_path, output_path):
     #   b.c.d.q1(   -> __safe(b.c.d).q1
     print("\nPatching additional method calls to be null-safe...")
     import re as _re_methods
-    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU', 'ks', 'O', 'b8', 'dEy', 'W0', 'Ah']:
+    for method_name in ['eY', 'd_', 'PG', 'elf', 'dha', 'a7k', 'N4', 'q1', 'oz', 'b5', 'W', 'cI', 'X', 'bHU', 'ks', 'O', 'b8', 'dEy', 'W0', 'Ah', 'bZ8', 'P', 'bXt', 'dEA']:
         # Match VAR.field.field.method( — capture the full object expression
         method_pattern = _re_methods.compile(
             r'(?<![\w$.])([a-zA-Z$\w]\w*(?:\.\w+)*)\.' + _re_methods.escape(method_name) + r'\('
