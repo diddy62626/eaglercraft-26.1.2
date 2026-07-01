@@ -1008,8 +1008,7 @@ def patch_classes_js(input_path, output_path):
 
     # Make .data field accesses null-safe — MUST run BEFORE field access patches
     # Pattern: VAR.field.data -> (__safe(VAR.field).data||[])
-    # This prevents "Cannot read properties of undefined (reading 'data')"
-    # Must run first so the field patches don't break the .data chain
+    # Also handles when .data itself is null (not just the parent)
     print("\nPatching .data field accesses to be null-safe...")
     import re as _re_data
     # Match VAR.data where VAR can be a field access chain
@@ -1026,6 +1025,20 @@ def patch_classes_js(input_path, output_path):
     data = data_pattern.sub(data_replace, data)
     if data_count > 0:
         print(f"  Patched {data_count} .data field accesses")
+
+    # Also patch __safe(VAR).data which was already wrapped but data is null
+    # Pattern: __safe(VAR).data. -> (__safe(VAR).data||[]).
+    # This handles the case where __safe returns a real object but .data is null
+    safe_data_pattern = _re_data.compile(r'__safe\(([^)]+)\)\.data(?=[.\[])')
+    safe_data_count = 0
+    def safe_data_replace(m):
+        nonlocal safe_data_count
+        safe_data_count += 1
+        var = m.group(1)
+        return f'(__safe({var}).data||[])'
+    data = safe_data_pattern.sub(safe_data_replace, data)
+    if safe_data_count > 0:
+        print(f"  Patched {safe_data_count} __safe(VAR).data accesses")
 
     # Make field accesses null-safe — wrap with __safe
     # These are FIELD accesses (not method calls) that fail with
